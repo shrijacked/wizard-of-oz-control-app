@@ -5,12 +5,14 @@ const http = require('node:http');
 const path = require('node:path');
 const { URL } = require('node:url');
 
+const { AdminGuard } = require('./admin-guard');
 const { ExperimentStore } = require('./store');
 const { WebSocketHub } = require('./websocket-hub');
 const { WatchBridge } = require('./watch-bridge');
 const { GazeBridge } = require('./gaze-bridge');
 const { getLocalNetworkAddresses } = require('./network');
 const { LlmAdvisor } = require('./llm-advisor');
+const { assertPolicy, buildPolicy } = require('./session-policy');
 
 const ROBOT_ACTIONS = [
   { actionId: 'function-1', label: 'Function 1: Move Square' },
@@ -100,6 +102,9 @@ function text(response, statusCode, payload, headers = {}) {
 async function createApp(options = {}) {
   const port = Number(options.port || process.env.PORT || 3000);
   const publicDir = options.publicDir || path.join(process.cwd(), 'public');
+  const adminGuard = options.adminGuard || new AdminGuard({
+    pin: options.adminPin,
+  });
   const store = options.store || new ExperimentStore({
     dataDir: options.dataDir,
     adaptiveEngine: options.adaptiveEngine,
@@ -116,9 +121,12 @@ async function createApp(options = {}) {
   await store.initialize();
   await watchBridge.start();
 
+  const getAdminToken = (request) => request.headers['x-admin-token'];
+
   const getSystemStatus = () => ({
     watchBridge: watchBridge.getStatus(),
     gazeBridge: gazeBridge.getStatus(),
+    safeguards: adminGuard.getPublicStatus(),
     connections: hub.getConnectionStats(),
     robotActions: ROBOT_ACTIONS,
     network: {
@@ -202,6 +210,26 @@ async function createApp(options = {}) {
         return;
       }
 
+      if (request.method === 'GET' && pathname === '/api/guard') {
+        const token = getAdminToken(request);
+        const state = store.getState();
+        json(response, 200, {
+          ...adminGuard.getStatusForToken(token),
+          sessionStatus: state.session.status,
+          permittedActions: {
+            configureSession: buildPolicy(state, 'configureSession'),
+            startSession: buildPolicy(state, 'startSession'),
+            completeSession: buildPolicy(state, 'completeSession'),
+            setHint: buildPolicy(state, 'setHint'),
+            logRobotAction: buildPolicy(state, 'logRobotAction'),
+            simulateTelemetry: buildPolicy(state, 'simulateTelemetry'),
+            resetSession: buildPolicy(state, 'resetSession'),
+            forceResetSession: buildPolicy(state, 'resetSession', { force: true }),
+          },
+        });
+        return;
+      }
+
       if (request.method === 'GET' && pathname === '/api/exports') {
         json(response, 200, await store.getExportManifest());
         return;
@@ -242,6 +270,8 @@ async function createApp(options = {}) {
       }
 
       if (request.method === 'POST' && pathname === '/api/hints') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        assertPolicy(store.getState(), 'setHint');
         const body = await readJsonBody(request);
         const state = await store.setHint({
           text: body.text,
@@ -253,6 +283,8 @@ async function createApp(options = {}) {
       }
 
       if (request.method === 'POST' && pathname === '/api/actions') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        assertPolicy(store.getState(), 'logRobotAction');
         const body = await readJsonBody(request);
         const state = await store.logRobotAction({
           actionId: body.actionId,
@@ -280,6 +312,8 @@ async function createApp(options = {}) {
       }
 
       if (request.method === 'POST' && pathname === '/api/telemetry/simulate') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        assertPolicy(store.getState(), 'simulateTelemetry');
         const body = await readJsonBody(request);
         const state = await store.ingestSimulatedTelemetry(body, { source: 'simulator' });
         json(response, 200, state);
@@ -298,7 +332,25 @@ async function createApp(options = {}) {
         return;
       }
 
+      if (request.method === 'POST' && pathname === '/api/guard/unlock') {
+        const body = await readJsonBody(request);
+        json(response, 200, adminGuard.unlock(body.pin));
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/guard/lock') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        adminGuard.lock(getAdminToken(request));
+        json(response, 200, {
+          pinRequired: adminGuard.isEnabled(),
+          authenticated: false,
+        });
+        return;
+      }
+
       if (request.method === 'POST' && pathname === '/api/session/configure') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        assertPolicy(store.getState(), 'configureSession');
         const body = await readJsonBody(request);
         const state = await store.configureSession({
           studyId: body.studyId,
@@ -313,6 +365,8 @@ async function createApp(options = {}) {
       }
 
       if (request.method === 'POST' && pathname === '/api/session/start') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        assertPolicy(store.getState(), 'startSession');
         const body = await readJsonBody(request);
         const state = await store.startSession({
           operator: body.operator || 'researcher',
@@ -323,6 +377,8 @@ async function createApp(options = {}) {
       }
 
       if (request.method === 'POST' && pathname === '/api/session/complete') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        assertPolicy(store.getState(), 'completeSession');
         const body = await readJsonBody(request);
         const state = await store.completeSession({
           operator: body.operator || 'researcher',
@@ -335,6 +391,8 @@ async function createApp(options = {}) {
 
       if (request.method === 'POST' && pathname === '/api/session/reset') {
         const body = await readJsonBody(request);
+        adminGuard.assertAuthorized(getAdminToken(request));
+        assertPolicy(store.getState(), 'resetSession', { force: body.force });
         const state = await store.resetSession({
           requestedBy: body.requestedBy || 'researcher',
           source: 'admin',
@@ -345,7 +403,7 @@ async function createApp(options = {}) {
 
       json(response, 404, { error: 'Not found' });
     } catch (error) {
-      json(response, 500, {
+      json(response, error.statusCode || 500, {
         error: error.message || 'Unexpected server error',
       });
     }

@@ -28,6 +28,18 @@ async function startTestApp() {
   };
 }
 
+async function startConfiguredApp(options = {}) {
+  const dataDir = await fs.mkdtemp(path.join(os.tmpdir(), 'woz-configured-'));
+  const app = await createApp({ dataDir, port: 0, ...options });
+  await new Promise((resolve) => app.server.listen(0, '127.0.0.1', resolve));
+  const address = app.server.address();
+
+  return {
+    app,
+    baseUrl: `http://127.0.0.1:${address.port}`,
+  };
+}
+
 test('HTTP API updates state and exposes recent events', async () => {
   const { app, baseUrl } = await startTestApp();
 
@@ -101,6 +113,7 @@ test('server serves the actual admin, subject, audit, and stylesheet assets', as
     const css = await fetch(`${baseUrl}/styles.css`).then((response) => response.text());
 
     assert.match(adminHtml, /Research Control Deck/);
+    assert.match(adminHtml, /Operator Controls/);
     assert.match(subjectHtml, /Hint Terminal/);
     assert.match(auditHtml, /Robotic Action Monitor/);
     assert.match(exportsHtml, /Session Exports/);
@@ -133,6 +146,23 @@ test('WebSocket clients receive role-specific snapshots after updates', async ()
       new Promise((resolve) => subjectSocket.addEventListener('open', resolve, { once: true })),
       new Promise((resolve) => auditSocket.addEventListener('open', resolve, { once: true })),
     ]);
+
+    await fetch(`${baseUrl}/api/session/configure`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        participantId: 'P-020',
+        researcher: 'Shrijacked',
+      }),
+    });
+
+    await fetch(`${baseUrl}/api/session/start`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        operator: 'Shrijacked',
+      }),
+    });
 
     await fetch(`${baseUrl}/api/hints`, {
       method: 'POST',
@@ -214,6 +244,162 @@ test('gaze bridge endpoints update system state and export endpoints return down
 
     const csv = await fetch(`${baseUrl}/api/exports/current.csv`).then((response) => response.text());
     assert.match(csv, /telemetry\.gaze\.updated/);
+  } finally {
+    await app.close();
+  }
+});
+
+test('operator safeguards require unlock before mutating admin routes when a PIN is configured', async () => {
+  const { app, baseUrl } = await startConfiguredApp({ adminPin: '2468' });
+
+  try {
+    const guardStatus = await fetch(`${baseUrl}/api/guard`).then((response) => response.json());
+    assert.equal(guardStatus.pinRequired, true);
+    assert.equal(guardStatus.authenticated, false);
+
+    const lockedHintResponse = await fetch(`${baseUrl}/api/hints`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ text: 'This should be blocked.' }),
+    });
+    assert.equal(lockedHintResponse.status, 423);
+
+    const badUnlock = await fetch(`${baseUrl}/api/guard/unlock`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ pin: '0000' }),
+    });
+    assert.equal(badUnlock.status, 401);
+
+    const unlockPayload = await fetch(`${baseUrl}/api/guard/unlock`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ pin: '2468' }),
+    }).then((response) => response.json());
+    assert.ok(unlockPayload.token);
+
+    await fetch(`${baseUrl}/api/session/configure`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-admin-token': unlockPayload.token,
+      },
+      body: JSON.stringify({
+        participantId: 'P-200',
+        researcher: 'Shrijacked',
+      }),
+    });
+
+    await fetch(`${baseUrl}/api/session/start`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-admin-token': unlockPayload.token,
+      },
+      body: JSON.stringify({ operator: 'Shrijacked' }),
+    });
+
+    const unlockedHintResponse = await fetch(`${baseUrl}/api/hints`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-admin-token': unlockPayload.token,
+      },
+      body: JSON.stringify({ text: 'Allowed after unlock.' }),
+    });
+    assert.equal(unlockedHintResponse.status, 200);
+
+    const lockResponse = await fetch(`${baseUrl}/api/guard/lock`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-admin-token': unlockPayload.token,
+      },
+    });
+    assert.equal(lockResponse.status, 200);
+
+    const actionAfterLock = await fetch(`${baseUrl}/api/actions`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-admin-token': unlockPayload.token,
+      },
+      body: JSON.stringify({
+        actionId: 'function-1',
+        label: 'Function 1: Move Square',
+      }),
+    });
+    assert.equal(actionAfterLock.status, 423);
+  } finally {
+    await app.close();
+  }
+});
+
+test('session protections block unsafe actions before start, after completion, and during reset', async () => {
+  const { app, baseUrl } = await startConfiguredApp();
+
+  try {
+    await fetch(`${baseUrl}/api/session/configure`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        participantId: 'P-300',
+        researcher: 'Shrijacked',
+      }),
+    });
+
+    const beforeStartHint = await fetch(`${baseUrl}/api/hints`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ text: 'Blocked before start.' }),
+    });
+    assert.equal(beforeStartHint.status, 409);
+
+    await fetch(`${baseUrl}/api/session/start`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ operator: 'Shrijacked' }),
+    });
+
+    const guardDuringRun = await fetch(`${baseUrl}/api/guard`).then((response) => response.json());
+    assert.equal(guardDuringRun.permittedActions.resetSession.allowed, false);
+    assert.equal(guardDuringRun.permittedActions.forceResetSession.allowed, true);
+
+    const resetDuringRun = await fetch(`${baseUrl}/api/session/reset`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ requestedBy: 'Shrijacked' }),
+    });
+    assert.equal(resetDuringRun.status, 409);
+
+    await fetch(`${baseUrl}/api/session/complete`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        operator: 'Shrijacked',
+        summary: 'Finished safely.',
+      }),
+    });
+
+    const afterCompleteAction = await fetch(`${baseUrl}/api/actions`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        actionId: 'function-2',
+        label: 'Function 2: Rotate Triangle',
+      }),
+    });
+    assert.equal(afterCompleteAction.status, 409);
+
+    const forcedReset = await fetch(`${baseUrl}/api/session/reset`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        requestedBy: 'Shrijacked',
+        force: true,
+      }),
+    });
+    assert.equal(forcedReset.status, 200);
   } finally {
     await app.close();
   }
