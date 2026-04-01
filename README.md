@@ -14,6 +14,7 @@ The system is designed to run on a laptop on the same Wi-Fi network as the secon
 - `docs/implementation-plan.md`: task traceability and staged plan
 - `src/`: backend server and services
 - `public/`: browser UIs for admin, subject, and audit routes
+- `integrations/gaze/`: vendor bridge for gaze SDKs
 - `tests/`: automated test coverage
 - `integrations/watch/watch.py`: reference watch ingestion script supplied for HRV monitoring
 
@@ -25,6 +26,7 @@ The system is designed to run on a laptop on the same Wi-Fi network as the secon
 - Hint broadcasting to the subject display
 - Robotic arm action logging and live audit broadcasting
 - Automatic event logging to local files with timestamps
+- Session export page with JSON and CSV downloads
 
 ## Runbook
 
@@ -51,5 +53,12 @@ Then open:
 ## Sensor wiring
 
 - HRV watch: run [`integrations/watch/watch.py`](/Users/owlxshri/Downloads/hti/integrations/watch/watch.py) from the repo root so it writes `watch/watch_data.json`.
-- Gaze detector: post samples to `POST /api/telemetry/gaze`.
+- Gaze detector: either post samples to `POST /api/telemetry/gaze` directly or run the bridge in [`integrations/gaze/bridge.py`](/Users/owlxshri/Downloads/hti/integrations/gaze/bridge.py) and connect your SDK output to it.
 - Manual or demo telemetry: use `POST /api/telemetry/simulate` or the built-in simulator on `/admin`.
+
+## Export surface
+
+- `GET /exports`: operator-facing session export page
+- `GET /api/exports`: export manifest
+- `GET /api/exports/current.bundle.json`: current session bundle with state, events, and CSV text
+- `GET /api/exports/current.csv`: current session timeline CSV

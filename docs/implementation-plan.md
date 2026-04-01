@@ -33,8 +33,10 @@ flowchart LR
 | T6 | Implement watch file monitor and telemetry normalization | T2, T5 | Architecture: Sensor integration plan |
 | T7 | Build admin dashboard UI | T3, T4, T5, T6 | Architecture: Frontend route views |
 | T8 | Build subject and audit displays | T3, T4 | Architecture: Frontend route views |
-| T9 | Add automated tests for store, API, adaptive logic, and realtime flows | T2-T8 | Architecture: Data flow |
-| T10 | Add operator docs and end-to-end runbook | T1-T9 | README + architecture docs |
+| T9 | Add gaze bridge service, normalization, and operator diagnostics | T4, T6, T7 | Architecture: Sensor integration plan |
+| T10 | Add export manifest, download routes, and export-center UI | T2, T4, T7 | Architecture: Logging strategy |
+| T11 | Add automated tests for store, API, adaptive logic, and realtime flows | T2-T10 | Architecture: Data flow |
+| T12 | Add operator docs and end-to-end runbook | T1-T11 | README + architecture docs |
 
 ## Delivery slices
 
@@ -58,6 +60,12 @@ flowchart LR
 
 - Add watch integration, simulation tools, and runbook polish
 - Verify end-to-end flows locally
+
+### Slice 5
+
+- Add gaze bridge heartbeat and raw-frame normalization
+- Add session export center and downloadable artifacts
+- Verify operator flows and update docs
 
 ## Validation checklist
 

@@ -51,6 +51,7 @@ flowchart LR
 - Accepts HTTP posts from gaze or other sensor bridges
 - Watches the HRV watch output JSON file written by `watch.py`
 - Normalizes metrics into one internal telemetry model
+- Tracks gaze-bridge heartbeat and last-frame diagnostics for the admin UI
 
 ### 5. Adaptive logic engine
 
@@ -101,13 +102,20 @@ flowchart TD
 - `GET /admin`: main operator interface
 - `GET /subject`: participant hint terminal
 - `GET /audit`: robot action audit display
+- `GET /exports`: session export center
 - `GET /api/state`: full current experiment state
 - `GET /api/events?limit=N`: recent event timeline
+- `GET /api/exports`: session export manifest
+- `GET /api/exports/current.bundle.json`: current session bundle export
+- `GET /api/exports/current.csv`: current session timeline CSV
+- `GET /api/bridge/gaze`: current gaze-bridge status
 - `POST /api/hints`: create and broadcast a participant hint
 - `POST /api/actions`: create and broadcast a robotic arm action event
 - `POST /api/telemetry/hrv`: ingest HRV metrics from a bridge or simulator
 - `POST /api/telemetry/gaze`: ingest gaze metrics from a bridge or simulator
 - `POST /api/telemetry/simulate`: push a combined mock telemetry frame for demos/tests
+- `POST /api/bridge/gaze/heartbeat`: update gaze-bridge status
+- `POST /api/bridge/gaze/frame`: normalize and ingest a raw gaze-device frame
 - `POST /api/session/reset`: clear in-memory state and start a fresh experiment log
 
 ## Internal state shape
@@ -145,6 +153,7 @@ flowchart TD
 - `data/events.jsonl`: append-only experiment timeline
 - `data/state.json`: current state snapshot for crash recovery
 - `data/export/session-<id>.csv`: optional export-friendly timeline
+- `GET /api/exports/<session-id>.bundle.json`: machine-readable state and event bundle
 
 Every mutation must create a timestamped event with:
 
@@ -161,7 +170,9 @@ The provided `watch.py` writes `watch/watch_data.json`. The server should monito
 
 ### Gaze detector
 
-The gaze stack is SDK-dependent, so the server exposes a stable HTTP ingest contract. A lightweight future bridge can post:
+The gaze stack is SDK-dependent, so the server exposes a stable HTTP ingest contract. The repository now includes `integrations/gaze/bridge.py`, which can read SDK output from stdin or by tailing a JSONL file and then forward normalized frames into the app.
+
+A normalized gaze frame can look like:
 
 ```json
 {
@@ -171,6 +182,8 @@ The gaze stack is SDK-dependent, so the server exposes a stable HTTP ingest cont
   "source": "gaze-sdk"
 }
 ```
+
+The bridge also understands alias keys like `focus`, `attention`, `fixation_loss`, and `pupil`.
 
 ## Adaptive engine behavior
 

@@ -85,3 +85,26 @@ test('store can ingest watch baseline and metric entries', async () => {
   assert.equal(state.telemetry.hrv.stressLevel, 'High');
   assert.equal(state.adaptive.status, 'observe');
 });
+
+test('store can build a session export bundle and manifest', async () => {
+  const { store } = await createStore();
+
+  await store.setHint({ text: 'Try the outer edge first.' });
+  await store.logRobotAction({ actionId: 'function-2', label: 'Function 2: Rotate Triangle' });
+  await store.ingestGazeTelemetry({
+    attentionScore: 0.42,
+    fixationLoss: 0.53,
+    pupilDilation: 0.49,
+  }, { source: 'gaze-bridge' });
+
+  const manifest = await store.getExportManifest();
+  assert.ok(Array.isArray(manifest.sessions));
+  assert.equal(manifest.sessions[0].sessionId, store.getState().session.id);
+  assert.ok(manifest.sessions[0].downloads.bundleJson.endsWith('.bundle.json'));
+
+  const bundle = await store.buildSessionExport(store.getState().session.id);
+  assert.equal(bundle.session.id, store.getState().session.id);
+  assert.equal(bundle.state.hint.text, 'Try the outer edge first.');
+  assert.ok(bundle.events.some((event) => event.type === 'telemetry.gaze.updated'));
+  assert.match(bundle.csv, /telemetry\.gaze\.updated/);
+});

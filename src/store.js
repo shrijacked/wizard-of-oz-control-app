@@ -143,6 +143,10 @@ class ExperimentStore extends EventEmitter {
     return clone(this.timeline.slice(-limit).reverse());
   }
 
+  getCurrentSessionId() {
+    return this.state.session.id;
+  }
+
   async resetSession(meta = {}) {
     const previousResetCount = Number(this.state?.session?.resetCount || 0);
     this.state = createInitialState(this.now());
@@ -322,6 +326,115 @@ class ExperimentStore extends EventEmitter {
     }, { source: 'watch-bridge' });
   }
 
+  async logSystemEvent(details = {}) {
+    const event = this.#createEvent(details.type || 'system.event', {
+      source: details.source || 'system',
+      summary: details.summary || 'System event recorded.',
+      payload: clone(details.payload || {}),
+    });
+
+    await this.#persistAndBroadcast([event]);
+    return event;
+  }
+
+  async getExportManifest() {
+    const events = await this.#readPersistedEvents();
+    const sessions = new Map();
+
+    for (const event of events) {
+      if (!event.sessionId) {
+        continue;
+      }
+
+      if (!sessions.has(event.sessionId)) {
+        sessions.set(event.sessionId, {
+          sessionId: event.sessionId,
+          startedAt: event.timestamp,
+          lastEventAt: event.timestamp,
+          eventCount: 0,
+        });
+      }
+
+      const session = sessions.get(event.sessionId);
+      session.eventCount += 1;
+
+      if (!session.startedAt || event.timestamp < session.startedAt) {
+        session.startedAt = event.timestamp;
+      }
+
+      if (!session.lastEventAt || event.timestamp > session.lastEventAt) {
+        session.lastEventAt = event.timestamp;
+      }
+    }
+
+    const currentSessionId = this.getCurrentSessionId();
+    if (!sessions.has(currentSessionId)) {
+      sessions.set(currentSessionId, {
+        sessionId: currentSessionId,
+        startedAt: this.state.session.startedAt,
+        lastEventAt: null,
+        eventCount: 0,
+      });
+    }
+
+    const manifestSessions = [...sessions.values()]
+      .sort((left, right) => String(right.startedAt || '').localeCompare(String(left.startedAt || '')))
+      .map((session) => ({
+        ...session,
+        startedAt: session.sessionId === currentSessionId
+          ? this.state.session.startedAt
+          : session.startedAt,
+        isCurrent: session.sessionId === currentSessionId,
+        downloads: {
+          bundleJson: `/api/exports/${session.sessionId}.bundle.json`,
+          csv: `/api/exports/${session.sessionId}.csv`,
+        },
+      }));
+
+    return {
+      generatedAt: toIsoDate(this.now()),
+      currentSessionId,
+      sessions: manifestSessions,
+    };
+  }
+
+  async buildSessionExport(sessionIdInput) {
+    const sessionId = this.#resolveSessionId(sessionIdInput);
+    const events = await this.#readPersistedEvents();
+    const sessionEvents = events.filter((event) => event.sessionId === sessionId);
+    const csv = await this.getSessionCsv(sessionId);
+
+    return {
+      session: {
+        id: sessionId,
+        exportedAt: toIsoDate(this.now()),
+        eventCount: sessionEvents.length,
+      },
+      state: sessionId === this.getCurrentSessionId()
+        ? this.getState()
+        : {
+            session: { id: sessionId },
+          },
+      events: sessionEvents,
+      csv,
+    };
+  }
+
+  async getSessionCsv(sessionIdInput) {
+    const sessionId = this.#resolveSessionId(sessionIdInput);
+    const csvPath = this.#csvPathForSession(sessionId);
+
+    try {
+      return await fs.readFile(csvPath, 'utf8');
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        return 'timestamp,sessionId,type,source,summary,payload\n';
+      }
+
+      throw error;
+    }
+  }
+
   #createEvent(type, details) {
     return {
       id: randomUUID(),
@@ -476,6 +589,23 @@ class ExperimentStore extends EventEmitter {
     await fs.appendFile(this.eventsPath, lines, 'utf8');
   }
 
+  async #readPersistedEvents() {
+    try {
+      const raw = await fs.readFile(this.eventsPath, 'utf8');
+      return raw
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .map((line) => JSON.parse(line));
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        return [];
+      }
+
+      throw error;
+    }
+  }
+
   async #writeState() {
     await fs.writeFile(this.statePath, JSON.stringify(this.state, null, 2), 'utf8');
   }
@@ -485,8 +615,17 @@ class ExperimentStore extends EventEmitter {
     return this.writeQueue;
   }
 
-  #csvPathForSession() {
-    return path.join(this.exportDir, `${this.state.session.id}.csv`);
+  #resolveSessionId(sessionIdInput) {
+    const sessionId = String(sessionIdInput || '').trim();
+    if (!sessionId || sessionId === 'current') {
+      return this.getCurrentSessionId();
+    }
+
+    return sessionId;
+  }
+
+  #csvPathForSession(sessionId = this.state.session.id) {
+    return path.join(this.exportDir, `${sessionId}.csv`);
   }
 }
 

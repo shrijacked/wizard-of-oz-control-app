@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Session Exports</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body class="admin-page">
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">Wizard of Oz Control Application</p>
+          <h1>Session Exports</h1>
+          <p class="hero-text">
+            Download machine-readable session bundles and CSV timelines for post-trial analysis, archiving, or downstream annotation work.
+          </p>
+        </div>
+        <div class="hero-status">
+          <article class="status-card">
+            <span class="status-label">Current Session</span>
+            <strong id="exports-current-session">Loading...</strong>
+            <small id="exports-generated-at">Preparing export manifest...</small>
+          </article>
+          <article class="status-card">
+            <span class="status-label">Actions</span>
+            <a class="button button-primary" href="/admin">Back to admin</a>
+            <small>Return to the live control deck.</small>
+          </article>
+        </div>
+      </header>
+
+      <main class="dashboard-grid">
+        <section class="panel panel-wide">
+          <div class="panel-header">
+            <div>
+              <p class="panel-kicker">Downloads</p>
+              <h2>Available Sessions</h2>
+            </div>
+            <span class="panel-note">Each session exposes a JSON bundle and a CSV timeline.</span>
+          </div>
+          <div id="exports-list" class="export-list"></div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="/exports.js"></script>
+  </body>
+</html>

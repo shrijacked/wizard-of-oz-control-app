@@ -371,6 +371,29 @@ textarea {
   border: 1px solid var(--line);
 }
 
+.export-list {
+  display: grid;
+  gap: 12px;
+}
+
+.export-card {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.export-card h3,
+.export-meta {
+  margin: 0;
+}
+
+.export-meta {
+  color: var(--muted);
+}
+
 .display-page {
   display: grid;
   place-items: center;

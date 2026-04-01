@@ -12,6 +12,8 @@ const elements = {
   metricStressLevel: document.querySelector('#metric-stress-level'),
   metricAttention: document.querySelector('#metric-attention'),
   metricFixation: document.querySelector('#metric-fixation'),
+  gazeBridgeSummary: document.querySelector('#gaze-bridge-summary'),
+  gazeBridgeDetail: document.querySelector('#gaze-bridge-detail'),
   hrvSource: document.querySelector('#hrv-source'),
   gazeSource: document.querySelector('#gaze-source'),
   hrvChart: document.querySelector('#hrv-chart'),
@@ -32,6 +34,8 @@ const elements = {
   simDistraction: document.querySelector('#sim-distraction'),
   presetObserve: document.querySelector('#preset-observe'),
   presetIntervene: document.querySelector('#preset-intervene'),
+  currentExportLinks: document.querySelector('#current-export-links'),
+  exportSummary: document.querySelector('#export-summary'),
   localhostLinks: document.querySelector('#localhost-links'),
   lanLinks: document.querySelector('#lan-links'),
   eventList: document.querySelector('#event-list'),
@@ -45,6 +49,7 @@ const elements = {
 let currentState = null;
 let timelineEvents = [];
 let mediaStream = null;
+let exportManifest = null;
 
 function formatNumber(value, digits = 2) {
   return Number.isFinite(value) ? value.toFixed(digits) : '--';
@@ -176,6 +181,7 @@ function renderState() {
   const hrv = currentState.telemetry.hrv;
   const gaze = currentState.telemetry.gaze;
   const advisory = adaptive.advisory;
+  const gazeBridge = currentState.system.gazeBridge;
   elements.metricHr.textContent = formatNumber(hrv.metrics.hr, 0);
   elements.metricStress.textContent = formatNumber(hrv.stressScore);
   elements.metricStressLevel.textContent = hrv.stressLevel || 'Not Stressed';
@@ -183,6 +189,12 @@ function renderState() {
   elements.metricFixation.textContent = formatNumber(gaze.fixationLoss);
   elements.hrvSource.textContent = hrv.source ? `Source: ${hrv.source}` : 'No HRV source yet';
   elements.gazeSource.textContent = gaze.source ? `Source: ${gaze.source}` : 'No gaze source yet';
+  elements.gazeBridgeSummary.textContent = gazeBridge?.bridgeId
+    ? `${gazeBridge.deviceLabel || gazeBridge.bridgeId} • ${gazeBridge.active ? 'active' : 'stale'}`
+    : 'No gaze bridge connected.';
+  elements.gazeBridgeDetail.textContent = gazeBridge?.bridgeId
+    ? `Bridge ${gazeBridge.bridgeId} via ${gazeBridge.transport || 'unknown transport'} • last frame ${formatTimestamp(gazeBridge.lastFrameAt || gazeBridge.lastHeartbeatAt)}`
+    : 'Use the Python bridge or your SDK callback to start streaming gaze frames.';
   elements.hintPreview.textContent = currentState.hint.text || 'No hint has been sent yet.';
   elements.latestAction.textContent = currentState.robotAction.updatedAt
     ? `${currentState.robotAction.label} • ${formatTimestamp(currentState.robotAction.updatedAt)}`
@@ -199,6 +211,29 @@ function renderState() {
   renderActionButtons();
 }
 
+function renderExportInfo() {
+  if (!exportManifest) {
+    return;
+  }
+
+  const current = exportManifest.sessions.find((session) => session.sessionId === exportManifest.currentSessionId);
+  elements.currentExportLinks.innerHTML = '';
+
+  const bundleLink = document.createElement('a');
+  bundleLink.href = '/api/exports/current.bundle.json';
+  bundleLink.textContent = 'Download current bundle JSON';
+  elements.currentExportLinks.append(bundleLink);
+
+  const csvLink = document.createElement('a');
+  csvLink.href = '/api/exports/current.csv';
+  csvLink.textContent = 'Download current CSV timeline';
+  elements.currentExportLinks.append(csvLink);
+
+  elements.exportSummary.textContent = current
+    ? `${exportManifest.sessions.length} sessions available • current session has ${current.eventCount} events`
+    : `${exportManifest.sessions.length} sessions available`;
+}
+
 async function bootstrapState() {
   const [state, events] = await Promise.all([
     fetchJson('/api/state'),
@@ -208,6 +243,11 @@ async function bootstrapState() {
   timelineEvents = events.events;
   renderState();
   renderEvents();
+}
+
+async function refreshExportManifest() {
+  exportManifest = await fetchJson('/api/exports');
+  renderExportInfo();
 }
 
 function buildStressLevel(stressScore) {
@@ -280,6 +320,7 @@ function stopCamera() {
 
 async function init() {
   await bootstrapState();
+  await refreshExportManifest();
 
   connectSocket('admin', {
     onSnapshot(state) {
@@ -356,6 +397,7 @@ async function init() {
       await postJson('/api/session/reset', { requestedBy: 'researcher' });
       timelineEvents = [];
       await bootstrapState();
+      await refreshExportManifest();
     } catch (error) {
       window.alert(error.message);
     }

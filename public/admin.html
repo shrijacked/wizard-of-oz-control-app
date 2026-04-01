@@ -101,6 +101,20 @@
               <canvas id="gaze-chart" height="180"></canvas>
             </article>
           </div>
+          <div class="network-grid">
+            <article class="callout">
+              <span class="callout-label">Gaze Bridge</span>
+              <p id="gaze-bridge-summary">No gaze bridge connected.</p>
+              <p id="gaze-bridge-detail">Use the Python bridge or your SDK callback to start streaming gaze frames.</p>
+            </article>
+            <article class="callout">
+              <span class="callout-label">Bridge Endpoint</span>
+              <div class="link-list">
+                <code>POST /api/bridge/gaze/heartbeat</code>
+                <code>POST /api/bridge/gaze/frame</code>
+              </div>
+            </article>
+          </div>
         </section>
 
         <section class="panel">
@@ -179,6 +193,24 @@
               <button id="preset-intervene" class="button button-ghost" type="button">Preset: Intervene</button>
             </div>
           </form>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="panel-kicker">Exports</p>
+              <h2>Session Exports</h2>
+            </div>
+            <a class="button button-primary" href="/exports">Open export center</a>
+          </div>
+          <div class="callout">
+            <span class="callout-label">Current session downloads</span>
+            <div id="current-export-links" class="link-list"></div>
+          </div>
+          <div class="callout">
+            <span class="callout-label">Export summary</span>
+            <p id="export-summary">Loading export manifest...</p>
+          </div>
         </section>
 
         <section class="panel">

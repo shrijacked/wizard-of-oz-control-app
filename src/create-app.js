@@ -8,6 +8,7 @@ const { URL } = require('node:url');
 const { ExperimentStore } = require('./store');
 const { WebSocketHub } = require('./websocket-hub');
 const { WatchBridge } = require('./watch-bridge');
+const { GazeBridge } = require('./gaze-bridge');
 const { getLocalNetworkAddresses } = require('./network');
 const { LlmAdvisor } = require('./llm-advisor');
 
@@ -88,6 +89,14 @@ async function serveFile(response, filePath) {
   }
 }
 
+function text(response, statusCode, payload, headers = {}) {
+  response.writeHead(statusCode, {
+    'content-type': 'text/plain; charset=utf-8',
+    ...headers,
+  });
+  response.end(payload);
+}
+
 async function createApp(options = {}) {
   const port = Number(options.port || process.env.PORT || 3000);
   const publicDir = options.publicDir || path.join(process.cwd(), 'public');
@@ -100,12 +109,16 @@ async function createApp(options = {}) {
     store,
     watchFilePath: options.watchFilePath || path.join(process.cwd(), 'watch', 'watch_data.json'),
   });
+  const gazeBridge = options.gazeBridge || new GazeBridge({
+    store,
+  });
 
   await store.initialize();
   await watchBridge.start();
 
   const getSystemStatus = () => ({
     watchBridge: watchBridge.getStatus(),
+    gazeBridge: gazeBridge.getStatus(),
     connections: hub.getConnectionStats(),
     robotActions: ROBOT_ACTIONS,
     network: {
@@ -157,6 +170,11 @@ async function createApp(options = {}) {
         return;
       }
 
+      if (request.method === 'GET' && pathname === '/exports') {
+        await serveFile(response, path.join(publicDir, 'exports.html'));
+        return;
+      }
+
       if (request.method === 'GET' && pathname === '/health') {
         json(response, 200, { ok: true });
         return;
@@ -177,6 +195,36 @@ async function createApp(options = {}) {
       if (request.method === 'GET' && pathname === '/api/network') {
         json(response, 200, getSystemStatus().network);
         return;
+      }
+
+      if (request.method === 'GET' && pathname === '/api/bridge/gaze') {
+        json(response, 200, gazeBridge.getStatus());
+        return;
+      }
+
+      if (request.method === 'GET' && pathname === '/api/exports') {
+        json(response, 200, await store.getExportManifest());
+        return;
+      }
+
+      if (request.method === 'GET' && pathname.startsWith('/api/exports/')) {
+        const slug = pathname.slice('/api/exports/'.length);
+
+        if (slug.endsWith('.bundle.json')) {
+          const sessionId = slug.slice(0, -'.bundle.json'.length);
+          json(response, 200, await store.buildSessionExport(sessionId));
+          return;
+        }
+
+        if (slug.endsWith('.csv')) {
+          const sessionId = slug.slice(0, -'.csv'.length);
+          const csv = await store.getSessionCsv(sessionId);
+          const resolvedSessionId = sessionId === 'current' ? store.getCurrentSessionId() : sessionId;
+          text(response, 200, csv, {
+            'content-disposition': `attachment; filename="${resolvedSessionId}.csv"`,
+          });
+          return;
+        }
       }
 
       if (request.method === 'GET' && pathname.startsWith('/')) {
@@ -238,6 +286,18 @@ async function createApp(options = {}) {
         return;
       }
 
+      if (request.method === 'POST' && pathname === '/api/bridge/gaze/heartbeat') {
+        const body = await readJsonBody(request);
+        json(response, 200, await gazeBridge.heartbeat(body));
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/bridge/gaze/frame') {
+        const body = await readJsonBody(request);
+        json(response, 200, await gazeBridge.ingestFrame(body));
+        return;
+      }
+
       if (request.method === 'POST' && pathname === '/api/session/reset') {
         const body = await readJsonBody(request);
         const state = await store.resetSession({
@@ -271,6 +331,7 @@ async function createApp(options = {}) {
     server,
     store,
     watchBridge,
+    gazeBridge,
     hub,
     robotActions: ROBOT_ACTIONS,
     close() {

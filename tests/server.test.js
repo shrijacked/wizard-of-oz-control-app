@@ -74,11 +74,13 @@ test('server serves the actual admin, subject, audit, and stylesheet assets', as
     const adminHtml = await fetch(`${baseUrl}/admin`).then((response) => response.text());
     const subjectHtml = await fetch(`${baseUrl}/subject`).then((response) => response.text());
     const auditHtml = await fetch(`${baseUrl}/audit`).then((response) => response.text());
+    const exportsHtml = await fetch(`${baseUrl}/exports`).then((response) => response.text());
     const css = await fetch(`${baseUrl}/styles.css`).then((response) => response.text());
 
     assert.match(adminHtml, /Research Control Deck/);
     assert.match(subjectHtml, /Hint Terminal/);
     assert.match(auditHtml, /Robotic Action Monitor/);
+    assert.match(exportsHtml, /Session Exports/);
     assert.match(css, /--teal/);
   } finally {
     await app.close();
@@ -130,6 +132,61 @@ test('WebSocket clients receive role-specific snapshots after updates', async ()
 
     subjectSocket.close();
     auditSocket.close();
+  } finally {
+    await app.close();
+  }
+});
+
+test('gaze bridge endpoints update system state and export endpoints return downloadable session artifacts', async () => {
+  const dataDir = await fs.mkdtemp(path.join(os.tmpdir(), 'woz-bridge-'));
+  const app = await createApp({ dataDir, port: 0 });
+  await new Promise((resolve) => app.server.listen(0, '127.0.0.1', resolve));
+  const address = app.server.address();
+  const baseUrl = `http://127.0.0.1:${address.port}`;
+
+  try {
+    const heartbeatResponse = await fetch(`${baseUrl}/api/bridge/gaze/heartbeat`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        bridgeId: 'tobii-bridge',
+        deviceLabel: 'Tobii 4C',
+        transport: 'sdk-http',
+      }),
+    });
+    assert.equal(heartbeatResponse.status, 200);
+
+    const frameResponse = await fetch(`${baseUrl}/api/bridge/gaze/frame`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        bridgeId: 'tobii-bridge',
+        frame: {
+          focus: 0.22,
+          fixationLoss: 0.71,
+          pupil: 0.58,
+        },
+      }),
+    });
+    assert.equal(frameResponse.status, 200);
+
+    const state = await fetch(`${baseUrl}/api/state`).then((response) => response.json());
+    assert.equal(state.telemetry.gaze.source, 'gaze-bridge');
+    assert.equal(state.system.gazeBridge.bridgeId, 'tobii-bridge');
+    assert.equal(state.system.gazeBridge.deviceLabel, 'Tobii 4C');
+
+    const exportsView = await fetch(`${baseUrl}/exports`).then((response) => response.text());
+    assert.match(exportsView, /Session Exports/);
+
+    const manifest = await fetch(`${baseUrl}/api/exports`).then((response) => response.json());
+    assert.ok(manifest.sessions.length >= 1);
+
+    const bundle = await fetch(`${baseUrl}/api/exports/current.bundle.json`).then((response) => response.json());
+    assert.equal(bundle.state.session.id, state.session.id);
+    assert.ok(bundle.events.some((event) => event.type === 'telemetry.gaze.updated'));
+
+    const csv = await fetch(`${baseUrl}/api/exports/current.csv`).then((response) => response.text());
+    assert.match(csv, /telemetry\.gaze\.updated/);
   } finally {
     await app.close();
   }
