@@ -67,11 +67,19 @@ flowchart LR
 - Add session export center and downloadable artifacts
 - Verify operator flows and update docs
 
+### Slice 6
+
+- Add session metadata capture for study, participant, and condition
+- Add explicit setup, running, and completed trial states
+- Include lifecycle data in exports and operator workflow
+
 ## Validation checklist
 
 - Admin view loads and can preview the webcam
 - Subject display updates without refresh when a hint is sent
 - Audit display updates without refresh when a robotic action is logged
 - Telemetry ingest updates charts and adaptive recommendation state
+- Session metadata persists into state and export bundles
+- Trial lifecycle transitions are logged with timestamps
 - Session events append to disk with timestamps
 - Tests pass before any commit is created

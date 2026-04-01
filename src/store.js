@@ -22,6 +22,17 @@ function createInitialState(now = new Date()) {
     session: {
       id: createSessionId(now),
       startedAt: timestamp,
+      status: 'setup',
+      trialStartedAt: null,
+      completedAt: null,
+      completedSummary: null,
+      metadata: {
+        studyId: '',
+        participantId: '',
+        condition: 'adaptive',
+        researcher: '',
+        notes: '',
+      },
       resetCount: 0,
     },
     hint: {
@@ -157,6 +168,80 @@ class ExperimentStore extends EventEmitter {
       summary: 'The experiment session was reset.',
       payload: {
         requestedBy: meta.requestedBy || 'researcher',
+      },
+    });
+
+    await this.#persistAndBroadcast([event]);
+    return this.getState();
+  }
+
+  async configureSession(payload = {}) {
+    const nextMetadata = {
+      ...this.state.session.metadata,
+      studyId: String(payload.studyId || '').trim(),
+      participantId: String(payload.participantId || '').trim(),
+      condition: String(payload.condition || this.state.session.metadata.condition || 'adaptive').trim() || 'adaptive',
+      researcher: String(payload.researcher || '').trim(),
+      notes: String(payload.notes || '').trim(),
+    };
+
+    this.state.session = {
+      ...this.state.session,
+      metadata: nextMetadata,
+    };
+
+    const event = this.#createEvent('session.configured', {
+      source: payload.source || 'admin',
+      summary: `Session configured for participant ${nextMetadata.participantId || 'unassigned'}.`,
+      payload: {
+        metadata: clone(nextMetadata),
+      },
+    });
+
+    await this.#persistAndBroadcast([event]);
+    return this.getState();
+  }
+
+  async startSession(payload = {}) {
+    const timestamp = toIsoDate(this.now());
+    this.state.session = {
+      ...this.state.session,
+      status: 'running',
+      trialStartedAt: timestamp,
+      completedAt: null,
+      completedSummary: null,
+    };
+
+    const event = this.#createEvent('session.started', {
+      source: payload.source || 'admin',
+      summary: `Session started by ${payload.operator || 'researcher'}.`,
+      payload: {
+        operator: payload.operator || 'researcher',
+        trialStartedAt: timestamp,
+      },
+    });
+
+    await this.#persistAndBroadcast([event]);
+    return this.getState();
+  }
+
+  async completeSession(payload = {}) {
+    const timestamp = toIsoDate(this.now());
+    const completedSummary = String(payload.summary || '').trim() || null;
+    this.state.session = {
+      ...this.state.session,
+      status: 'completed',
+      completedAt: timestamp,
+      completedSummary,
+    };
+
+    const event = this.#createEvent('session.completed', {
+      source: payload.source || 'admin',
+      summary: `Session completed by ${payload.operator || 'researcher'}.`,
+      payload: {
+        operator: payload.operator || 'researcher',
+        completedAt: timestamp,
+        summary: completedSummary,
       },
     });
 

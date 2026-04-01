@@ -124,7 +124,17 @@ flowchart TD
 {
   "session": {
     "id": "session-20260401-214800",
-    "startedAt": "2026-04-01T21:48:00.000Z"
+    "startedAt": "2026-04-01T21:48:00.000Z",
+    "status": "running",
+    "trialStartedAt": "2026-04-01T21:49:30.000Z",
+    "completedAt": null,
+    "metadata": {
+      "studyId": "pilot-01",
+      "participantId": "P-001",
+      "condition": "adaptive",
+      "researcher": "Primary Researcher",
+      "notes": "Puzzle pieces pre-arranged."
+    }
   },
   "hint": {
     "text": "Try matching the blue triangle to the outer corner.",
@@ -161,6 +171,8 @@ Every mutation must create a timestamped event with:
 - actor or source
 - machine-readable payload
 - human-readable summary
+
+Session configuration, start, and completion are logged alongside telemetry and intervention events so exports can reconstruct the full trial lifecycle.
 
 ## Sensor integration plan
 

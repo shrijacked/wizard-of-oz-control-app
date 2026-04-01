@@ -32,6 +32,27 @@ test('HTTP API updates state and exposes recent events', async () => {
   const { app, baseUrl } = await startTestApp();
 
   try {
+    const configureResponse = await fetch(`${baseUrl}/api/session/configure`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        studyId: 'pilot-03',
+        participantId: 'P-013',
+        condition: 'adaptive',
+        researcher: 'Shrijacked',
+      }),
+    });
+    assert.equal(configureResponse.status, 200);
+
+    const startResponse = await fetch(`${baseUrl}/api/session/start`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        operator: 'Shrijacked',
+      }),
+    });
+    assert.equal(startResponse.status, 200);
+
     const hintResponse = await fetch(`${baseUrl}/api/hints`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -53,10 +74,12 @@ test('HTTP API updates state and exposes recent events', async () => {
     const state = await stateResponse.json();
     assert.equal(state.hint.text, 'Look at the corner alignment.');
     assert.equal(state.robotAction.actionId, 'function-1');
+    assert.equal(state.session.status, 'running');
+    assert.equal(state.session.metadata.participantId, 'P-013');
 
     const eventsResponse = await fetch(`${baseUrl}/api/events?limit=5`);
     const payload = await eventsResponse.json();
-    assert.equal(payload.events.length, 2);
+    assert.equal(payload.events.length, 4);
     assert.equal(payload.events[0].type, 'robot.action.logged');
   } finally {
     await app.close();

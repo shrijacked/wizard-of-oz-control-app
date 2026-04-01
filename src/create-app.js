@@ -298,6 +298,41 @@ async function createApp(options = {}) {
         return;
       }
 
+      if (request.method === 'POST' && pathname === '/api/session/configure') {
+        const body = await readJsonBody(request);
+        const state = await store.configureSession({
+          studyId: body.studyId,
+          participantId: body.participantId,
+          condition: body.condition,
+          researcher: body.researcher,
+          notes: body.notes,
+          source: 'admin',
+        });
+        json(response, 200, state);
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/session/start') {
+        const body = await readJsonBody(request);
+        const state = await store.startSession({
+          operator: body.operator || 'researcher',
+          source: 'admin',
+        });
+        json(response, 200, state);
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/session/complete') {
+        const body = await readJsonBody(request);
+        const state = await store.completeSession({
+          operator: body.operator || 'researcher',
+          summary: body.summary,
+          source: 'admin',
+        });
+        json(response, 200, state);
+        return;
+      }
+
       if (request.method === 'POST' && pathname === '/api/session/reset') {
         const body = await readJsonBody(request);
         const state = await store.resetSession({

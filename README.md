@@ -27,6 +27,7 @@ The system is designed to run on a laptop on the same Wi-Fi network as the secon
 - Robotic arm action logging and live audit broadcasting
 - Automatic event logging to local files with timestamps
 - Session export page with JSON and CSV downloads
+- Session metadata and trial lifecycle controls for participant-ready runs
 
 ## Runbook
 
@@ -41,6 +42,14 @@ Then open:
 - `http://localhost:3000/admin`
 - `http://<host-ip>:3000/subject`
 - `http://<host-ip>:3000/audit`
+
+On `/admin`, the typical operator flow is:
+
+1. Save the session profile with study ID, participant ID, condition, and notes.
+2. Start the trial when the participant is ready.
+3. Use hints, action logging, and telemetry during the run.
+4. Mark the session complete and enter an end-of-trial summary.
+5. Download the final bundle or CSV from `/exports`.
 
 ## Optional runtime configuration
 

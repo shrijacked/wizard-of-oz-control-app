@@ -40,6 +40,41 @@ test('store persists hints, actions, and telemetry to disk-backed state', async 
   assert.match(eventsLog, /robot\.action\.logged/);
 });
 
+test('store can configure session metadata and move through trial lifecycle states', async () => {
+  const { store, dataDir } = await createStore();
+
+  await store.configureSession({
+    studyId: 'pilot-01',
+    participantId: 'P-007',
+    condition: 'adaptive',
+    researcher: 'Shrijacked',
+    notes: 'Evening pilot session',
+  });
+
+  await store.startSession({
+    operator: 'Shrijacked',
+  });
+
+  await store.completeSession({
+    operator: 'Shrijacked',
+    summary: 'Participant completed the puzzle with one adaptive hint.',
+  });
+
+  const state = store.getState();
+  assert.equal(state.session.status, 'completed');
+  assert.equal(state.session.metadata.studyId, 'pilot-01');
+  assert.equal(state.session.metadata.participantId, 'P-007');
+  assert.equal(state.session.metadata.condition, 'adaptive');
+  assert.equal(state.session.completedSummary, 'Participant completed the puzzle with one adaptive hint.');
+  assert.ok(state.session.trialStartedAt);
+  assert.ok(state.session.completedAt);
+
+  const eventsLog = await fs.readFile(path.join(dataDir, 'events.jsonl'), 'utf8');
+  assert.match(eventsLog, /session\.configured/);
+  assert.match(eventsLog, /session\.started/);
+  assert.match(eventsLog, /session\.completed/);
+});
+
 test('store can ingest watch baseline and metric entries', async () => {
   const { store } = await createStore();
 
@@ -89,6 +124,13 @@ test('store can ingest watch baseline and metric entries', async () => {
 test('store can build a session export bundle and manifest', async () => {
   const { store } = await createStore();
 
+  await store.configureSession({
+    studyId: 'pilot-02',
+    participantId: 'P-010',
+    condition: 'control',
+    researcher: 'Shrijacked',
+  });
+
   await store.setHint({ text: 'Try the outer edge first.' });
   await store.logRobotAction({ actionId: 'function-2', label: 'Function 2: Rotate Triangle' });
   await store.ingestGazeTelemetry({
@@ -105,6 +147,7 @@ test('store can build a session export bundle and manifest', async () => {
   const bundle = await store.buildSessionExport(store.getState().session.id);
   assert.equal(bundle.session.id, store.getState().session.id);
   assert.equal(bundle.state.hint.text, 'Try the outer edge first.');
+  assert.equal(bundle.state.session.metadata.participantId, 'P-010');
   assert.ok(bundle.events.some((event) => event.type === 'telemetry.gaze.updated'));
   assert.match(bundle.csv, /telemetry\.gaze\.updated/);
 });

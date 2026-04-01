@@ -3,6 +3,17 @@ import { connectSocket, drawSeriesChart, fetchJson, formatTimestamp, postJson } 
 const elements = {
   sessionId: document.querySelector('#session-id'),
   sessionStarted: document.querySelector('#session-started'),
+  sessionForm: document.querySelector('#session-form'),
+  sessionStudyId: document.querySelector('#session-study-id'),
+  sessionParticipantId: document.querySelector('#session-participant-id'),
+  sessionCondition: document.querySelector('#session-condition'),
+  sessionResearcher: document.querySelector('#session-researcher'),
+  sessionNotes: document.querySelector('#session-notes'),
+  sessionStatusSummary: document.querySelector('#session-status-summary'),
+  sessionStatusDetail: document.querySelector('#session-status-detail'),
+  sessionSummary: document.querySelector('#session-summary'),
+  sessionStart: document.querySelector('#session-start'),
+  sessionComplete: document.querySelector('#session-complete'),
   adaptiveStatus: document.querySelector('#adaptive-status'),
   adaptiveReason: document.querySelector('#adaptive-reason'),
   connectionCounts: document.querySelector('#connection-counts'),
@@ -53,6 +64,18 @@ let exportManifest = null;
 
 function formatNumber(value, digits = 2) {
   return Number.isFinite(value) ? value.toFixed(digits) : '--';
+}
+
+function setValueSafely(element, value) {
+  if (!element) {
+    return;
+  }
+
+  if (document.activeElement === element) {
+    return;
+  }
+
+  element.value = value ?? '';
 }
 
 function renderLinks(container, links) {
@@ -163,7 +186,29 @@ function renderState() {
   }
 
   elements.sessionId.textContent = currentState.session.id;
-  elements.sessionStarted.textContent = `Started ${formatTimestamp(currentState.session.startedAt)}`;
+  elements.sessionStarted.textContent = `Created ${formatTimestamp(currentState.session.startedAt)}`;
+
+  const session = currentState.session;
+  const metadata = session.metadata || {};
+  setValueSafely(elements.sessionStudyId, metadata.studyId);
+  setValueSafely(elements.sessionParticipantId, metadata.participantId);
+  setValueSafely(elements.sessionCondition, metadata.condition || 'adaptive');
+  setValueSafely(elements.sessionResearcher, metadata.researcher);
+  setValueSafely(elements.sessionNotes, metadata.notes);
+
+  const statusLabel = session.status ? session.status.toUpperCase() : 'SETUP';
+  elements.sessionStatusSummary.textContent = `${statusLabel} • ${metadata.participantId || 'participant not assigned'}`;
+  if (session.status === 'running') {
+    elements.sessionStatusDetail.textContent = `Trial started ${formatTimestamp(session.trialStartedAt)} by ${metadata.researcher || 'researcher'}.`;
+  } else if (session.status === 'completed') {
+    elements.sessionStatusDetail.textContent = session.completedSummary
+      ? `${session.completedSummary} Completed ${formatTimestamp(session.completedAt)}.`
+      : `Completed ${formatTimestamp(session.completedAt)}.`;
+  } else {
+    elements.sessionStatusDetail.textContent = 'Save metadata, then start the trial when the participant is ready.';
+  }
+  elements.sessionStart.disabled = session.status === 'running';
+  elements.sessionComplete.disabled = session.status !== 'running';
 
   const adaptive = currentState.adaptive;
   elements.adaptiveStatus.textContent = `${adaptive.status.toUpperCase()} • ${formatNumber(adaptive.score)}`;
@@ -342,6 +387,45 @@ async function init() {
     try {
       await postJson('/api/hints', { text: elements.hintText.value });
       elements.hintText.value = '';
+    } catch (error) {
+      window.alert(error.message);
+    }
+  });
+
+  elements.sessionForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    try {
+      await postJson('/api/session/configure', {
+        studyId: elements.sessionStudyId.value,
+        participantId: elements.sessionParticipantId.value,
+        condition: elements.sessionCondition.value,
+        researcher: elements.sessionResearcher.value,
+        notes: elements.sessionNotes.value,
+      });
+      await refreshExportManifest();
+    } catch (error) {
+      window.alert(error.message);
+    }
+  });
+
+  elements.sessionStart.addEventListener('click', async () => {
+    try {
+      await postJson('/api/session/start', {
+        operator: elements.sessionResearcher.value || 'researcher',
+      });
+      await refreshExportManifest();
+    } catch (error) {
+      window.alert(error.message);
+    }
+  });
+
+  elements.sessionComplete.addEventListener('click', async () => {
+    try {
+      await postJson('/api/session/complete', {
+        operator: elements.sessionResearcher.value || 'researcher',
+        summary: elements.sessionSummary.value,
+      });
+      await refreshExportManifest();
     } catch (error) {
       window.alert(error.message);
     }
