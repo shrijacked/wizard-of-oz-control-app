@@ -5,6 +5,8 @@
   "description": "Local-first Wizard of Oz control application for multi-screen research sessions.",
   "scripts": {
     "start": "node src/server.js",
-    "test": "node --test"
+    "test": "node --test",
+    "test:python": "python3 -X pycache_prefix=/tmp/hti-pycache -m py_compile integrations/gaze/bridge.py integrations/watch/watch.py",
+    "verify": "npm test && npm run test:python"
   }
 }

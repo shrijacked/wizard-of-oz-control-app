@@ -59,6 +59,16 @@ On `/admin`, the typical operator flow is:
 - `ADAPTIVE_LLM_ENDPOINT`: override the chat-completions endpoint.
 - `ADAPTIVE_LLM_MODEL`: override the advisory model name.
 
+## Verification
+
+Run the full local verification bundle with:
+
+```bash
+npm run verify
+```
+
+That executes the Node test suite plus Python syntax validation for the watch and gaze bridge scripts. The same checks also run in GitHub Actions on pushes and pull requests.
+
 ## Sensor wiring
 
 - HRV watch: run [`integrations/watch/watch.py`](/Users/owlxshri/Downloads/hti/integrations/watch/watch.py) from the repo root so it writes `watch/watch_data.json`.
