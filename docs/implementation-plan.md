@@ -73,6 +73,12 @@ flowchart LR
 - Add explicit setup, running, and completed trial states
 - Include lifecycle data in exports and operator workflow
 
+### Slice 7
+
+- Derive export analytics from the ordered event log
+- Add replay timeline browsing to the export center
+- Verify analytics and replay output through tests
+
 ## Validation checklist
 
 - Admin view loads and can preview the webcam
@@ -81,5 +87,6 @@ flowchart LR
 - Telemetry ingest updates charts and adaptive recommendation state
 - Session metadata persists into state and export bundles
 - Trial lifecycle transitions are logged with timestamps
+- Export center shows analytics and replay timeline for a selected session
 - Session events append to disk with timestamps
 - Tests pass before any commit is created

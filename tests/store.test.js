@@ -133,11 +133,16 @@ test('store can build a session export bundle and manifest', async () => {
 
   await store.setHint({ text: 'Try the outer edge first.' });
   await store.logRobotAction({ actionId: 'function-2', label: 'Function 2: Rotate Triangle' });
+  await store.startSession({ operator: 'Shrijacked' });
   await store.ingestGazeTelemetry({
     attentionScore: 0.42,
     fixationLoss: 0.53,
     pupilDilation: 0.49,
   }, { source: 'gaze-bridge' });
+  await store.completeSession({
+    operator: 'Shrijacked',
+    summary: 'Participant completed the puzzle steadily.',
+  });
 
   const manifest = await store.getExportManifest();
   assert.ok(Array.isArray(manifest.sessions));
@@ -148,6 +153,14 @@ test('store can build a session export bundle and manifest', async () => {
   assert.equal(bundle.session.id, store.getState().session.id);
   assert.equal(bundle.state.hint.text, 'Try the outer edge first.');
   assert.equal(bundle.state.session.metadata.participantId, 'P-010');
+  assert.equal(bundle.analytics.eventCounts['telemetry.gaze.updated'], 1);
+  assert.equal(bundle.analytics.sessionStatus, 'completed');
+  assert.ok(bundle.analytics.durationSeconds >= 0);
+  assert.equal(bundle.analytics.latestHint, 'Try the outer edge first.');
+  assert.equal(bundle.analytics.latestRobotAction, 'Function 2: Rotate Triangle');
+  assert.ok(bundle.replay.events.length >= 4);
+  assert.equal(bundle.replay.events[0].step, 1);
+  assert.ok(bundle.replay.events.some((event) => event.type === 'session.completed'));
   assert.ok(bundle.events.some((event) => event.type === 'telemetry.gaze.updated'));
   assert.match(bundle.csv, /telemetry\.gaze\.updated/);
 });

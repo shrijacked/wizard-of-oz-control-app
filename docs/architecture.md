@@ -64,6 +64,7 @@ flowchart LR
 - `admin`: dense operational UI for the researcher
 - `subject`: distraction-free hint panel
 - `audit`: large-format robotic action monitor
+- `exports`: session analytics, download center, and replay timeline
 
 ## Data flow
 
@@ -173,6 +174,12 @@ Every mutation must create a timestamped event with:
 - human-readable summary
 
 Session configuration, start, and completion are logged alongside telemetry and intervention events so exports can reconstruct the full trial lifecycle.
+
+The export bundle also derives:
+
+- event counts by type
+- session duration and latest intervention summaries
+- replay steps with offsets from the first event
 
 ## Sensor integration plan
 

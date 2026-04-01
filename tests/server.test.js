@@ -104,6 +104,7 @@ test('server serves the actual admin, subject, audit, and stylesheet assets', as
     assert.match(subjectHtml, /Hint Terminal/);
     assert.match(auditHtml, /Robotic Action Monitor/);
     assert.match(exportsHtml, /Session Exports/);
+    assert.match(exportsHtml, /Replay Timeline/);
     assert.match(css, /--teal/);
   } finally {
     await app.close();
@@ -207,6 +208,9 @@ test('gaze bridge endpoints update system state and export endpoints return down
     const bundle = await fetch(`${baseUrl}/api/exports/current.bundle.json`).then((response) => response.json());
     assert.equal(bundle.state.session.id, state.session.id);
     assert.ok(bundle.events.some((event) => event.type === 'telemetry.gaze.updated'));
+    assert.ok(bundle.analytics);
+    assert.ok(bundle.replay);
+    assert.ok(bundle.replay.events.length >= 1);
 
     const csv = await fetch(`${baseUrl}/api/exports/current.csv`).then((response) => response.text());
     assert.match(csv, /telemetry\.gaze\.updated/);

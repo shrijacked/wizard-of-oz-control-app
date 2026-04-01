@@ -109,6 +109,29 @@ function csvEscape(value) {
   return `"${stringValue.replaceAll('"', '""')}"`;
 }
 
+function eventCounts(events) {
+  const counts = {};
+  for (const event of events) {
+    counts[event.type] = (counts[event.type] || 0) + 1;
+  }
+  return counts;
+}
+
+function secondsBetween(start, end) {
+  if (!start || !end) {
+    return null;
+  }
+
+  const startTime = new Date(start).getTime();
+  const endTime = new Date(end).getTime();
+
+  if (!Number.isFinite(startTime) || !Number.isFinite(endTime)) {
+    return null;
+  }
+
+  return Math.max(0, Math.round((endTime - startTime) / 1000));
+}
+
 class ExperimentStore extends EventEmitter {
   constructor(options = {}) {
     super();
@@ -488,6 +511,9 @@ class ExperimentStore extends EventEmitter {
     const events = await this.#readPersistedEvents();
     const sessionEvents = events.filter((event) => event.sessionId === sessionId);
     const csv = await this.getSessionCsv(sessionId);
+    const state = sessionId === this.getCurrentSessionId()
+      ? this.getState()
+      : this.#reconstructStateFromEvents(sessionId, sessionEvents);
 
     return {
       session: {
@@ -495,11 +521,9 @@ class ExperimentStore extends EventEmitter {
         exportedAt: toIsoDate(this.now()),
         eventCount: sessionEvents.length,
       },
-      state: sessionId === this.getCurrentSessionId()
-        ? this.getState()
-        : {
-            session: { id: sessionId },
-          },
+      state,
+      analytics: this.#buildAnalytics(state, sessionEvents),
+      replay: this.#buildReplay(sessionEvents),
       events: sessionEvents,
       csv,
     };
@@ -711,6 +735,113 @@ class ExperimentStore extends EventEmitter {
 
   #csvPathForSession(sessionId = this.state.session.id) {
     return path.join(this.exportDir, `${sessionId}.csv`);
+  }
+
+  #reconstructStateFromEvents(sessionId, sessionEvents) {
+    const reconstructed = createInitialState(this.now());
+    reconstructed.session.id = sessionId;
+
+    if (sessionEvents.length > 0) {
+      reconstructed.session.startedAt = sessionEvents[0].timestamp;
+    }
+
+    for (const event of sessionEvents) {
+      if (event.type === 'session.configured' && event.payload?.metadata) {
+        reconstructed.session.metadata = {
+          ...reconstructed.session.metadata,
+          ...event.payload.metadata,
+        };
+      }
+
+      if (event.type === 'session.started') {
+        reconstructed.session.status = 'running';
+        reconstructed.session.trialStartedAt = event.payload?.trialStartedAt || event.timestamp;
+      }
+
+      if (event.type === 'session.completed') {
+        reconstructed.session.status = 'completed';
+        reconstructed.session.completedAt = event.payload?.completedAt || event.timestamp;
+        reconstructed.session.completedSummary = event.payload?.summary || null;
+      }
+
+      if (event.type === 'hint.updated' && event.payload) {
+        reconstructed.hint = {
+          ...reconstructed.hint,
+          ...event.payload,
+        };
+      }
+
+      if (event.type === 'robot.action.logged' && event.payload) {
+        reconstructed.robotAction = {
+          ...reconstructed.robotAction,
+          ...event.payload,
+        };
+      }
+
+      if (event.type === 'telemetry.hrv.updated' && event.payload) {
+        reconstructed.telemetry.hrv = {
+          ...reconstructed.telemetry.hrv,
+          ...event.payload,
+        };
+      }
+
+      if (event.type === 'telemetry.gaze.updated' && event.payload) {
+        reconstructed.telemetry.gaze = {
+          ...reconstructed.telemetry.gaze,
+          ...event.payload,
+        };
+      }
+
+      if (event.type === 'adaptive.status.changed' && event.payload) {
+        reconstructed.adaptive = {
+          ...reconstructed.adaptive,
+          ...event.payload,
+        };
+      }
+    }
+
+    return reconstructed;
+  }
+
+  #buildAnalytics(state, sessionEvents) {
+    const counts = eventCounts(sessionEvents);
+    const session = state.session || {};
+    const firstEventAt = sessionEvents[0]?.timestamp || session.startedAt || null;
+    const lastEventAt = sessionEvents.at(-1)?.timestamp || session.completedAt || session.trialStartedAt || null;
+    const durationSeconds = secondsBetween(session.trialStartedAt || firstEventAt, session.completedAt || lastEventAt);
+
+    return {
+      sessionStatus: session.status || 'setup',
+      eventCounts: counts,
+      totalEvents: sessionEvents.length,
+      durationSeconds,
+      firstEventAt,
+      lastEventAt,
+      latestHint: state.hint?.text || '',
+      latestRobotAction: state.robotAction?.label || '',
+      adaptiveTransitions: counts['adaptive.status.changed'] || 0,
+      hrvFrames: counts['telemetry.hrv.updated'] || 0,
+      gazeFrames: counts['telemetry.gaze.updated'] || 0,
+      participantId: session.metadata?.participantId || '',
+      condition: session.metadata?.condition || '',
+    };
+  }
+
+  #buildReplay(sessionEvents) {
+    const firstTimestamp = sessionEvents[0]?.timestamp || null;
+    const replayEvents = sessionEvents.map((event, index) => ({
+      step: index + 1,
+      type: event.type,
+      source: event.source,
+      timestamp: event.timestamp,
+      offsetSeconds: secondsBetween(firstTimestamp, event.timestamp) || 0,
+      summary: event.summary,
+    }));
+
+    return {
+      totalSteps: replayEvents.length,
+      events: replayEvents,
+    };
   }
 }
 

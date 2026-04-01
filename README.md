@@ -28,6 +28,7 @@ The system is designed to run on a laptop on the same Wi-Fi network as the secon
 - Automatic event logging to local files with timestamps
 - Session export page with JSON and CSV downloads
 - Session metadata and trial lifecycle controls for participant-ready runs
+- Export analytics and replay timeline for post-trial review
 
 ## Runbook
 
@@ -81,3 +82,8 @@ That executes the Node test suite plus Python syntax validation for the watch an
 - `GET /api/exports`: export manifest
 - `GET /api/exports/current.bundle.json`: current session bundle with state, events, and CSV text
 - `GET /api/exports/current.csv`: current session timeline CSV
+
+The export center also renders:
+
+- derived session analytics such as duration, event counts, and adaptive transitions
+- a replay timeline built from the ordered event log
