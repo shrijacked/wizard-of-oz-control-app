@@ -29,6 +29,8 @@ The system is designed to run on a laptop on the same Wi-Fi network as the secon
 - Session export page with JSON and CSV downloads
 - Session metadata and trial lifecycle controls for participant-ready runs
 - Export analytics and replay timeline for post-trial review
+- Optional local admin PIN lock with browser-scoped unlock tokens
+- Session-phase protections that block hints, robot actions, and unsafe resets at the wrong time
 
 ## Runbook
 
@@ -46,16 +48,24 @@ Then open:
 
 On `/admin`, the typical operator flow is:
 
-1. Save the session profile with study ID, participant ID, condition, and notes.
-2. Start the trial when the participant is ready.
-3. Use hints, action logging, and telemetry during the run.
-4. Mark the session complete and enter an end-of-trial summary.
-5. Download the final bundle or CSV from `/exports`.
+1. Unlock the dashboard first if `ADMIN_PIN` is configured on the host.
+2. Save the session profile with study ID, participant ID, condition, and notes.
+3. Start the trial when the participant is ready.
+4. Use hints, action logging, and telemetry during the run.
+5. Mark the session complete and enter an end-of-trial summary.
+6. Download the final bundle or CSV from `/exports`.
+
+Session protections are always active, even when no PIN is configured:
+
+- hints and robot actions are blocked until the trial is running
+- completed sessions become read-only until reset
+- live sessions require an explicit force reset confirmation
 
 ## Optional runtime configuration
 
 - `PORT`: override the listening port. Default is `3000`.
 - `HOST`: override the listening host. Default is `0.0.0.0`.
+- `ADMIN_PIN`: require a local PIN unlock before browser-based admin mutations are allowed.
 - `OPENAI_API_KEY` or `ADAPTIVE_LLM_API_KEY`: enable optional OpenAI-compatible adaptive advice.
 - `ADAPTIVE_LLM_ENDPOINT`: override the chat-completions endpoint.
 - `ADAPTIVE_LLM_MODEL`: override the advisory model name.
@@ -75,6 +85,13 @@ That executes the Node test suite plus Python syntax validation for the watch an
 - HRV watch: run [`integrations/watch/watch.py`](/Users/owlxshri/Downloads/hti/integrations/watch/watch.py) from the repo root so it writes `watch/watch_data.json`.
 - Gaze detector: either post samples to `POST /api/telemetry/gaze` directly or run the bridge in [`integrations/gaze/bridge.py`](/Users/owlxshri/Downloads/hti/integrations/gaze/bridge.py) and connect your SDK output to it.
 - Manual or demo telemetry: use `POST /api/telemetry/simulate` or the built-in simulator on `/admin`.
+
+Bridge and sensor ingestion routes stay available without admin unlock so the external devices can keep streaming during a study:
+
+- `POST /api/telemetry/hrv`
+- `POST /api/telemetry/gaze`
+- `POST /api/bridge/gaze/heartbeat`
+- `POST /api/bridge/gaze/frame`
 
 ## Export surface
 

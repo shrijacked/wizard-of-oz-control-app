@@ -65,6 +65,7 @@ flowchart LR
 - `subject`: distraction-free hint panel
 - `audit`: large-format robotic action monitor
 - `exports`: session analytics, download center, and replay timeline
+- `admin` also exposes the operator safeguard board with lock state and policy gating
 
 ## Data flow
 
@@ -110,6 +111,7 @@ flowchart TD
 - `GET /api/exports/current.bundle.json`: current session bundle export
 - `GET /api/exports/current.csv`: current session timeline CSV
 - `GET /api/bridge/gaze`: current gaze-bridge status
+- `GET /api/guard`: current operator safeguard state and action policy matrix
 - `POST /api/hints`: create and broadcast a participant hint
 - `POST /api/actions`: create and broadcast a robotic arm action event
 - `POST /api/telemetry/hrv`: ingest HRV metrics from a bridge or simulator
@@ -117,6 +119,8 @@ flowchart TD
 - `POST /api/telemetry/simulate`: push a combined mock telemetry frame for demos/tests
 - `POST /api/bridge/gaze/heartbeat`: update gaze-bridge status
 - `POST /api/bridge/gaze/frame`: normalize and ingest a raw gaze-device frame
+- `POST /api/guard/unlock`: exchange the local PIN for a browser-scoped admin token
+- `POST /api/guard/lock`: invalidate the current browser token
 - `POST /api/session/reset`: clear in-memory state and start a fresh experiment log
 
 ## Internal state shape
@@ -225,9 +229,28 @@ Inputs considered in the composite score:
 - gaze attention loss and fixation instability
 - recency weighting so stale telemetry cannot trigger interventions
 
+## Operator safeguard flow
+
+```mermaid
+flowchart TD
+    browser["Admin browser"] --> guard["GET /api/guard"]
+    guard --> lock{"ADMIN_PIN set?"}
+    lock -- no --> session["Apply session-phase policy"]
+    lock -- yes --> auth{"Unlocked token present?"}
+    auth -- no --> blocked["Block protected mutations with 423 Locked"]
+    auth -- yes --> session
+    session --> run{"Action allowed in current session state?"}
+    run -- no --> denied["Block mutation with 409 Conflict"]
+    run -- yes --> mutate["Persist event and broadcast update"]
+```
+
 ## Security and operational posture
 
 - Meant for trusted local-network use during live studies
 - No authentication is enforced by default for local setup simplicity
+- `ADMIN_PIN` enables a lightweight local lock for browser-based admin mutations
+- Unlock state is browser-scoped through short in-memory tokens rather than shared cookies
+- Sensor and bridge ingest routes remain open so device streaming is not interrupted by the operator lock
+- Session-phase protections are always enforced, even when the PIN lock is disabled
 - All external API use is optional and disabled when keys are absent
 - The server should remain functional offline except for optional LLM calls

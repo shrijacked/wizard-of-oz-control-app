@@ -1,26 +1,36 @@
 const RETRY_DELAY_MS = 1500;
 
-export async function fetchJson(url) {
-  const response = await fetch(url);
+async function throwResponseError(response) {
+  const body = await response.json().catch(() => ({}));
+  const error = new Error(body.error || `Request failed with status ${response.status}`);
+  error.status = response.status;
+  error.body = body;
+  throw error;
+}
+
+export async function fetchJson(url, options = {}) {
+  const response = await fetch(url, options);
   if (!response.ok) {
-    throw new Error(`Request failed with status ${response.status}`);
+    await throwResponseError(response);
   }
 
   return response.json();
 }
 
-export async function postJson(url, payload) {
+export async function postJson(url, payload, options = {}) {
+  const headers = {
+    'content-type': 'application/json',
+    ...(options.headers || {}),
+  };
   const response = await fetch(url, {
+    ...options,
     method: 'POST',
-    headers: {
-      'content-type': 'application/json',
-    },
+    headers,
     body: JSON.stringify(payload),
   });
 
   if (!response.ok) {
-    const body = await response.json().catch(() => ({}));
-    throw new Error(body.error || `Request failed with status ${response.status}`);
+    await throwResponseError(response);
   }
 
   return response.json();

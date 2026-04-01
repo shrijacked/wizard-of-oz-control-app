@@ -73,7 +73,7 @@
                 <textarea id="session-notes" rows="4" placeholder="Context, setup notes, or observations before the trial starts."></textarea>
               </label>
               <div class="button-row">
-                <button class="button button-primary" type="submit">Save session profile</button>
+                <button id="session-save" class="button button-primary" type="submit">Save session profile</button>
                 <button id="session-start" class="button button-ghost" type="button">Start trial</button>
                 <button id="session-complete" class="button button-ghost" type="button">Mark complete</button>
               </div>
@@ -90,6 +90,38 @@
               </label>
             </div>
           </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="panel-kicker">Safeguards</p>
+              <h2>Operator Controls</h2>
+            </div>
+            <span class="panel-note">Optional local PIN lock plus session-phase protections</span>
+          </div>
+          <div class="guard-grid">
+            <article class="callout safeguard-callout">
+              <span class="callout-label">Control lock</span>
+              <p id="guard-summary">Checking local safeguard status...</p>
+              <p id="guard-detail">The dashboard will show when controls are unlocked and which actions are currently safe.</p>
+            </article>
+            <form id="guard-form" class="stack-form compact-form">
+              <label class="field">
+                <span>Local admin PIN</span>
+                <input id="guard-pin" type="password" placeholder="Enter the local PIN" autocomplete="current-password">
+              </label>
+              <div class="button-row">
+                <button id="guard-unlock" class="button button-primary" type="submit">Unlock controls</button>
+                <button id="guard-lock" class="button button-ghost" type="button">Lock this browser</button>
+              </div>
+            </form>
+          </div>
+          <article class="callout">
+            <span class="callout-label">Live policy board</span>
+            <p id="guard-message" class="inline-status">No operator alerts yet.</p>
+            <ul id="guard-policy-list" class="policy-list"></ul>
+          </article>
         </section>
 
         <section class="panel">
@@ -187,7 +219,7 @@
               <textarea id="hint-text" rows="5" placeholder="Type the guidance that should appear on the participant display."></textarea>
             </label>
             <div class="button-row">
-              <button class="button button-primary" type="submit">Broadcast hint</button>
+              <button id="hint-send" class="button button-primary" type="submit">Broadcast hint</button>
               <button id="clear-hint" class="button button-ghost" type="button">Clear editor</button>
             </div>
           </form>
@@ -244,7 +276,7 @@
               <span>Watch reports distraction</span>
             </label>
             <div class="button-row">
-              <button class="button button-primary" type="submit">Push simulated telemetry</button>
+              <button id="simulate-submit" class="button button-primary" type="submit">Push simulated telemetry</button>
               <button id="preset-observe" class="button button-ghost" type="button">Preset: Observe</button>
               <button id="preset-intervene" class="button button-ghost" type="button">Preset: Intervene</button>
             </div>

@@ -1,5 +1,18 @@
 import { connectSocket, drawSeriesChart, fetchJson, formatTimestamp, postJson } from './shared.js';
 
+const ADMIN_TOKEN_KEY = 'woz.admin.token';
+
+const POLICY_LABELS = {
+  configureSession: 'Configure session',
+  startSession: 'Start trial',
+  completeSession: 'Complete trial',
+  setHint: 'Broadcast hint',
+  logRobotAction: 'Log robot action',
+  simulateTelemetry: 'Simulate telemetry',
+  resetSession: 'Reset session',
+  forceResetSession: 'Force reset session',
+};
+
 const elements = {
   sessionId: document.querySelector('#session-id'),
   sessionStarted: document.querySelector('#session-started'),
@@ -9,11 +22,20 @@ const elements = {
   sessionCondition: document.querySelector('#session-condition'),
   sessionResearcher: document.querySelector('#session-researcher'),
   sessionNotes: document.querySelector('#session-notes'),
+  sessionSave: document.querySelector('#session-save'),
   sessionStatusSummary: document.querySelector('#session-status-summary'),
   sessionStatusDetail: document.querySelector('#session-status-detail'),
   sessionSummary: document.querySelector('#session-summary'),
   sessionStart: document.querySelector('#session-start'),
   sessionComplete: document.querySelector('#session-complete'),
+  guardForm: document.querySelector('#guard-form'),
+  guardPin: document.querySelector('#guard-pin'),
+  guardUnlock: document.querySelector('#guard-unlock'),
+  guardLock: document.querySelector('#guard-lock'),
+  guardSummary: document.querySelector('#guard-summary'),
+  guardDetail: document.querySelector('#guard-detail'),
+  guardMessage: document.querySelector('#guard-message'),
+  guardPolicyList: document.querySelector('#guard-policy-list'),
   adaptiveStatus: document.querySelector('#adaptive-status'),
   adaptiveReason: document.querySelector('#adaptive-reason'),
   connectionCounts: document.querySelector('#connection-counts'),
@@ -31,6 +53,7 @@ const elements = {
   gazeChart: document.querySelector('#gaze-chart'),
   hintForm: document.querySelector('#hint-form'),
   hintText: document.querySelector('#hint-text'),
+  hintSend: document.querySelector('#hint-send'),
   hintPreview: document.querySelector('#hint-preview'),
   clearHint: document.querySelector('#clear-hint'),
   llmSummary: document.querySelector('#llm-summary'),
@@ -43,6 +66,7 @@ const elements = {
   simAttention: document.querySelector('#sim-attention'),
   simFixation: document.querySelector('#sim-fixation'),
   simDistraction: document.querySelector('#sim-distraction'),
+  simulateSubmit: document.querySelector('#simulate-submit'),
   presetObserve: document.querySelector('#preset-observe'),
   presetIntervene: document.querySelector('#preset-intervene'),
   currentExportLinks: document.querySelector('#current-export-links'),
@@ -61,6 +85,8 @@ let currentState = null;
 let timelineEvents = [];
 let mediaStream = null;
 let exportManifest = null;
+let guardStatus = null;
+let adminToken = window.localStorage.getItem(ADMIN_TOKEN_KEY) || '';
 
 function formatNumber(value, digits = 2) {
   return Number.isFinite(value) ? value.toFixed(digits) : '--';
@@ -76,6 +102,30 @@ function setValueSafely(element, value) {
   }
 
   element.value = value ?? '';
+}
+
+function setAdminToken(token) {
+  adminToken = token || '';
+
+  if (adminToken) {
+    window.localStorage.setItem(ADMIN_TOKEN_KEY, adminToken);
+    return;
+  }
+
+  window.localStorage.removeItem(ADMIN_TOKEN_KEY);
+}
+
+function buildAdminHeaders() {
+  return adminToken
+    ? {
+      'x-admin-token': adminToken,
+    }
+    : {};
+}
+
+function setGuardMessage(message, tone = 'neutral') {
+  elements.guardMessage.textContent = message;
+  elements.guardMessage.dataset.tone = tone;
 }
 
 function renderLinks(container, links) {
@@ -156,8 +206,182 @@ function renderCharts() {
   );
 }
 
+function buildLocalPolicy(actionName) {
+  const session = currentState?.session || {};
+  const status = session.status || 'setup';
+  const metadata = session.metadata || {};
+
+  if (actionName === 'configureSession') {
+    return status === 'setup'
+      ? { allowed: true, reason: null }
+      : { allowed: false, reason: 'Session metadata is locked once the trial has started.' };
+  }
+
+  if (actionName === 'startSession') {
+    if (status !== 'setup') {
+      return { allowed: false, reason: 'Only setup sessions can be started.' };
+    }
+
+    if (!metadata.participantId || !metadata.researcher) {
+      return { allowed: false, reason: 'Participant ID and researcher must be set before starting the trial.' };
+    }
+
+    return { allowed: true, reason: null };
+  }
+
+  if (actionName === 'completeSession') {
+    return status === 'running'
+      ? { allowed: true, reason: null }
+      : { allowed: false, reason: 'Only running sessions can be completed.' };
+  }
+
+  if (actionName === 'setHint' || actionName === 'logRobotAction') {
+    return status === 'running'
+      ? { allowed: true, reason: null }
+      : { allowed: false, reason: 'Hints and robotic actions are only allowed during an active run.' };
+  }
+
+  if (actionName === 'simulateTelemetry') {
+    return status === 'completed'
+      ? { allowed: false, reason: 'Completed sessions are read-only until reset.' }
+      : { allowed: true, reason: null };
+  }
+
+  if (actionName === 'resetSession') {
+    return status === 'running'
+      ? { allowed: false, reason: 'Running sessions require a forced reset confirmation.' }
+      : { allowed: true, reason: null };
+  }
+
+  if (actionName === 'forceResetSession') {
+    return { allowed: true, reason: null };
+  }
+
+  return { allowed: true, reason: null };
+}
+
+function getSafeguardState() {
+  const pinRequired = guardStatus?.pinRequired ?? currentState?.system?.safeguards?.pinRequired ?? false;
+
+  return {
+    pinRequired,
+    authenticated: pinRequired ? Boolean(guardStatus?.authenticated) : true,
+    activeUnlocks: currentState?.system?.safeguards?.activeUnlocks ?? guardStatus?.activeUnlocks ?? 0,
+    permittedActions: guardStatus?.permittedActions || {},
+    sessionStatus: currentState?.session?.status ?? guardStatus?.sessionStatus ?? 'setup',
+  };
+}
+
+function resolvePolicy(actionName) {
+  const safeguard = getSafeguardState();
+  if (safeguard.pinRequired && !safeguard.authenticated) {
+    return {
+      allowed: false,
+      reason: 'Unlock this browser with the local admin PIN before using protected controls.',
+    };
+  }
+
+  return safeguard.permittedActions[actionName] || buildLocalPolicy(actionName);
+}
+
+function policyMessage(actionName, policy) {
+  if (policy.reason) {
+    return policy.reason;
+  }
+
+  if (actionName === 'forceResetSession') {
+    return 'Available if you need to abort a live run and start a fresh log immediately.';
+  }
+
+  if (actionName === 'simulateTelemetry') {
+    return 'Available during setup and live rehearsals while the session is not completed.';
+  }
+
+  return 'Ready in the current session state.';
+}
+
+function setElementDisabled(element, disabled, reason = '') {
+  if (!element) {
+    return;
+  }
+
+  element.disabled = disabled;
+  element.title = disabled ? reason : '';
+}
+
+function renderGuardStatus() {
+  const safeguard = getSafeguardState();
+
+  if (!safeguard.pinRequired) {
+    elements.guardSummary.textContent = 'No local admin PIN is configured on this host.';
+    elements.guardDetail.textContent = 'Session-phase protections still apply, but any operator on the trusted LAN can use the dashboard until ADMIN_PIN is set.';
+  } else if (safeguard.authenticated) {
+    elements.guardSummary.textContent = 'Controls are unlocked on this browser.';
+    elements.guardDetail.textContent = `${safeguard.activeUnlocks} unlocked browser${safeguard.activeUnlocks === 1 ? '' : 's'} across the local network. Sensor bridges continue to post telemetry without operator unlock.`;
+  } else {
+    elements.guardSummary.textContent = 'Controls are locked on this browser.';
+    elements.guardDetail.textContent = 'Enter the local admin PIN on the host machine to enable hints, robot actions, session changes, and telemetry simulation.';
+  }
+
+  setElementDisabled(elements.guardPin, !safeguard.pinRequired || safeguard.authenticated);
+  setElementDisabled(
+    elements.guardUnlock,
+    !safeguard.pinRequired || safeguard.authenticated,
+    'This browser is already unlocked.',
+  );
+  setElementDisabled(
+    elements.guardLock,
+    !safeguard.pinRequired || !safeguard.authenticated,
+    'Unlock the browser before locking it again.',
+  );
+
+  const policyEntries = [
+    ['configureSession', POLICY_LABELS.configureSession],
+    ['startSession', POLICY_LABELS.startSession],
+    ['completeSession', POLICY_LABELS.completeSession],
+    ['setHint', POLICY_LABELS.setHint],
+    ['logRobotAction', POLICY_LABELS.logRobotAction],
+    ['simulateTelemetry', POLICY_LABELS.simulateTelemetry],
+    ['resetSession', POLICY_LABELS.resetSession],
+  ];
+
+  if (safeguard.sessionStatus === 'running') {
+    policyEntries.push(['forceResetSession', POLICY_LABELS.forceResetSession]);
+  }
+
+  elements.guardPolicyList.innerHTML = '';
+  policyEntries.forEach(([actionName, label]) => {
+    const policy = resolvePolicy(actionName);
+    const item = document.createElement('li');
+    item.className = `policy-item ${policy.allowed ? 'allowed' : 'blocked'}`;
+
+    const header = document.createElement('div');
+    header.className = 'policy-item-header';
+
+    const title = document.createElement('strong');
+    title.textContent = label;
+    header.append(title);
+
+    const badge = document.createElement('span');
+    badge.className = 'policy-badge';
+    badge.textContent = policy.allowed ? 'Ready' : 'Blocked';
+    header.append(badge);
+
+    item.append(header);
+
+    const detail = document.createElement('small');
+    detail.textContent = policyMessage(actionName, policy);
+    item.append(detail);
+
+    elements.guardPolicyList.append(item);
+  });
+
+  renderInteractionControls();
+}
+
 function renderActionButtons() {
   const actions = currentState?.system?.robotActions || [];
+  const actionPolicy = resolvePolicy('logRobotAction');
   elements.actionGrid.innerHTML = '';
 
   actions.forEach((action) => {
@@ -165,19 +389,77 @@ function renderActionButtons() {
     button.type = 'button';
     button.className = 'action-button';
     button.textContent = action.label;
+    button.disabled = !actionPolicy.allowed;
+    button.title = actionPolicy.allowed ? '' : actionPolicy.reason || '';
     button.addEventListener('click', async () => {
       try {
         await postJson('/api/actions', {
           actionId: action.actionId,
           label: action.label,
           payload: { origin: 'admin-dashboard' },
+        }, {
+          headers: buildAdminHeaders(),
         });
+        setGuardMessage(`Logged ${action.label}.`, 'success');
       } catch (error) {
-        window.alert(error.message);
+        await handleAdminError(error);
       }
     });
     elements.actionGrid.append(button);
   });
+}
+
+function renderInteractionControls() {
+  const configurePolicy = resolvePolicy('configureSession');
+  const startPolicy = resolvePolicy('startSession');
+  const completePolicy = resolvePolicy('completeSession');
+  const hintPolicy = resolvePolicy('setHint');
+  const simulatePolicy = resolvePolicy('simulateTelemetry');
+  const resetPolicy = resolvePolicy('resetSession');
+  const forceResetPolicy = resolvePolicy('forceResetSession');
+  const sessionStatus = currentState?.session?.status || 'setup';
+  const resetControlPolicy = sessionStatus === 'running' ? forceResetPolicy : resetPolicy;
+
+  [
+    elements.sessionStudyId,
+    elements.sessionParticipantId,
+    elements.sessionCondition,
+    elements.sessionResearcher,
+    elements.sessionNotes,
+    elements.sessionSave,
+  ].forEach((element) => {
+    setElementDisabled(element, !configurePolicy.allowed, configurePolicy.reason || '');
+  });
+
+  setElementDisabled(elements.sessionStart, !startPolicy.allowed, startPolicy.reason || '');
+  setElementDisabled(elements.sessionComplete, !completePolicy.allowed, completePolicy.reason || '');
+  setElementDisabled(elements.sessionSummary, !completePolicy.allowed, completePolicy.reason || '');
+
+  setElementDisabled(elements.hintText, !hintPolicy.allowed, hintPolicy.reason || '');
+  setElementDisabled(elements.hintSend, !hintPolicy.allowed, hintPolicy.reason || '');
+  setElementDisabled(elements.clearHint, !hintPolicy.allowed, hintPolicy.reason || '');
+  setElementDisabled(
+    elements.useLlmHint,
+    !hintPolicy.allowed || !currentState?.adaptive?.advisory?.recommendedHint,
+    hintPolicy.reason || 'No suggested hint is available yet.',
+  );
+
+  [
+    elements.simStress,
+    elements.simAttention,
+    elements.simFixation,
+    elements.simDistraction,
+    elements.simulateSubmit,
+    elements.presetObserve,
+    elements.presetIntervene,
+  ].forEach((element) => {
+    setElementDisabled(element, !simulatePolicy.allowed, simulatePolicy.reason || '');
+  });
+
+  elements.resetSession.textContent = sessionStatus === 'running' ? 'Force reset session' : 'Reset session';
+  setElementDisabled(elements.resetSession, !resetControlPolicy.allowed, resetControlPolicy.reason || '');
+
+  renderActionButtons();
 }
 
 function renderState() {
@@ -199,16 +481,15 @@ function renderState() {
   const statusLabel = session.status ? session.status.toUpperCase() : 'SETUP';
   elements.sessionStatusSummary.textContent = `${statusLabel} • ${metadata.participantId || 'participant not assigned'}`;
   if (session.status === 'running') {
-    elements.sessionStatusDetail.textContent = `Trial started ${formatTimestamp(session.trialStartedAt)} by ${metadata.researcher || 'researcher'}.`;
+    elements.sessionStatusDetail.textContent = `Trial started ${formatTimestamp(session.trialStartedAt)} by ${metadata.researcher || 'researcher'}. Hints and robotic actions are now enabled.`;
   } else if (session.status === 'completed') {
     elements.sessionStatusDetail.textContent = session.completedSummary
-      ? `${session.completedSummary} Completed ${formatTimestamp(session.completedAt)}.`
-      : `Completed ${formatTimestamp(session.completedAt)}.`;
+      ? `${session.completedSummary} Completed ${formatTimestamp(session.completedAt)}. The session is now read-only until reset.`
+      : `Completed ${formatTimestamp(session.completedAt)}. The session is now read-only until reset.`;
   } else {
-    elements.sessionStatusDetail.textContent = 'Save metadata, then start the trial when the participant is ready.';
+    elements.sessionStatusDetail.textContent = 'Save metadata, then start the trial when the participant is ready. During setup, only session configuration and telemetry rehearsal are available.';
   }
-  elements.sessionStart.disabled = session.status === 'running';
-  elements.sessionComplete.disabled = session.status !== 'running';
+  setValueSafely(elements.sessionSummary, session.completedSummary);
 
   const adaptive = currentState.adaptive;
   elements.adaptiveStatus.textContent = `${adaptive.status.toUpperCase()} • ${formatNumber(adaptive.score)}`;
@@ -248,12 +529,11 @@ function renderState() {
   elements.llmHint.textContent = advisory?.recommendedHint
     ? `Suggested hint: ${advisory.recommendedHint}`
     : 'Suggested hint: unavailable';
-  elements.useLlmHint.disabled = !advisory?.recommendedHint;
 
   renderLinks(elements.localhostLinks, currentState.system.network.localhost);
   renderLanLinks(elements.lanLinks, currentState.system.network.lan);
   renderCharts();
-  renderActionButtons();
+  renderGuardStatus();
 }
 
 function renderExportInfo() {
@@ -293,6 +573,18 @@ async function bootstrapState() {
 async function refreshExportManifest() {
   exportManifest = await fetchJson('/api/exports');
   renderExportInfo();
+}
+
+async function refreshGuardStatus() {
+  guardStatus = await fetchJson('/api/guard', {
+    headers: buildAdminHeaders(),
+  });
+
+  if (guardStatus.pinRequired && !guardStatus.authenticated && adminToken) {
+    setAdminToken('');
+  }
+
+  renderGuardStatus();
 }
 
 function buildStressLevel(stressScore) {
@@ -335,7 +627,9 @@ async function submitSimulation() {
     },
   };
 
-  await postJson('/api/telemetry/simulate', payload);
+  await postJson('/api/telemetry/simulate', payload, {
+    headers: buildAdminHeaders(),
+  });
 }
 
 async function startCamera() {
@@ -363,9 +657,29 @@ function stopCamera() {
   elements.cameraStatus.textContent = 'Camera is off.';
 }
 
+async function handleAdminError(error) {
+  if (error.status === 423) {
+    setAdminToken('');
+  }
+
+  if (error.status === 401 || error.status === 409 || error.status === 423) {
+    setGuardMessage(error.message, 'warning');
+    await refreshGuardStatus();
+    return;
+  }
+
+  setGuardMessage(error.message || 'Unexpected dashboard error.', 'warning');
+  window.alert(error.message);
+}
+
 async function init() {
-  await bootstrapState();
-  await refreshExportManifest();
+  setGuardMessage('Loading safeguard status...', 'neutral');
+
+  await Promise.all([
+    bootstrapState(),
+    refreshExportManifest(),
+    refreshGuardStatus(),
+  ]);
 
   connectSocket('admin', {
     onSnapshot(state) {
@@ -382,13 +696,50 @@ async function init() {
     },
   });
 
+  elements.guardForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    try {
+      const response = await postJson('/api/guard/unlock', {
+        pin: elements.guardPin.value,
+      });
+      setAdminToken(response.token);
+      elements.guardPin.value = '';
+      setGuardMessage('Controls unlocked on this browser.', 'success');
+      await refreshGuardStatus();
+    } catch (error) {
+      await handleAdminError(error);
+    }
+  });
+
+  elements.guardLock.addEventListener('click', async () => {
+    if (!getSafeguardState().pinRequired) {
+      setGuardMessage('No admin PIN is configured, so there is nothing to lock locally.', 'neutral');
+      return;
+    }
+
+    try {
+      await postJson('/api/guard/lock', {}, {
+        headers: buildAdminHeaders(),
+      });
+      setAdminToken('');
+      setGuardMessage('Controls locked on this browser.', 'success');
+      await refreshGuardStatus();
+    } catch (error) {
+      await handleAdminError(error);
+    }
+  });
+
   elements.hintForm.addEventListener('submit', async (event) => {
     event.preventDefault();
     try {
-      await postJson('/api/hints', { text: elements.hintText.value });
+      await postJson('/api/hints', { text: elements.hintText.value }, {
+        headers: buildAdminHeaders(),
+      });
       elements.hintText.value = '';
+      setGuardMessage('Hint broadcast to the participant display.', 'success');
     } catch (error) {
-      window.alert(error.message);
+      await handleAdminError(error);
     }
   });
 
@@ -401,10 +752,14 @@ async function init() {
         condition: elements.sessionCondition.value,
         researcher: elements.sessionResearcher.value,
         notes: elements.sessionNotes.value,
+      }, {
+        headers: buildAdminHeaders(),
       });
+      setGuardMessage('Session profile saved.', 'success');
       await refreshExportManifest();
+      await refreshGuardStatus();
     } catch (error) {
-      window.alert(error.message);
+      await handleAdminError(error);
     }
   });
 
@@ -412,10 +767,14 @@ async function init() {
     try {
       await postJson('/api/session/start', {
         operator: elements.sessionResearcher.value || 'researcher',
+      }, {
+        headers: buildAdminHeaders(),
       });
+      setGuardMessage('Trial started. Live interventions are now enabled.', 'success');
       await refreshExportManifest();
+      await refreshGuardStatus();
     } catch (error) {
-      window.alert(error.message);
+      await handleAdminError(error);
     }
   });
 
@@ -424,10 +783,14 @@ async function init() {
       await postJson('/api/session/complete', {
         operator: elements.sessionResearcher.value || 'researcher',
         summary: elements.sessionSummary.value,
+      }, {
+        headers: buildAdminHeaders(),
       });
+      setGuardMessage('Trial marked complete. The session is now read-only until reset.', 'success');
       await refreshExportManifest();
+      await refreshGuardStatus();
     } catch (error) {
-      window.alert(error.message);
+      await handleAdminError(error);
     }
   });
 
@@ -449,8 +812,9 @@ async function init() {
     event.preventDefault();
     try {
       await submitSimulation();
+      setGuardMessage('Simulated telemetry pushed into the adaptive engine.', 'success');
     } catch (error) {
-      window.alert(error.message);
+      await handleAdminError(error);
     }
   });
 
@@ -472,18 +836,29 @@ async function init() {
   elements.stopCamera.addEventListener('click', stopCamera);
 
   elements.resetSession.addEventListener('click', async () => {
-    const confirmed = window.confirm('Reset the current session and start a fresh log?');
+    const isRunning = (currentState?.session?.status || 'setup') === 'running';
+    const message = isRunning
+      ? 'Force reset the live session and start a fresh log immediately?'
+      : 'Reset the current session and start a fresh log?';
+    const confirmed = window.confirm(message);
     if (!confirmed) {
       return;
     }
 
     try {
-      await postJson('/api/session/reset', { requestedBy: 'researcher' });
+      await postJson('/api/session/reset', {
+        requestedBy: 'researcher',
+        force: isRunning,
+      }, {
+        headers: buildAdminHeaders(),
+      });
       timelineEvents = [];
+      setGuardMessage('Session reset. A fresh log is ready.', 'success');
       await bootstrapState();
       await refreshExportManifest();
+      await refreshGuardStatus();
     } catch (error) {
-      window.alert(error.message);
+      await handleAdminError(error);
     }
   });
 
@@ -491,5 +866,6 @@ async function init() {
 }
 
 init().catch((error) => {
+  setGuardMessage(error.message || 'Failed to initialize the dashboard.', 'warning');
   window.alert(error.message);
 });

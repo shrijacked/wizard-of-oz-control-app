@@ -37,6 +37,7 @@ flowchart LR
 | T10 | Add export manifest, download routes, and export-center UI | T2, T4, T7 | Architecture: Logging strategy |
 | T11 | Add automated tests for store, API, adaptive logic, and realtime flows | T2-T10 | Architecture: Data flow |
 | T12 | Add operator docs and end-to-end runbook | T1-T11 | README + architecture docs |
+| T13 | Add operator safeguards with local PIN lock and session-phase policy enforcement | T2, T4, T7, T11 | Architecture: Operator safeguard flow |
 
 ## Delivery slices
 
@@ -79,6 +80,12 @@ flowchart LR
 - Add replay timeline browsing to the export center
 - Verify analytics and replay output through tests
 
+### Slice 8
+
+- Add local operator safeguards and browser unlock flow
+- Enforce session-phase mutation policy at the API and dashboard layers
+- Verify lock, read-only, and force-reset behaviors through tests and live checks
+
 ## Validation checklist
 
 - Admin view loads and can preview the webcam
@@ -87,6 +94,9 @@ flowchart LR
 - Telemetry ingest updates charts and adaptive recommendation state
 - Session metadata persists into state and export bundles
 - Trial lifecycle transitions are logged with timestamps
+- PIN-protected admin mutations stay locked until the correct local unlock flow succeeds
+- Hints and robotic actions stay blocked outside the running phase
+- Force reset is required before aborting an active run
 - Export center shows analytics and replay timeline for a selected session
 - Session events append to disk with timestamps
 - Tests pass before any commit is created
