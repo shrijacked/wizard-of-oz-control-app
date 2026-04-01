@@ -1,0 +1,201 @@
+# Wizard of Oz Control Application Architecture
+
+## Goals
+
+The application coordinates a live Wizard of Oz research session from one host machine while keeping the participant and audit screens synchronized in real time. It must:
+
+- surface live camera and telemetry to the researcher
+- decide when adaptive interventions are warranted
+- broadcast hints to a participant-facing display
+- log manual robotic arm actions and broadcast them to an audit display
+- write a trustworthy experiment timeline for later analysis
+
+## System topology
+
+```mermaid
+flowchart LR
+    webcam["USB Webcam<br/>Logitech C270"] --> admin["Admin Dashboard<br/>/admin"]
+    watch["HRV Watch<br/>watch.py -> watch/watch_data.json"] --> server["Local Node Server<br/>HTTP + WebSocket"]
+    gaze["Gaze Detector<br/>SDK bridge / HTTP ingest"] --> server
+    admin --> server
+    server --> subject["Subject Display<br/>/subject"]
+    server --> audit["Audit Display<br/>/audit"]
+    server --> logs["Local Event Log<br/>JSONL + state snapshot"]
+    server --> adaptive["Adaptive Logic Engine"]
+    adaptive --> admin
+    adaptive --> llm["Optional LLM API"]
+```
+
+## Component responsibilities
+
+### 1. Local HTTP server
+
+- Serves the three route-specific frontends
+- Exposes REST endpoints for telemetry ingest, interventions, actions, and state
+- Hosts the WebSocket hub used by all displays
+
+### 2. WebSocket hub
+
+- Maintains active clients grouped by screen role
+- Pushes state snapshots and incremental events without page refreshes
+- Broadcasts hint updates to subject screens and action updates to audit screens
+
+### 3. Experiment state store
+
+- Keeps the latest state in memory for fast UI refresh
+- Persists snapshots and timeline events to disk
+- Tracks the latest hint, latest robotic action, adaptive status, and telemetry summaries
+
+### 4. Telemetry ingestion layer
+
+- Accepts HTTP posts from gaze or other sensor bridges
+- Watches the HRV watch output JSON file written by `watch.py`
+- Normalizes metrics into one internal telemetry model
+
+### 5. Adaptive logic engine
+
+- Evaluates recent HRV and gaze conditions
+- Produces a recommendation state: `normal`, `observe`, or `intervene`
+- Uses heuristics by default and can optionally call an LLM adapter for narrative guidance
+
+### 6. Frontend route views
+
+- `admin`: dense operational UI for the researcher
+- `subject`: distraction-free hint panel
+- `audit`: large-format robotic action monitor
+
+## Data flow
+
+```mermaid
+sequenceDiagram
+    participant Admin as Researcher (/admin)
+    participant Server as Local Server
+    participant Store as Experiment Store
+    participant Subject as Subject Display
+    participant Audit as Audit Display
+
+    Admin->>Server: POST hint or robot action
+    Server->>Store: persist event + update state
+    Store-->>Server: latest state snapshot
+    Server-->>Subject: WebSocket hint update
+    Server-->>Audit: WebSocket action update
+    Server-->>Admin: WebSocket state refresh
+```
+
+## Telemetry flow
+
+```mermaid
+flowchart TD
+    watchfile["watch/watch_data.json"] --> watcher["Watch file monitor"]
+    gazehttp["POST /api/telemetry/gaze"] --> normalizer["Telemetry normalizer"]
+    manualhrv["POST /api/telemetry/hrv"] --> normalizer
+    watcher --> normalizer
+    normalizer --> store["Experiment state store"]
+    store --> adaptive["Adaptive logic engine"]
+    adaptive --> broadcast["WebSocket broadcast"]
+    broadcast --> admin["Admin dashboard"]
+```
+
+## Route map
+
+- `GET /admin`: main operator interface
+- `GET /subject`: participant hint terminal
+- `GET /audit`: robot action audit display
+- `GET /api/state`: full current experiment state
+- `GET /api/events?limit=N`: recent event timeline
+- `POST /api/hints`: create and broadcast a participant hint
+- `POST /api/actions`: create and broadcast a robotic arm action event
+- `POST /api/telemetry/hrv`: ingest HRV metrics from a bridge or simulator
+- `POST /api/telemetry/gaze`: ingest gaze metrics from a bridge or simulator
+- `POST /api/telemetry/simulate`: push a combined mock telemetry frame for demos/tests
+- `POST /api/session/reset`: clear in-memory state and start a fresh experiment log
+
+## Internal state shape
+
+```json
+{
+  "session": {
+    "id": "session-20260401-214800",
+    "startedAt": "2026-04-01T21:48:00.000Z"
+  },
+  "hint": {
+    "text": "Try matching the blue triangle to the outer corner.",
+    "updatedAt": "2026-04-01T21:55:00.000Z"
+  },
+  "robotAction": {
+    "actionId": "function-3",
+    "label": "Blue Triangle",
+    "updatedAt": "2026-04-01T21:55:08.000Z"
+  },
+  "telemetry": {
+    "hrv": {},
+    "gaze": {},
+    "derived": {}
+  },
+  "adaptive": {
+    "status": "observe",
+    "score": 0.53,
+    "reason": "HRV stress is elevated and focus loss is increasing."
+  }
+}
+```
+
+## Logging strategy
+
+- `data/events.jsonl`: append-only experiment timeline
+- `data/state.json`: current state snapshot for crash recovery
+- `data/export/session-<id>.csv`: optional export-friendly timeline
+
+Every mutation must create a timestamped event with:
+
+- event type
+- actor or source
+- machine-readable payload
+- human-readable summary
+
+## Sensor integration plan
+
+### HRV watch
+
+The provided `watch.py` writes `watch/watch_data.json`. The server should monitor that file and ingest only new entries as they appear. This avoids coupling BLE logic to the web server process.
+
+### Gaze detector
+
+The gaze stack is SDK-dependent, so the server exposes a stable HTTP ingest contract. A lightweight future bridge can post:
+
+```json
+{
+  "attentionScore": 0.31,
+  "fixationLoss": 0.68,
+  "pupilDilation": 0.54,
+  "source": "gaze-sdk"
+}
+```
+
+## Adaptive engine behavior
+
+```mermaid
+flowchart TD
+    start["New telemetry frame"] --> score["Compute composite adaptive score"]
+    score --> check1{"score >= 0.75?"}
+    check1 -- yes --> intervene["Status = intervene"]
+    check1 -- no --> check2{"score >= 0.45?"}
+    check2 -- yes --> observe["Status = observe"]
+    check2 -- no --> normal["Status = normal"]
+    intervene --> notify["Push recommendation to admin"]
+    observe --> notify
+    normal --> notify
+```
+
+Inputs considered in the composite score:
+
+- HRV stress score and distraction flag from the watch
+- gaze attention loss and fixation instability
+- recency weighting so stale telemetry cannot trigger interventions
+
+## Security and operational posture
+
+- Meant for trusted local-network use during live studies
+- No authentication is enforced by default for local setup simplicity
+- All external API use is optional and disabled when keys are absent
+- The server should remain functional offline except for optional LLM calls
