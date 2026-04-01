@@ -39,3 +39,17 @@ Then open:
 - `http://localhost:3000/admin`
 - `http://<host-ip>:3000/subject`
 - `http://<host-ip>:3000/audit`
+
+## Optional runtime configuration
+
+- `PORT`: override the listening port. Default is `3000`.
+- `HOST`: override the listening host. Default is `0.0.0.0`.
+- `OPENAI_API_KEY` or `ADAPTIVE_LLM_API_KEY`: enable optional OpenAI-compatible adaptive advice.
+- `ADAPTIVE_LLM_ENDPOINT`: override the chat-completions endpoint.
+- `ADAPTIVE_LLM_MODEL`: override the advisory model name.
+
+## Sensor wiring
+
+- HRV watch: run [`integrations/watch/watch.py`](/Users/owlxshri/Downloads/hti/integrations/watch/watch.py) from the repo root so it writes `watch/watch_data.json`.
+- Gaze detector: post samples to `POST /api/telemetry/gaze`.
+- Manual or demo telemetry: use `POST /api/telemetry/simulate` or the built-in simulator on `/admin`.

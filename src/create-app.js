@@ -9,6 +9,7 @@ const { ExperimentStore } = require('./store');
 const { WebSocketHub } = require('./websocket-hub');
 const { WatchBridge } = require('./watch-bridge');
 const { getLocalNetworkAddresses } = require('./network');
+const { LlmAdvisor } = require('./llm-advisor');
 
 const ROBOT_ACTIONS = [
   { actionId: 'function-1', label: 'Function 1: Move Square' },
@@ -93,6 +94,7 @@ async function createApp(options = {}) {
   const store = options.store || new ExperimentStore({
     dataDir: options.dataDir,
     adaptiveEngine: options.adaptiveEngine,
+    llmAdvisor: options.llmAdvisor || new LlmAdvisor(),
   });
   const watchBridge = options.watchBridge || new WatchBridge({
     store,

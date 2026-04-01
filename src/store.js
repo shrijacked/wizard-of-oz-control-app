@@ -6,6 +6,7 @@ const path = require('node:path');
 const { randomUUID } = require('node:crypto');
 
 const { AdaptiveEngine, toIsoDate } = require('./adaptive-engine');
+const { LlmAdvisor } = require('./llm-advisor');
 
 const MAX_HISTORY_POINTS = 60;
 const MAX_TIMELINE_EVENTS = 200;
@@ -65,6 +66,7 @@ function createInitialState(now = new Date()) {
       score: 0,
       reason: 'Waiting for telemetry.',
       updatedAt: timestamp,
+      advisory: null,
       contributingSignals: {
         hrvScore: 0,
         gazeScore: 0,
@@ -104,10 +106,12 @@ class ExperimentStore extends EventEmitter {
     this.statePath = path.join(this.dataDir, 'state.json');
     this.eventsPath = path.join(this.dataDir, 'events.jsonl');
     this.adaptiveEngine = options.adaptiveEngine || new AdaptiveEngine();
+    this.llmAdvisor = options.llmAdvisor || new LlmAdvisor();
     this.now = options.now || (() => new Date());
     this.state = createInitialState(this.now());
     this.timeline = [];
     this.writeQueue = Promise.resolve();
+    this.lastAdvisorySignature = null;
   }
 
   async initialize() {
@@ -238,8 +242,8 @@ class ExperimentStore extends EventEmitter {
       payload: clone(this.state.telemetry.hrv),
     });
 
-    const adaptiveEvent = await this.#refreshAdaptiveState(meta.source || payload.source || 'api');
-    const events = adaptiveEvent ? [telemetryEvent, adaptiveEvent] : [telemetryEvent];
+    const adaptiveEvents = await this.#refreshAdaptiveState(meta.source || payload.source || 'api');
+    const events = [telemetryEvent, ...adaptiveEvents];
     await this.#persistAndBroadcast(events);
     return this.getState();
   }
@@ -266,8 +270,8 @@ class ExperimentStore extends EventEmitter {
       payload: clone(this.state.telemetry.gaze),
     });
 
-    const adaptiveEvent = await this.#refreshAdaptiveState(meta.source || payload.source || 'api');
-    const events = adaptiveEvent ? [telemetryEvent, adaptiveEvent] : [telemetryEvent];
+    const adaptiveEvents = await this.#refreshAdaptiveState(meta.source || payload.source || 'api');
+    const events = [telemetryEvent, ...adaptiveEvents];
     await this.#persistAndBroadcast(events);
     return this.getState();
   }
@@ -333,6 +337,16 @@ class ExperimentStore extends EventEmitter {
   async #refreshAdaptiveState(source) {
     const previous = this.state.adaptive;
     const next = this.adaptiveEngine.evaluate(this.state, this.now());
+    const events = [];
+
+    if (next.status === 'observe' || next.status === 'intervene') {
+      const advisory = await this.#maybeRequestLlmAdvice(next);
+      next.advisory = advisory;
+    } else {
+      next.advisory = null;
+      this.lastAdvisorySignature = null;
+    }
+
     this.state.adaptive = next;
 
     const materiallyChanged = (
@@ -342,14 +356,66 @@ class ExperimentStore extends EventEmitter {
     );
 
     if (!materiallyChanged) {
-      return null;
+      if (this.#shouldEmitAdvisoryEvent(previous.advisory, next.advisory)) {
+        events.push(this.#createEvent('adaptive.llm.advice.updated', {
+          source,
+          summary: 'LLM-backed adaptive guidance was refreshed.',
+          payload: clone(next.advisory),
+        }));
+      }
+
+      return events;
     }
 
-    return this.#createEvent('adaptive.status.changed', {
+    events.push(this.#createEvent('adaptive.status.changed', {
       source,
       summary: `Adaptive recommendation is now ${next.status}.`,
       payload: clone(next),
+    }));
+
+    if (this.#shouldEmitAdvisoryEvent(previous.advisory, next.advisory)) {
+      events.push(this.#createEvent('adaptive.llm.advice.updated', {
+        source,
+        summary: 'LLM-backed adaptive guidance was refreshed.',
+        payload: clone(next.advisory),
+      }));
+    }
+
+    return events;
+  }
+
+  async #maybeRequestLlmAdvice(nextAdaptiveState) {
+    if (!this.llmAdvisor.isEnabled()) {
+      return null;
+    }
+
+    const signature = JSON.stringify({
+      status: nextAdaptiveState.status,
+      score: nextAdaptiveState.score,
+      hrv: this.state.telemetry.hrv.stressScore,
+      gazeAttention: this.state.telemetry.gaze.attentionScore,
+      fixationLoss: this.state.telemetry.gaze.fixationLoss,
+      distractionDetected: this.state.telemetry.hrv.distractionDetected,
     });
+
+    if (this.lastAdvisorySignature === signature && this.state.adaptive?.advisory) {
+      return this.state.adaptive.advisory;
+    }
+
+    this.lastAdvisorySignature = signature;
+    return this.llmAdvisor.analyze(this.state, nextAdaptiveState);
+  }
+
+  #shouldEmitAdvisoryEvent(previousAdvisory, nextAdvisory) {
+    if (!nextAdvisory) {
+      return false;
+    }
+
+    if (!previousAdvisory) {
+      return true;
+    }
+
+    return previousAdvisory.generatedAt !== nextAdvisory.generatedAt;
   }
 
   async #persistAndBroadcast(events) {

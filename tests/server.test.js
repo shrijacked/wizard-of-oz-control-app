@@ -63,6 +63,28 @@ test('HTTP API updates state and exposes recent events', async () => {
   }
 });
 
+test('server serves the actual admin, subject, audit, and stylesheet assets', async () => {
+  const dataDir = await fs.mkdtemp(path.join(os.tmpdir(), 'woz-public-'));
+  const app = await createApp({ dataDir, port: 0 });
+  await new Promise((resolve) => app.server.listen(0, '127.0.0.1', resolve));
+  const address = app.server.address();
+  const baseUrl = `http://127.0.0.1:${address.port}`;
+
+  try {
+    const adminHtml = await fetch(`${baseUrl}/admin`).then((response) => response.text());
+    const subjectHtml = await fetch(`${baseUrl}/subject`).then((response) => response.text());
+    const auditHtml = await fetch(`${baseUrl}/audit`).then((response) => response.text());
+    const css = await fetch(`${baseUrl}/styles.css`).then((response) => response.text());
+
+    assert.match(adminHtml, /Research Control Deck/);
+    assert.match(subjectHtml, /Hint Terminal/);
+    assert.match(auditHtml, /Robotic Action Monitor/);
+    assert.match(css, /--teal/);
+  } finally {
+    await app.close();
+  }
+});
+
 test('WebSocket clients receive role-specific snapshots after updates', async () => {
   const { app, baseUrl } = await startTestApp();
   const wsBase = baseUrl.replace('http://', 'ws://');

@@ -4,11 +4,12 @@ const { createApp } = require('./create-app');
 
 async function main() {
   const port = Number(process.env.PORT || 3000);
+  const host = process.env.HOST || '0.0.0.0';
   const app = await createApp({ port });
 
-  app.server.listen(port, '0.0.0.0', () => {
+  app.server.listen(port, host, () => {
     // eslint-disable-next-line no-console
-    console.log(`Wizard of Oz Control Application listening on http://localhost:${port}/admin`);
+    console.log(`Wizard of Oz Control Application listening on http://${host === '0.0.0.0' ? 'localhost' : host}:${port}/admin`);
   });
 
   const shutdown = async () => {
