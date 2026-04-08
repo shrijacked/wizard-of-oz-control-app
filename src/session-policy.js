@@ -45,6 +45,12 @@ function buildPolicy(state, action, options = {}) {
       : allow();
   }
 
+  if (action === 'updateAdaptiveConfig') {
+    return status === 'completed'
+      ? deny('Adaptive controls are read-only after completion.')
+      : allow();
+  }
+
   if (action === 'resetSession') {
     if (status === 'running' && !force) {
       return deny('Running sessions require a forced reset confirmation.');

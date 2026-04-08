@@ -114,6 +114,7 @@ test('server serves the actual admin, subject, audit, and stylesheet assets', as
 
     assert.match(adminHtml, /Research Control Deck/);
     assert.match(adminHtml, /Operator Controls/);
+    assert.match(adminHtml, /Adaptive Controls/);
     assert.match(subjectHtml, /Hint Terminal/);
     assert.match(auditHtml, /Robotic Action Monitor/);
     assert.match(exportsHtml, /Session Exports/);
@@ -400,6 +401,100 @@ test('session protections block unsafe actions before start, after completion, a
       }),
     });
     assert.equal(forcedReset.status, 200);
+  } finally {
+    await app.close();
+  }
+});
+
+test('adaptive configuration endpoint updates state and is blocked after completion', async () => {
+  const { app, baseUrl } = await startConfiguredApp({ adminPin: '2468' });
+
+  try {
+    const unlockPayload = await fetch(`${baseUrl}/api/guard/unlock`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ pin: '2468' }),
+    }).then((response) => response.json());
+
+    const configureResponse = await fetch(`${baseUrl}/api/adaptive/config`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-admin-token': unlockPayload.token,
+      },
+      body: JSON.stringify({
+        thresholds: {
+          observe: 0.33,
+          intervene: 0.61,
+        },
+        weights: {
+          hrv: 0.72,
+          gaze: 0.28,
+        },
+        distractionBoost: 0.16,
+        freshness: {
+          fullStrengthSeconds: 80,
+          staleAfterSeconds: 210,
+        },
+      }),
+    });
+    assert.equal(configureResponse.status, 200);
+
+    const state = await fetch(`${baseUrl}/api/state`).then((response) => response.json());
+    assert.equal(state.adaptive.configuration.thresholds.observe, 0.33);
+    assert.equal(state.adaptive.configuration.weights.hrv, 0.72);
+
+    await fetch(`${baseUrl}/api/session/configure`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-admin-token': unlockPayload.token,
+      },
+      body: JSON.stringify({
+        participantId: 'P-900',
+        researcher: 'Shrijacked',
+      }),
+    });
+
+    await fetch(`${baseUrl}/api/session/start`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-admin-token': unlockPayload.token,
+      },
+      body: JSON.stringify({ operator: 'Shrijacked' }),
+    });
+
+    await fetch(`${baseUrl}/api/session/complete`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-admin-token': unlockPayload.token,
+      },
+      body: JSON.stringify({ operator: 'Shrijacked' }),
+    });
+
+    const guardAfterComplete = await fetch(`${baseUrl}/api/guard`, {
+      headers: {
+        'x-admin-token': unlockPayload.token,
+      },
+    }).then((response) => response.json());
+    assert.equal(guardAfterComplete.permittedActions.updateAdaptiveConfig.allowed, false);
+
+    const afterCompleteResponse = await fetch(`${baseUrl}/api/adaptive/config`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-admin-token': unlockPayload.token,
+      },
+      body: JSON.stringify({
+        thresholds: {
+          observe: 0.4,
+          intervene: 0.7,
+        },
+      }),
+    });
+    assert.equal(afterCompleteResponse.status, 409);
   } finally {
     await app.close();
   }

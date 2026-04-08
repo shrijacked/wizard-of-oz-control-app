@@ -5,7 +5,13 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { randomUUID } = require('node:crypto');
 
-const { AdaptiveEngine, toIsoDate } = require('./adaptive-engine');
+const {
+  AdaptiveEngine,
+  DEFAULT_ADAPTIVE_CONFIGURATION,
+  mergeAdaptiveConfiguration,
+  normalizeAdaptiveConfiguration,
+  toIsoDate,
+} = require('./adaptive-engine');
 const { LlmAdvisor } = require('./llm-advisor');
 
 const MAX_HISTORY_POINTS = 60;
@@ -14,6 +20,25 @@ const MAX_TIMELINE_EVENTS = 200;
 function createSessionId(now = new Date()) {
   const safe = now.toISOString().replace(/[-:]/g, '').replace(/\..+/, '').replace('T', '-');
   return `session-${safe}`;
+}
+
+function createInitialAdaptiveState(now = new Date()) {
+  return {
+    status: 'normal',
+    score: 0,
+    reason: 'Waiting for telemetry.',
+    updatedAt: toIsoDate(now),
+    advisory: null,
+    configuration: clone(DEFAULT_ADAPTIVE_CONFIGURATION),
+    defaults: clone(DEFAULT_ADAPTIVE_CONFIGURATION),
+    contributingSignals: {
+      hrvScore: 0,
+      gazeScore: 0,
+      distractionDetected: false,
+      hrvFreshness: 0,
+      gazeFreshness: 0,
+    },
+  };
 }
 
 function createInitialState(now = new Date()) {
@@ -72,20 +97,7 @@ function createInitialState(now = new Date()) {
         gaze: [],
       },
     },
-    adaptive: {
-      status: 'normal',
-      score: 0,
-      reason: 'Waiting for telemetry.',
-      updatedAt: timestamp,
-      advisory: null,
-      contributingSignals: {
-        hrvScore: 0,
-        gazeScore: 0,
-        distractionDetected: false,
-        hrvFreshness: 0,
-        gazeFreshness: 0,
-      },
-    },
+    adaptive: createInitialAdaptiveState(now),
   };
 }
 
@@ -98,6 +110,67 @@ function pushCapped(list, item, max = MAX_HISTORY_POINTS) {
 
 function clone(value) {
   return structuredClone(value);
+}
+
+function hydrateState(parsed, now = new Date()) {
+  const initial = createInitialState(now);
+  if (!parsed || typeof parsed !== 'object') {
+    return initial;
+  }
+
+  return {
+    ...initial,
+    ...parsed,
+    session: {
+      ...initial.session,
+      ...(parsed.session || {}),
+      metadata: {
+        ...initial.session.metadata,
+        ...(parsed.session?.metadata || {}),
+      },
+    },
+    hint: {
+      ...initial.hint,
+      ...(parsed.hint || {}),
+    },
+    robotAction: {
+      ...initial.robotAction,
+      ...(parsed.robotAction || {}),
+    },
+    telemetry: {
+      ...initial.telemetry,
+      ...(parsed.telemetry || {}),
+      hrv: {
+        ...initial.telemetry.hrv,
+        ...(parsed.telemetry?.hrv || {}),
+      },
+      gaze: {
+        ...initial.telemetry.gaze,
+        ...(parsed.telemetry?.gaze || {}),
+      },
+      history: {
+        hrv: Array.isArray(parsed.telemetry?.history?.hrv)
+          ? parsed.telemetry.history.hrv
+          : initial.telemetry.history.hrv,
+        gaze: Array.isArray(parsed.telemetry?.history?.gaze)
+          ? parsed.telemetry.history.gaze
+          : initial.telemetry.history.gaze,
+      },
+    },
+    adaptive: {
+      ...initial.adaptive,
+      ...(parsed.adaptive || {}),
+      configuration: normalizeAdaptiveConfiguration(mergeAdaptiveConfiguration(
+        initial.adaptive.configuration,
+        parsed.adaptive?.configuration || {},
+      )),
+      defaults: clone(DEFAULT_ADAPTIVE_CONFIGURATION),
+      contributingSignals: {
+        ...initial.adaptive.contributingSignals,
+        ...(parsed.adaptive?.contributingSignals || {}),
+      },
+    },
+  };
 }
 
 function csvEscape(value) {
@@ -156,7 +229,7 @@ class ExperimentStore extends EventEmitter {
       const raw = await fs.readFile(this.statePath, 'utf8');
       const parsed = JSON.parse(raw);
       if (parsed && parsed.session && parsed.telemetry && parsed.adaptive) {
-        this.state = parsed;
+        this.state = hydrateState(parsed, this.now());
       }
     } catch (error) {
       if (error.code !== 'ENOENT') {
@@ -445,6 +518,32 @@ class ExperimentStore extends EventEmitter {
     return event;
   }
 
+  async updateAdaptiveConfiguration(payload = {}) {
+    const nextConfiguration = normalizeAdaptiveConfiguration(mergeAdaptiveConfiguration(
+      this.state.adaptive.configuration || DEFAULT_ADAPTIVE_CONFIGURATION,
+      payload.configuration || payload,
+    ));
+
+    this.state.adaptive = {
+      ...this.state.adaptive,
+      configuration: nextConfiguration,
+      defaults: clone(DEFAULT_ADAPTIVE_CONFIGURATION),
+    };
+
+    const configEvent = this.#createEvent('adaptive.configuration.updated', {
+      source: payload.source || 'admin',
+      summary: `Adaptive controls were updated by ${payload.actor || 'researcher'}.`,
+      payload: {
+        actor: payload.actor || 'researcher',
+        configuration: clone(nextConfiguration),
+      },
+    });
+
+    const adaptiveEvents = await this.#refreshAdaptiveState(payload.source || 'admin');
+    await this.#persistAndBroadcast([configEvent, ...adaptiveEvents]);
+    return this.getState();
+  }
+
   async getExportManifest() {
     const events = await this.#readPersistedEvents();
     const sessions = new Map();
@@ -559,6 +658,7 @@ class ExperimentStore extends EventEmitter {
   async #refreshAdaptiveState(source) {
     const previous = this.state.adaptive;
     const next = this.adaptiveEngine.evaluate(this.state, this.now());
+    next.defaults = clone(DEFAULT_ADAPTIVE_CONFIGURATION);
     const events = [];
 
     if (next.status === 'observe' || next.status === 'intervene') {
@@ -614,6 +714,7 @@ class ExperimentStore extends EventEmitter {
     const signature = JSON.stringify({
       status: nextAdaptiveState.status,
       score: nextAdaptiveState.score,
+      configuration: nextAdaptiveState.configuration,
       hrv: this.state.telemetry.hrv.stressScore,
       gazeAttention: this.state.telemetry.gaze.attentionScore,
       fixationLoss: this.state.telemetry.gaze.fixationLoss,
@@ -796,6 +897,22 @@ class ExperimentStore extends EventEmitter {
         reconstructed.adaptive = {
           ...reconstructed.adaptive,
           ...event.payload,
+          configuration: normalizeAdaptiveConfiguration(mergeAdaptiveConfiguration(
+            reconstructed.adaptive.configuration,
+            event.payload.configuration || {},
+          )),
+          defaults: clone(DEFAULT_ADAPTIVE_CONFIGURATION),
+        };
+      }
+
+      if (event.type === 'adaptive.configuration.updated' && event.payload?.configuration) {
+        reconstructed.adaptive = {
+          ...reconstructed.adaptive,
+          configuration: normalizeAdaptiveConfiguration(mergeAdaptiveConfiguration(
+            reconstructed.adaptive.configuration,
+            event.payload.configuration,
+          )),
+          defaults: clone(DEFAULT_ADAPTIVE_CONFIGURATION),
         };
       }
     }
@@ -824,6 +941,7 @@ class ExperimentStore extends EventEmitter {
       gazeFrames: counts['telemetry.gaze.updated'] || 0,
       participantId: session.metadata?.participantId || '',
       condition: session.metadata?.condition || '',
+      adaptiveConfiguration: clone(state.adaptive?.configuration || DEFAULT_ADAPTIVE_CONFIGURATION),
     };
   }
 

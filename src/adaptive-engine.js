@@ -1,7 +1,32 @@
 'use strict';
 
+const DEFAULT_ADAPTIVE_CONFIGURATION = Object.freeze({
+  thresholds: Object.freeze({
+    observe: 0.45,
+    intervene: 0.75,
+  }),
+  weights: Object.freeze({
+    hrv: 0.55,
+    gaze: 0.45,
+  }),
+  distractionBoost: 0.12,
+  freshness: Object.freeze({
+    fullStrengthSeconds: 90,
+    staleAfterSeconds: 300,
+  }),
+});
+
 function clamp(value, min = 0, max = 1) {
   return Math.min(max, Math.max(min, value));
+}
+
+function round(value, digits = 2) {
+  const factor = 10 ** digits;
+  return Math.round(value * factor) / factor;
+}
+
+function finiteNumber(value, fallback) {
+  return Number.isFinite(Number(value)) ? Number(value) : fallback;
 }
 
 function toIsoDate(input) {
@@ -31,18 +56,29 @@ function ageSeconds(timestamp, now = new Date()) {
   return Math.max(0, (now.getTime() - then.getTime()) / 1000);
 }
 
-function freshnessWeight(timestamp, now = new Date()) {
+function freshnessWeight(timestamp, now = new Date(), freshness = DEFAULT_ADAPTIVE_CONFIGURATION.freshness) {
+  const fullStrengthSeconds = Math.max(15, Math.round(finiteNumber(
+    freshness?.fullStrengthSeconds,
+    DEFAULT_ADAPTIVE_CONFIGURATION.freshness.fullStrengthSeconds,
+  )));
+  const staleAfterSeconds = Math.max(
+    fullStrengthSeconds + 30,
+    Math.round(finiteNumber(
+      freshness?.staleAfterSeconds,
+      DEFAULT_ADAPTIVE_CONFIGURATION.freshness.staleAfterSeconds,
+    )),
+  );
   const age = ageSeconds(timestamp, now);
 
-  if (age <= 90) {
+  if (age <= fullStrengthSeconds) {
     return 1;
   }
 
-  if (age >= 300) {
+  if (age >= staleAfterSeconds) {
     return 0;
   }
 
-  return clamp(1 - (age - 90) / 210);
+  return clamp(1 - ((age - fullStrengthSeconds) / Math.max(1, staleAfterSeconds - fullStrengthSeconds)));
 }
 
 function normalizeStressLevel(level) {
@@ -86,21 +122,96 @@ function buildReason({ compositeScore, hrvScore, gazeScore, distractionDetected,
   return sentence.charAt(0).toUpperCase() + sentence.slice(1) + '.';
 }
 
+function mergeAdaptiveConfiguration(base = DEFAULT_ADAPTIVE_CONFIGURATION, override = {}) {
+  return {
+    thresholds: {
+      ...base.thresholds,
+      ...(override.thresholds || {}),
+    },
+    weights: {
+      ...base.weights,
+      ...(override.weights || {}),
+    },
+    distractionBoost: override.distractionBoost ?? base.distractionBoost,
+    freshness: {
+      ...base.freshness,
+      ...(override.freshness || {}),
+    },
+  };
+}
+
+function normalizeAdaptiveConfiguration(input = {}) {
+  const merged = mergeAdaptiveConfiguration(DEFAULT_ADAPTIVE_CONFIGURATION, input);
+  const observe = clamp(finiteNumber(merged.thresholds.observe, DEFAULT_ADAPTIVE_CONFIGURATION.thresholds.observe), 0.05, 0.9);
+  const intervene = clamp(
+    finiteNumber(merged.thresholds.intervene, DEFAULT_ADAPTIVE_CONFIGURATION.thresholds.intervene),
+    observe + 0.05,
+    1,
+  );
+
+  const rawHrvWeight = clamp(finiteNumber(merged.weights.hrv, DEFAULT_ADAPTIVE_CONFIGURATION.weights.hrv), 0, 1);
+  const rawGazeWeight = clamp(finiteNumber(merged.weights.gaze, DEFAULT_ADAPTIVE_CONFIGURATION.weights.gaze), 0, 1);
+  const weightTotal = rawHrvWeight + rawGazeWeight;
+  const weights = weightTotal === 0
+    ? DEFAULT_ADAPTIVE_CONFIGURATION.weights
+    : {
+      hrv: rawHrvWeight / weightTotal,
+      gaze: rawGazeWeight / weightTotal,
+    };
+
+  const fullStrengthSeconds = Math.round(clamp(
+    finiteNumber(merged.freshness.fullStrengthSeconds, DEFAULT_ADAPTIVE_CONFIGURATION.freshness.fullStrengthSeconds),
+    15,
+    600,
+  ));
+  const staleAfterSeconds = Math.round(Math.max(
+    fullStrengthSeconds + 30,
+    clamp(
+      finiteNumber(merged.freshness.staleAfterSeconds, DEFAULT_ADAPTIVE_CONFIGURATION.freshness.staleAfterSeconds),
+      fullStrengthSeconds + 30,
+      1200,
+    ),
+  ));
+
+  return {
+    thresholds: {
+      observe: round(observe),
+      intervene: round(intervene),
+    },
+    weights: {
+      hrv: round(weights.hrv),
+      gaze: round(weights.gaze),
+    },
+    distractionBoost: round(clamp(
+      finiteNumber(merged.distractionBoost, DEFAULT_ADAPTIVE_CONFIGURATION.distractionBoost),
+      0,
+      0.5,
+    )),
+    freshness: {
+      fullStrengthSeconds,
+      staleAfterSeconds,
+    },
+  };
+}
+
 class AdaptiveEngine {
   constructor(options = {}) {
-    this.thresholds = {
-      observe: 0.45,
-      intervene: 0.75,
-      ...options.thresholds,
-    };
+    this.defaultConfiguration = normalizeAdaptiveConfiguration({
+      ...(options.configuration || {}),
+      thresholds: options.thresholds || options.configuration?.thresholds,
+    });
   }
 
   evaluate(state, now = new Date()) {
     const hrv = state?.telemetry?.hrv || {};
     const gaze = state?.telemetry?.gaze || {};
+    const configuration = normalizeAdaptiveConfiguration(mergeAdaptiveConfiguration(
+      this.defaultConfiguration,
+      state?.adaptive?.configuration || {},
+    ));
 
-    const hrvFreshness = freshnessWeight(hrv.updatedAt, now);
-    const gazeFreshness = freshnessWeight(gaze.updatedAt, now);
+    const hrvFreshness = freshnessWeight(hrv.updatedAt, now, configuration.freshness);
+    const gazeFreshness = freshnessWeight(gaze.updatedAt, now, configuration.freshness);
 
     const hrvStressScore = clamp(
       Number.isFinite(hrv.stressScore) ? hrv.stressScore : normalizeStressLevel(hrv.stressLevel),
@@ -110,17 +221,19 @@ class AdaptiveEngine {
     const pupilActivation = clamp(Number.isFinite(gaze.pupilDilation) ? gaze.pupilDilation : 0);
     const distractionDetected = Boolean(hrv.distractionDetected);
 
-    const weightedHrvScore = clamp(hrvStressScore + (distractionDetected ? 0.12 : 0)) * hrvFreshness;
+    const weightedHrvScore = clamp(hrvStressScore + (distractionDetected ? configuration.distractionBoost : 0)) * hrvFreshness;
     const weightedGazeScore = clamp(
       (gazeAttentionLoss * 0.5) + (gazeFixationLoss * 0.4) + (pupilActivation * 0.1),
     ) * gazeFreshness;
 
-    const compositeScore = clamp((weightedHrvScore * 0.55) + (weightedGazeScore * 0.45));
+    const compositeScore = clamp(
+      (weightedHrvScore * configuration.weights.hrv) + (weightedGazeScore * configuration.weights.gaze),
+    );
 
     let status = 'normal';
-    if (compositeScore >= this.thresholds.intervene) {
+    if (compositeScore >= configuration.thresholds.intervene) {
       status = 'intervene';
-    } else if (compositeScore >= this.thresholds.observe) {
+    } else if (compositeScore >= configuration.thresholds.observe) {
       status = 'observe';
     }
 
@@ -140,6 +253,7 @@ class AdaptiveEngine {
         gazeFreshness,
       }),
       updatedAt: toIsoDate(now),
+      configuration,
       contributingSignals: {
         hrvScore: Number(weightedHrvScore.toFixed(2)),
         gazeScore: Number(weightedGazeScore.toFixed(2)),
@@ -155,7 +269,10 @@ module.exports = {
   AdaptiveEngine,
   ageSeconds,
   clamp,
+  DEFAULT_ADAPTIVE_CONFIGURATION,
   freshnessWeight,
+  mergeAdaptiveConfiguration,
   normalizeStressLevel,
+  normalizeAdaptiveConfiguration,
   toIsoDate,
 };

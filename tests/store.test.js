@@ -164,3 +164,42 @@ test('store can build a session export bundle and manifest', async () => {
   assert.ok(bundle.events.some((event) => event.type === 'telemetry.gaze.updated'));
   assert.match(bundle.csv, /telemetry\.gaze\.updated/);
 });
+
+test('store persists adaptive configuration updates into state and exports', async () => {
+  const { store, dataDir } = await createStore();
+
+  await store.updateAdaptiveConfiguration({
+    configuration: {
+      thresholds: {
+        observe: 0.34,
+        intervene: 0.62,
+      },
+      weights: {
+        hrv: 0.7,
+        gaze: 0.3,
+      },
+      distractionBoost: 0.18,
+      freshness: {
+        fullStrengthSeconds: 75,
+        staleAfterSeconds: 240,
+      },
+    },
+    actor: 'Shrijacked',
+  });
+
+  const state = store.getState();
+  assert.equal(state.adaptive.configuration.thresholds.observe, 0.34);
+  assert.equal(state.adaptive.configuration.thresholds.intervene, 0.62);
+  assert.equal(state.adaptive.configuration.weights.hrv, 0.7);
+  assert.equal(state.adaptive.configuration.freshness.staleAfterSeconds, 240);
+
+  const savedState = JSON.parse(await fs.readFile(path.join(dataDir, 'state.json'), 'utf8'));
+  assert.equal(savedState.adaptive.configuration.distractionBoost, 0.18);
+
+  const eventsLog = await fs.readFile(path.join(dataDir, 'events.jsonl'), 'utf8');
+  assert.match(eventsLog, /adaptive\.configuration\.updated/);
+
+  const bundle = await store.buildSessionExport(store.getCurrentSessionId());
+  assert.equal(bundle.state.adaptive.configuration.thresholds.observe, 0.34);
+  assert.equal(bundle.analytics.adaptiveConfiguration.weights.gaze, 0.3);
+});

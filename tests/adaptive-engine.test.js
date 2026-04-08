@@ -52,3 +52,47 @@ test('adaptive engine falls back to normal when telemetry is stale', () => {
   assert.equal(result.status, 'normal');
   assert.equal(result.score, 0);
 });
+
+test('adaptive engine honors custom configuration from state', () => {
+  const engine = new AdaptiveEngine();
+  const now = new Date('2026-04-01T12:00:00.000Z');
+  const result = engine.evaluate({
+    telemetry: {
+      hrv: {
+        updatedAt: now.toISOString(),
+        stressScore: 0.62,
+        stressLevel: 'Mild',
+        distractionDetected: true,
+      },
+      gaze: {
+        updatedAt: now.toISOString(),
+        attentionScore: 0.5,
+        fixationLoss: 0.4,
+        pupilDilation: 0.3,
+      },
+    },
+    adaptive: {
+      configuration: {
+        thresholds: {
+          observe: 0.3,
+          intervene: 0.5,
+        },
+        weights: {
+          hrv: 0.8,
+          gaze: 0.2,
+        },
+        distractionBoost: 0.2,
+        freshness: {
+          fullStrengthSeconds: 45,
+          staleAfterSeconds: 180,
+        },
+      },
+    },
+  }, now);
+
+  assert.equal(result.status, 'intervene');
+  assert.equal(result.configuration.thresholds.observe, 0.3);
+  assert.equal(result.configuration.thresholds.intervene, 0.5);
+  assert.equal(result.configuration.weights.hrv, 0.8);
+  assert.equal(result.configuration.freshness.staleAfterSeconds, 180);
+});

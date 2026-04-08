@@ -220,6 +220,7 @@ async function createApp(options = {}) {
             configureSession: buildPolicy(state, 'configureSession'),
             startSession: buildPolicy(state, 'startSession'),
             completeSession: buildPolicy(state, 'completeSession'),
+            updateAdaptiveConfig: buildPolicy(state, 'updateAdaptiveConfig'),
             setHint: buildPolicy(state, 'setHint'),
             logRobotAction: buildPolicy(state, 'logRobotAction'),
             simulateTelemetry: buildPolicy(state, 'simulateTelemetry'),
@@ -316,6 +317,19 @@ async function createApp(options = {}) {
         assertPolicy(store.getState(), 'simulateTelemetry');
         const body = await readJsonBody(request);
         const state = await store.ingestSimulatedTelemetry(body, { source: 'simulator' });
+        json(response, 200, state);
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/adaptive/config') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        assertPolicy(store.getState(), 'updateAdaptiveConfig');
+        const body = await readJsonBody(request);
+        const state = await store.updateAdaptiveConfiguration({
+          ...body,
+          actor: body.actor || 'researcher',
+          source: 'admin',
+        });
         json(response, 200, state);
         return;
       }
