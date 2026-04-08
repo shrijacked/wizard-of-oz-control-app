@@ -9,6 +9,7 @@ This integration provides a concrete bridge process for vendor gaze SDKs. It tra
 - supports two acquisition modes out of the box:
   - `stdin-jsonl`: read raw SDK frames from standard input
   - `file-tail`: tail a local JSONL file produced by another process
+  - `heartbeat-only`: keep the bridge alive and visible in the dashboard before frames are flowing
 
 ## Quick start
 
@@ -42,3 +43,13 @@ In your SDK callback, serialize each frame to JSON and write it to stdin or a JS
 - `pupilDilation`, `pupil`, `pupil_size`, `dilation`
 
 That keeps the SDK-specific code very small while preserving one stable interface at the server.
+
+## Experiment-day launcher
+
+The repository also includes:
+
+```bash
+npm run launch:study
+```
+
+By default that starts the gaze bridge in `heartbeat-only` mode so the admin dashboard can confirm the bridge is alive before real SDK frames are connected.

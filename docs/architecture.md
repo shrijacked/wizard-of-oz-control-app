@@ -52,6 +52,7 @@ flowchart LR
 - Watches the HRV watch output JSON file written by `watch.py`
 - Normalizes metrics into one internal telemetry model
 - Tracks gaze-bridge heartbeat and last-frame diagnostics for the admin UI
+- Derives sensor-health summaries so stale or missing streams surface clearly to the operator
 
 ### 5. Adaptive logic engine
 
@@ -113,6 +114,7 @@ flowchart TD
 - `GET /api/exports/current.csv`: current session timeline CSV
 - `GET /api/bridge/gaze`: current gaze-bridge status
 - `GET /api/guard`: current operator safeguard state and action policy matrix
+- `GET /health`: server and sensor-health summary for launcher checks and operator diagnostics
 - `POST /api/hints`: create and broadcast a participant hint
 - `POST /api/actions`: create and broadcast a robotic arm action event
 - `POST /api/adaptive/config`: update the adaptive rule set for the current session
@@ -209,6 +211,12 @@ A normalized gaze frame can look like:
 ```
 
 The bridge also understands alias keys like `focus`, `attention`, `fixation_loss`, and `pupil`.
+
+### Study-day launcher
+
+The repository now includes `npm run launch:study` for experiment-day startup. The launcher starts the local server first, then brings up the watch process and the gaze bridge with a configurable mode such as `heartbeat-only`, `stdin-jsonl`, or `file-tail`.
+
+Optional hardware-side processes are allowed to fail independently without taking down the main server, so the researcher can still recover or continue setup from the dashboard.
 
 ## Adaptive engine behavior
 

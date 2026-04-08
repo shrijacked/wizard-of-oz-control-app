@@ -32,6 +32,8 @@ The system is designed to run on a laptop on the same Wi-Fi network as the secon
 - Export analytics and replay timeline for post-trial review
 - Optional local admin PIN lock with browser-scoped unlock tokens
 - Session-phase protections that block hints, robot actions, and unsafe resets at the wrong time
+- One-command study-day launcher for the local stack
+- Sensor health summaries with stale-stream warnings for watch and gaze inputs
 
 ## Runbook
 
@@ -39,6 +41,12 @@ See `docs/architecture.md` and `docs/implementation-plan.md` first. Once the imp
 
 ```bash
 npm start
+```
+
+For experiment-day startup, use the one-command launcher:
+
+```bash
+npm run launch:study
 ```
 
 Then open:
@@ -99,6 +107,13 @@ Protected operator tuning is available through:
 
 - `POST /api/adaptive/config`
 
+Launcher controls:
+
+- `npm run launch:study`: starts the server, the watch bridge process, and a heartbeat-only gaze bridge
+- `LAUNCH_WATCH=0 npm run launch:study`: skips the watch process when hardware is unavailable
+- `GAZE_MODE=file-tail GAZE_FILE=/path/to/frames.jsonl npm run launch:study`: start the gaze bridge in file-tail mode
+- `GAZE_MODE=stdin-jsonl npm run launch:study`: keep the gaze bridge open for stdin-fed SDK frames
+
 ## Export surface
 
 - `GET /exports`: operator-facing session export page
@@ -111,3 +126,8 @@ The export center also renders:
 - derived session analytics such as duration, event counts, and adaptive transitions
 - the active adaptive configuration used for that session
 - a replay timeline built from the ordered event log
+
+## Health endpoints and operator status
+
+- `GET /health`: server and sensor health summary with `ok`, `status`, and derived watch/gaze diagnostics
+- `/admin`: now includes a sensor-health panel that warns when watch data or gaze heartbeats go stale

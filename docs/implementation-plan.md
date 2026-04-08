@@ -39,6 +39,7 @@ flowchart LR
 | T12 | Add operator docs and end-to-end runbook | T1-T11 | README + architecture docs |
 | T13 | Add operator safeguards with local PIN lock and session-phase policy enforcement | T2, T4, T7, T11 | Architecture: Operator safeguard flow |
 | T14 | Add adaptive threshold controls that persist into state, exports, and the dashboard | T5, T7, T10, T11, T13 | Architecture: Adaptive engine behavior |
+| T15 | Add one-command study-day launcher and sensor health diagnostics | T4, T6, T7, T11, T12 | Architecture: Sensor integration plan |
 
 ## Delivery slices
 
@@ -93,6 +94,12 @@ flowchart LR
 - Persist the active adaptive rule set into state, exports, and event logs
 - Verify config changes through engine tests, store tests, API tests, and live checks
 
+### Slice 10
+
+- Add a one-command launcher for the app server and bridge processes
+- Add sensor health summaries and stale-stream warnings to the admin dashboard and health endpoint
+- Verify launcher planning, health derivation, and live startup behavior
+
 ## Validation checklist
 
 - Admin view loads and can preview the webcam
@@ -105,6 +112,8 @@ flowchart LR
 - Hints and robotic actions stay blocked outside the running phase
 - Force reset is required before aborting an active run
 - Adaptive control changes persist into the session state and export bundle
+- Sensor health summaries warn when watch or gaze data goes stale
+- The study-day launcher can bring up the local stack with one command
 - Export center shows analytics and replay timeline for a selected session
 - Session events append to disk with timestamps
 - Tests pass before any commit is created

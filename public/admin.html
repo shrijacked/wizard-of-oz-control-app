@@ -208,6 +208,42 @@
         <section class="panel">
           <div class="panel-header">
             <div>
+              <p class="panel-kicker">Sensor Health</p>
+              <h2>Sensor Health And Stream Status</h2>
+            </div>
+            <span class="panel-note">Watch for stale or missing data before and during a run.</span>
+          </div>
+          <div class="network-grid">
+            <article class="callout">
+              <span class="callout-label">Overall</span>
+              <p id="sensor-health-summary">Checking sensor health...</p>
+              <p id="sensor-health-detail">The server will summarize stream issues here.</p>
+            </article>
+            <article class="callout">
+              <span class="callout-label">Watch Feed</span>
+              <p id="watch-health-summary">Waiting for watch bridge status.</p>
+              <p id="watch-health-detail">The HRV watch bridge will report freshness and file activity here.</p>
+            </article>
+            <article class="callout">
+              <span class="callout-label">Gaze Feed</span>
+              <p id="gaze-health-summary">Waiting for gaze bridge status.</p>
+              <p id="gaze-health-detail">The gaze bridge heartbeat and frame freshness will appear here.</p>
+            </article>
+            <article class="callout">
+              <span class="callout-label">Experiment Day Launch</span>
+              <p id="launcher-summary">Use the one command launcher to start the local stack.</p>
+              <div class="link-list">
+                <code>npm run launch:study</code>
+                <code>LAUNCH_WATCH=0</code>
+                <code>GAZE_MODE=file-tail</code>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
               <p class="panel-kicker">Adaptive Controls</p>
               <h2>Adaptive Controls</h2>
             </div>

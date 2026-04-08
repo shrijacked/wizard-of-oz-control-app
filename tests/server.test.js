@@ -115,6 +115,7 @@ test('server serves the actual admin, subject, audit, and stylesheet assets', as
     assert.match(adminHtml, /Research Control Deck/);
     assert.match(adminHtml, /Operator Controls/);
     assert.match(adminHtml, /Adaptive Controls/);
+    assert.match(adminHtml, /Sensor Health And Stream Status/);
     assert.match(subjectHtml, /Hint Terminal/);
     assert.match(auditHtml, /Robotic Action Monitor/);
     assert.match(exportsHtml, /Session Exports/);
@@ -245,6 +246,68 @@ test('gaze bridge endpoints update system state and export endpoints return down
 
     const csv = await fetch(`${baseUrl}/api/exports/current.csv`).then((response) => response.text());
     assert.match(csv, /telemetry\.gaze\.updated/);
+  } finally {
+    await app.close();
+  }
+});
+
+test('health endpoint reports degraded sensor summaries when streams are stale or missing', async () => {
+  const dataDir = await fs.mkdtemp(path.join(os.tmpdir(), 'woz-health-'));
+  const watchBridge = {
+    async start() {},
+    stop() {},
+    getStatus() {
+      return {
+        filePath: './watch/watch_data.json',
+        active: true,
+        lastCheckedAt: '2026-04-01T11:59:58.000Z',
+        lastProcessedAt: '2026-04-01T11:58:00.000Z',
+        lastError: null,
+        lastSequenceNumber: 7,
+      };
+    },
+  };
+  const gazeBridge = {
+    getStatus() {
+      return {
+        bridgeId: null,
+        deviceLabel: null,
+        transport: null,
+        sdkName: null,
+        lastHeartbeatAt: null,
+        lastFrameAt: null,
+        active: false,
+        staleAfterMs: 15000,
+        lastError: null,
+      };
+    },
+    async heartbeat() {
+      return this.getStatus();
+    },
+    async ingestFrame() {
+      return {
+        status: this.getStatus(),
+      };
+    },
+  };
+
+  const app = await createApp({
+    dataDir,
+    port: 0,
+    watchBridge,
+    gazeBridge,
+    store: undefined,
+  });
+  await new Promise((resolve) => app.server.listen(0, '127.0.0.1', resolve));
+  const address = app.server.address();
+  const baseUrl = `http://127.0.0.1:${address.port}`;
+
+  try {
+    const health = await fetch(`${baseUrl}/health`).then((response) => response.json());
+    assert.equal(health.ok, true);
+    assert.equal(health.status, 'degraded');
+    assert.equal(health.sensorHealth.watch.state, 'stale');
+    assert.equal(health.sensorHealth.gaze.state, 'waiting');
   } finally {
     await app.close();
   }

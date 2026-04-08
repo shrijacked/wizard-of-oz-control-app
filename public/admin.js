@@ -41,6 +41,13 @@ const elements = {
   adaptiveReason: document.querySelector('#adaptive-reason'),
   connectionCounts: document.querySelector('#connection-counts'),
   watchBridgeStatus: document.querySelector('#watch-bridge-status'),
+  sensorHealthSummary: document.querySelector('#sensor-health-summary'),
+  sensorHealthDetail: document.querySelector('#sensor-health-detail'),
+  watchHealthSummary: document.querySelector('#watch-health-summary'),
+  watchHealthDetail: document.querySelector('#watch-health-detail'),
+  gazeHealthSummary: document.querySelector('#gaze-health-summary'),
+  gazeHealthDetail: document.querySelector('#gaze-health-detail'),
+  launcherSummary: document.querySelector('#launcher-summary'),
   metricHr: document.querySelector('#metric-hr'),
   metricStress: document.querySelector('#metric-stress'),
   metricStressLevel: document.querySelector('#metric-stress-level'),
@@ -100,6 +107,7 @@ let mediaStream = null;
 let exportManifest = null;
 let guardStatus = null;
 let adminToken = window.localStorage.getItem(ADMIN_TOKEN_KEY) || '';
+let statePollTimer = null;
 
 function formatNumber(value, digits = 2) {
   return Number.isFinite(value) ? value.toFixed(digits) : '--';
@@ -596,12 +604,23 @@ function renderState() {
   elements.adaptiveConfigNote.textContent = adaptiveNote(configuration);
 
   const connections = currentState.system.connections;
+  const sensorHealth = currentState.system.sensorHealth || {};
+  const watchHealth = sensorHealth.watch || {};
+  const gazeHealth = sensorHealth.gaze || {};
   elements.connectionCounts.textContent = `${connections.admin} admin / ${connections.subject} subject / ${connections.audit} audit`;
 
   const watchStatus = currentState.system.watchBridge;
-  elements.watchBridgeStatus.textContent = watchStatus.lastProcessedAt
-    ? `Watch file ${watchStatus.filePath} • last processed ${formatTimestamp(watchStatus.lastProcessedAt)}`
-    : `Watching ${watchStatus.filePath} for HRV updates`;
+  elements.watchBridgeStatus.textContent = sensorHealth.overall?.summary
+    || (watchStatus.lastProcessedAt
+      ? `Watch file ${watchStatus.filePath} • last processed ${formatTimestamp(watchStatus.lastProcessedAt)}`
+      : `Watching ${watchStatus.filePath} for HRV updates`);
+  elements.sensorHealthSummary.textContent = sensorHealth.overall?.summary || 'Sensor health is unavailable.';
+  elements.sensorHealthDetail.textContent = sensorHealth.overall?.detail || 'The server has not published sensor health details yet.';
+  elements.watchHealthSummary.textContent = watchHealth.summary || 'Watch bridge status is unavailable.';
+  elements.watchHealthDetail.textContent = watchHealth.detail || `Watching ${watchStatus.filePath} for HRV updates.`;
+  elements.gazeHealthSummary.textContent = gazeHealth.summary || 'Gaze bridge status is unavailable.';
+  elements.gazeHealthDetail.textContent = gazeHealth.detail || 'The gaze bridge has not reported any status yet.';
+  elements.launcherSummary.textContent = `Launch the local stack with npm run launch:study, then check ${sensorHealth.overall?.issueCount || 0} active sensor issue${(sensorHealth.overall?.issueCount || 0) === 1 ? '' : 's'} here.`;
 
   const hrv = currentState.telemetry.hrv;
   const gaze = currentState.telemetry.gaze;
@@ -667,6 +686,11 @@ async function bootstrapState() {
   timelineEvents = events.events;
   renderState();
   renderEvents();
+}
+
+async function refreshStateSnapshot() {
+  currentState = await fetchJson('/api/state');
+  renderState();
 }
 
 async function refreshExportManifest() {
@@ -779,6 +803,12 @@ async function init() {
     refreshExportManifest(),
     refreshGuardStatus(),
   ]);
+
+  statePollTimer = window.setInterval(() => {
+    refreshStateSnapshot().catch((error) => {
+      setGuardMessage(error.message || 'State refresh failed.', 'warning');
+    });
+  }, 10000);
 
   connectSocket('admin', {
     onSnapshot(state) {
@@ -992,6 +1022,11 @@ async function init() {
   });
 
   window.addEventListener('resize', renderCharts);
+  window.addEventListener('beforeunload', () => {
+    if (statePollTimer) {
+      window.clearInterval(statePollTimer);
+    }
+  });
 }
 
 init().catch((error) => {
