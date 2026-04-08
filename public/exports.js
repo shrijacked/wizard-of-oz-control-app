@@ -37,6 +37,11 @@ function renderBundle(bundle) {
     metricCard('Participant', analytics.participantId || 'Unassigned', bundle.state?.session?.metadata?.studyId || 'study unavailable'),
     metricCard('Duration', analytics.durationSeconds == null ? '--' : `${analytics.durationSeconds}s`, `${analytics.totalEvents || 0} logged events`),
     metricCard('Adaptive transitions', String(analytics.adaptiveTransitions || 0), `${analytics.gazeFrames || 0} gaze frames / ${analytics.hrvFrames || 0} HRV frames`),
+    metricCard(
+      'Adaptive rule set',
+      `o ${analytics.adaptiveConfiguration?.thresholds?.observe ?? '--'} / i ${analytics.adaptiveConfiguration?.thresholds?.intervene ?? '--'}`,
+      `weights ${analytics.adaptiveConfiguration?.weights?.hrv ?? '--'} HRV / ${analytics.adaptiveConfiguration?.weights?.gaze ?? '--'} gaze`,
+    ),
   );
 
   replaySummaryElement.textContent = analytics.lastEventAt

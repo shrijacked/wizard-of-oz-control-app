@@ -306,6 +306,7 @@ select:disabled {
 
 .field textarea,
 .field input[type="range"],
+.field input[type="number"],
 .field input[type="text"],
 .field input[type="password"],
 .field select {
@@ -322,6 +323,7 @@ select:disabled {
 }
 
 .field input[type="text"],
+.field input[type="number"],
 .field input[type="password"],
 .field select {
   border: 1px solid var(--line);

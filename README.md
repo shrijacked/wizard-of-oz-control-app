@@ -23,6 +23,7 @@ The system is designed to run on a laptop on the same Wi-Fi network as the secon
 - Live webcam preview inside the admin dashboard
 - Real-time HRV and gaze telemetry ingestion
 - Adaptive intervention engine with heuristic fallback and optional LLM analysis
+- Researcher-tunable adaptive thresholds, weights, and freshness windows
 - Hint broadcasting to the subject display
 - Robotic arm action logging and live audit broadcasting
 - Automatic event logging to local files with timestamps
@@ -50,10 +51,11 @@ On `/admin`, the typical operator flow is:
 
 1. Unlock the dashboard first if `ADMIN_PIN` is configured on the host.
 2. Save the session profile with study ID, participant ID, condition, and notes.
-3. Start the trial when the participant is ready.
-4. Use hints, action logging, and telemetry during the run.
-5. Mark the session complete and enter an end-of-trial summary.
-6. Download the final bundle or CSV from `/exports`.
+3. Tune the adaptive controls for the study if the default rule set is not appropriate.
+4. Start the trial when the participant is ready.
+5. Use hints, action logging, and telemetry during the run.
+6. Mark the session complete and enter an end-of-trial summary.
+7. Download the final bundle or CSV from `/exports`.
 
 Session protections are always active, even when no PIN is configured:
 
@@ -93,6 +95,10 @@ Bridge and sensor ingestion routes stay available without admin unlock so the ex
 - `POST /api/bridge/gaze/heartbeat`
 - `POST /api/bridge/gaze/frame`
 
+Protected operator tuning is available through:
+
+- `POST /api/adaptive/config`
+
 ## Export surface
 
 - `GET /exports`: operator-facing session export page
@@ -103,4 +109,5 @@ Bridge and sensor ingestion routes stay available without admin unlock so the ex
 The export center also renders:
 
 - derived session analytics such as duration, event counts, and adaptive transitions
+- the active adaptive configuration used for that session
 - a replay timeline built from the ordered event log

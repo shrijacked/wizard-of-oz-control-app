@@ -6,6 +6,7 @@ const POLICY_LABELS = {
   configureSession: 'Configure session',
   startSession: 'Start trial',
   completeSession: 'Complete trial',
+  updateAdaptiveConfig: 'Tune adaptive controls',
   setHint: 'Broadcast hint',
   logRobotAction: 'Log robot action',
   simulateTelemetry: 'Simulate telemetry',
@@ -51,6 +52,18 @@ const elements = {
   gazeSource: document.querySelector('#gaze-source'),
   hrvChart: document.querySelector('#hrv-chart'),
   gazeChart: document.querySelector('#gaze-chart'),
+  adaptiveConfigForm: document.querySelector('#adaptive-config-form'),
+  adaptiveObserveThreshold: document.querySelector('#adaptive-observe-threshold'),
+  adaptiveInterveneThreshold: document.querySelector('#adaptive-intervene-threshold'),
+  adaptiveHrvWeight: document.querySelector('#adaptive-hrv-weight'),
+  adaptiveGazeWeight: document.querySelector('#adaptive-gaze-weight'),
+  adaptiveDistractionBoost: document.querySelector('#adaptive-distraction-boost'),
+  adaptiveFullFreshness: document.querySelector('#adaptive-full-freshness'),
+  adaptiveStaleAfter: document.querySelector('#adaptive-stale-after'),
+  adaptiveConfigSave: document.querySelector('#adaptive-config-save'),
+  adaptiveConfigReset: document.querySelector('#adaptive-config-reset'),
+  adaptiveConfigSummary: document.querySelector('#adaptive-config-summary'),
+  adaptiveConfigNote: document.querySelector('#adaptive-config-note'),
   hintForm: document.querySelector('#hint-form'),
   hintText: document.querySelector('#hint-text'),
   hintSend: document.querySelector('#hint-send'),
@@ -126,6 +139,62 @@ function buildAdminHeaders() {
 function setGuardMessage(message, tone = 'neutral') {
   elements.guardMessage.textContent = message;
   elements.guardMessage.dataset.tone = tone;
+}
+
+function adaptiveConfiguration() {
+  return currentState?.adaptive?.configuration || null;
+}
+
+function adaptiveDefaults() {
+  return currentState?.adaptive?.defaults || currentState?.adaptive?.configuration || null;
+}
+
+function setAdaptiveConfigurationFields(configuration) {
+  if (!configuration) {
+    return;
+  }
+
+  setValueSafely(elements.adaptiveObserveThreshold, configuration.thresholds?.observe);
+  setValueSafely(elements.adaptiveInterveneThreshold, configuration.thresholds?.intervene);
+  setValueSafely(elements.adaptiveHrvWeight, configuration.weights?.hrv);
+  setValueSafely(elements.adaptiveGazeWeight, configuration.weights?.gaze);
+  setValueSafely(elements.adaptiveDistractionBoost, configuration.distractionBoost);
+  setValueSafely(elements.adaptiveFullFreshness, configuration.freshness?.fullStrengthSeconds);
+  setValueSafely(elements.adaptiveStaleAfter, configuration.freshness?.staleAfterSeconds);
+}
+
+function adaptiveSummary(configuration) {
+  if (!configuration) {
+    return 'Adaptive rules will appear here once the current state is loaded.';
+  }
+
+  return `observe at ${formatNumber(configuration.thresholds?.observe)} and intervene at ${formatNumber(configuration.thresholds?.intervene)} with HRV ${formatNumber(configuration.weights?.hrv)} / gaze ${formatNumber(configuration.weights?.gaze)} weighting.`;
+}
+
+function adaptiveNote(configuration) {
+  if (!configuration) {
+    return 'Changes are logged immediately and included in exports.';
+  }
+
+  return `Distraction boost ${formatNumber(configuration.distractionBoost)} • full freshness ${configuration.freshness?.fullStrengthSeconds || '--'}s • stale after ${configuration.freshness?.staleAfterSeconds || '--'}s.`;
+}
+
+function readAdaptiveConfigurationForm() {
+  return {
+    thresholds: {
+      observe: Number(elements.adaptiveObserveThreshold.value),
+      intervene: Number(elements.adaptiveInterveneThreshold.value),
+    },
+    weights: {
+      hrv: Number(elements.adaptiveHrvWeight.value),
+      gaze: Number(elements.adaptiveGazeWeight.value),
+    },
+    distractionBoost: Number(elements.adaptiveDistractionBoost.value),
+    freshness: {
+      fullStrengthSeconds: Number(elements.adaptiveFullFreshness.value),
+      staleAfterSeconds: Number(elements.adaptiveStaleAfter.value),
+    },
+  };
 }
 
 function renderLinks(container, links) {
@@ -235,6 +304,12 @@ function buildLocalPolicy(actionName) {
       : { allowed: false, reason: 'Only running sessions can be completed.' };
   }
 
+  if (actionName === 'updateAdaptiveConfig') {
+    return status === 'completed'
+      ? { allowed: false, reason: 'Adaptive controls are read-only after completion.' }
+      : { allowed: true, reason: null };
+  }
+
   if (actionName === 'setHint' || actionName === 'logRobotAction') {
     return status === 'running'
       ? { allowed: true, reason: null }
@@ -297,6 +372,10 @@ function policyMessage(actionName, policy) {
     return 'Available during setup and live rehearsals while the session is not completed.';
   }
 
+  if (actionName === 'updateAdaptiveConfig') {
+    return 'Available during setup and live sessions. Every change is logged into the export bundle.';
+  }
+
   return 'Ready in the current session state.';
 }
 
@@ -339,6 +418,7 @@ function renderGuardStatus() {
     ['configureSession', POLICY_LABELS.configureSession],
     ['startSession', POLICY_LABELS.startSession],
     ['completeSession', POLICY_LABELS.completeSession],
+    ['updateAdaptiveConfig', POLICY_LABELS.updateAdaptiveConfig],
     ['setHint', POLICY_LABELS.setHint],
     ['logRobotAction', POLICY_LABELS.logRobotAction],
     ['simulateTelemetry', POLICY_LABELS.simulateTelemetry],
@@ -413,6 +493,7 @@ function renderInteractionControls() {
   const configurePolicy = resolvePolicy('configureSession');
   const startPolicy = resolvePolicy('startSession');
   const completePolicy = resolvePolicy('completeSession');
+  const adaptiveConfigPolicy = resolvePolicy('updateAdaptiveConfig');
   const hintPolicy = resolvePolicy('setHint');
   const simulatePolicy = resolvePolicy('simulateTelemetry');
   const resetPolicy = resolvePolicy('resetSession');
@@ -434,6 +515,20 @@ function renderInteractionControls() {
   setElementDisabled(elements.sessionStart, !startPolicy.allowed, startPolicy.reason || '');
   setElementDisabled(elements.sessionComplete, !completePolicy.allowed, completePolicy.reason || '');
   setElementDisabled(elements.sessionSummary, !completePolicy.allowed, completePolicy.reason || '');
+
+  [
+    elements.adaptiveObserveThreshold,
+    elements.adaptiveInterveneThreshold,
+    elements.adaptiveHrvWeight,
+    elements.adaptiveGazeWeight,
+    elements.adaptiveDistractionBoost,
+    elements.adaptiveFullFreshness,
+    elements.adaptiveStaleAfter,
+    elements.adaptiveConfigSave,
+    elements.adaptiveConfigReset,
+  ].forEach((element) => {
+    setElementDisabled(element, !adaptiveConfigPolicy.allowed, adaptiveConfigPolicy.reason || '');
+  });
 
   setElementDisabled(elements.hintText, !hintPolicy.allowed, hintPolicy.reason || '');
   setElementDisabled(elements.hintSend, !hintPolicy.allowed, hintPolicy.reason || '');
@@ -492,9 +587,13 @@ function renderState() {
   setValueSafely(elements.sessionSummary, session.completedSummary);
 
   const adaptive = currentState.adaptive;
+  const configuration = adaptive.configuration;
   elements.adaptiveStatus.textContent = `${adaptive.status.toUpperCase()} • ${formatNumber(adaptive.score)}`;
   elements.adaptiveReason.textContent = adaptive.reason;
   elements.adaptiveStatus.dataset.status = adaptive.status;
+  setAdaptiveConfigurationFields(configuration);
+  elements.adaptiveConfigSummary.textContent = adaptiveSummary(configuration);
+  elements.adaptiveConfigNote.textContent = adaptiveNote(configuration);
 
   const connections = currentState.system.connections;
   elements.connectionCounts.textContent = `${connections.admin} admin / ${connections.subject} subject / ${connections.audit} audit`;
@@ -788,6 +887,36 @@ async function init() {
       });
       setGuardMessage('Trial marked complete. The session is now read-only until reset.', 'success');
       await refreshExportManifest();
+      await refreshGuardStatus();
+    } catch (error) {
+      await handleAdminError(error);
+    }
+  });
+
+  elements.adaptiveConfigForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    try {
+      await postJson('/api/adaptive/config', readAdaptiveConfigurationForm(), {
+        headers: buildAdminHeaders(),
+      });
+      setGuardMessage('Adaptive controls updated for the current session.', 'success');
+      await refreshGuardStatus();
+    } catch (error) {
+      await handleAdminError(error);
+    }
+  });
+
+  elements.adaptiveConfigReset.addEventListener('click', async () => {
+    const defaults = adaptiveDefaults();
+    if (!defaults) {
+      return;
+    }
+
+    try {
+      await postJson('/api/adaptive/config', defaults, {
+        headers: buildAdminHeaders(),
+      });
+      setGuardMessage('Adaptive controls reset to the default rule set.', 'success');
       await refreshGuardStatus();
     } catch (error) {
       await handleAdminError(error);

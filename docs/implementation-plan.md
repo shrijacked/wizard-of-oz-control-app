@@ -38,6 +38,7 @@ flowchart LR
 | T11 | Add automated tests for store, API, adaptive logic, and realtime flows | T2-T10 | Architecture: Data flow |
 | T12 | Add operator docs and end-to-end runbook | T1-T11 | README + architecture docs |
 | T13 | Add operator safeguards with local PIN lock and session-phase policy enforcement | T2, T4, T7, T11 | Architecture: Operator safeguard flow |
+| T14 | Add adaptive threshold controls that persist into state, exports, and the dashboard | T5, T7, T10, T11, T13 | Architecture: Adaptive engine behavior |
 
 ## Delivery slices
 
@@ -86,6 +87,12 @@ flowchart LR
 - Enforce session-phase mutation policy at the API and dashboard layers
 - Verify lock, read-only, and force-reset behaviors through tests and live checks
 
+### Slice 9
+
+- Add adaptive threshold, weight, and freshness controls to the admin dashboard
+- Persist the active adaptive rule set into state, exports, and event logs
+- Verify config changes through engine tests, store tests, API tests, and live checks
+
 ## Validation checklist
 
 - Admin view loads and can preview the webcam
@@ -97,6 +104,7 @@ flowchart LR
 - PIN-protected admin mutations stay locked until the correct local unlock flow succeeds
 - Hints and robotic actions stay blocked outside the running phase
 - Force reset is required before aborting an active run
+- Adaptive control changes persist into the session state and export bundle
 - Export center shows analytics and replay timeline for a selected session
 - Session events append to disk with timestamps
 - Tests pass before any commit is created

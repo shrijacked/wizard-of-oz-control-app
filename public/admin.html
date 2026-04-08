@@ -208,6 +208,57 @@
         <section class="panel">
           <div class="panel-header">
             <div>
+              <p class="panel-kicker">Adaptive Controls</p>
+              <h2>Adaptive Controls</h2>
+            </div>
+            <span class="panel-note">Tune intervention sensitivity for the current study.</span>
+          </div>
+          <form id="adaptive-config-form" class="stack-form">
+            <div class="field-grid">
+              <label class="field">
+                <span>Observe threshold</span>
+                <input id="adaptive-observe-threshold" type="number" min="0.05" max="0.9" step="0.01">
+              </label>
+              <label class="field">
+                <span>Intervene threshold</span>
+                <input id="adaptive-intervene-threshold" type="number" min="0.1" max="1" step="0.01">
+              </label>
+              <label class="field">
+                <span>HRV weight</span>
+                <input id="adaptive-hrv-weight" type="number" min="0" max="1" step="0.01">
+              </label>
+              <label class="field">
+                <span>Gaze weight</span>
+                <input id="adaptive-gaze-weight" type="number" min="0" max="1" step="0.01">
+              </label>
+              <label class="field">
+                <span>Distraction boost</span>
+                <input id="adaptive-distraction-boost" type="number" min="0" max="0.5" step="0.01">
+              </label>
+              <label class="field">
+                <span>Full freshness seconds</span>
+                <input id="adaptive-full-freshness" type="number" min="15" max="600" step="5">
+              </label>
+              <label class="field">
+                <span>Stale after seconds</span>
+                <input id="adaptive-stale-after" type="number" min="45" max="1200" step="5">
+              </label>
+            </div>
+            <div class="button-row">
+              <button id="adaptive-config-save" class="button button-primary" type="submit">Apply adaptive settings</button>
+              <button id="adaptive-config-reset" class="button button-ghost" type="button">Reset defaults</button>
+            </div>
+          </form>
+          <div class="callout">
+            <span class="callout-label">Current rule summary</span>
+            <p id="adaptive-config-summary">Loading adaptive configuration...</p>
+            <p id="adaptive-config-note">Changes are logged immediately and included in exports.</p>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-header">
+            <div>
               <p class="panel-kicker">Intervention</p>
               <h2>Digital Hint Terminal</h2>
             </div>

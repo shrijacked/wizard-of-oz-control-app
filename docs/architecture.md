@@ -58,6 +58,7 @@ flowchart LR
 - Evaluates recent HRV and gaze conditions
 - Produces a recommendation state: `normal`, `observe`, or `intervene`
 - Uses heuristics by default and can optionally call an LLM adapter for narrative guidance
+- Persists per-session thresholds, weights, and freshness timing so a study can tune sensitivity without code changes
 
 ### 6. Frontend route views
 
@@ -114,6 +115,7 @@ flowchart TD
 - `GET /api/guard`: current operator safeguard state and action policy matrix
 - `POST /api/hints`: create and broadcast a participant hint
 - `POST /api/actions`: create and broadcast a robotic arm action event
+- `POST /api/adaptive/config`: update the adaptive rule set for the current session
 - `POST /api/telemetry/hrv`: ingest HRV metrics from a bridge or simulator
 - `POST /api/telemetry/gaze`: ingest gaze metrics from a bridge or simulator
 - `POST /api/telemetry/simulate`: push a combined mock telemetry frame for demos/tests
@@ -228,6 +230,13 @@ Inputs considered in the composite score:
 - HRV stress score and distraction flag from the watch
 - gaze attention loss and fixation instability
 - recency weighting so stale telemetry cannot trigger interventions
+
+The rule set is operator-tunable per session:
+
+- observe and intervene thresholds
+- HRV versus gaze weighting
+- distraction boost
+- freshness windows for how long telemetry remains actionable
 
 ## Operator safeguard flow
 
