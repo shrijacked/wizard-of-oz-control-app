@@ -13,6 +13,7 @@ const { GazeBridge } = require('./gaze-bridge');
 const { getLocalNetworkAddresses } = require('./network');
 const { LlmAdvisor } = require('./llm-advisor');
 const { summarizeSensorHealth } = require('./sensor-health');
+const { summarizePreflight } = require('./preflight');
 const { assertPolicy, buildPolicy } = require('./session-policy');
 
 const ROBOT_ACTIONS = [
@@ -124,30 +125,54 @@ async function createApp(options = {}) {
 
   const getAdminToken = (request) => request.headers['x-admin-token'];
 
-  const getSystemStatus = () => ({
-    watchBridge: watchBridge.getStatus(),
-    gazeBridge: gazeBridge.getStatus(),
-    sensorHealth: summarizeSensorHealth({
-      sessionStatus: store.getState().session.status,
-      watchBridge: watchBridge.getStatus(),
-      gazeBridge: gazeBridge.getStatus(),
-    }),
-    safeguards: adminGuard.getPublicStatus(),
-    connections: hub.getConnectionStats(),
-    robotActions: ROBOT_ACTIONS,
-    network: {
-      localhost: {
-        admin: `http://localhost:${port}/admin`,
-        subject: `http://localhost:${port}/subject`,
-        audit: `http://localhost:${port}/audit`,
+  const getBaseSystemStatus = () => {
+    const state = store.getState();
+    const watchStatus = watchBridge.getStatus();
+    const gazeStatus = gazeBridge.getStatus();
+    const connections = hub.getConnectionStats();
+    const sensorHealth = summarizeSensorHealth({
+      sessionStatus: state.session.status,
+      watchBridge: watchStatus,
+      gazeBridge: gazeStatus,
+    });
+
+    return {
+      watchBridge: watchStatus,
+      gazeBridge: gazeStatus,
+      sensorHealth,
+      safeguards: adminGuard.getPublicStatus(),
+      connections,
+      robotActions: ROBOT_ACTIONS,
+      network: {
+        localhost: {
+          admin: `http://localhost:${port}/admin`,
+          subject: `http://localhost:${port}/subject`,
+          audit: `http://localhost:${port}/audit`,
+        },
+        lan: getLocalNetworkAddresses(port),
       },
-      lan: getLocalNetworkAddresses(port),
-    },
-  });
+    };
+  };
+
+  const getSystemStatus = () => {
+    const state = store.getState();
+    const system = getBaseSystemStatus();
+
+    return {
+      ...system,
+      preflight: summarizePreflight({
+        state,
+        system,
+      }),
+    };
+  };
 
   const hub = new WebSocketHub({
     getStateForRole: (role) => roleState(store, role, getSystemStatus()),
     getSystemStatus,
+    onConnectionStatsChanged() {
+      hub.broadcastSnapshots();
+    },
   });
 
   store.on('state', () => {
@@ -197,6 +222,7 @@ async function createApp(options = {}) {
           status: healthLevel === 'healthy' ? 'ok' : (healthLevel === 'error' ? 'error' : 'degraded'),
           sessionStatus: store.getState().session.status,
           sensorHealth: systemStatus.sensorHealth,
+          preflight: systemStatus.preflight,
         });
         return;
       }
@@ -226,12 +252,14 @@ async function createApp(options = {}) {
       if (request.method === 'GET' && pathname === '/api/guard') {
         const token = getAdminToken(request);
         const state = store.getState();
+        const preflight = getSystemStatus().preflight;
         json(response, 200, {
           ...adminGuard.getStatusForToken(token),
           sessionStatus: state.session.status,
           permittedActions: {
             configureSession: buildPolicy(state, 'configureSession'),
-            startSession: buildPolicy(state, 'startSession'),
+            updatePreflight: buildPolicy(state, 'updatePreflight'),
+            startSession: buildPolicy(state, 'startSession', { preflight }),
             completeSession: buildPolicy(state, 'completeSession'),
             updateAdaptiveConfig: buildPolicy(state, 'updateAdaptiveConfig'),
             setHint: buildPolicy(state, 'setHint'),
@@ -241,6 +269,11 @@ async function createApp(options = {}) {
             forceResetSession: buildPolicy(state, 'resetSession', { force: true }),
           },
         });
+        return;
+      }
+
+      if (request.method === 'GET' && pathname === '/api/preflight') {
+        json(response, 200, getSystemStatus().preflight);
         return;
       }
 
@@ -393,10 +426,23 @@ async function createApp(options = {}) {
 
       if (request.method === 'POST' && pathname === '/api/session/start') {
         adminGuard.assertAuthorized(getAdminToken(request));
-        assertPolicy(store.getState(), 'startSession');
+        assertPolicy(store.getState(), 'startSession', { preflight: getSystemStatus().preflight });
         const body = await readJsonBody(request);
         const state = await store.startSession({
           operator: body.operator || 'researcher',
+          source: 'admin',
+        });
+        json(response, 200, state);
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/preflight/acknowledgements') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        assertPolicy(store.getState(), 'updatePreflight');
+        const body = await readJsonBody(request);
+        const state = await store.updatePreflightAcknowledgements({
+          acknowledgements: body.acknowledgements,
+          actor: body.actor || 'researcher',
           source: 'admin',
         });
         json(response, 200, state);

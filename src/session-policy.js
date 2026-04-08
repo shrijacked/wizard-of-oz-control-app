@@ -15,13 +15,24 @@ function buildPolicy(state, action, options = {}) {
       : deny('Session metadata is locked once the trial has started.');
   }
 
+  if (action === 'updatePreflight') {
+    return status === 'setup'
+      ? allow()
+      : deny('The before-participant checklist is locked once the trial has started.');
+  }
+
   if (action === 'startSession') {
     if (status !== 'setup') {
       return deny('Only setup sessions can be started.');
     }
 
-    if (!metadata.participantId || !metadata.researcher) {
-      return deny('Participant ID and researcher must be set before starting the trial.');
+    if (!metadata.studyId || !metadata.participantId || !metadata.researcher) {
+      return deny('Study ID, participant ID, and researcher must be set before starting the trial.');
+    }
+
+    if (options.preflight && options.preflight.requiredReady === false) {
+      const reason = options.preflight.blockers?.[0]?.summary || 'Resolve the before-participant checklist blockers before starting the trial.';
+      return deny(reason);
     }
 
     return allow();

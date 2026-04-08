@@ -13,6 +13,7 @@ const {
   toIsoDate,
 } = require('./adaptive-engine');
 const { LlmAdvisor } = require('./llm-advisor');
+const { createInitialPreflightAcknowledgements, normalizePreflightAcknowledgements } = require('./preflight');
 
 const MAX_HISTORY_POINTS = 60;
 const MAX_TIMELINE_EVENTS = 200;
@@ -38,6 +39,14 @@ function createInitialAdaptiveState(now = new Date()) {
       hrvFreshness: 0,
       gazeFreshness: 0,
     },
+  };
+}
+
+function createInitialPreflightState() {
+  return {
+    acknowledgements: createInitialPreflightAcknowledgements(),
+    updatedAt: null,
+    updatedBy: null,
   };
 }
 
@@ -98,6 +107,7 @@ function createInitialState(now = new Date()) {
       },
     },
     adaptive: createInitialAdaptiveState(now),
+    preflight: createInitialPreflightState(),
   };
 }
 
@@ -169,6 +179,11 @@ function hydrateState(parsed, now = new Date()) {
         ...initial.adaptive.contributingSignals,
         ...(parsed.adaptive?.contributingSignals || {}),
       },
+    },
+    preflight: {
+      ...initial.preflight,
+      ...(parsed.preflight || {}),
+      acknowledgements: normalizePreflightAcknowledgements(parsed.preflight?.acknowledgements || {}),
     },
   };
 }
@@ -544,6 +559,35 @@ class ExperimentStore extends EventEmitter {
     return this.getState();
   }
 
+  async updatePreflightAcknowledgements(payload = {}) {
+    const timestamp = toIsoDate(this.now());
+    const incoming = payload.acknowledgements || {};
+    const nextAcknowledgements = {
+      ...this.state.preflight.acknowledgements,
+    };
+
+    for (const [key, value] of Object.entries(normalizePreflightAcknowledgements(incoming))) {
+      if (Object.hasOwn(incoming, key)) {
+        nextAcknowledgements[key] = value;
+      }
+    }
+
+    this.state.preflight = {
+      acknowledgements: nextAcknowledgements,
+      updatedAt: timestamp,
+      updatedBy: payload.actor || 'researcher',
+    };
+
+    const event = this.#createEvent('preflight.acknowledgements.updated', {
+      source: payload.source || 'admin',
+      summary: `Preflight checklist updated by ${payload.actor || 'researcher'}.`,
+      payload: clone(this.state.preflight),
+    });
+
+    await this.#persistAndBroadcast([event]);
+    return this.getState();
+  }
+
   async getExportManifest() {
     const events = await this.#readPersistedEvents();
     const sessions = new Map();
@@ -913,6 +957,14 @@ class ExperimentStore extends EventEmitter {
             event.payload.configuration,
           )),
           defaults: clone(DEFAULT_ADAPTIVE_CONFIGURATION),
+        };
+      }
+
+      if (event.type === 'preflight.acknowledgements.updated' && event.payload) {
+        reconstructed.preflight = {
+          ...reconstructed.preflight,
+          ...event.payload,
+          acknowledgements: normalizePreflightAcknowledgements(event.payload.acknowledgements || {}),
         };
       }
     }

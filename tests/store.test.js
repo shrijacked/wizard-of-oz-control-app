@@ -203,3 +203,29 @@ test('store persists adaptive configuration updates into state and exports', asy
   assert.equal(bundle.state.adaptive.configuration.thresholds.observe, 0.34);
   assert.equal(bundle.analytics.adaptiveConfiguration.weights.gaze, 0.3);
 });
+
+test('store persists preflight acknowledgements into state and exports', async () => {
+  const { store, dataDir } = await createStore();
+
+  await store.updatePreflightAcknowledgements({
+    acknowledgements: {
+      cameraFramingChecked: true,
+      subjectDisplayChecked: true,
+      robotBoardReady: false,
+      materialsReset: true,
+    },
+    actor: 'Shrijacked',
+  });
+
+  const state = store.getState();
+  assert.equal(state.preflight.acknowledgements.cameraFramingChecked, true);
+  assert.equal(state.preflight.acknowledgements.robotBoardReady, false);
+  assert.equal(state.preflight.updatedBy, 'Shrijacked');
+
+  const savedState = JSON.parse(await fs.readFile(path.join(dataDir, 'state.json'), 'utf8'));
+  assert.equal(savedState.preflight.acknowledgements.subjectDisplayChecked, true);
+
+  const bundle = await store.buildSessionExport(store.getCurrentSessionId());
+  assert.equal(bundle.state.preflight.acknowledgements.materialsReset, true);
+  assert.ok(bundle.events.some((event) => event.type === 'preflight.acknowledgements.updated'));
+});

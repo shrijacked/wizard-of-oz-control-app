@@ -40,21 +40,80 @@ async function startConfiguredApp(options = {}) {
   };
 }
 
+async function prepareReadySetup(baseUrl, session = {}) {
+  const wsBase = baseUrl.replace('http://', 'ws://');
+  const subjectSocket = new WebSocket(`${wsBase}/ws?role=subject`);
+  await new Promise((resolve) => subjectSocket.addEventListener('open', resolve, { once: true }));
+
+  await fetch(`${baseUrl}/api/session/configure`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      studyId: session.studyId || 'pilot-test',
+      participantId: session.participantId || 'P-ready',
+      condition: session.condition || 'adaptive',
+      researcher: session.researcher || 'Shrijacked',
+    }),
+  });
+
+  await fetch(`${baseUrl}/api/telemetry/hrv`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      source: 'watch-bridge',
+      metrics: {
+        hr: 74,
+        sdnn: 41,
+        rmssd: 29,
+        pnn50: 18,
+      },
+      stressScore: 0.22,
+      stressLevel: 'Not Stressed',
+    }),
+  });
+
+  await fetch(`${baseUrl}/api/telemetry/gaze`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      source: 'gaze-bridge',
+      attentionScore: 0.63,
+      fixationLoss: 0.21,
+      pupilDilation: 0.41,
+    }),
+  });
+
+  await fetch(`${baseUrl}/api/preflight/acknowledgements`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({
+      acknowledgements: {
+        cameraFramingChecked: true,
+        subjectDisplayChecked: true,
+        robotBoardReady: true,
+        materialsReset: true,
+      },
+      actor: session.researcher || 'Shrijacked',
+    }),
+  });
+
+  return {
+    subjectSocket,
+    close() {
+      subjectSocket.close();
+    },
+  };
+}
+
 test('HTTP API updates state and exposes recent events', async () => {
   const { app, baseUrl } = await startTestApp();
+  let readySetup = null;
 
   try {
-    const configureResponse = await fetch(`${baseUrl}/api/session/configure`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        studyId: 'pilot-03',
-        participantId: 'P-013',
-        condition: 'adaptive',
-        researcher: 'Shrijacked',
-      }),
+    readySetup = await prepareReadySetup(baseUrl, {
+      studyId: 'pilot-03',
+      participantId: 'P-013',
     });
-    assert.equal(configureResponse.status, 200);
 
     const startResponse = await fetch(`${baseUrl}/api/session/start`, {
       method: 'POST',
@@ -91,9 +150,10 @@ test('HTTP API updates state and exposes recent events', async () => {
 
     const eventsResponse = await fetch(`${baseUrl}/api/events?limit=5`);
     const payload = await eventsResponse.json();
-    assert.equal(payload.events.length, 4);
+    assert.equal(payload.events.length, 5);
     assert.equal(payload.events[0].type, 'robot.action.logged');
   } finally {
+    readySetup?.close();
     await app.close();
   }
 });
@@ -115,6 +175,7 @@ test('server serves the actual admin, subject, audit, and stylesheet assets', as
     assert.match(adminHtml, /Research Control Deck/);
     assert.match(adminHtml, /Operator Controls/);
     assert.match(adminHtml, /Adaptive Controls/);
+    assert.match(adminHtml, /Before Participant Gate/);
     assert.match(adminHtml, /Sensor Health And Stream Status/);
     assert.match(subjectHtml, /Hint Terminal/);
     assert.match(auditHtml, /Robotic Action Monitor/);
@@ -153,8 +214,49 @@ test('WebSocket clients receive role-specific snapshots after updates', async ()
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
+        studyId: 'pilot-ws',
         participantId: 'P-020',
         researcher: 'Shrijacked',
+      }),
+    });
+
+    await fetch(`${baseUrl}/api/telemetry/hrv`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        source: 'watch-bridge',
+        metrics: {
+          hr: 74,
+          sdnn: 41,
+          rmssd: 29,
+          pnn50: 18,
+        },
+        stressScore: 0.22,
+        stressLevel: 'Not Stressed',
+      }),
+    });
+
+    await fetch(`${baseUrl}/api/telemetry/gaze`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        source: 'gaze-bridge',
+        attentionScore: 0.63,
+        fixationLoss: 0.21,
+        pupilDilation: 0.41,
+      }),
+    });
+
+    await fetch(`${baseUrl}/api/preflight/acknowledgements`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        acknowledgements: {
+          cameraFramingChecked: true,
+          subjectDisplayChecked: true,
+          robotBoardReady: true,
+          materialsReset: true,
+        },
       }),
     });
 
@@ -313,8 +415,107 @@ test('health endpoint reports degraded sensor summaries when streams are stale o
   }
 });
 
+test('preflight endpoint blocks trial start until readiness blockers are cleared', async () => {
+  const dataDir = await fs.mkdtemp(path.join(os.tmpdir(), 'woz-preflight-'));
+  const app = await createApp({ dataDir, port: 0 });
+  await new Promise((resolve) => app.server.listen(0, '127.0.0.1', resolve));
+  const address = app.server.address();
+  const baseUrl = `http://127.0.0.1:${address.port}`;
+
+  try {
+    const initialPreflight = await fetch(`${baseUrl}/api/preflight`).then((response) => response.json());
+    assert.equal(initialPreflight.phase, 'setup');
+    assert.equal(initialPreflight.requiredReady, false);
+    assert.ok(initialPreflight.blockers.some((item) => item.id === 'metadata'));
+
+    const configureResponse = await fetch(`${baseUrl}/api/session/configure`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        studyId: 'pilot-09',
+        participantId: 'P-030',
+        condition: 'adaptive',
+        researcher: 'Shrijacked',
+      }),
+    });
+    assert.equal(configureResponse.status, 200);
+
+    const blockedStart = await fetch(`${baseUrl}/api/session/start`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        operator: 'Shrijacked',
+      }),
+    });
+    assert.equal(blockedStart.status, 409);
+
+    const subjectSocket = new WebSocket(`${baseUrl.replace('http://', 'ws://')}/ws?role=subject`);
+    await new Promise((resolve) => subjectSocket.addEventListener('open', resolve, { once: true }));
+
+    await fetch(`${baseUrl}/api/telemetry/hrv`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        source: 'watch-bridge',
+        metrics: {
+          hr: 74,
+          sdnn: 41,
+          rmssd: 29,
+          pnn50: 18,
+        },
+        stressScore: 0.22,
+        stressLevel: 'Not Stressed',
+      }),
+    });
+
+    await fetch(`${baseUrl}/api/telemetry/gaze`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        source: 'gaze-bridge',
+        attentionScore: 0.63,
+        fixationLoss: 0.21,
+        pupilDilation: 0.41,
+      }),
+    });
+
+    const checklistResponse = await fetch(`${baseUrl}/api/preflight/acknowledgements`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        acknowledgements: {
+          cameraFramingChecked: true,
+          subjectDisplayChecked: true,
+          robotBoardReady: true,
+          materialsReset: true,
+        },
+        actor: 'Shrijacked',
+      }),
+    });
+    assert.equal(checklistResponse.status, 200);
+
+    const readyPreflight = await fetch(`${baseUrl}/api/preflight`).then((response) => response.json());
+    assert.equal(readyPreflight.requiredReady, true);
+    assert.equal(readyPreflight.blockingCount, 0);
+
+    const startResponse = await fetch(`${baseUrl}/api/session/start`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        operator: 'Shrijacked',
+      }),
+    });
+    assert.equal(startResponse.status, 200);
+
+    subjectSocket.close();
+  } finally {
+    await app.close();
+  }
+});
+
 test('operator safeguards require unlock before mutating admin routes when a PIN is configured', async () => {
   const { app, baseUrl } = await startConfiguredApp({ adminPin: '2468' });
+  let subjectSocket = null;
 
   try {
     const guardStatus = await fetch(`${baseUrl}/api/guard`).then((response) => response.json());
@@ -349,8 +550,55 @@ test('operator safeguards require unlock before mutating admin routes when a PIN
         'x-admin-token': unlockPayload.token,
       },
       body: JSON.stringify({
+        studyId: 'pilot-pin',
         participantId: 'P-200',
         researcher: 'Shrijacked',
+      }),
+    });
+
+    subjectSocket = new WebSocket(`${baseUrl.replace('http://', 'ws://')}/ws?role=subject`);
+    await new Promise((resolve) => subjectSocket.addEventListener('open', resolve, { once: true }));
+
+    await fetch(`${baseUrl}/api/telemetry/hrv`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        source: 'watch-bridge',
+        metrics: {
+          hr: 74,
+          sdnn: 41,
+          rmssd: 29,
+          pnn50: 18,
+        },
+        stressScore: 0.22,
+        stressLevel: 'Not Stressed',
+      }),
+    });
+
+    await fetch(`${baseUrl}/api/telemetry/gaze`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        source: 'gaze-bridge',
+        attentionScore: 0.63,
+        fixationLoss: 0.21,
+        pupilDilation: 0.41,
+      }),
+    });
+
+    await fetch(`${baseUrl}/api/preflight/acknowledgements`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-admin-token': unlockPayload.token,
+      },
+      body: JSON.stringify({
+        acknowledgements: {
+          cameraFramingChecked: true,
+          subjectDisplayChecked: true,
+          robotBoardReady: true,
+          materialsReset: true,
+        },
       }),
     });
 
@@ -395,18 +643,21 @@ test('operator safeguards require unlock before mutating admin routes when a PIN
     });
     assert.equal(actionAfterLock.status, 423);
   } finally {
+    subjectSocket?.close();
     await app.close();
   }
 });
 
 test('session protections block unsafe actions before start, after completion, and during reset', async () => {
   const { app, baseUrl } = await startConfiguredApp();
+  let readySetup = null;
 
   try {
     await fetch(`${baseUrl}/api/session/configure`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
+        studyId: 'pilot-protection',
         participantId: 'P-300',
         researcher: 'Shrijacked',
       }),
@@ -419,11 +670,17 @@ test('session protections block unsafe actions before start, after completion, a
     });
     assert.equal(beforeStartHint.status, 409);
 
-    await fetch(`${baseUrl}/api/session/start`, {
+    readySetup = await prepareReadySetup(baseUrl, {
+      studyId: 'pilot-protection',
+      participantId: 'P-300',
+    });
+
+    const startResponse = await fetch(`${baseUrl}/api/session/start`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ operator: 'Shrijacked' }),
     });
+    assert.equal(startResponse.status, 200);
 
     const guardDuringRun = await fetch(`${baseUrl}/api/guard`).then((response) => response.json());
     assert.equal(guardDuringRun.permittedActions.resetSession.allowed, false);
@@ -465,12 +722,14 @@ test('session protections block unsafe actions before start, after completion, a
     });
     assert.equal(forcedReset.status, 200);
   } finally {
+    readySetup?.close();
     await app.close();
   }
 });
 
 test('adaptive configuration endpoint updates state and is blocked after completion', async () => {
   const { app, baseUrl } = await startConfiguredApp({ adminPin: '2468' });
+  let subjectSocket = null;
 
   try {
     const unlockPayload = await fetch(`${baseUrl}/api/guard/unlock`, {
@@ -514,8 +773,55 @@ test('adaptive configuration endpoint updates state and is blocked after complet
         'x-admin-token': unlockPayload.token,
       },
       body: JSON.stringify({
+        studyId: 'pilot-adaptive',
         participantId: 'P-900',
         researcher: 'Shrijacked',
+      }),
+    });
+
+    subjectSocket = new WebSocket(`${baseUrl.replace('http://', 'ws://')}/ws?role=subject`);
+    await new Promise((resolve) => subjectSocket.addEventListener('open', resolve, { once: true }));
+
+    await fetch(`${baseUrl}/api/telemetry/hrv`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        source: 'watch-bridge',
+        metrics: {
+          hr: 74,
+          sdnn: 41,
+          rmssd: 29,
+          pnn50: 18,
+        },
+        stressScore: 0.22,
+        stressLevel: 'Not Stressed',
+      }),
+    });
+
+    await fetch(`${baseUrl}/api/telemetry/gaze`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        source: 'gaze-bridge',
+        attentionScore: 0.63,
+        fixationLoss: 0.21,
+        pupilDilation: 0.41,
+      }),
+    });
+
+    await fetch(`${baseUrl}/api/preflight/acknowledgements`, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-admin-token': unlockPayload.token,
+      },
+      body: JSON.stringify({
+        acknowledgements: {
+          cameraFramingChecked: true,
+          subjectDisplayChecked: true,
+          robotBoardReady: true,
+          materialsReset: true,
+        },
       }),
     });
 
@@ -559,6 +865,7 @@ test('adaptive configuration endpoint updates state and is blocked after complet
     });
     assert.equal(afterCompleteResponse.status, 409);
   } finally {
+    subjectSocket?.close();
     await app.close();
   }
 });

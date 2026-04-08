@@ -92,6 +92,65 @@
           </div>
         </section>
 
+        <section class="panel panel-wide">
+          <div class="panel-header">
+            <div>
+              <p class="panel-kicker">Readiness</p>
+              <h2>Before Participant Gate</h2>
+            </div>
+            <span class="panel-note">Clear every blocker here before you bring in the next participant.</span>
+          </div>
+          <div class="preflight-grid">
+            <article class="callout readiness-callout">
+              <span class="callout-label">Readiness summary</span>
+              <p id="preflight-summary">Checking the before-participant gate...</p>
+              <p id="preflight-detail">The server will summarize blockers, recommendations, and live readiness signals here.</p>
+              <p id="preflight-progress" class="inline-status">0 of 0 checks ready.</p>
+              <p id="preflight-updated" class="panel-note">Manual confirmations have not been saved yet.</p>
+            </article>
+
+            <article class="callout">
+              <span class="callout-label">Automatic checks</span>
+              <ul id="preflight-automatic-list" class="policy-list"></ul>
+            </article>
+
+            <form id="preflight-form" class="preflight-form stack-form compact-form">
+              <span class="callout-label">Manual confirmations</span>
+              <label class="checkbox-field">
+                <input id="preflight-camera" type="checkbox">
+                <span class="checkbox-copy">
+                  <strong>Camera framing checked</strong>
+                  <small>The webcam clearly shows the puzzle area and participant workspace.</small>
+                </span>
+              </label>
+              <label class="checkbox-field">
+                <input id="preflight-subject-display" type="checkbox">
+                <span class="checkbox-copy">
+                  <strong>Subject display confirmed</strong>
+                  <small>The participant can see the hint screen clearly and it remains distraction-free.</small>
+                </span>
+              </label>
+              <label class="checkbox-field">
+                <input id="preflight-robot-board" type="checkbox">
+                <span class="checkbox-copy">
+                  <strong>Robot control board ready</strong>
+                  <small>The manual robot controller is reachable and the preset actions are available.</small>
+                </span>
+              </label>
+              <label class="checkbox-field">
+                <input id="preflight-materials" type="checkbox">
+                <span class="checkbox-copy">
+                  <strong>Puzzle materials reset</strong>
+                  <small>The puzzle pieces, props, and session materials are ready for a fresh run.</small>
+                </span>
+              </label>
+              <div class="button-row">
+                <button id="preflight-save" class="button button-primary" type="submit">Save checklist</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
         <section class="panel">
           <div class="panel-header">
             <div>

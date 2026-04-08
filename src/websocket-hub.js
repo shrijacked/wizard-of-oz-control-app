@@ -33,6 +33,7 @@ class WebSocketHub {
   constructor(options = {}) {
     this.getStateForRole = options.getStateForRole;
     this.getSystemStatus = options.getSystemStatus || (() => ({}));
+    this.onConnectionStatsChanged = options.onConnectionStatsChanged || (() => {});
     this.clients = new Map();
   }
 
@@ -64,6 +65,7 @@ class WebSocketHub {
 
     const cleanup = () => {
       this.clients.delete(clientId);
+      this.onConnectionStatsChanged(this.getConnectionStats());
     };
 
     socket.on('close', cleanup);
@@ -79,6 +81,7 @@ class WebSocketHub {
       data: this.getStateForRole(role),
       system: this.getSystemStatus(),
     });
+    this.onConnectionStatsChanged(this.getConnectionStats());
   }
 
   getConnectionStats() {

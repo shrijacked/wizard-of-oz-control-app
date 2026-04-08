@@ -4,6 +4,7 @@ const ADMIN_TOKEN_KEY = 'woz.admin.token';
 
 const POLICY_LABELS = {
   configureSession: 'Configure session',
+  updatePreflight: 'Update readiness checklist',
   startSession: 'Start trial',
   completeSession: 'Complete trial',
   updateAdaptiveConfig: 'Tune adaptive controls',
@@ -29,6 +30,17 @@ const elements = {
   sessionSummary: document.querySelector('#session-summary'),
   sessionStart: document.querySelector('#session-start'),
   sessionComplete: document.querySelector('#session-complete'),
+  preflightForm: document.querySelector('#preflight-form'),
+  preflightSummary: document.querySelector('#preflight-summary'),
+  preflightDetail: document.querySelector('#preflight-detail'),
+  preflightProgress: document.querySelector('#preflight-progress'),
+  preflightUpdated: document.querySelector('#preflight-updated'),
+  preflightAutomaticList: document.querySelector('#preflight-automatic-list'),
+  preflightCamera: document.querySelector('#preflight-camera'),
+  preflightSubjectDisplay: document.querySelector('#preflight-subject-display'),
+  preflightRobotBoard: document.querySelector('#preflight-robot-board'),
+  preflightMaterials: document.querySelector('#preflight-materials'),
+  preflightSave: document.querySelector('#preflight-save'),
   guardForm: document.querySelector('#guard-form'),
   guardPin: document.querySelector('#guard-pin'),
   guardUnlock: document.querySelector('#guard-unlock'),
@@ -123,6 +135,14 @@ function setValueSafely(element, value) {
   }
 
   element.value = value ?? '';
+}
+
+function setCheckedSafely(element, value) {
+  if (!element) {
+    return;
+  }
+
+  element.checked = Boolean(value);
 }
 
 function setAdminToken(token) {
@@ -287,6 +307,7 @@ function buildLocalPolicy(actionName) {
   const session = currentState?.session || {};
   const status = session.status || 'setup';
   const metadata = session.metadata || {};
+  const preflight = currentState?.system?.preflight || null;
 
   if (actionName === 'configureSession') {
     return status === 'setup'
@@ -294,13 +315,23 @@ function buildLocalPolicy(actionName) {
       : { allowed: false, reason: 'Session metadata is locked once the trial has started.' };
   }
 
+  if (actionName === 'updatePreflight') {
+    return status === 'setup'
+      ? { allowed: true, reason: null }
+      : { allowed: false, reason: 'The before-participant checklist is locked once the trial has started.' };
+  }
+
   if (actionName === 'startSession') {
     if (status !== 'setup') {
       return { allowed: false, reason: 'Only setup sessions can be started.' };
     }
 
-    if (!metadata.participantId || !metadata.researcher) {
-      return { allowed: false, reason: 'Participant ID and researcher must be set before starting the trial.' };
+    if (!metadata.studyId || !metadata.participantId || !metadata.researcher) {
+      return { allowed: false, reason: 'Study ID, participant ID, and researcher must be set before starting the trial.' };
+    }
+
+    if ((preflight?.blockingCount || 0) > 0) {
+      return { allowed: false, reason: preflight.blockers?.[0]?.summary || 'Resolve the before-participant checklist blockers before starting the trial.' };
     }
 
     return { allowed: true, reason: null };
@@ -364,7 +395,7 @@ function resolvePolicy(actionName) {
     };
   }
 
-  return safeguard.permittedActions[actionName] || buildLocalPolicy(actionName);
+  return buildLocalPolicy(actionName);
 }
 
 function policyMessage(actionName, policy) {
@@ -424,6 +455,7 @@ function renderGuardStatus() {
 
   const policyEntries = [
     ['configureSession', POLICY_LABELS.configureSession],
+    ['updatePreflight', POLICY_LABELS.updatePreflight],
     ['startSession', POLICY_LABELS.startSession],
     ['completeSession', POLICY_LABELS.completeSession],
     ['updateAdaptiveConfig', POLICY_LABELS.updateAdaptiveConfig],
@@ -497,8 +529,92 @@ function renderActionButtons() {
   });
 }
 
+function preflightBadgeText(item) {
+  if (item.status === 'ready') {
+    return 'Ready';
+  }
+
+  if (item.required) {
+    return item.status === 'warning' ? 'Attention' : 'Blocked';
+  }
+
+  return 'Recommended';
+}
+
+function preflightItemClass(item) {
+  if (item.status === 'ready') {
+    return 'allowed';
+  }
+
+  if (item.status === 'blocked') {
+    return 'blocked';
+  }
+
+  return 'warning';
+}
+
+function renderPreflight() {
+  const preflight = currentState?.system?.preflight;
+  const acknowledgements = currentState?.preflight?.acknowledgements || {};
+
+  if (!preflight) {
+    elements.preflightSummary.textContent = 'Readiness details are not available yet.';
+    elements.preflightDetail.textContent = 'The server has not published the before-participant gate.';
+    elements.preflightProgress.textContent = '0 of 0 checks ready.';
+    elements.preflightUpdated.textContent = 'Manual confirmations have not been saved yet.';
+    elements.preflightAutomaticList.innerHTML = '';
+    return;
+  }
+
+  elements.preflightSummary.textContent = preflight.summary;
+  elements.preflightDetail.textContent = preflight.detail;
+  elements.preflightProgress.textContent = `${preflight.progress?.readyCount || 0} of ${preflight.progress?.totalCount || 0} checks ready`;
+  elements.preflightProgress.dataset.tone = preflight.blockingCount > 0
+    ? 'warning'
+    : (preflight.warningCount > 0 ? 'neutral' : 'success');
+  elements.preflightUpdated.textContent = preflight.updatedAt
+    ? `Manual checklist last updated ${formatTimestamp(preflight.updatedAt)} by ${preflight.updatedBy || 'researcher'}.`
+    : 'Manual confirmations have not been saved yet.';
+
+  elements.preflightAutomaticList.innerHTML = '';
+  (preflight.automaticItems || []).forEach((item) => {
+    const entry = document.createElement('li');
+    entry.className = `policy-item ${preflightItemClass(item)}`;
+
+    const header = document.createElement('div');
+    header.className = 'policy-item-header';
+
+    const title = document.createElement('strong');
+    title.textContent = item.label;
+    header.append(title);
+
+    const badge = document.createElement('span');
+    badge.className = 'policy-badge';
+    badge.textContent = preflightBadgeText(item);
+    header.append(badge);
+
+    entry.append(header);
+
+    const summary = document.createElement('small');
+    summary.textContent = item.summary;
+    entry.append(summary);
+
+    const detail = document.createElement('small');
+    detail.textContent = item.detail;
+    entry.append(detail);
+
+    elements.preflightAutomaticList.append(entry);
+  });
+
+  setCheckedSafely(elements.preflightCamera, acknowledgements.cameraFramingChecked);
+  setCheckedSafely(elements.preflightSubjectDisplay, acknowledgements.subjectDisplayChecked);
+  setCheckedSafely(elements.preflightRobotBoard, acknowledgements.robotBoardReady);
+  setCheckedSafely(elements.preflightMaterials, acknowledgements.materialsReset);
+}
+
 function renderInteractionControls() {
   const configurePolicy = resolvePolicy('configureSession');
+  const preflightPolicy = resolvePolicy('updatePreflight');
   const startPolicy = resolvePolicy('startSession');
   const completePolicy = resolvePolicy('completeSession');
   const adaptiveConfigPolicy = resolvePolicy('updateAdaptiveConfig');
@@ -518,6 +634,16 @@ function renderInteractionControls() {
     elements.sessionSave,
   ].forEach((element) => {
     setElementDisabled(element, !configurePolicy.allowed, configurePolicy.reason || '');
+  });
+
+  [
+    elements.preflightCamera,
+    elements.preflightSubjectDisplay,
+    elements.preflightRobotBoard,
+    elements.preflightMaterials,
+    elements.preflightSave,
+  ].forEach((element) => {
+    setElementDisabled(element, !preflightPolicy.allowed, preflightPolicy.reason || '');
   });
 
   setElementDisabled(elements.sessionStart, !startPolicy.allowed, startPolicy.reason || '');
@@ -621,6 +747,7 @@ function renderState() {
   elements.gazeHealthSummary.textContent = gazeHealth.summary || 'Gaze bridge status is unavailable.';
   elements.gazeHealthDetail.textContent = gazeHealth.detail || 'The gaze bridge has not reported any status yet.';
   elements.launcherSummary.textContent = `Launch the local stack with npm run launch:study, then check ${sensorHealth.overall?.issueCount || 0} active sensor issue${(sensorHealth.overall?.issueCount || 0) === 1 ? '' : 's'} here.`;
+  renderPreflight();
 
   const hrv = currentState.telemetry.hrv;
   const gaze = currentState.telemetry.gaze;
@@ -886,6 +1013,27 @@ async function init() {
       });
       setGuardMessage('Session profile saved.', 'success');
       await refreshExportManifest();
+      await refreshGuardStatus();
+    } catch (error) {
+      await handleAdminError(error);
+    }
+  });
+
+  elements.preflightForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    try {
+      await postJson('/api/preflight/acknowledgements', {
+        acknowledgements: {
+          cameraFramingChecked: elements.preflightCamera.checked,
+          subjectDisplayChecked: elements.preflightSubjectDisplay.checked,
+          robotBoardReady: elements.preflightRobotBoard.checked,
+          materialsReset: elements.preflightMaterials.checked,
+        },
+        actor: elements.sessionResearcher.value || 'researcher',
+      }, {
+        headers: buildAdminHeaders(),
+      });
+      setGuardMessage('Before-participant checklist saved.', 'success');
       await refreshGuardStatus();
     } catch (error) {
       await handleAdminError(error);
