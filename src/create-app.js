@@ -12,6 +12,7 @@ const { WatchBridge } = require('./watch-bridge');
 const { GazeBridge } = require('./gaze-bridge');
 const { getLocalNetworkAddresses } = require('./network');
 const { LlmAdvisor } = require('./llm-advisor');
+const { summarizeSensorHealth } = require('./sensor-health');
 const { assertPolicy, buildPolicy } = require('./session-policy');
 
 const ROBOT_ACTIONS = [
@@ -126,6 +127,11 @@ async function createApp(options = {}) {
   const getSystemStatus = () => ({
     watchBridge: watchBridge.getStatus(),
     gazeBridge: gazeBridge.getStatus(),
+    sensorHealth: summarizeSensorHealth({
+      sessionStatus: store.getState().session.status,
+      watchBridge: watchBridge.getStatus(),
+      gazeBridge: gazeBridge.getStatus(),
+    }),
     safeguards: adminGuard.getPublicStatus(),
     connections: hub.getConnectionStats(),
     robotActions: ROBOT_ACTIONS,
@@ -184,7 +190,14 @@ async function createApp(options = {}) {
       }
 
       if (request.method === 'GET' && pathname === '/health') {
-        json(response, 200, { ok: true });
+        const systemStatus = getSystemStatus();
+        const healthLevel = systemStatus.sensorHealth?.overall?.level || 'healthy';
+        json(response, 200, {
+          ok: true,
+          status: healthLevel === 'healthy' ? 'ok' : (healthLevel === 'error' ? 'error' : 'degraded'),
+          sessionStatus: store.getState().session.status,
+          sensorHealth: systemStatus.sensorHealth,
+        });
         return;
       }
 

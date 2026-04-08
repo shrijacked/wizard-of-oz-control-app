@@ -118,6 +118,18 @@ class GazeBridgeClient:
 
         self._running = False
 
+    def run_heartbeat_only(self, heartbeat_interval: float) -> None:
+        self._running = True
+        try:
+            while self._running:
+                try:
+                    self.send_heartbeat()
+                except urllib.error.URLError as error:
+                    print(f"Heartbeat failed: {error}", file=sys.stderr)
+                time.sleep(heartbeat_interval)
+        finally:
+            self._running = False
+
     def run_file_tail(self, path: str, heartbeat_interval: float, poll_seconds: float) -> None:
         self._running = True
         thread = threading.Thread(
@@ -152,7 +164,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--device-label", required=True, help="Human-readable gaze device label")
     parser.add_argument("--transport", default="sdk-http", help="Transport description shown in the admin UI")
     parser.add_argument("--sdk-name", default=None, help="Optional SDK name for diagnostics")
-    parser.add_argument("--mode", choices=["stdin-jsonl", "file-tail"], default="stdin-jsonl")
+    parser.add_argument("--mode", choices=["stdin-jsonl", "file-tail", "heartbeat-only"], default="stdin-jsonl")
     parser.add_argument("--file", default=None, help="Path to a JSONL file when using file-tail mode")
     parser.add_argument("--heartbeat-interval", type=float, default=5.0, help="Seconds between bridge heartbeats")
     parser.add_argument("--poll-seconds", type=float, default=0.5, help="Polling interval for file-tail mode")
@@ -170,9 +182,10 @@ def main() -> int:
     )
 
     try:
-        client.send_heartbeat()
         if args.mode == "stdin-jsonl":
             client.run_stdin_jsonl(args.heartbeat_interval)
+        elif args.mode == "heartbeat-only":
+            client.run_heartbeat_only(args.heartbeat_interval)
         else:
             if not args.file:
                 raise ValueError("--file is required for file-tail mode")
