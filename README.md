@@ -12,6 +12,7 @@ The system is designed to run on a laptop on the same Wi-Fi network as the secon
 
 - `docs/architecture.md`: system architecture and data flow
 - `docs/implementation-plan.md`: task traceability and staged plan
+- `docs/internal-study-readiness.md`: before-first-participant checklist and dry-run protocol
 - `src/`: backend server and services
 - `public/`: browser UIs for admin, subject, and audit routes
 - `integrations/gaze/`: vendor bridge for gaze SDKs
@@ -37,7 +38,7 @@ The system is designed to run on a laptop on the same Wi-Fi network as the secon
 
 ## Runbook
 
-See `docs/architecture.md` and `docs/implementation-plan.md` first. Once the implementation is in place, start the local server with:
+See `docs/architecture.md`, `docs/implementation-plan.md`, and `docs/internal-study-readiness.md` first. Once the implementation is in place, start the local server with:
 
 ```bash
 npm start
@@ -60,10 +61,11 @@ On `/admin`, the typical operator flow is:
 1. Unlock the dashboard first if `ADMIN_PIN` is configured on the host.
 2. Save the session profile with study ID, participant ID, condition, and notes.
 3. Tune the adaptive controls for the study if the default rule set is not appropriate.
-4. Start the trial when the participant is ready.
-5. Use hints, action logging, and telemetry during the run.
-6. Mark the session complete and enter an end-of-trial summary.
-7. Download the final bundle or CSV from `/exports`.
+4. Clear the before-participant gate, including the four manual confirmations.
+5. Start the trial when the participant is ready.
+6. Use hints, action logging, and telemetry during the run.
+7. Mark the session complete and enter an end-of-trial summary.
+8. Download the final bundle or CSV from `/exports`.
 
 Session protections are always active, even when no PIN is configured:
 
@@ -106,6 +108,8 @@ Bridge and sensor ingestion routes stay available without admin unlock so the ex
 Protected operator tuning is available through:
 
 - `POST /api/adaptive/config`
+- `GET /api/preflight`
+- `POST /api/preflight/acknowledgements`
 
 Launcher controls:
 
@@ -130,4 +134,4 @@ The export center also renders:
 ## Health endpoints and operator status
 
 - `GET /health`: server and sensor health summary with `ok`, `status`, and derived watch/gaze diagnostics
-- `/admin`: now includes a sensor-health panel that warns when watch data or gaze heartbeats go stale
+- `/admin`: now includes a before-participant gate plus a sensor-health panel that warns when watch data or gaze heartbeats go stale

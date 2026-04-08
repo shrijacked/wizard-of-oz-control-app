@@ -40,6 +40,7 @@ flowchart LR
 | T13 | Add operator safeguards with local PIN lock and session-phase policy enforcement | T2, T4, T7, T11 | Architecture: Operator safeguard flow |
 | T14 | Add adaptive threshold controls that persist into state, exports, and the dashboard | T5, T7, T10, T11, T13 | Architecture: Adaptive engine behavior |
 | T15 | Add one-command study-day launcher and sensor health diagnostics | T4, T6, T7, T11, T12 | Architecture: Sensor integration plan |
+| T16 | Add a before-participant readiness gate with live blockers, manual acknowledgements, and a study-day runbook | T6, T7, T11, T12, T15 | Architecture: Before-participant gate |
 
 ## Delivery slices
 
@@ -100,6 +101,12 @@ flowchart LR
 - Add sensor health summaries and stale-stream warnings to the admin dashboard and health endpoint
 - Verify launcher planning, health derivation, and live startup behavior
 
+### Slice 11
+
+- Add a before-participant gate that blocks trial start until required setup conditions are satisfied
+- Persist manual readiness acknowledgements into state, events, and exports
+- Add the dry-run and internal-study readiness runbook
+
 ## Validation checklist
 
 - Admin view loads and can preview the webcam
@@ -114,6 +121,7 @@ flowchart LR
 - Adaptive control changes persist into the session state and export bundle
 - Sensor health summaries warn when watch or gaze data goes stale
 - The study-day launcher can bring up the local stack with one command
+- The before-participant gate blocks trial start until required readiness items are clear
 - Export center shows analytics and replay timeline for a selected session
 - Session events append to disk with timestamps
 - Tests pass before any commit is created

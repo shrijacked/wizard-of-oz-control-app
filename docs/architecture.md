@@ -45,6 +45,7 @@ flowchart LR
 - Keeps the latest state in memory for fast UI refresh
 - Persists snapshots and timeline events to disk
 - Tracks the latest hint, latest robotic action, adaptive status, and telemetry summaries
+- Persists manual before-participant acknowledgements so study-day setup becomes part of the export record
 
 ### 4. Telemetry ingestion layer
 
@@ -67,7 +68,7 @@ flowchart LR
 - `subject`: distraction-free hint panel
 - `audit`: large-format robotic action monitor
 - `exports`: session analytics, download center, and replay timeline
-- `admin` also exposes the operator safeguard board with lock state and policy gating
+- `admin` also exposes the operator safeguard board plus the before-participant gate with live readiness blockers
 
 ## Data flow
 
@@ -85,6 +86,20 @@ sequenceDiagram
     Server-->>Subject: WebSocket hint update
     Server-->>Audit: WebSocket action update
     Server-->>Admin: WebSocket state refresh
+```
+
+## Before-participant gate
+
+```mermaid
+flowchart TD
+    session["Session metadata"] --> gate["Readiness gate"]
+    displays["Subject display connection"] --> gate
+    hrv["Fresh HRV telemetry"] --> gate
+    gaze["Fresh gaze telemetry"] --> gate
+    manual["Manual confirmations"] --> gate
+    gate --> start{"All blockers clear?"}
+    start -- yes --> allow["Enable session start"]
+    start -- no --> block["Return 409 from POST /api/session/start"]
 ```
 
 ## Telemetry flow
@@ -114,10 +129,12 @@ flowchart TD
 - `GET /api/exports/current.csv`: current session timeline CSV
 - `GET /api/bridge/gaze`: current gaze-bridge status
 - `GET /api/guard`: current operator safeguard state and action policy matrix
+- `GET /api/preflight`: current before-participant gate summary
 - `GET /health`: server and sensor-health summary for launcher checks and operator diagnostics
 - `POST /api/hints`: create and broadcast a participant hint
 - `POST /api/actions`: create and broadcast a robotic arm action event
 - `POST /api/adaptive/config`: update the adaptive rule set for the current session
+- `POST /api/preflight/acknowledgements`: save manual before-participant confirmations
 - `POST /api/telemetry/hrv`: ingest HRV metrics from a bridge or simulator
 - `POST /api/telemetry/gaze`: ingest gaze metrics from a bridge or simulator
 - `POST /api/telemetry/simulate`: push a combined mock telemetry frame for demos/tests
@@ -163,6 +180,16 @@ flowchart TD
     "status": "observe",
     "score": 0.53,
     "reason": "HRV stress is elevated and focus loss is increasing."
+  },
+  "preflight": {
+    "acknowledgements": {
+      "cameraFramingChecked": true,
+      "subjectDisplayChecked": true,
+      "robotBoardReady": true,
+      "materialsReset": true
+    },
+    "updatedAt": "2026-04-01T21:48:55.000Z",
+    "updatedBy": "Primary Researcher"
   }
 }
 ```
@@ -188,6 +215,7 @@ The export bundle also derives:
 - event counts by type
 - session duration and latest intervention summaries
 - replay steps with offsets from the first event
+- the stored before-participant acknowledgements inside the exported session state
 
 ## Sensor integration plan
 
