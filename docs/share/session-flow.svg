@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="860" viewBox="0 0 1280 860" role="img" aria-labelledby="title desc">
+  <title id="title">wizard of oz control application session flow</title>
+  <desc id="desc">operator flow showing lock, setup, running, completion, reset, and continuous event logging.</desc>
+  <defs>
+    <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f9f1e7"/>
+      <stop offset="100%" stop-color="#ead9c6"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fffdfa"/>
+      <stop offset="100%" stop-color="#f6ede2"/>
+    </linearGradient>
+    <linearGradient id="teal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#edf8f6"/>
+      <stop offset="100%" stop-color="#d9f0ea"/>
+    </linearGradient>
+    <linearGradient id="coral" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fff5ef"/>
+      <stop offset="100%" stop-color="#f6ddd5"/>
+    </linearGradient>
+    <linearGradient id="navy" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#16334a"/>
+      <stop offset="100%" stop-color="#245674"/>
+    </linearGradient>
+    <filter id="shadow2" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#7d5c46" flood-opacity="0.14"/>
+    </filter>
+    <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#536874"/>
+    </marker>
+    <style>
+      .title { font: 700 34px 'Avenir Next', 'Segoe UI', Arial, sans-serif; fill: #201a17; }
+      .subtitle { font: 400 18px 'Avenir Next', 'Segoe UI', Arial, sans-serif; fill: #6d6259; }
+      .label { font: 700 14px 'Avenir Next', 'Segoe UI', Arial, sans-serif; fill: #6d6259; letter-spacing: 2px; text-transform: uppercase; }
+      .cardTitle { font: 700 24px 'Avenir Next', 'Segoe UI', Arial, sans-serif; fill: #1d2429; }
+      .cardTitleDark { font: 700 24px 'Avenir Next', 'Segoe UI', Arial, sans-serif; fill: #fff7ef; }
+      .body { font: 400 17px 'Avenir Next', 'Segoe UI', Arial, sans-serif; fill: #51463f; }
+      .bodyDark { font: 400 17px 'Avenir Next', 'Segoe UI', Arial, sans-serif; fill: #e9f1f4; }
+      .arrowLabel { font: 600 14px 'Avenir Next', 'Segoe UI', Arial, sans-serif; fill: #536874; }
+      .small { font: 600 14px 'Avenir Next', 'Segoe UI', Arial, sans-serif; fill: #0a7a78; }
+    </style>
+  </defs>
+
+  <rect width="1280" height="860" fill="url(#bg2)"/>
+  <circle cx="1090" cy="140" r="220" fill="#fff7ee" opacity="0.65"/>
+  <circle cx="150" cy="760" r="260" fill="#f4e5d7" opacity="0.7"/>
+
+  <text x="72" y="80" class="title">session and operator flow</text>
+  <text x="72" y="114" class="subtitle">how a live study moves through lock, setup, run, completion, and reset</text>
+
+  <text x="118" y="188" class="label">operator access</text>
+  <text x="480" y="188" class="label">study lifecycle</text>
+  <text x="948" y="188" class="label">safety and records</text>
+
+  <g filter="url(#shadow2)">
+    <rect x="88" y="220" rx="26" ry="26" width="280" height="138" fill="url(#card)" stroke="#d7c6b3"/>
+    <text x="118" y="266" class="cardTitle">dashboard locked</text>
+    <text x="118" y="300" class="body">if a local pin is set, protected</text>
+    <text x="118" y="326" class="body">controls stay disabled at first</text>
+  </g>
+
+  <g filter="url(#shadow2)">
+    <rect x="88" y="414" rx="26" ry="26" width="280" height="138" fill="url(#teal)" stroke="#b8dfd7"/>
+    <text x="118" y="460" class="cardTitle">unlock browser</text>
+    <text x="118" y="494" class="body">enter local pin to enable hints,</text>
+    <text x="118" y="520" class="body">actions, and session controls</text>
+  </g>
+
+  <g filter="url(#shadow2)">
+    <rect x="448" y="220" rx="28" ry="28" width="350" height="142" fill="url(#card)" stroke="#d7c6b3"/>
+    <text x="482" y="268" class="cardTitle">setup session</text>
+    <text x="482" y="302" class="body">enter study id, participant id,</text>
+    <text x="482" y="328" class="body">condition, researcher, and notes</text>
+  </g>
+
+  <g filter="url(#shadow2)">
+    <rect x="448" y="412" rx="28" ry="28" width="350" height="170" fill="url(#navy)"/>
+    <text x="482" y="462" class="cardTitleDark">running session</text>
+    <text x="482" y="498" class="bodyDark">live camera, telemetry, adaptive alerts</text>
+    <text x="482" y="526" class="bodyDark">broadcast hints to the subject display</text>
+    <text x="482" y="554" class="bodyDark">log manual robot actions to the audit display</text>
+  </g>
+
+  <g filter="url(#shadow2)">
+    <rect x="448" y="636" rx="28" ry="28" width="350" height="138" fill="url(#card)" stroke="#d7c6b3"/>
+    <text x="482" y="684" class="cardTitle">completed session</text>
+    <text x="482" y="718" class="body">summary is captured and the run</text>
+    <text x="482" y="744" class="body">becomes read only until reset</text>
+  </g>
+
+  <g filter="url(#shadow2)">
+    <rect x="898" y="220" rx="26" ry="26" width="296" height="138" fill="url(#coral)" stroke="#e6bfb1"/>
+    <text x="928" y="266" class="cardTitle">force reset path</text>
+    <text x="928" y="300" class="body">an active run cannot be reset</text>
+    <text x="928" y="326" class="body">unless the operator confirms it</text>
+  </g>
+
+  <g filter="url(#shadow2)">
+    <rect x="898" y="414" rx="26" ry="26" width="296" height="138" fill="url(#teal)" stroke="#b8dfd7"/>
+    <text x="928" y="460" class="cardTitle">fresh session reset</text>
+    <text x="928" y="494" class="body">clear state, keep the logs, and</text>
+    <text x="928" y="520" class="body">start a new experiment timeline</text>
+  </g>
+
+  <g filter="url(#shadow2)">
+    <rect x="874" y="624" rx="30" ry="30" width="320" height="156" fill="url(#card)" stroke="#d7c6b3"/>
+    <text x="906" y="674" class="cardTitle">continuous record</text>
+    <text x="906" y="708" class="body">all session changes, telemetry, hints,</text>
+    <text x="906" y="734" class="body">and actions are appended to the log</text>
+    <text x="906" y="760" class="small">exports can be reviewed after the trial</text>
+  </g>
+
+  <line x1="228" y1="358" x2="228" y2="414" stroke="#536874" stroke-width="4" marker-end="url(#arrow2)"/>
+  <text x="246" y="392" class="arrowLabel">enter pin</text>
+
+  <line x1="368" y1="484" x2="448" y2="484" stroke="#536874" stroke-width="4" marker-end="url(#arrow2)"/>
+  <text x="386" y="468" class="arrowLabel">unlocked</text>
+
+  <line x1="623" y1="362" x2="623" y2="412" stroke="#536874" stroke-width="4" marker-end="url(#arrow2)"/>
+  <text x="643" y="392" class="arrowLabel">start trial</text>
+
+  <line x1="623" y1="582" x2="623" y2="636" stroke="#536874" stroke-width="4" marker-end="url(#arrow2)"/>
+  <text x="644" y="614" class="arrowLabel">mark complete</text>
+
+  <line x1="798" y1="484" x2="898" y2="484" stroke="#536874" stroke-width="4" marker-end="url(#arrow2)"/>
+  <text x="818" y="466" class="arrowLabel">unsafe live reset</text>
+
+  <line x1="1046" y1="358" x2="1046" y2="414" stroke="#536874" stroke-width="4" marker-end="url(#arrow2)"/>
+  <text x="1062" y="392" class="arrowLabel">confirm</text>
+
+  <line x1="798" y1="705" x2="898" y2="483" stroke="#536874" stroke-width="4" marker-end="url(#arrow2)"/>
+  <text x="820" y="624" class="arrowLabel">reset when ready</text>
+
+  <polyline points="898,446 846,446 846,291 798,291" fill="none" stroke="#536874" stroke-width="4" marker-end="url(#arrow2)"/>
+  <text x="822" y="430" class="arrowLabel">new trial</text>
+
+  <line x1="798" y1="484" x2="874" y2="684" stroke="#8b9fa9" stroke-width="3" marker-end="url(#arrow2)" opacity="0.8"/>
+  <line x1="623" y1="552" x2="874" y2="702" stroke="#8b9fa9" stroke-width="3" marker-end="url(#arrow2)" opacity="0.8"/>
+  <line x1="623" y1="744" x2="874" y2="744" stroke="#8b9fa9" stroke-width="3" marker-end="url(#arrow2)" opacity="0.8"/>
+  <line x1="623" y1="302" x2="874" y2="666" stroke="#8b9fa9" stroke-width="3" marker-end="url(#arrow2)" opacity="0.45"/>
+</svg>
