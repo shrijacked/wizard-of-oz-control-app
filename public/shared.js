@@ -93,6 +93,69 @@ export function connectSocket(role, handlers = {}) {
   };
 }
 
+export function installSectionNavigation(selector = '[data-section-link]') {
+  const links = Array.from(document.querySelectorAll(selector));
+  if (!links.length) {
+    return () => {};
+  }
+
+  const sections = links
+    .map((link) => {
+      const href = link.getAttribute('href');
+      return href?.startsWith('#') ? document.querySelector(href) : null;
+    })
+    .filter(Boolean);
+
+  if (!sections.length) {
+    return () => {};
+  }
+
+  const setActive = (activeId) => {
+    links.forEach((link) => {
+      const href = link.getAttribute('href');
+      const isActive = href === `#${activeId}`;
+      link.classList.toggle('active', isActive);
+      if (isActive) {
+        link.setAttribute('aria-current', 'true');
+      } else {
+        link.removeAttribute('aria-current');
+      }
+    });
+  };
+
+  setActive(sections[0].id);
+
+  if (!('IntersectionObserver' in window)) {
+    return () => {};
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    const visibleEntries = entries
+      .filter((entry) => entry.isIntersecting)
+      .sort((left, right) => right.intersectionRatio - left.intersectionRatio);
+
+    if (visibleEntries[0]?.target?.id) {
+      setActive(visibleEntries[0].target.id);
+    }
+  }, {
+    rootMargin: '-18% 0px -58% 0px',
+    threshold: [0.15, 0.35, 0.55, 0.75],
+  });
+
+  sections.forEach((section) => observer.observe(section));
+
+  links.forEach((link) => {
+    link.addEventListener('click', () => {
+      const href = link.getAttribute('href');
+      if (href?.startsWith('#')) {
+        setActive(href.slice(1));
+      }
+    });
+  });
+
+  return () => observer.disconnect();
+}
+
 export function drawSeriesChart(canvas, points, options) {
   const context = canvas.getContext('2d');
   const rect = canvas.getBoundingClientRect();

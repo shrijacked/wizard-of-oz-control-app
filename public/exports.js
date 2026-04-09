@@ -1,4 +1,4 @@
-import { fetchJson, formatTimestamp } from './shared.js';
+import { fetchJson, formatTimestamp, installSectionNavigation } from './shared.js';
 
 const currentSessionElement = document.querySelector('#exports-current-session');
 const generatedAtElement = document.querySelector('#exports-generated-at');
@@ -122,6 +122,7 @@ function renderManifest(manifest) {
 }
 
 async function init() {
+  installSectionNavigation();
   const manifest = await fetchJson('/api/exports');
   renderManifest(manifest);
   await selectSession(manifest.currentSessionId);

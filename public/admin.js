@@ -1,4 +1,11 @@
-import { connectSocket, drawSeriesChart, fetchJson, formatTimestamp, postJson } from './shared.js';
+import {
+  connectSocket,
+  drawSeriesChart,
+  fetchJson,
+  formatTimestamp,
+  installSectionNavigation,
+  postJson,
+} from './shared.js';
 
 const ADMIN_TOKEN_KEY = 'woz.admin.token';
 
@@ -924,6 +931,7 @@ async function handleAdminError(error) {
 
 async function init() {
   setGuardMessage('Loading safeguard status...', 'neutral');
+  installSectionNavigation();
 
   await Promise.all([
     bootstrapState(),

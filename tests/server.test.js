@@ -173,13 +173,16 @@ test('server serves the actual admin, subject, audit, and stylesheet assets', as
     const css = await fetch(`${baseUrl}/styles.css`).then((response) => response.text());
 
     assert.match(adminHtml, /Research Control Deck/);
+    assert.match(adminHtml, /Operator Flow/);
     assert.match(adminHtml, /Operator Controls/);
     assert.match(adminHtml, /Adaptive Controls/);
     assert.match(adminHtml, /Before Participant Gate/);
+    assert.match(adminHtml, /Review And Routing/);
     assert.match(adminHtml, /Sensor Health And Stream Status/);
     assert.match(subjectHtml, /Hint Terminal/);
     assert.match(auditHtml, /Robotic Action Monitor/);
     assert.match(exportsHtml, /Session Exports/);
+    assert.match(exportsHtml, /Export Center/);
     assert.match(exportsHtml, /Replay Timeline/);
     assert.match(css, /--teal/);
   } finally {
