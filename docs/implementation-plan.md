@@ -41,6 +41,7 @@ flowchart LR
 | T14 | Add adaptive threshold controls that persist into state, exports, and the dashboard | T5, T7, T10, T11, T13 | Architecture: Adaptive engine behavior |
 | T15 | Add one-command study-day launcher and sensor health diagnostics | T4, T6, T7, T11, T12 | Architecture: Sensor integration plan |
 | T16 | Add a before-participant readiness gate with live blockers, manual acknowledgements, and a study-day runbook | T6, T7, T11, T12, T15 | Architecture: Before-participant gate |
+| T17 | Audit and reorganize the operator UI so task-heavy pages are easier to scan and navigate | T7, T10, T12, T16 | Docs: Operator navigation audit + Architecture: Operator information architecture |
 
 ## Delivery slices
 
@@ -106,6 +107,12 @@ flowchart LR
 - Add a before-participant gate that blocks trial start until required setup conditions are satisfied
 - Persist manual readiness acknowledgements into state, events, and exports
 - Add the dry-run and internal-study readiness runbook
+
+### Slice 12
+
+- Audit the operator-facing pages for navigation friction
+- Add a shared route shell and sticky section rail
+- Reorganize admin and exports around operator tasks instead of a flat panel wall
 
 ## Validation checklist
 

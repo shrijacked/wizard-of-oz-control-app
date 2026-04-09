@@ -70,6 +70,23 @@ flowchart LR
 - `exports`: session analytics, download center, and replay timeline
 - `admin` also exposes the operator safeguard board plus the before-participant gate with live readiness blockers
 
+## Operator information architecture
+
+```mermaid
+flowchart LR
+    topbar["Persistent route bar"] --> admin["Admin workspace"]
+    topbar --> exports["Export center"]
+    rail["Sticky operator rail"] --> setup["Run setup"]
+    rail --> live["Live controls"]
+    rail --> monitoring["Monitoring"]
+    rail --> review["Review and routing"]
+    admin --> rail
+    admin --> setup
+    admin --> live
+    admin --> monitoring
+    admin --> review
+```
+
 ## Data flow
 
 ```mermaid
