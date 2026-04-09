@@ -4,6 +4,8 @@
 
 This runbook is the shortest path from a clean laptop to a participant-ready internal study session. It is intentionally strict. The goal is to make experiment-day setup boring, repeatable, and easy to audit after the fact.
 
+For the full rehearsal ladder and pass criteria, use [end-to-end-validation-plan.md](/Users/owlxshri/Downloads/hti/docs/end-to-end-validation-plan.md). For each rehearsal, duplicate and fill [dry-run-log-template.md](/Users/owlxshri/Downloads/hti/docs/dry-run-log-template.md).
+
 ## Readiness architecture
 
 ```mermaid
