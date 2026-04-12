@@ -408,7 +408,10 @@ test('gaze bridge endpoints update system state and export endpoints return down
     const manifest = await fetch(`${baseUrl}/api/exports`).then((response) => response.json());
     assert.ok(manifest.sessions.length >= 1);
 
-    const bundle = await fetch(`${baseUrl}/api/exports/current.bundle.json`).then((response) => response.json());
+    const bundleResponse = await fetch(`${baseUrl}/api/exports/current.bundle.json`);
+    assert.match(bundleResponse.headers.get('content-disposition') || '', /attachment; filename=".*\.bundle\.json"/);
+    assert.match(bundleResponse.headers.get('content-type') || '', /application\/json/);
+    const bundle = await bundleResponse.json();
     assert.equal(bundle.state.session.id, state.session.id);
     assert.ok(bundle.events.some((event) => event.type === 'telemetry.gaze.updated'));
     assert.ok(bundle.analytics);

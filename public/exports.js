@@ -111,12 +111,14 @@ function renderManifest(manifest) {
     bundleLink.className = 'button button-primary';
     bundleLink.href = session.isCurrent ? '/api/exports/current.bundle.json' : session.downloads.bundleJson;
     bundleLink.textContent = 'Download bundle JSON';
+    bundleLink.download = `${session.sessionId}.bundle.json`;
     actions.append(bundleLink);
 
     const csvLink = document.createElement('a');
     csvLink.className = 'button button-ghost';
     csvLink.href = session.isCurrent ? '/api/exports/current.csv' : session.downloads.csv;
     csvLink.textContent = 'Download CSV timeline';
+    csvLink.download = `${session.sessionId}.csv`;
     actions.append(csvLink);
 
     const inspectButton = document.createElement('button');

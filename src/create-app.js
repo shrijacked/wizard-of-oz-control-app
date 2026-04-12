@@ -48,8 +48,11 @@ const OPERATOR_ROUTE_FILES = {
   '/admin/review': 'admin-review.html',
 };
 
-function json(response, statusCode, payload) {
-  response.writeHead(statusCode, { 'content-type': 'application/json; charset=utf-8' });
+function json(response, statusCode, payload, headers = {}) {
+  response.writeHead(statusCode, {
+    'content-type': 'application/json; charset=utf-8',
+    ...headers,
+  });
   response.end(JSON.stringify(payload, null, 2));
 }
 
@@ -320,7 +323,10 @@ async function createApp(options = {}) {
 
         if (slug.endsWith('.bundle.json')) {
           const sessionId = slug.slice(0, -'.bundle.json'.length);
-          json(response, 200, await store.buildSessionExport(sessionId));
+          const resolvedSessionId = sessionId === 'current' ? store.getCurrentSessionId() : sessionId;
+          json(response, 200, await store.buildSessionExport(sessionId), {
+            'content-disposition': `attachment; filename="${resolvedSessionId}.bundle.json"`,
+          });
           return;
         }
 

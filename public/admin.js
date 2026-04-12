@@ -7,7 +7,10 @@ import {
   installSectionNavigation,
   postJson,
 } from './shared.js';
+import { createCameraController } from './admin-camera.mjs';
 import { bindCameraControls } from './admin-controls.mjs';
+import { mergeAdminState } from './admin-state.mjs';
+import { createSessionDraftController } from './admin-session-draft.mjs';
 import { describeGuardBanner } from './admin-view.mjs';
 
 const ADMIN_TOKEN_KEY = 'woz.admin.token';
@@ -35,6 +38,7 @@ const elements = {
   sessionResearcher: document.querySelector('#session-researcher'),
   sessionNotes: document.querySelector('#session-notes'),
   sessionSave: document.querySelector('#session-save'),
+  sessionStartReason: document.querySelector('#session-start-reason'),
   sessionStatusSummary: document.querySelector('#session-status-summary'),
   sessionStatusDetail: document.querySelector('#session-status-detail'),
   sessionDurationSummary: document.querySelector('#session-duration-summary'),
@@ -136,13 +140,24 @@ const elements = {
 
 let currentState = null;
 let timelineEvents = [];
-let mediaStream = null;
 let exportManifest = null;
 let guardStatus = null;
 let adminToken = window.localStorage.getItem(ADMIN_TOKEN_KEY) || '';
 let statePollTimer = null;
 let durationTicker = null;
 let puzzlePreviewAssetId = null;
+const sessionDraft = createSessionDraftController([
+  'studyId',
+  'participantId',
+  'condition',
+  'researcher',
+  'notes',
+]);
+const cameraController = createCameraController({
+  videoElement: elements.cameraFeed,
+  statusElement: elements.cameraStatus,
+  mediaDevices: window.navigator?.mediaDevices || null,
+});
 
 const PUZZLE_ACCEPTED_TYPES = {
   '.jpg': 'image/jpeg',
@@ -203,6 +218,12 @@ function setValueSafely(element, value) {
   }
 
   element.value = value ?? '';
+}
+
+function trackSessionDraft(field, element, eventName = 'input') {
+  bindEvent(element, eventName, () => {
+    sessionDraft.noteChange(field, element?.value ?? '');
+  });
 }
 
 function setCheckedSafely(element, value) {
@@ -999,6 +1020,13 @@ function renderInteractionControls() {
   setElementDisabled(elements.sessionStart, !startPolicy.allowed, startPolicy.reason || '');
   setElementDisabled(elements.sessionComplete, !completePolicy.allowed, completePolicy.reason || '');
   setElementDisabled(elements.sessionSummary, !completePolicy.allowed, completePolicy.reason || '');
+  setText(
+    elements.sessionStartReason,
+    startPolicy.allowed
+      ? 'Readiness gate cleared. You can start the trial now.'
+      : (currentState?.system?.preflight?.detail || startPolicy.reason || 'Save metadata, clear the readiness gate, then start the trial.'),
+  );
+  setDatasetValue(elements.sessionStartReason, 'tone', startPolicy.allowed ? 'success' : 'warning');
 
   [
     elements.adaptiveObserveThreshold,
@@ -1052,11 +1080,18 @@ function renderState() {
 
   const session = currentState.session;
   const metadata = session.metadata || {};
-  setValueSafely(elements.sessionStudyId, metadata.studyId);
-  setValueSafely(elements.sessionParticipantId, metadata.participantId);
-  setValueSafely(elements.sessionCondition, metadata.condition || 'adaptive');
-  setValueSafely(elements.sessionResearcher, metadata.researcher);
-  setValueSafely(elements.sessionNotes, metadata.notes);
+  const resolvedMetadata = sessionDraft.resolve(session.id, {
+    studyId: metadata.studyId,
+    participantId: metadata.participantId,
+    condition: metadata.condition || 'adaptive',
+    researcher: metadata.researcher,
+    notes: metadata.notes,
+  });
+  setValueSafely(elements.sessionStudyId, resolvedMetadata.studyId);
+  setValueSafely(elements.sessionParticipantId, resolvedMetadata.participantId);
+  setValueSafely(elements.sessionCondition, resolvedMetadata.condition || 'adaptive');
+  setValueSafely(elements.sessionResearcher, resolvedMetadata.researcher);
+  setValueSafely(elements.sessionNotes, resolvedMetadata.notes);
 
   const statusLabel = session.status ? session.status.toUpperCase() : 'SETUP';
   setText(elements.sessionStatusSummary, `${statusLabel} • ${metadata.participantId || 'participant not assigned'}`);
@@ -1073,13 +1108,14 @@ function renderState() {
   setText(elements.adaptiveConfigSummary, adaptiveSummary(configuration));
   setText(elements.adaptiveConfigNote, adaptiveNote(configuration));
 
-  const connections = currentState.system.connections;
-  const sensorHealth = currentState.system.sensorHealth || {};
+  const system = currentState.system || {};
+  const connections = system.connections || { admin: 0, subject: 0, audit: 0 };
+  const sensorHealth = system.sensorHealth || {};
   const watchHealth = sensorHealth.watch || {};
   const gazeHealth = sensorHealth.gaze || {};
   setText(elements.connectionCounts, `${connections.admin} admin / ${connections.subject} subject / ${connections.audit} audit`);
 
-  const watchStatus = currentState.system.watchBridge;
+  const watchStatus = system.watchBridge || {};
   setText(elements.watchBridgeStatus, sensorHealth.overall?.summary
     || (watchStatus.lastProcessedAt
       ? `Watch file ${watchStatus.filePath} • last processed ${formatTimestamp(watchStatus.lastProcessedAt)}`
@@ -1096,7 +1132,7 @@ function renderState() {
   const hrv = currentState.telemetry.hrv;
   const gaze = currentState.telemetry.gaze;
   const advisory = adaptive.advisory;
-  const gazeBridge = currentState.system.gazeBridge;
+  const gazeBridge = system.gazeBridge;
   setText(elements.metricHr, formatNumber(hrv.metrics.hr, 0));
   setText(elements.metricStress, formatNumber(hrv.stressScore));
   setText(elements.metricStressLevel, hrv.stressLevel || 'Not Stressed');
@@ -1119,8 +1155,8 @@ function renderState() {
     ? `Suggested hint: ${advisory.recommendedHint}`
     : 'Suggested hint: unavailable');
 
-  renderLinks(elements.localhostLinks, currentState.system.network.localhost);
-  renderLanLinks(elements.lanLinks, currentState.system.network.lan);
+  renderLinks(elements.localhostLinks, system.network?.localhost || {});
+  renderLanLinks(elements.lanLinks, system.network?.lan || []);
   renderCharts();
   renderGuardStatus();
 }
@@ -1136,11 +1172,13 @@ function renderExportInfo() {
   const bundleLink = document.createElement('a');
   bundleLink.href = '/api/exports/current.bundle.json';
   bundleLink.textContent = 'Download current bundle JSON';
+  bundleLink.download = `${exportManifest.currentSessionId}.bundle.json`;
   elements.currentExportLinks?.append(bundleLink);
 
   const csvLink = document.createElement('a');
   csvLink.href = '/api/exports/current.csv';
   csvLink.textContent = 'Download current CSV timeline';
+  csvLink.download = `${exportManifest.currentSessionId}.csv`;
   elements.currentExportLinks?.append(csvLink);
 
   setText(elements.exportSummary, current
@@ -1153,14 +1191,14 @@ async function bootstrapState() {
     fetchJson('/api/state'),
     fetchJson('/api/events?limit=20'),
   ]);
-  currentState = state;
+  currentState = mergeAdminState(currentState, state);
   timelineEvents = events.events;
   renderState();
   renderEvents();
 }
 
 async function refreshStateSnapshot() {
-  currentState = await fetchJson('/api/state');
+  currentState = mergeAdminState(currentState, await fetchJson('/api/state'));
   renderState();
 }
 
@@ -1227,36 +1265,11 @@ async function submitSimulation() {
 }
 
 async function startCamera() {
-  if (!elements.cameraFeed || !elements.cameraStatus) {
-    return;
-  }
-
-  try {
-    mediaStream = await navigator.mediaDevices.getUserMedia({
-      video: {
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
-      },
-      audio: false,
-    });
-    elements.cameraFeed.srcObject = mediaStream;
-    elements.cameraStatus.textContent = 'Live webcam preview active.';
-  } catch (error) {
-    elements.cameraStatus.textContent = `Unable to start camera: ${error.message}`;
-  }
+  await cameraController.start();
 }
 
 function stopCamera() {
-  if (!elements.cameraFeed || !elements.cameraStatus) {
-    return;
-  }
-
-  if (mediaStream) {
-    mediaStream.getTracks().forEach((track) => track.stop());
-    mediaStream = null;
-  }
-  elements.cameraFeed.srcObject = null;
-  elements.cameraStatus.textContent = 'Camera is off.';
+  cameraController.stop();
 }
 
 async function handleAdminError(error) {
@@ -1283,6 +1296,11 @@ async function init() {
     onStart: startCamera,
     onStop: stopCamera,
   });
+  trackSessionDraft('studyId', elements.sessionStudyId);
+  trackSessionDraft('participantId', elements.sessionParticipantId);
+  trackSessionDraft('condition', elements.sessionCondition, 'change');
+  trackSessionDraft('researcher', elements.sessionResearcher);
+  trackSessionDraft('notes', elements.sessionNotes);
 
   await Promise.all([
     bootstrapState(),
@@ -1306,7 +1324,7 @@ async function init() {
 
   connectSocket('admin', {
     onSnapshot(state) {
-      currentState = state;
+      currentState = mergeAdminState(currentState, state);
       renderState();
     },
     onEvent(event) {
@@ -1369,7 +1387,7 @@ async function init() {
   bindEvent(elements.sessionForm, 'submit', async (event) => {
     event.preventDefault();
     try {
-      await postJson('/api/session/configure', {
+      currentState = mergeAdminState(currentState, await postJson('/api/session/configure', {
         studyId: elements.sessionStudyId.value,
         participantId: elements.sessionParticipantId.value,
         condition: elements.sessionCondition.value,
@@ -1377,7 +1395,8 @@ async function init() {
         notes: elements.sessionNotes.value,
       }, {
         headers: buildAdminHeaders(),
-      });
+      }));
+      renderState();
       setGuardMessage('Session profile saved.', 'success');
       await refreshExportManifest();
       await refreshGuardStatus();
