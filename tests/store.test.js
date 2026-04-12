@@ -121,6 +121,36 @@ test('store can ingest watch baseline and metric entries', async () => {
   assert.equal(state.adaptive.status, 'observe');
 });
 
+test('store preserves the loaded watch baseline across session resets', async () => {
+  const { store } = await createStore();
+
+  await store.ingestWatchEntry({
+    sequence_number: 1,
+    timestamp: '2026-04-01 12:00:00',
+    watch_data: {
+      is_baseline: true,
+      baseline_metrics: {
+        hr: 70,
+        sdnn: 40,
+        rmssd: 30,
+        pnn50: 20,
+      },
+    },
+  });
+
+  await store.resetSession({
+    requestedBy: 'Shrijacked',
+  });
+
+  const state = store.getState();
+  assert.deepEqual(state.telemetry.hrv.baseline, {
+    hr: 70,
+    sdnn: 40,
+    rmssd: 30,
+    pnn50: 20,
+  });
+});
+
 test('store can build a session export bundle and manifest', async () => {
   const { store } = await createStore();
 
@@ -156,6 +186,9 @@ test('store can build a session export bundle and manifest', async () => {
   assert.equal(bundle.analytics.eventCounts['telemetry.gaze.updated'], 1);
   assert.equal(bundle.analytics.sessionStatus, 'completed');
   assert.ok(bundle.analytics.durationSeconds >= 0);
+  assert.equal(bundle.analytics.puzzleDurationSeconds, bundle.analytics.durationSeconds);
+  assert.equal(bundle.analytics.trialStartedAt, bundle.state.session.trialStartedAt);
+  assert.equal(bundle.analytics.completedAt, bundle.state.session.completedAt);
   assert.equal(bundle.analytics.latestHint, 'Try the outer edge first.');
   assert.equal(bundle.analytics.latestRobotAction, 'Function 2: Rotate Triangle');
   assert.ok(bundle.replay.events.length >= 4);

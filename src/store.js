@@ -271,8 +271,10 @@ class ExperimentStore extends EventEmitter {
 
   async resetSession(meta = {}) {
     const previousResetCount = Number(this.state?.session?.resetCount || 0);
+    const preservedBaseline = clone(this.state?.telemetry?.hrv?.baseline || null);
     this.state = createInitialState(this.now());
     this.state.session.resetCount = previousResetCount + 1;
+    this.state.telemetry.hrv.baseline = preservedBaseline;
 
     const event = this.#createEvent('session.reset', {
       source: meta.source || 'admin',
@@ -984,6 +986,9 @@ class ExperimentStore extends EventEmitter {
       eventCounts: counts,
       totalEvents: sessionEvents.length,
       durationSeconds,
+      puzzleDurationSeconds: durationSeconds,
+      trialStartedAt: session.trialStartedAt || null,
+      completedAt: session.completedAt || null,
       firstEventAt,
       lastEventAt,
       latestHint: state.hint?.text || '',
