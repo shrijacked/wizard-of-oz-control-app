@@ -42,6 +42,13 @@ function renderBundle(bundle) {
   analyticsGridElement.append(
     metricCard('Status', analytics.sessionStatus || 'setup', bundle.state?.session?.metadata?.condition || 'condition unavailable'),
     metricCard('Participant', analytics.participantId || 'Unassigned', bundle.state?.session?.metadata?.studyId || 'study unavailable'),
+    metricCard(
+      'Reference puzzle',
+      analytics.referencePuzzleLabel || 'None selected',
+      bundle.state?.session?.referencePuzzle?.displayKind === 'pdf'
+        ? 'PDF reference shown beside the hint on /subject'
+        : 'Image reference shown beside the hint on /subject',
+    ),
     metricCard('Puzzle duration', formatDurationSeconds(puzzleDuration), timingNote),
     metricCard('Adaptive transitions', String(analytics.adaptiveTransitions || 0), `${analytics.gazeFrames || 0} gaze frames / ${analytics.hrvFrames || 0} HRV frames`),
     metricCard(

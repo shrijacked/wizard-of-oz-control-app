@@ -40,6 +40,15 @@ const elements = {
   sessionDurationSummary: document.querySelector('#session-duration-summary'),
   sessionDurationDetail: document.querySelector('#session-duration-detail'),
   sessionSummary: document.querySelector('#session-summary'),
+  referencePuzzleSummary: document.querySelector('#reference-puzzle-summary'),
+  referencePuzzleDetail: document.querySelector('#reference-puzzle-detail'),
+  referencePuzzlePreview: document.querySelector('#reference-puzzle-preview'),
+  puzzleUploadForm: document.querySelector('#puzzle-upload-form'),
+  puzzleUploadInput: document.querySelector('#puzzle-upload-input'),
+  puzzleUploadSubmit: document.querySelector('#puzzle-upload-submit'),
+  puzzleUploadStatus: document.querySelector('#puzzle-upload-status'),
+  puzzleClearSelection: document.querySelector('#puzzle-clear-selection'),
+  puzzleLibraryList: document.querySelector('#puzzle-library-list'),
   sessionStart: document.querySelector('#session-start'),
   sessionComplete: document.querySelector('#session-complete'),
   preflightForm: document.querySelector('#preflight-form'),
@@ -133,6 +142,15 @@ let guardStatus = null;
 let adminToken = window.localStorage.getItem(ADMIN_TOKEN_KEY) || '';
 let statePollTimer = null;
 let durationTicker = null;
+let puzzlePreviewAssetId = null;
+
+const PUZZLE_ACCEPTED_TYPES = {
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.pdf': 'application/pdf',
+  '.png': 'image/png',
+  '.webp': 'image/webp',
+};
 
 function formatNumber(value, digits = 2) {
   return Number.isFinite(value) ? value.toFixed(digits) : '--';
@@ -195,6 +213,39 @@ function setCheckedSafely(element, value) {
   element.checked = Boolean(value);
 }
 
+function guessPuzzleMimeType(name = '') {
+  const fileName = String(name || '');
+  const extensionIndex = fileName.lastIndexOf('.');
+  if (extensionIndex < 0) {
+    return '';
+  }
+
+  const extension = fileName.slice(extensionIndex).toLowerCase();
+  return PUZZLE_ACCEPTED_TYPES[extension] || '';
+}
+
+function readUploadFileAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.addEventListener('load', () => {
+      const result = String(reader.result || '');
+      const commaIndex = result.indexOf(',');
+      resolve({
+        name: file.name,
+        mimeType: file.type || guessPuzzleMimeType(file.name),
+        contentBase64: commaIndex >= 0 ? result.slice(commaIndex + 1) : result,
+      });
+    });
+
+    reader.addEventListener('error', () => {
+      reject(new Error(`Failed to read ${file.name}.`));
+    });
+
+    reader.readAsDataURL(file);
+  });
+}
+
 function parseTimestamp(value) {
   if (!value) {
     return null;
@@ -206,6 +257,22 @@ function parseTimestamp(value) {
   }
 
   return date;
+}
+
+function puzzleLibrary() {
+  return currentState?.assets?.puzzles || [];
+}
+
+function selectedReferencePuzzle() {
+  return currentState?.session?.referencePuzzle || null;
+}
+
+function resolvePuzzleAsset(assetId) {
+  if (!assetId) {
+    return null;
+  }
+
+  return puzzleLibrary().find((asset) => asset.assetId === assetId) || null;
 }
 
 function sessionDurationSeconds(session) {
@@ -251,6 +318,24 @@ function setAdminToken(token) {
   }
 
   window.localStorage.removeItem(ADMIN_TOKEN_KEY);
+}
+
+function referencePuzzleSummary(referencePuzzle) {
+  if (!referencePuzzle) {
+    return {
+      summary: 'No reference puzzle selected.',
+      detail: 'Choose an uploaded asset to show it beside the hint on the participant display.',
+    };
+  }
+
+  const selectionNote = referencePuzzle.selectedAt
+    ? `Selected ${formatTimestamp(referencePuzzle.selectedAt)} by ${referencePuzzle.selectedBy || 'researcher'}.`
+    : 'Selected for this session.';
+
+  return {
+    summary: referencePuzzle.originalName,
+    detail: `${referencePuzzle.displayKind === 'pdf' ? 'PDF reference' : 'Image reference'} • ${selectionNote}`,
+  };
 }
 
 function buildAdminHeaders() {
@@ -392,6 +477,129 @@ function renderEvents() {
     item.append(meta);
 
     elements.eventList.append(item);
+  });
+}
+
+function renderReferencePuzzlePreview(asset) {
+  if (!elements.referencePuzzlePreview) {
+    return;
+  }
+
+  elements.referencePuzzlePreview.innerHTML = '';
+  elements.referencePuzzlePreview.classList.toggle('empty', !asset);
+
+  if (!asset) {
+    const empty = document.createElement('p');
+    empty.className = 'panel-note';
+    empty.textContent = 'Preview a puzzle asset here before selecting it for the participant display.';
+    elements.referencePuzzlePreview.append(empty);
+    return;
+  }
+
+  if (asset.displayKind === 'pdf') {
+    const frame = document.createElement('iframe');
+    frame.className = 'reference-preview-frame';
+    frame.src = `${asset.urlPath}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
+    frame.title = asset.originalName;
+    elements.referencePuzzlePreview.append(frame);
+    return;
+  }
+
+  const image = document.createElement('img');
+  image.className = 'reference-preview-image';
+  image.src = asset.urlPath;
+  image.alt = asset.originalName;
+  elements.referencePuzzlePreview.append(image);
+}
+
+function renderPuzzleLibrary() {
+  const referencePuzzle = selectedReferencePuzzle();
+  const library = puzzleLibrary();
+  const summary = referencePuzzleSummary(referencePuzzle);
+  const configurePolicy = resolvePolicy('configureSession');
+
+  setText(elements.referencePuzzleSummary, summary.summary);
+  setText(elements.referencePuzzleDetail, summary.detail);
+
+  if (!puzzlePreviewAssetId || !library.some((asset) => asset.assetId === puzzlePreviewAssetId)) {
+    puzzlePreviewAssetId = referencePuzzle?.assetId || library[0]?.assetId || null;
+  }
+
+  renderReferencePuzzlePreview(resolvePuzzleAsset(puzzlePreviewAssetId) || referencePuzzle);
+
+  if (!elements.puzzleLibraryList) {
+    return;
+  }
+
+  elements.puzzleLibraryList.innerHTML = '';
+
+  if (!library.length) {
+    const empty = document.createElement('p');
+    empty.className = 'panel-note';
+    empty.textContent = 'No puzzle assets uploaded yet.';
+    elements.puzzleLibraryList.append(empty);
+    return;
+  }
+
+  library.forEach((asset) => {
+    const card = document.createElement('article');
+    card.className = 'reference-library-item';
+    if (referencePuzzle?.assetId === asset.assetId) {
+      card.classList.add('selected');
+    }
+    if (puzzlePreviewAssetId === asset.assetId) {
+      card.classList.add('previewing');
+    }
+
+    const title = document.createElement('strong');
+    title.textContent = asset.originalName;
+    card.append(title);
+
+    const meta = document.createElement('small');
+    meta.textContent = `${asset.displayKind === 'pdf' ? 'PDF' : 'Image'} • uploaded ${formatTimestamp(asset.uploadedAt)}${asset.uploadedBy ? ` by ${asset.uploadedBy}` : ''}`;
+    card.append(meta);
+
+    const actions = document.createElement('div');
+    actions.className = 'button-row';
+
+    const previewButton = document.createElement('button');
+    previewButton.type = 'button';
+    previewButton.className = 'button button-ghost';
+    previewButton.textContent = puzzlePreviewAssetId === asset.assetId ? 'Previewing' : 'Preview';
+    previewButton.disabled = puzzlePreviewAssetId === asset.assetId;
+    previewButton.addEventListener('click', () => {
+      puzzlePreviewAssetId = asset.assetId;
+      renderPuzzleLibrary();
+    });
+    actions.append(previewButton);
+
+    const selectButton = document.createElement('button');
+    selectButton.type = 'button';
+    selectButton.className = 'button button-primary';
+    selectButton.textContent = referencePuzzle?.assetId === asset.assetId ? 'Visible on subject' : 'Show on subject';
+    selectButton.disabled = !configurePolicy.allowed || referencePuzzle?.assetId === asset.assetId;
+    selectButton.title = selectButton.disabled && configurePolicy.reason ? configurePolicy.reason : '';
+    selectButton.addEventListener('click', async () => {
+      try {
+        await postJson('/api/puzzles/select', {
+          assetId: asset.assetId,
+          actor: elements.sessionResearcher?.value || currentState?.session?.metadata?.researcher || 'researcher',
+        }, {
+          headers: buildAdminHeaders(),
+        });
+        puzzlePreviewAssetId = asset.assetId;
+        setGuardMessage(`Reference puzzle switched to ${asset.originalName}.`, 'success');
+        await refreshStateSnapshot();
+        await refreshExportManifest();
+        await refreshGuardStatus();
+      } catch (error) {
+        await handleAdminError(error);
+      }
+    });
+    actions.append(selectButton);
+
+    card.append(actions);
+    elements.puzzleLibraryList.append(card);
   });
 }
 
@@ -771,6 +979,9 @@ function renderInteractionControls() {
     elements.sessionResearcher,
     elements.sessionNotes,
     elements.sessionSave,
+    elements.puzzleUploadInput,
+    elements.puzzleUploadSubmit,
+    elements.puzzleClearSelection,
   ].forEach((element) => {
     setElementDisabled(element, !configurePolicy.allowed, configurePolicy.reason || '');
   });
@@ -828,6 +1039,7 @@ function renderInteractionControls() {
   setElementDisabled(elements.resetSession, !resetControlPolicy.allowed, resetControlPolicy.reason || '');
 
   renderActionButtons();
+  renderPuzzleLibrary();
 }
 
 function renderState() {
@@ -850,6 +1062,7 @@ function renderState() {
   setText(elements.sessionStatusSummary, `${statusLabel} • ${metadata.participantId || 'participant not assigned'}`);
   renderSessionTiming(session, metadata);
   setValueSafely(elements.sessionSummary, session.completedSummary);
+  renderPuzzleLibrary();
 
   const adaptive = currentState.adaptive;
   const configuration = adaptive.configuration;
@@ -1166,6 +1379,54 @@ async function init() {
         headers: buildAdminHeaders(),
       });
       setGuardMessage('Session profile saved.', 'success');
+      await refreshExportManifest();
+      await refreshGuardStatus();
+    } catch (error) {
+      await handleAdminError(error);
+    }
+  });
+
+  bindEvent(elements.puzzleUploadForm, 'submit', async (event) => {
+    event.preventDefault();
+
+    const files = [...(elements.puzzleUploadInput?.files || [])];
+    if (!files.length) {
+      setText(elements.puzzleUploadStatus, 'Choose one or more puzzle files before uploading.');
+      return;
+    }
+
+    try {
+      setText(elements.puzzleUploadStatus, `Uploading ${files.length} puzzle file${files.length === 1 ? '' : 's'}...`);
+      const uploadedFiles = await Promise.all(files.map((file) => readUploadFileAsBase64(file)));
+      const result = await postJson('/api/puzzles/upload', {
+        files: uploadedFiles,
+        actor: elements.sessionResearcher?.value || currentState?.session?.metadata?.researcher || 'researcher',
+      }, {
+        headers: buildAdminHeaders(),
+      });
+      elements.puzzleUploadInput.value = '';
+      puzzlePreviewAssetId = result.uploaded?.at(-1)?.assetId || puzzlePreviewAssetId;
+      setText(elements.puzzleUploadStatus, `Uploaded ${result.uploaded?.length || files.length} puzzle file${files.length === 1 ? '' : 's'} into the reference library.`);
+      setGuardMessage('Puzzle library updated.', 'success');
+      await refreshStateSnapshot();
+      await refreshExportManifest();
+      await refreshGuardStatus();
+    } catch (error) {
+      setText(elements.puzzleUploadStatus, error.message || 'Puzzle upload failed.');
+      await handleAdminError(error);
+    }
+  });
+
+  bindEvent(elements.puzzleClearSelection, 'click', async () => {
+    try {
+      await postJson('/api/puzzles/select', {
+        assetId: null,
+        actor: elements.sessionResearcher?.value || currentState?.session?.metadata?.researcher || 'researcher',
+      }, {
+        headers: buildAdminHeaders(),
+      });
+      setGuardMessage('Reference puzzle cleared for this session.', 'success');
+      await refreshStateSnapshot();
       await refreshExportManifest();
       await refreshGuardStatus();
     } catch (error) {

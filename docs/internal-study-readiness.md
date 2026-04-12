@@ -29,7 +29,8 @@ flowchart TD
     unlock -- yes --> pin["Unlock this browser"]
     unlock -- no --> save["Save session metadata"]
     pin --> save
-    save --> sensors["Go to /admin/monitoring and verify watch and gaze feeds"]
+    save --> reference["Upload puzzle set and choose reference puzzle"]
+    reference --> sensors["Go to /admin/monitoring and verify watch and gaze feeds"]
     sensors --> displays["Open /subject and optional /audit"]
     displays --> manual["Save manual checklist confirmations"]
     manual --> gate{"Before participant gate clear?"}
@@ -45,17 +46,18 @@ flowchart TD
 2. Open `/admin` on the host laptop, then move into `/admin/setup`.
 3. Unlock the admin browser if `ADMIN_PIN` is enabled.
 4. Save the session profile with `study id`, `participant id`, `condition`, and `researcher`.
-5. Open `/subject` on the participant-facing device and confirm the admin screen shows the subject display as connected.
-6. Open `/audit` on a secondary device if you want a separate robot-action monitor.
-7. Confirm the watch bridge is live and at least one HRV sample has arrived.
-8. Confirm the gaze bridge is live and at least one gaze sample has arrived.
-9. Save all four manual checklist confirmations on the before-participant gate:
+5. Upload the puzzle set on `/admin/setup`, preview the library, and choose the single reference puzzle that should stay visible on `/subject`.
+6. Open `/subject` on the participant-facing device and confirm the admin screen shows the subject display as connected and the selected reference puzzle is visible beside the hint area.
+7. Open `/audit` on a secondary device if you want a separate robot-action monitor.
+8. Confirm the watch bridge is live and at least one HRV sample has arrived.
+9. Confirm the gaze bridge is live and at least one gaze sample has arrived.
+10. Save all four manual checklist confirmations on the before-participant gate:
    camera framing checked
    subject display confirmed
    robot control board ready
    puzzle materials reset
-10. Use `/admin/live` for hints and robot actions once the trial is running.
-11. Start the trial only after the gate reports no blockers.
+11. Use `/admin/live` for hints and robot actions once the trial is running.
+12. Start the trial only after the gate reports no blockers.
 
 ## Dry-run protocol
 
@@ -63,15 +65,17 @@ Run this before your first real participant and again after any network or hardw
 
 1. Launch the stack.
 2. Walk through the full gate until it reports ready.
-3. Start a mock trial.
-4. Send one hint and verify it appears on `/subject`.
-5. Log one robot action and verify it appears on `/audit`.
-6. Confirm the adaptive panel updates after fresh telemetry.
-7. Confirm the live puzzle timer is advancing while the trial is running.
-8. Complete the trial and note the final completion duration shown on `/admin/review` or `/exports`.
-9. Download `current.bundle.json` and `current.csv` from `/exports`.
-10. Confirm the bundle contains:
+3. Upload at least two puzzle assets and switch the active reference once so the operator flow is rehearsed.
+4. Start a mock trial.
+5. Send one hint and verify it appears on `/subject` beside the selected reference puzzle.
+6. Log one robot action and verify it appears on `/audit`.
+7. Confirm the adaptive panel updates after fresh telemetry.
+8. Confirm the live puzzle timer is advancing while the trial is running.
+9. Complete the trial and note the final completion duration shown on `/admin/review` or `/exports`.
+10. Download `current.bundle.json` and `current.csv` from `/exports`.
+11. Confirm the bundle contains:
    session metadata
+   selected reference puzzle
    preflight acknowledgements
    telemetry events
    adaptive configuration

@@ -29,10 +29,15 @@ const ROBOT_ACTIONS = [
 const CONTENT_TYPES = {
   '.css': 'text/css; charset=utf-8',
   '.html': 'text/html; charset=utf-8',
+  '.jpeg': 'image/jpeg',
+  '.jpg': 'image/jpeg',
   '.js': 'text/javascript; charset=utf-8',
   '.mjs': 'text/javascript; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
+  '.pdf': 'application/pdf',
+  '.png': 'image/png',
   '.svg': 'image/svg+xml',
+  '.webp': 'image/webp',
 };
 
 const OPERATOR_ROUTE_FILES = {
@@ -69,6 +74,7 @@ function roleState(store, role, systemStatus) {
     return {
       session: state.session,
       hint: state.hint,
+      referencePuzzle: state.session.referencePuzzle,
     };
   }
 
@@ -232,6 +238,15 @@ async function createApp(options = {}) {
         return;
       }
 
+      if (request.method === 'GET' && pathname.startsWith('/media/puzzles/')) {
+        const fileName = pathname.slice('/media/puzzles/'.length);
+        const candidatePath = path.join(store.puzzleDir, fileName);
+        if (candidatePath.startsWith(store.puzzleDir)) {
+          await serveFile(response, candidatePath);
+          return;
+        }
+      }
+
       if (request.method === 'GET' && pathname === '/health') {
         const systemStatus = getSystemStatus();
         const healthLevel = systemStatus.sensorHealth?.overall?.level || 'healthy';
@@ -391,6 +406,31 @@ async function createApp(options = {}) {
         const body = await readJsonBody(request);
         const state = await store.updateAdaptiveConfiguration({
           ...body,
+          actor: body.actor || 'researcher',
+          source: 'admin',
+        });
+        json(response, 200, state);
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/puzzles/upload') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        assertPolicy(store.getState(), 'configureSession');
+        const body = await readJsonBody(request);
+        const result = await store.uploadPuzzleAssets(body.files || [], {
+          actor: body.actor || 'researcher',
+          source: 'admin',
+        });
+        json(response, 200, result);
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/puzzles/select') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        assertPolicy(store.getState(), 'configureSession');
+        const body = await readJsonBody(request);
+        const state = await store.selectReferencePuzzle({
+          assetId: body.assetId || null,
           actor: body.actor || 'researcher',
           source: 'admin',
         });

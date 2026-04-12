@@ -122,6 +122,43 @@
           <section class="panel panel-wide">
             <div class="panel-header">
               <div>
+                <p class="panel-kicker">Reference puzzle</p>
+                <h2>Puzzle Library And Subject Reference</h2>
+              </div>
+              <span class="panel-note">Upload puzzle assets once, then choose the one the participant should keep visible beside the hint.</span>
+            </div>
+            <div class="reference-library-grid">
+              <form id="puzzle-upload-form" class="stack-form compact-form">
+                <label class="field">
+                  <span>Upload puzzle set</span>
+                  <input id="puzzle-upload-input" type="file" accept=".png,.jpg,.jpeg,.webp,.pdf,application/pdf,image/png,image/jpeg,image/webp" multiple>
+                </label>
+                <p id="puzzle-upload-status" class="panel-note">Accepted formats: PNG, JPG, WEBP, and PDF. The uploaded library stays available after a session reset, but the active reference is cleared for the next participant.</p>
+                <div class="button-row">
+                  <button id="puzzle-upload-submit" class="button button-primary" type="submit">Upload selected files</button>
+                  <button id="puzzle-clear-selection" class="button button-ghost" type="button">Clear active reference</button>
+                </div>
+              </form>
+
+              <article class="callout reference-preview-callout">
+                <span class="callout-label">Current subject reference</span>
+                <p id="reference-puzzle-summary">No reference puzzle selected.</p>
+                <p id="reference-puzzle-detail">Choose an uploaded asset to show it beside the hint on the participant display.</p>
+                <div id="reference-puzzle-preview" class="reference-preview empty"></div>
+              </article>
+
+              <article class="callout reference-library-callout">
+                <span class="callout-label">Uploaded library</span>
+                <div id="puzzle-library-list" class="reference-library-list">
+                  <p class="panel-note">No puzzle assets uploaded yet.</p>
+                </div>
+              </article>
+            </div>
+          </section>
+
+          <section class="panel panel-wide">
+            <div class="panel-header">
+              <div>
                 <p class="panel-kicker">Readiness</p>
                 <h2>Before Participant Gate</h2>
               </div>

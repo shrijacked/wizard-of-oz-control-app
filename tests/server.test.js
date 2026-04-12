@@ -312,6 +312,58 @@ test('WebSocket clients receive role-specific snapshots after updates', async ()
   }
 });
 
+test('admin can upload a puzzle set, choose a reference asset, and expose it to the subject display', async () => {
+  const { app, baseUrl } = await startConfiguredApp();
+
+  try {
+    const uploadResponse = await fetch(`${baseUrl}/api/puzzles/upload`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        files: [
+          {
+            name: 'puzzle-a.png',
+            mimeType: 'image/png',
+            contentBase64: 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIW2NkYGD4DwABBAEAAP+rVwAAAABJRU5ErkJggg==',
+          },
+          {
+            name: 'puzzle-b.pdf',
+            mimeType: 'application/pdf',
+            contentBase64: Buffer.from('%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\ntrailer\n<<>>\n%%EOF').toString('base64'),
+          },
+        ],
+      }),
+    });
+    assert.equal(uploadResponse.status, 200);
+
+    const stateAfterUpload = await fetch(`${baseUrl}/api/state`).then((response) => response.json());
+    assert.equal(stateAfterUpload.assets.puzzles.length, 2);
+
+    const pdfAsset = stateAfterUpload.assets.puzzles.find((asset) => asset.originalName === 'puzzle-b.pdf');
+    assert.ok(pdfAsset);
+
+    const selectResponse = await fetch(`${baseUrl}/api/puzzles/select`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        assetId: pdfAsset.assetId,
+        actor: 'Shrijacked',
+      }),
+    });
+    assert.equal(selectResponse.status, 200);
+
+    const subjectState = await fetch(`${baseUrl}/api/state?role=subject`).then((response) => response.json());
+    assert.equal(subjectState.referencePuzzle.originalName, 'puzzle-b.pdf');
+    assert.match(subjectState.referencePuzzle.urlPath, /\/media\/puzzles\//);
+
+    const assetResponse = await fetch(`${baseUrl}${subjectState.referencePuzzle.urlPath}`);
+    assert.equal(assetResponse.status, 200);
+    assert.match(assetResponse.headers.get('content-type') || '', /application\/pdf/);
+  } finally {
+    await app.close();
+  }
+});
+
 test('gaze bridge endpoints update system state and export endpoints return downloadable session artifacts', async () => {
   const dataDir = await fs.mkdtemp(path.join(os.tmpdir(), 'woz-bridge-'));
   const app = await createApp({ dataDir, port: 0 });

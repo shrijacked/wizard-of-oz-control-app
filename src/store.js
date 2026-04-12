@@ -17,6 +17,22 @@ const { createInitialPreflightAcknowledgements, normalizePreflightAcknowledgemen
 
 const MAX_HISTORY_POINTS = 60;
 const MAX_TIMELINE_EVENTS = 200;
+const MAX_PUZZLE_FILE_BYTES = 8 * 1024 * 1024;
+
+const PUZZLE_MIME_TYPES = Object.freeze({
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.pdf': 'application/pdf',
+  '.png': 'image/png',
+  '.webp': 'image/webp',
+});
+
+const PUZZLE_EXTENSIONS = Object.freeze({
+  'application/pdf': '.pdf',
+  'image/jpeg': '.jpg',
+  'image/png': '.png',
+  'image/webp': '.webp',
+});
 
 function createSessionId(now = new Date()) {
   const safe = now.toISOString().replace(/[-:]/g, '').replace(/\..+/, '').replace('T', '-');
@@ -50,6 +66,82 @@ function createInitialPreflightState() {
   };
 }
 
+function createInitialAssetState() {
+  return {
+    puzzles: [],
+  };
+}
+
+function baseNameLabel(name = '') {
+  const trimmed = String(name || '').trim();
+  if (!trimmed) {
+    return 'Reference puzzle';
+  }
+
+  return path.basename(trimmed, path.extname(trimmed)) || trimmed;
+}
+
+function inferPuzzleExtension(name = '', mimeType = '') {
+  const extension = path.extname(String(name || '').trim()).toLowerCase();
+  if (PUZZLE_MIME_TYPES[extension]) {
+    return extension;
+  }
+
+  return PUZZLE_EXTENSIONS[String(mimeType || '').trim().toLowerCase()] || null;
+}
+
+function inferPuzzleMimeType(name = '', mimeType = '') {
+  const normalizedMimeType = String(mimeType || '').trim().toLowerCase();
+  if (PUZZLE_EXTENSIONS[normalizedMimeType]) {
+    return normalizedMimeType;
+  }
+
+  const extension = inferPuzzleExtension(name, mimeType);
+  return extension ? PUZZLE_MIME_TYPES[extension] : null;
+}
+
+function puzzleDisplayKind(mimeType = '') {
+  return String(mimeType || '').trim().toLowerCase() === 'application/pdf' ? 'pdf' : 'image';
+}
+
+function normalizePuzzleAsset(asset = {}) {
+  const assetId = String(asset.assetId || '').trim();
+  const storedFileName = String(asset.storedFileName || '').trim();
+  const originalName = String(asset.originalName || '').trim();
+  const mimeType = inferPuzzleMimeType(originalName || storedFileName, asset.mimeType);
+
+  if (!assetId || !storedFileName || !mimeType) {
+    return null;
+  }
+
+  return {
+    assetId,
+    originalName: originalName || storedFileName,
+    label: String(asset.label || '').trim() || baseNameLabel(originalName || storedFileName),
+    mimeType,
+    extension: inferPuzzleExtension(storedFileName, mimeType),
+    storedFileName,
+    sizeBytes: Number(asset.sizeBytes || 0),
+    uploadedAt: asset.uploadedAt || null,
+    uploadedBy: asset.uploadedBy || null,
+    displayKind: puzzleDisplayKind(mimeType),
+    urlPath: `/media/puzzles/${storedFileName}`,
+  };
+}
+
+function createReferencePuzzleSnapshot(asset, selection = {}) {
+  const normalizedAsset = normalizePuzzleAsset(asset);
+  if (!normalizedAsset) {
+    return null;
+  }
+
+  return {
+    ...normalizedAsset,
+    selectedAt: selection.selectedAt || null,
+    selectedBy: selection.selectedBy || null,
+  };
+}
+
 function createInitialState(now = new Date()) {
   const timestamp = toIsoDate(now);
   return {
@@ -67,6 +159,7 @@ function createInitialState(now = new Date()) {
         researcher: '',
         notes: '',
       },
+      referencePuzzle: null,
       resetCount: 0,
     },
     hint: {
@@ -108,6 +201,7 @@ function createInitialState(now = new Date()) {
     },
     adaptive: createInitialAdaptiveState(now),
     preflight: createInitialPreflightState(),
+    assets: createInitialAssetState(),
   };
 }
 
@@ -138,6 +232,10 @@ function hydrateState(parsed, now = new Date()) {
         ...initial.session.metadata,
         ...(parsed.session?.metadata || {}),
       },
+      referencePuzzle: createReferencePuzzleSnapshot(parsed.session?.referencePuzzle, {
+        selectedAt: parsed.session?.referencePuzzle?.selectedAt || null,
+        selectedBy: parsed.session?.referencePuzzle?.selectedBy || null,
+      }),
     },
     hint: {
       ...initial.hint,
@@ -185,6 +283,13 @@ function hydrateState(parsed, now = new Date()) {
       ...(parsed.preflight || {}),
       acknowledgements: normalizePreflightAcknowledgements(parsed.preflight?.acknowledgements || {}),
     },
+    assets: {
+      ...initial.assets,
+      ...(parsed.assets || {}),
+      puzzles: Array.isArray(parsed.assets?.puzzles)
+        ? parsed.assets.puzzles.map((asset) => normalizePuzzleAsset(asset)).filter(Boolean)
+        : initial.assets.puzzles,
+    },
   };
 }
 
@@ -225,6 +330,7 @@ class ExperimentStore extends EventEmitter {
     super();
     this.dataDir = options.dataDir || path.join(process.cwd(), 'data');
     this.exportDir = path.join(this.dataDir, 'export');
+    this.puzzleDir = path.join(this.dataDir, 'puzzles');
     this.statePath = path.join(this.dataDir, 'state.json');
     this.eventsPath = path.join(this.dataDir, 'events.jsonl');
     this.adaptiveEngine = options.adaptiveEngine || new AdaptiveEngine();
@@ -239,6 +345,7 @@ class ExperimentStore extends EventEmitter {
   async initialize() {
     await fs.mkdir(this.dataDir, { recursive: true });
     await fs.mkdir(this.exportDir, { recursive: true });
+    await fs.mkdir(this.puzzleDir, { recursive: true });
 
     try {
       const raw = await fs.readFile(this.statePath, 'utf8');
@@ -272,9 +379,11 @@ class ExperimentStore extends EventEmitter {
   async resetSession(meta = {}) {
     const previousResetCount = Number(this.state?.session?.resetCount || 0);
     const preservedBaseline = clone(this.state?.telemetry?.hrv?.baseline || null);
+    const preservedAssets = clone(this.state?.assets || createInitialAssetState());
     this.state = createInitialState(this.now());
     this.state.session.resetCount = previousResetCount + 1;
     this.state.telemetry.hrv.baseline = preservedBaseline;
+    this.state.assets = preservedAssets;
 
     const event = this.#createEvent('session.reset', {
       source: meta.source || 'admin',
@@ -308,6 +417,82 @@ class ExperimentStore extends EventEmitter {
       summary: `Session configured for participant ${nextMetadata.participantId || 'unassigned'}.`,
       payload: {
         metadata: clone(nextMetadata),
+      },
+    });
+
+    await this.#persistAndBroadcast([event]);
+    return this.getState();
+  }
+
+  async uploadPuzzleAssets(files = [], meta = {}) {
+    if (!Array.isArray(files) || files.length === 0) {
+      throw new Error('Select at least one puzzle file to upload.');
+    }
+
+    const uploadedAt = toIsoDate(this.now());
+    const uploadedBy = meta.actor || 'researcher';
+    const preparedAssets = await Promise.all(files.map((file) => this.#preparePuzzleAsset(file, {
+      uploadedAt,
+      uploadedBy,
+    })));
+
+    await Promise.all(preparedAssets.map((entry) => fs.writeFile(
+      path.join(this.puzzleDir, entry.asset.storedFileName),
+      entry.buffer,
+    )));
+
+    this.state.assets = {
+      ...this.state.assets,
+      puzzles: [...this.state.assets.puzzles, ...preparedAssets.map((entry) => entry.asset)],
+    };
+
+    const event = this.#createEvent('puzzle.library.uploaded', {
+      source: meta.source || 'admin',
+      summary: `Uploaded ${preparedAssets.length} reference puzzle${preparedAssets.length === 1 ? '' : 's'}.`,
+      payload: {
+        actor: uploadedBy,
+        assets: clone(preparedAssets.map((entry) => entry.asset)),
+      },
+    });
+
+    await this.#persistAndBroadcast([event]);
+    return {
+      uploaded: preparedAssets.map((entry) => entry.asset),
+      state: this.getState(),
+    };
+  }
+
+  async selectReferencePuzzle(payload = {}) {
+    const actor = payload.actor || 'researcher';
+    const selectedAt = toIsoDate(this.now());
+    const assetId = String(payload.assetId || '').trim();
+    let referencePuzzle = null;
+
+    if (assetId) {
+      const asset = this.state.assets.puzzles.find((entry) => entry.assetId === assetId);
+      if (!asset) {
+        throw new Error('Selected reference puzzle was not found in the library.');
+      }
+
+      referencePuzzle = createReferencePuzzleSnapshot(asset, {
+        selectedAt,
+        selectedBy: actor,
+      });
+    }
+
+    this.state.session = {
+      ...this.state.session,
+      referencePuzzle,
+    };
+
+    const event = this.#createEvent('session.reference-puzzle.selected', {
+      source: payload.source || 'admin',
+      summary: referencePuzzle
+        ? `Reference puzzle selected: ${referencePuzzle.originalName}.`
+        : 'Reference puzzle cleared for this session.',
+      payload: {
+        actor,
+        referencePuzzle: clone(referencePuzzle),
       },
     });
 
@@ -884,6 +1069,48 @@ class ExperimentStore extends EventEmitter {
     return path.join(this.exportDir, `${sessionId}.csv`);
   }
 
+  async #preparePuzzleAsset(file = {}, meta = {}) {
+    const originalName = String(file.name || file.originalName || '').trim();
+    if (!originalName) {
+      throw new Error('Every uploaded puzzle file needs a filename.');
+    }
+
+    const mimeType = inferPuzzleMimeType(originalName, file.mimeType || file.type);
+    if (!mimeType) {
+      throw new Error(`Unsupported puzzle file type for ${originalName}. Use PNG, JPG, WEBP, or PDF.`);
+    }
+
+    const buffer = Buffer.isBuffer(file.buffer)
+      ? file.buffer
+      : Buffer.from(String(file.contentBase64 || '').trim(), 'base64');
+
+    if (!buffer.length) {
+      throw new Error(`Uploaded puzzle file ${originalName} was empty.`);
+    }
+
+    if (buffer.length > MAX_PUZZLE_FILE_BYTES) {
+      throw new Error(`Uploaded puzzle file ${originalName} exceeded the ${MAX_PUZZLE_FILE_BYTES} byte limit.`);
+    }
+
+    const extension = inferPuzzleExtension(originalName, mimeType);
+    const assetId = randomUUID();
+    const storedFileName = `${assetId}${extension}`;
+    const asset = normalizePuzzleAsset({
+      assetId,
+      originalName,
+      storedFileName,
+      mimeType,
+      sizeBytes: buffer.length,
+      uploadedAt: meta.uploadedAt || null,
+      uploadedBy: meta.uploadedBy || null,
+    });
+
+    return {
+      asset,
+      buffer,
+    };
+  }
+
   #reconstructStateFromEvents(sessionId, sessionEvents) {
     const reconstructed = createInitialState(this.now());
     reconstructed.session.id = sessionId;
@@ -900,6 +1127,19 @@ class ExperimentStore extends EventEmitter {
         };
       }
 
+      if (event.type === 'puzzle.library.uploaded' && Array.isArray(event.payload?.assets)) {
+        const uploadedAssets = event.payload.assets
+          .map((asset) => normalizePuzzleAsset(asset))
+          .filter(Boolean);
+        reconstructed.assets = {
+          ...reconstructed.assets,
+          puzzles: [
+            ...reconstructed.assets.puzzles.filter((existing) => !uploadedAssets.some((asset) => asset.assetId === existing.assetId)),
+            ...uploadedAssets,
+          ],
+        };
+      }
+
       if (event.type === 'session.started') {
         reconstructed.session.status = 'running';
         reconstructed.session.trialStartedAt = event.payload?.trialStartedAt || event.timestamp;
@@ -909,6 +1149,16 @@ class ExperimentStore extends EventEmitter {
         reconstructed.session.status = 'completed';
         reconstructed.session.completedAt = event.payload?.completedAt || event.timestamp;
         reconstructed.session.completedSummary = event.payload?.summary || null;
+      }
+
+      if (event.type === 'session.reference-puzzle.selected') {
+        reconstructed.session.referencePuzzle = createReferencePuzzleSnapshot(
+          event.payload?.referencePuzzle,
+          {
+            selectedAt: event.payload?.referencePuzzle?.selectedAt || null,
+            selectedBy: event.payload?.referencePuzzle?.selectedBy || null,
+          },
+        );
       }
 
       if (event.type === 'hint.updated' && event.payload) {
@@ -993,6 +1243,7 @@ class ExperimentStore extends EventEmitter {
       lastEventAt,
       latestHint: state.hint?.text || '',
       latestRobotAction: state.robotAction?.label || '',
+      referencePuzzleLabel: state.session?.referencePuzzle?.originalName || '',
       adaptiveTransitions: counts['adaptive.status.changed'] || 0,
       hrvFrames: counts['telemetry.hrv.updated'] || 0,
       gazeFrames: counts['telemetry.gaze.updated'] || 0,

@@ -6,6 +6,7 @@ The application coordinates a live Wizard of Oz research session from one host m
 
 - surface live camera and telemetry to the researcher
 - decide when adaptive interventions are warranted
+- keep the chosen puzzle reference visible on the participant display
 - broadcast hints to a participant-facing display
 - log manual robotic arm actions and broadcast them to an audit display
 - write a trustworthy experiment timeline for later analysis
@@ -45,6 +46,8 @@ flowchart LR
 - Keeps the latest state in memory for fast UI refresh
 - Persists snapshots and timeline events to disk
 - Tracks the latest hint, latest robotic action, adaptive status, and telemetry summaries
+- Persists a puzzle-library catalog that survives session resets
+- Persists the session-specific reference puzzle that is shown on `/subject`
 - Persists manual before-participant acknowledgements so study-day setup becomes part of the export record
 
 ### 4. Telemetry ingestion layer
@@ -65,11 +68,11 @@ flowchart LR
 ### 6. Frontend route views
 
 - `admin`: operator home and routing overview
-- `admin/setup`: session metadata, readiness gate, and safeguard controls
+- `admin/setup`: session metadata, puzzle-library management, readiness gate, and safeguard controls
 - `admin/live`: hint terminal and robot action logging
 - `admin/monitoring`: camera, telemetry, sensor health, and adaptive controls
 - `admin/review`: exports summary, routing, simulator, and event log
-- `subject`: distraction-free hint panel
+- `subject`: distraction-free hint panel with the chosen reference puzzle beside it
 - `audit`: large-format robotic action monitor
 - `exports`: session analytics, download center, and replay timeline
 - the admin routes together replace the old single long dashboard with dedicated task pages
@@ -97,10 +100,10 @@ sequenceDiagram
     participant Subject as Subject Display
     participant Audit as Audit Display
 
-    Admin->>Server: POST hint or robot action
+    Admin->>Server: POST reference-puzzle selection, hint, or robot action
     Server->>Store: persist event + update state
     Store-->>Server: latest state snapshot
-    Server-->>Subject: WebSocket hint update
+    Server-->>Subject: WebSocket reference + hint update
     Server-->>Audit: WebSocket action update
     Server-->>Admin: WebSocket state refresh
 ```
@@ -143,6 +146,7 @@ flowchart TD
 - `GET /subject`: participant hint terminal
 - `GET /audit`: robot action audit display
 - `GET /exports`: session export center
+- `GET /media/puzzles/<file>`: serve an uploaded puzzle asset to the participant display
 - `GET /api/state`: full current experiment state
 - `GET /api/events?limit=N`: recent event timeline
 - `GET /api/exports`: session export manifest
@@ -155,6 +159,8 @@ flowchart TD
 - `POST /api/hints`: create and broadcast a participant hint
 - `POST /api/actions`: create and broadcast a robotic arm action event
 - `POST /api/adaptive/config`: update the adaptive rule set for the current session
+- `POST /api/puzzles/upload`: add new image or PDF assets to the persistent puzzle library
+- `POST /api/puzzles/select`: choose or clear the session-specific reference puzzle
 - `POST /api/preflight/acknowledgements`: save manual before-participant confirmations
 - `POST /api/telemetry/hrv`: ingest HRV metrics from a bridge or simulator
 - `POST /api/telemetry/gaze`: ingest gaze metrics from a bridge or simulator
@@ -181,6 +187,15 @@ flowchart TD
       "condition": "adaptive",
       "researcher": "Primary Researcher",
       "notes": "Puzzle pieces pre-arranged."
+    },
+    "referencePuzzle": {
+      "assetId": "fddeab7c",
+      "originalName": "7.pdf",
+      "mimeType": "application/pdf",
+      "displayKind": "pdf",
+      "urlPath": "/media/puzzles/fddeab7c.pdf",
+      "selectedAt": "2026-04-01T21:48:20.000Z",
+      "selectedBy": "Primary Researcher"
     }
   },
   "hint": {
@@ -211,6 +226,17 @@ flowchart TD
     },
     "updatedAt": "2026-04-01T21:48:55.000Z",
     "updatedBy": "Primary Researcher"
+  },
+  "assets": {
+    "puzzles": [
+      {
+        "assetId": "fddeab7c",
+        "originalName": "7.pdf",
+        "mimeType": "application/pdf",
+        "displayKind": "pdf",
+        "urlPath": "/media/puzzles/fddeab7c.pdf"
+      }
+    ]
   }
 }
 ```
@@ -235,6 +261,7 @@ The export bundle also derives:
 
 - event counts by type
 - session duration and latest intervention summaries
+- the selected reference puzzle label used during the session
 - replay steps with offsets from the first event
 - the stored before-participant acknowledgements inside the exported session state
 

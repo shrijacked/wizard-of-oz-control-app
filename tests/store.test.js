@@ -151,6 +151,53 @@ test('store preserves the loaded watch baseline across session resets', async ()
   });
 });
 
+test('store persists reference-puzzle uploads, selection, and resets only the active session choice', async () => {
+  const { store, dataDir } = await createStore();
+
+  await store.uploadPuzzleAssets([
+    {
+      name: 'puzzle-reference.pdf',
+      mimeType: 'application/pdf',
+      buffer: Buffer.from('%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\ntrailer\n<<>>\n%%EOF'),
+    },
+  ], {
+    actor: 'Shrijacked',
+    source: 'admin',
+  });
+
+  let state = store.getState();
+  assert.equal(state.assets.puzzles.length, 1);
+  assert.equal(state.assets.puzzles[0].originalName, 'puzzle-reference.pdf');
+  assert.equal(state.session.referencePuzzle, null);
+
+  await store.selectReferencePuzzle({
+    assetId: state.assets.puzzles[0].assetId,
+    actor: 'Shrijacked',
+    source: 'admin',
+  });
+
+  state = store.getState();
+  assert.equal(state.session.referencePuzzle.originalName, 'puzzle-reference.pdf');
+  assert.equal(state.session.referencePuzzle.mimeType, 'application/pdf');
+  assert.match(state.session.referencePuzzle.urlPath, /\/media\/puzzles\//);
+
+  const eventsLog = await fs.readFile(path.join(dataDir, 'events.jsonl'), 'utf8');
+  assert.match(eventsLog, /puzzle\.library\.uploaded/);
+  assert.match(eventsLog, /session\.reference-puzzle\.selected/);
+
+  const bundle = await store.buildSessionExport(store.getCurrentSessionId());
+  assert.equal(bundle.state.session.referencePuzzle.originalName, 'puzzle-reference.pdf');
+  assert.equal(bundle.analytics.referencePuzzleLabel, 'puzzle-reference.pdf');
+
+  await store.resetSession({
+    requestedBy: 'Shrijacked',
+  });
+
+  state = store.getState();
+  assert.equal(state.assets.puzzles.length, 1);
+  assert.equal(state.session.referencePuzzle, null);
+});
+
 test('store can build a session export bundle and manifest', async () => {
   const { store } = await createStore();
 

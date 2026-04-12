@@ -7,10 +7,21 @@
     <link rel="stylesheet" href="/styles.css">
   </head>
   <body class="display-page subject-display">
-    <main class="display-shell">
-      <p class="display-kicker">Participant Display</p>
-      <h1>Hint Terminal</h1>
-      <section class="display-card">
+    <main class="display-shell subject-layout">
+      <section class="display-card subject-reference-card">
+        <p class="display-kicker">Participant Display</p>
+        <h1>Reference Puzzle</h1>
+        <div id="subject-reference-shell" class="subject-reference-shell empty">
+          <p id="subject-reference-empty" class="subject-reference-empty">Waiting for the researcher to choose a reference puzzle.</p>
+          <img id="subject-reference-image" class="subject-reference-image" alt="Selected reference puzzle" hidden>
+          <iframe id="subject-reference-pdf" class="subject-reference-pdf" title="Selected reference puzzle PDF" hidden></iframe>
+        </div>
+        <small id="subject-reference-meta" class="display-meta">No reference puzzle selected yet.</small>
+      </section>
+
+      <section class="display-card subject-hint-card">
+        <p class="display-kicker">Participant Display</p>
+        <h2>Hint Terminal</h2>
         <p id="subject-hint" class="display-message">Waiting for a hint from the researcher.</p>
         <small id="subject-updated" class="display-meta">No broadcast received yet.</small>
       </section>

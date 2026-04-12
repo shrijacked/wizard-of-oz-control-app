@@ -26,6 +26,8 @@ The system is designed to run on a laptop on the same Wi-Fi network as the secon
 - Adaptive intervention engine with heuristic fallback and optional LLM analysis
 - Researcher-tunable adaptive thresholds, weights, and freshness windows
 - Hint broadcasting to the subject display
+- Persistent puzzle library uploads with session-specific reference-puzzle selection
+- Subject display layout that keeps the chosen reference asset visible beside live hints
 - Robotic arm action logging and live audit broadcasting
 - Automatic event logging to local files with timestamps
 - Session export page with JSON and CSV downloads
@@ -61,12 +63,13 @@ On `/admin`, the typical operator flow is:
 
 1. Unlock the dashboard first if `ADMIN_PIN` is configured on the host.
 2. Save the session profile with study ID, participant ID, condition, and notes.
-3. Tune the adaptive controls for the study if the default rule set is not appropriate.
-4. Clear the before-participant gate, including the four manual confirmations.
-5. Start the trial when the participant is ready.
-6. Use hints, action logging, and telemetry during the run.
-7. Watch the live puzzle timer on `/admin/live`, then mark the session complete and enter an end-of-trial summary.
-8. Download the final bundle or CSV from `/exports`.
+3. Upload the puzzle set on `/admin/setup` and choose the reference asset that should stay visible on `/subject`.
+4. Tune the adaptive controls for the study if the default rule set is not appropriate.
+5. Clear the before-participant gate, including the four manual confirmations.
+6. Start the trial when the participant is ready.
+7. Use hints, action logging, and telemetry during the run.
+8. Watch the live puzzle timer on `/admin/live`, then mark the session complete and enter an end-of-trial summary.
+9. Download the final bundle or CSV from `/exports`.
 
 Session protections are always active, even when no PIN is configured:
 
@@ -109,6 +112,8 @@ Bridge and sensor ingestion routes stay available without admin unlock so the ex
 Protected operator tuning is available through:
 
 - `POST /api/adaptive/config`
+- `POST /api/puzzles/upload`
+- `POST /api/puzzles/select`
 - `GET /api/preflight`
 - `POST /api/preflight/acknowledgements`
 
@@ -129,6 +134,7 @@ Launcher controls:
 The export center also renders:
 
 - derived session analytics such as puzzle duration, event counts, and adaptive transitions
+- the reference puzzle that was shown on the participant display
 - the active adaptive configuration used for that session
 - a replay timeline built from the ordered event log
 

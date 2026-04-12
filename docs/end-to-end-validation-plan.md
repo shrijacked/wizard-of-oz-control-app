@@ -107,12 +107,15 @@ Confirm the multi-device routing works exactly as it will during the study.
 1. Open `/subject` on the participant device.
 2. Open `/audit` on the audit device if you are using one.
 3. Open `/exports` on the host.
-4. Refresh each page once.
+4. Upload at least two puzzle assets on `/admin/setup`.
+5. Select one reference puzzle and confirm it appears on `/subject`.
+6. Refresh each page once.
 
 ### Pass criteria
 
 - all pages load
 - admin shows connection counts correctly
+- the chosen reference puzzle appears on `/subject`
 - subject and audit reconnect after refresh
 - no page requires a server restart after reconnecting
 
@@ -159,13 +162,14 @@ Confirm the actual researcher workflow works start to finish.
 ### Actions
 
 1. Save session metadata.
-2. Clear the before-participant gate.
-3. Start the session.
-4. Send at least two hints.
-5. Log at least two robot actions.
-6. Confirm adaptive status changes using real or simulated telemetry.
-7. Confirm the live puzzle timer is advancing during the run.
-8. Mark the session complete and note the final completion duration.
+2. Upload the puzzle set and choose the active reference puzzle.
+3. Clear the before-participant gate.
+4. Start the session.
+5. Send at least two hints.
+6. Log at least two robot actions.
+7. Confirm adaptive status changes using real or simulated telemetry.
+8. Confirm the live puzzle timer is advancing during the run.
+9. Mark the session complete and note the final completion duration.
 
 ### Pass criteria
 
@@ -178,6 +182,7 @@ Confirm the actual researcher workflow works start to finish.
 ### Evidence
 
 - participant ID used in the mock run
+- selected reference puzzle used in the mock run
 - hint text samples used
 - robot actions logged
 - adaptive status transitions observed
@@ -228,6 +233,7 @@ Confirm the study produces complete analysis artifacts.
 
 - study metadata
 - participant ID and condition
+- selected reference puzzle
 - preflight acknowledgements
 - hints sent
 - robot actions logged
