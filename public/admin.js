@@ -7,6 +7,7 @@ import {
   installSectionNavigation,
   postJson,
 } from './shared.js';
+import { describeGuardBanner } from './admin-view.mjs';
 
 const ADMIN_TOKEN_KEY = 'woz.admin.token';
 
@@ -540,6 +541,7 @@ function setElementDisabled(element, disabled, reason = '') {
 
 function renderGuardStatus() {
   const safeguard = getSafeguardState();
+  const banner = describeGuardBanner(safeguard);
 
   if (!safeguard.pinRequired) {
     setText(elements.guardSummary, 'No local admin PIN is configured on this host.');
@@ -551,6 +553,8 @@ function renderGuardStatus() {
     setText(elements.guardSummary, 'Controls are locked on this browser.');
     setText(elements.guardDetail, 'Enter the local admin PIN on the host machine to enable hints, robot actions, session changes, and telemetry simulation.');
   }
+
+  setGuardMessage(banner.message, banner.tone);
 
   setElementDisabled(elements.guardPin, !safeguard.pinRequired || safeguard.authenticated);
   setElementDisabled(
