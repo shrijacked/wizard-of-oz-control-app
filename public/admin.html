@@ -21,12 +21,20 @@
         </div>
       </nav>
 
+      <nav class="workspace-subbar" aria-label="Operator pages">
+        <a class="workspace-sub-link active" href="/admin" aria-current="page">Overview</a>
+        <a class="workspace-sub-link" href="/admin/setup">Setup</a>
+        <a class="workspace-sub-link" href="/admin/live">Live controls</a>
+        <a class="workspace-sub-link" href="/admin/monitoring">Monitoring</a>
+        <a class="workspace-sub-link" href="/admin/review">Review</a>
+      </nav>
+
       <header class="hero hero-grid">
         <div class="hero-copy">
           <p class="eyebrow">Wizard of Oz Control Application</p>
           <h1>Research Control Deck</h1>
           <p class="hero-text">
-            Run the live session, watch the participant, coordinate interventions, and keep a clean experiment timeline without leaving this screen.
+            Use this overview page as the operator home base, then jump into the dedicated setup, live, monitoring, and review pages as the session moves forward.
           </p>
         </div>
         <div class="hero-status">
@@ -48,566 +56,130 @@
         </div>
       </header>
 
-      <div class="workspace-layout">
-        <aside class="workspace-rail" aria-label="Operator navigation">
-          <section class="panel rail-card">
+      <article class="callout page-banner">
+        <span class="callout-label">Operator message</span>
+        <p id="guard-message" class="inline-status">Loading safeguard status...</p>
+      </article>
+
+      <main class="workspace-main">
+        <header class="workspace-header">
+          <div>
+            <p class="panel-kicker">Admin home</p>
+            <h2>Workspace overview</h2>
+          </div>
+          <p class="workspace-note">This page keeps the whole study state visible while giving you direct links into the focused pages for actual task work.</p>
+        </header>
+
+        <div class="dashboard-grid">
+          <section class="panel">
             <div class="panel-header">
               <div>
-                <p class="panel-kicker">Jump Map</p>
-                <h2>Operator Flow</h2>
+                <p class="panel-kicker">Setup</p>
+                <h2>Session And Readiness</h2>
               </div>
-              <span class="panel-note">Move by task instead of hunting through the page.</span>
+              <a class="button button-primary" href="/admin/setup">Open setup page</a>
             </div>
-            <nav class="section-nav section-nav-rail" aria-label="Workspace sections">
-              <a class="section-link active" data-section-link href="#run-setup">
-                <span class="section-step">1</span>
-                <span class="section-copy">
-                  <strong>Run setup</strong>
-                  <small>metadata, readiness, safeguards</small>
-                </span>
-              </a>
-              <a class="section-link" data-section-link href="#live-controls">
-                <span class="section-step">2</span>
-                <span class="section-copy">
-                  <strong>Live controls</strong>
-                  <small>hints and robot actions</small>
-                </span>
-              </a>
-              <a class="section-link" data-section-link href="#monitoring">
-                <span class="section-step">3</span>
-                <span class="section-copy">
-                  <strong>Monitoring</strong>
-                  <small>camera, telemetry, adaptive status</small>
-                </span>
-              </a>
-              <a class="section-link" data-section-link href="#review">
-                <span class="section-step">4</span>
-                <span class="section-copy">
-                  <strong>Review and routing</strong>
-                  <small>exports, network, simulator, timeline</small>
-                </span>
-              </a>
-            </nav>
+            <div class="callout">
+              <span class="callout-label">Session state</span>
+              <p id="session-status-summary">Session is in setup.</p>
+              <p id="session-status-detail">Save metadata, then start the trial when the participant is ready.</p>
+            </div>
+            <div class="callout">
+              <span class="callout-label">Before participant gate</span>
+              <p id="preflight-summary">Checking the before-participant gate...</p>
+              <p id="preflight-detail">The server will summarize blockers here.</p>
+              <p id="preflight-progress" class="inline-status">0 of 0 checks ready.</p>
+            </div>
+            <div class="callout">
+              <span class="callout-label">Safeguards</span>
+              <p id="guard-summary">Checking safeguard status...</p>
+              <p id="guard-detail">Protected admin actions are evaluated here.</p>
+            </div>
           </section>
 
-          <section class="panel rail-card">
+          <section class="panel">
             <div class="panel-header">
               <div>
-                <p class="panel-kicker">Route Guide</p>
-                <h2>Screen Map</h2>
+                <p class="panel-kicker">Live</p>
+                <h2>Intervention Snapshot</h2>
               </div>
+              <a class="button button-primary" href="/admin/live">Open live controls</a>
             </div>
-            <div class="link-list">
-              <a href="/admin">Host dashboard on this machine</a>
-              <a href="/subject" target="_blank" rel="noreferrer">Subject hint screen</a>
-              <a href="/audit" target="_blank" rel="noreferrer">Robot audit screen</a>
-              <a href="/exports">Export center</a>
+            <div class="callout">
+              <span class="callout-label">Current hint</span>
+              <p id="hint-preview">No hint has been sent yet.</p>
+            </div>
+            <div class="callout">
+              <span class="callout-label">Latest robot action</span>
+              <p id="latest-action">No robotic action logged yet.</p>
+            </div>
+            <div class="callout advisory-callout">
+              <span class="callout-label">LLM advisory</span>
+              <p id="llm-summary">No LLM recommendation has been generated.</p>
+              <p id="llm-hint">Suggested hint: unavailable</p>
             </div>
           </section>
 
-          <section class="panel rail-card">
+          <section class="panel">
             <div class="panel-header">
               <div>
-                <p class="panel-kicker">Run Rhythm</p>
-                <h2>Fast Checklist</h2>
+                <p class="panel-kicker">Monitoring</p>
+                <h2>Telemetry Snapshot</h2>
               </div>
+              <a class="button button-primary" href="/admin/monitoring">Open monitoring page</a>
             </div>
-            <ol class="rail-list">
-              <li>Save the participant profile and clear the readiness gate.</li>
-              <li>Start the trial, then stay mostly inside live controls and monitoring.</li>
-              <li>Use review and routing only when you need exports, resets, or rehearsal tools.</li>
-            </ol>
+            <div class="metric-grid">
+              <article class="metric-card">
+                <span>Heart Rate</span>
+                <strong id="metric-hr">--</strong>
+                <small>BPM</small>
+              </article>
+              <article class="metric-card">
+                <span>Stress Score</span>
+                <strong id="metric-stress">0.00</strong>
+                <small id="metric-stress-level">Not Stressed</small>
+              </article>
+              <article class="metric-card">
+                <span>Attention</span>
+                <strong id="metric-attention">--</strong>
+                <small>0 to 1</small>
+              </article>
+              <article class="metric-card">
+                <span>Fixation Loss</span>
+                <strong id="metric-fixation">--</strong>
+                <small>0 to 1</small>
+              </article>
+            </div>
+            <div class="callout">
+              <span class="callout-label">Sensor health</span>
+              <p id="sensor-health-summary">Checking sensor health...</p>
+              <p id="sensor-health-detail">The server will summarize stream issues here.</p>
+            </div>
           </section>
-        </aside>
 
-        <main class="workspace-main">
-          <section id="run-setup" class="workspace-section">
-            <header class="workspace-header">
+          <section class="panel">
+            <div class="panel-header">
               <div>
-                <p class="panel-kicker">Workspace 1</p>
-                <h2>Run Setup</h2>
+                <p class="panel-kicker">Review</p>
+                <h2>Exports And Routing</h2>
               </div>
-              <p class="workspace-note">Lock in the participant record, clear the readiness gate, and confirm the session can start safely.</p>
-            </header>
-            <div class="dashboard-grid workspace-grid setup-grid">
-              <section class="panel panel-wide">
-                <div class="panel-header">
-                  <div>
-                    <p class="panel-kicker">Session Setup</p>
-                    <h2>Trial Metadata And Lifecycle</h2>
-                  </div>
-                  <span class="panel-note">Record participant context before and during the experiment.</span>
-                </div>
-                <div class="session-grid">
-                  <form id="session-form" class="stack-form">
-                    <div class="field-grid">
-                      <label class="field">
-                        <span>Study ID</span>
-                        <input id="session-study-id" type="text" placeholder="pilot-01">
-                      </label>
-                      <label class="field">
-                        <span>Participant ID</span>
-                        <input id="session-participant-id" type="text" placeholder="P-001">
-                      </label>
-                      <label class="field">
-                        <span>Condition</span>
-                        <select id="session-condition">
-                          <option value="adaptive">Adaptive</option>
-                          <option value="control">Control</option>
-                          <option value="pilot">Pilot</option>
-                        </select>
-                      </label>
-                      <label class="field">
-                        <span>Researcher</span>
-                        <input id="session-researcher" type="text" placeholder="Primary researcher name">
-                      </label>
-                    </div>
-                    <label class="field">
-                      <span>Session notes</span>
-                      <textarea id="session-notes" rows="4" placeholder="Context, setup notes, or observations before the trial starts."></textarea>
-                    </label>
-                    <div class="button-row">
-                      <button id="session-save" class="button button-primary" type="submit">Save session profile</button>
-                      <button id="session-start" class="button button-ghost" type="button">Start trial</button>
-                      <button id="session-complete" class="button button-ghost" type="button">Mark complete</button>
-                    </div>
-                  </form>
-                  <div class="stack-form">
-                    <div class="callout">
-                      <span class="callout-label">Current trial state</span>
-                      <p id="session-status-summary">Session is in setup.</p>
-                      <p id="session-status-detail">Save metadata, then start the trial when the participant is ready.</p>
-                    </div>
-                    <label class="field">
-                      <span>Completion summary</span>
-                      <textarea id="session-summary" rows="4" placeholder="Brief end-of-trial summary for exports and analysis."></textarea>
-                    </label>
-                  </div>
-                </div>
-              </section>
-
-              <section class="panel panel-wide">
-                <div class="panel-header">
-                  <div>
-                    <p class="panel-kicker">Readiness</p>
-                    <h2>Before Participant Gate</h2>
-                  </div>
-                  <span class="panel-note">Clear every blocker here before you bring in the next participant.</span>
-                </div>
-                <div class="preflight-grid">
-                  <article class="callout readiness-callout">
-                    <span class="callout-label">Readiness summary</span>
-                    <p id="preflight-summary">Checking the before-participant gate...</p>
-                    <p id="preflight-detail">The server will summarize blockers, recommendations, and live readiness signals here.</p>
-                    <p id="preflight-progress" class="inline-status">0 of 0 checks ready.</p>
-                    <p id="preflight-updated" class="panel-note">Manual confirmations have not been saved yet.</p>
-                  </article>
-
-                  <article class="callout">
-                    <span class="callout-label">Automatic checks</span>
-                    <ul id="preflight-automatic-list" class="policy-list"></ul>
-                  </article>
-
-                  <form id="preflight-form" class="preflight-form stack-form compact-form">
-                    <span class="callout-label">Manual confirmations</span>
-                    <label class="checkbox-field">
-                      <input id="preflight-camera" type="checkbox">
-                      <span class="checkbox-copy">
-                        <strong>Camera framing checked</strong>
-                        <small>The webcam clearly shows the puzzle area and participant workspace.</small>
-                      </span>
-                    </label>
-                    <label class="checkbox-field">
-                      <input id="preflight-subject-display" type="checkbox">
-                      <span class="checkbox-copy">
-                        <strong>Subject display confirmed</strong>
-                        <small>The participant can see the hint screen clearly and it remains distraction-free.</small>
-                      </span>
-                    </label>
-                    <label class="checkbox-field">
-                      <input id="preflight-robot-board" type="checkbox">
-                      <span class="checkbox-copy">
-                        <strong>Robot control board ready</strong>
-                        <small>The manual robot controller is reachable and the preset actions are available.</small>
-                      </span>
-                    </label>
-                    <label class="checkbox-field">
-                      <input id="preflight-materials" type="checkbox">
-                      <span class="checkbox-copy">
-                        <strong>Puzzle materials reset</strong>
-                        <small>The puzzle pieces, props, and session materials are ready for a fresh run.</small>
-                      </span>
-                    </label>
-                    <div class="button-row">
-                      <button id="preflight-save" class="button button-primary" type="submit">Save checklist</button>
-                    </div>
-                  </form>
-                </div>
-              </section>
-
-              <section class="panel">
-                <div class="panel-header">
-                  <div>
-                    <p class="panel-kicker">Safeguards</p>
-                    <h2>Operator Controls</h2>
-                  </div>
-                  <span class="panel-note">Optional local PIN lock plus session-phase protections</span>
-                </div>
-                <div class="guard-grid">
-                  <article class="callout safeguard-callout">
-                    <span class="callout-label">Control lock</span>
-                    <p id="guard-summary">Checking local safeguard status...</p>
-                    <p id="guard-detail">The dashboard will show when controls are unlocked and which actions are currently safe.</p>
-                  </article>
-                  <form id="guard-form" class="stack-form compact-form">
-                    <label class="field">
-                      <span>Local admin PIN</span>
-                      <input id="guard-pin" type="password" placeholder="Enter the local PIN" autocomplete="current-password">
-                    </label>
-                    <div class="button-row">
-                      <button id="guard-unlock" class="button button-primary" type="submit">Unlock controls</button>
-                      <button id="guard-lock" class="button button-ghost" type="button">Lock this browser</button>
-                    </div>
-                  </form>
-                </div>
-                <article class="callout">
-                  <span class="callout-label">Live policy board</span>
-                  <p id="guard-message" class="inline-status">No operator alerts yet.</p>
-                  <ul id="guard-policy-list" class="policy-list"></ul>
-                </article>
-              </section>
+              <a class="button button-primary" href="/admin/review">Open review page</a>
+            </div>
+            <div class="callout">
+              <span class="callout-label">Export summary</span>
+              <p id="export-summary">Loading export manifest...</p>
+            </div>
+            <div class="callout">
+              <span class="callout-label">Current downloads</span>
+              <div id="current-export-links" class="link-list"></div>
+            </div>
+            <div class="callout">
+              <span class="callout-label">Host routes</span>
+              <div id="localhost-links" class="link-list"></div>
             </div>
           </section>
-
-          <section id="live-controls" class="workspace-section">
-            <header class="workspace-header">
-              <div>
-                <p class="panel-kicker">Workspace 2</p>
-                <h2>Live Controls</h2>
-              </div>
-              <p class="workspace-note">These are the fastest controls during the session. Use them to intervene, hint, and log robot actions without hunting around the page.</p>
-            </header>
-            <div class="dashboard-grid workspace-grid live-grid">
-              <section class="panel live-panel">
-                <div class="panel-header">
-                  <div>
-                    <p class="panel-kicker">Intervention</p>
-                    <h2>Digital Hint Terminal</h2>
-                  </div>
-                  <span class="panel-note">Broadcasts immediately to `/subject`</span>
-                </div>
-                <form id="hint-form" class="stack-form">
-                  <label class="field">
-                    <span>Hint text</span>
-                    <textarea id="hint-text" rows="5" placeholder="Type the guidance that should appear on the participant display."></textarea>
-                  </label>
-                  <div class="button-row">
-                    <button id="hint-send" class="button button-primary" type="submit">Broadcast hint</button>
-                    <button id="clear-hint" class="button button-ghost" type="button">Clear editor</button>
-                  </div>
-                </form>
-                <div class="callout advisory-callout">
-                  <span class="callout-label">LLM Advisory</span>
-                  <p id="llm-summary">No LLM recommendation has been generated.</p>
-                  <p id="llm-hint">Suggested hint: unavailable</p>
-                  <button id="use-llm-hint" class="button button-ghost" type="button">Load suggested hint</button>
-                </div>
-                <div class="callout">
-                  <span class="callout-label">Currently visible to participant</span>
-                  <p id="hint-preview">No hint has been sent yet.</p>
-                </div>
-              </section>
-
-              <section class="panel live-panel">
-                <div class="panel-header">
-                  <div>
-                    <p class="panel-kicker">Robot Audit</p>
-                    <h2>Robotic Arm Action Log</h2>
-                  </div>
-                  <span class="panel-note">Broadcasts immediately to `/audit`</span>
-                </div>
-                <div id="action-grid" class="action-grid"></div>
-                <div class="callout">
-                  <span class="callout-label">Latest logged action</span>
-                  <p id="latest-action">No robotic action logged yet.</p>
-                </div>
-              </section>
-            </div>
-          </section>
-
-          <section id="monitoring" class="workspace-section">
-            <header class="workspace-header">
-              <div>
-                <p class="panel-kicker">Workspace 3</p>
-                <h2>Monitoring</h2>
-              </div>
-              <p class="workspace-note">Observe the participant, track sensor freshness, and understand why the adaptive engine is making its current recommendation.</p>
-            </header>
-            <div class="dashboard-grid workspace-grid monitoring-grid">
-              <section class="panel">
-                <div class="panel-header">
-                  <div>
-                    <p class="panel-kicker">Observation</p>
-                    <h2>Live Observation Feed</h2>
-                  </div>
-                  <div class="button-row">
-                    <button id="start-camera" class="button button-primary" type="button">Start camera</button>
-                    <button id="stop-camera" class="button button-ghost" type="button">Stop</button>
-                  </div>
-                </div>
-                <div class="video-frame">
-                  <video id="camera-feed" autoplay muted playsinline></video>
-                  <div class="video-overlay">
-                    <span id="camera-status">Camera is off.</span>
-                  </div>
-                </div>
-              </section>
-
-              <section class="panel panel-wide">
-                <div class="panel-header">
-                  <div>
-                    <p class="panel-kicker">Physiology</p>
-                    <h2>Telemetry Dashboard</h2>
-                  </div>
-                  <span class="panel-note">Realtime HRV and gaze summaries</span>
-                </div>
-                <div class="metric-grid">
-                  <article class="metric-card">
-                    <span>Heart Rate</span>
-                    <strong id="metric-hr">--</strong>
-                    <small>BPM</small>
-                  </article>
-                  <article class="metric-card">
-                    <span>Stress Score</span>
-                    <strong id="metric-stress">0.00</strong>
-                    <small id="metric-stress-level">Not Stressed</small>
-                  </article>
-                  <article class="metric-card">
-                    <span>Attention</span>
-                    <strong id="metric-attention">--</strong>
-                    <small>0 to 1</small>
-                  </article>
-                  <article class="metric-card">
-                    <span>Fixation Loss</span>
-                    <strong id="metric-fixation">--</strong>
-                    <small>0 to 1</small>
-                  </article>
-                </div>
-                <div class="chart-grid">
-                  <article class="chart-card">
-                    <div class="chart-header">
-                      <h3>HRV Stress Trend</h3>
-                      <span id="hrv-source">No HRV source yet</span>
-                    </div>
-                    <canvas id="hrv-chart" height="180"></canvas>
-                  </article>
-                  <article class="chart-card">
-                    <div class="chart-header">
-                      <h3>Attention Trend</h3>
-                      <span id="gaze-source">No gaze source yet</span>
-                    </div>
-                    <canvas id="gaze-chart" height="180"></canvas>
-                  </article>
-                </div>
-                <div class="network-grid">
-                  <article class="callout">
-                    <span class="callout-label">Gaze Bridge</span>
-                    <p id="gaze-bridge-summary">No gaze bridge connected.</p>
-                    <p id="gaze-bridge-detail">Use the Python bridge or your SDK callback to start streaming gaze frames.</p>
-                  </article>
-                  <article class="callout">
-                    <span class="callout-label">Bridge Endpoint</span>
-                    <div class="link-list">
-                      <code>POST /api/bridge/gaze/heartbeat</code>
-                      <code>POST /api/bridge/gaze/frame</code>
-                    </div>
-                  </article>
-                </div>
-              </section>
-
-              <section class="panel">
-                <div class="panel-header">
-                  <div>
-                    <p class="panel-kicker">Sensor Health</p>
-                    <h2>Sensor Health And Stream Status</h2>
-                  </div>
-                  <span class="panel-note">Watch for stale or missing data before and during a run.</span>
-                </div>
-                <div class="network-grid">
-                  <article class="callout">
-                    <span class="callout-label">Overall</span>
-                    <p id="sensor-health-summary">Checking sensor health...</p>
-                    <p id="sensor-health-detail">The server will summarize stream issues here.</p>
-                  </article>
-                  <article class="callout">
-                    <span class="callout-label">Watch Feed</span>
-                    <p id="watch-health-summary">Waiting for watch bridge status.</p>
-                    <p id="watch-health-detail">The HRV watch bridge will report freshness and file activity here.</p>
-                  </article>
-                  <article class="callout">
-                    <span class="callout-label">Gaze Feed</span>
-                    <p id="gaze-health-summary">Waiting for gaze bridge status.</p>
-                    <p id="gaze-health-detail">The gaze bridge heartbeat and frame freshness will appear here.</p>
-                  </article>
-                  <article class="callout">
-                    <span class="callout-label">Experiment Day Launch</span>
-                    <p id="launcher-summary">Use the one command launcher to start the local stack.</p>
-                    <div class="link-list">
-                      <code>npm run launch:study</code>
-                      <code>LAUNCH_WATCH=0</code>
-                      <code>GAZE_MODE=file-tail</code>
-                    </div>
-                  </article>
-                </div>
-              </section>
-
-              <section class="panel">
-                <div class="panel-header">
-                  <div>
-                    <p class="panel-kicker">Adaptive Controls</p>
-                    <h2>Adaptive Controls</h2>
-                  </div>
-                  <span class="panel-note">Tune intervention sensitivity for the current study.</span>
-                </div>
-                <form id="adaptive-config-form" class="stack-form">
-                  <div class="field-grid">
-                    <label class="field">
-                      <span>Observe threshold</span>
-                      <input id="adaptive-observe-threshold" type="number" min="0.05" max="0.9" step="0.01">
-                    </label>
-                    <label class="field">
-                      <span>Intervene threshold</span>
-                      <input id="adaptive-intervene-threshold" type="number" min="0.1" max="1" step="0.01">
-                    </label>
-                    <label class="field">
-                      <span>HRV weight</span>
-                      <input id="adaptive-hrv-weight" type="number" min="0" max="1" step="0.01">
-                    </label>
-                    <label class="field">
-                      <span>Gaze weight</span>
-                      <input id="adaptive-gaze-weight" type="number" min="0" max="1" step="0.01">
-                    </label>
-                    <label class="field">
-                      <span>Distraction boost</span>
-                      <input id="adaptive-distraction-boost" type="number" min="0" max="0.5" step="0.01">
-                    </label>
-                    <label class="field">
-                      <span>Full freshness seconds</span>
-                      <input id="adaptive-full-freshness" type="number" min="15" max="600" step="5">
-                    </label>
-                    <label class="field">
-                      <span>Stale after seconds</span>
-                      <input id="adaptive-stale-after" type="number" min="45" max="1200" step="5">
-                    </label>
-                  </div>
-                  <div class="button-row">
-                    <button id="adaptive-config-save" class="button button-primary" type="submit">Apply adaptive settings</button>
-                    <button id="adaptive-config-reset" class="button button-ghost" type="button">Reset defaults</button>
-                  </div>
-                </form>
-                <div class="callout">
-                  <span class="callout-label">Current rule summary</span>
-                  <p id="adaptive-config-summary">Loading adaptive configuration...</p>
-                  <p id="adaptive-config-note">Changes are logged immediately and included in exports.</p>
-                </div>
-              </section>
-            </div>
-          </section>
-
-          <section id="review" class="workspace-section">
-            <header class="workspace-header">
-              <div>
-                <p class="panel-kicker">Workspace 4</p>
-                <h2>Review And Routing</h2>
-              </div>
-              <p class="workspace-note">Use these lower-frequency tools for routing devices, rehearsing inputs, reviewing logs, and collecting exports.</p>
-            </header>
-            <div class="dashboard-grid workspace-grid review-grid">
-              <section class="panel">
-                <div class="panel-header">
-                  <div>
-                    <p class="panel-kicker">Exports</p>
-                    <h2>Session Exports</h2>
-                  </div>
-                  <a class="button button-primary" href="/exports">Open export center</a>
-                </div>
-                <div class="callout">
-                  <span class="callout-label">Current session downloads</span>
-                  <div id="current-export-links" class="link-list"></div>
-                </div>
-                <div class="callout">
-                  <span class="callout-label">Export summary</span>
-                  <p id="export-summary">Loading export manifest...</p>
-                </div>
-              </section>
-
-              <section class="panel">
-                <div class="panel-header">
-                  <div>
-                    <p class="panel-kicker">Network</p>
-                    <h2>Session Routing</h2>
-                  </div>
-                  <button id="reset-session" class="button button-ghost" type="button">Reset session</button>
-                </div>
-                <div class="network-grid">
-                  <article class="callout">
-                    <span class="callout-label">Localhost</span>
-                    <div id="localhost-links" class="link-list"></div>
-                  </article>
-                  <article class="callout">
-                    <span class="callout-label">LAN URLs</span>
-                    <div id="lan-links" class="link-list"></div>
-                  </article>
-                </div>
-              </section>
-
-              <section class="panel">
-                <div class="panel-header">
-                  <div>
-                    <p class="panel-kicker">Simulation</p>
-                    <h2>Adaptive Logic Simulator</h2>
-                  </div>
-                  <span class="panel-note">Useful before the real sensors are online</span>
-                </div>
-                <form id="simulator-form" class="stack-form">
-                  <label class="field">
-                    <span>Stress score</span>
-                    <input id="sim-stress" type="range" min="0" max="1" step="0.01" value="0.35">
-                  </label>
-                  <label class="field">
-                    <span>Attention score</span>
-                    <input id="sim-attention" type="range" min="0" max="1" step="0.01" value="0.7">
-                  </label>
-                  <label class="field">
-                    <span>Fixation loss</span>
-                    <input id="sim-fixation" type="range" min="0" max="1" step="0.01" value="0.2">
-                  </label>
-                  <label class="checkbox-field">
-                    <input id="sim-distraction" type="checkbox">
-                    <span>Watch reports distraction</span>
-                  </label>
-                  <div class="button-row">
-                    <button id="simulate-submit" class="button button-primary" type="submit">Push simulated telemetry</button>
-                    <button id="preset-observe" class="button button-ghost" type="button">Preset: Observe</button>
-                    <button id="preset-intervene" class="button button-ghost" type="button">Preset: Intervene</button>
-                  </div>
-                </form>
-              </section>
-
-              <section class="panel panel-wide">
-                <div class="panel-header">
-                  <div>
-                    <p class="panel-kicker">Timeline</p>
-                    <h2>Global Event Logger</h2>
-                  </div>
-                  <span class="panel-note">Append-only events persisted to disk</span>
-                </div>
-                <ol id="event-list" class="event-list"></ol>
-              </section>
-            </div>
-          </section>
-        </main>
-      </div>
+        </div>
+      </main>
     </div>
 
     <script type="module" src="/admin.js"></script>

@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Review And Routing</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body class="admin-page">
+    <div class="page-shell">
+      <nav class="workspace-topbar" aria-label="App routes">
+        <div class="workspace-brand">
+          <p class="eyebrow">Wizard of Oz Control Application</p>
+          <strong>Operator Workspace</strong>
+        </div>
+        <div class="workspace-links">
+          <a class="workspace-link active" href="/admin">Admin</a>
+          <a class="workspace-link" href="/subject" target="_blank" rel="noreferrer">Subject display</a>
+          <a class="workspace-link" href="/audit" target="_blank" rel="noreferrer">Audit display</a>
+          <a class="workspace-link" href="/exports">Exports</a>
+        </div>
+      </nav>
+
+      <nav class="workspace-subbar" aria-label="Operator pages">
+        <a class="workspace-sub-link" href="/admin">Overview</a>
+        <a class="workspace-sub-link" href="/admin/setup">Setup</a>
+        <a class="workspace-sub-link" href="/admin/live">Live controls</a>
+        <a class="workspace-sub-link" href="/admin/monitoring">Monitoring</a>
+        <a class="workspace-sub-link active" href="/admin/review" aria-current="page">Review</a>
+      </nav>
+
+      <header class="hero hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Workspace 4</p>
+          <h1>Review And Routing</h1>
+          <p class="hero-text">
+            Use this page for exports, network routing, rehearsal tools, and reviewing the append-only event log without crowding the live run surface.
+          </p>
+        </div>
+        <div class="hero-status">
+          <article class="status-card">
+            <span class="status-label">Session</span>
+            <strong id="session-id">Loading...</strong>
+            <small id="session-started">Connecting to local server...</small>
+          </article>
+          <article class="status-card adaptive">
+            <span class="status-label">Adaptive Recommendation</span>
+            <strong id="adaptive-status">Waiting for telemetry</strong>
+            <small id="adaptive-reason">The engine will flag observe or intervene states here.</small>
+          </article>
+          <article class="status-card">
+            <span class="status-label">Connections</span>
+            <strong id="connection-counts">0 admin / 0 subject / 0 audit</strong>
+            <small id="watch-bridge-status">Watch bridge idle</small>
+          </article>
+        </div>
+      </header>
+
+      <article class="callout page-banner">
+        <span class="callout-label">Operator message</span>
+        <p id="guard-message" class="inline-status">Loading safeguard status...</p>
+      </article>
+
+      <main class="workspace-main">
+        <div class="dashboard-grid">
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <p class="panel-kicker">Exports</p>
+                <h2>Session Exports</h2>
+              </div>
+              <a class="button button-primary" href="/exports">Open export center</a>
+            </div>
+            <div class="callout">
+              <span class="callout-label">Current downloads</span>
+              <div id="current-export-links" class="link-list"></div>
+            </div>
+            <div class="callout">
+              <span class="callout-label">Export summary</span>
+              <p id="export-summary">Loading export manifest...</p>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <p class="panel-kicker">Network</p>
+                <h2>Session Routing</h2>
+              </div>
+              <button id="reset-session" class="button button-ghost" type="button">Reset session</button>
+            </div>
+            <div class="network-grid">
+              <article class="callout">
+                <span class="callout-label">Localhost</span>
+                <div id="localhost-links" class="link-list"></div>
+              </article>
+              <article class="callout">
+                <span class="callout-label">LAN URLs</span>
+                <div id="lan-links" class="link-list"></div>
+              </article>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <p class="panel-kicker">Simulation</p>
+                <h2>Adaptive Logic Simulator</h2>
+              </div>
+              <span class="panel-note">Useful before the real sensors are online</span>
+            </div>
+            <form id="simulator-form" class="stack-form">
+              <label class="field">
+                <span>Stress score</span>
+                <input id="sim-stress" type="range" min="0" max="1" step="0.01" value="0.35">
+              </label>
+              <label class="field">
+                <span>Attention score</span>
+                <input id="sim-attention" type="range" min="0" max="1" step="0.01" value="0.7">
+              </label>
+              <label class="field">
+                <span>Fixation loss</span>
+                <input id="sim-fixation" type="range" min="0" max="1" step="0.01" value="0.2">
+              </label>
+              <label class="checkbox-field">
+                <input id="sim-distraction" type="checkbox">
+                <span>Watch reports distraction</span>
+              </label>
+              <div class="button-row">
+                <button id="simulate-submit" class="button button-primary" type="submit">Push simulated telemetry</button>
+                <button id="preset-observe" class="button button-ghost" type="button">Preset: Observe</button>
+                <button id="preset-intervene" class="button button-ghost" type="button">Preset: Intervene</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel panel-wide">
+            <div class="panel-header">
+              <div>
+                <p class="panel-kicker">Timeline</p>
+                <h2>Global Event Logger</h2>
+              </div>
+              <span class="panel-note">Append-only events persisted to disk</span>
+            </div>
+            <ol id="event-list" class="event-list"></ol>
+          </section>
+        </div>
+      </main>
+
+      <script type="module" src="/admin.js"></script>
+    </div>
+  </body>
+</html>

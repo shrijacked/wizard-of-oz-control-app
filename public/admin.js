@@ -132,6 +132,43 @@ function formatNumber(value, digits = 2) {
   return Number.isFinite(value) ? value.toFixed(digits) : '--';
 }
 
+function setText(element, value) {
+  if (!element) {
+    return;
+  }
+
+  element.textContent = value;
+}
+
+function setHtml(element, value = '') {
+  if (!element) {
+    return;
+  }
+
+  element.innerHTML = value;
+}
+
+function setDatasetValue(element, key, value) {
+  if (!element) {
+    return;
+  }
+
+  if (value == null || value === '') {
+    delete element.dataset[key];
+    return;
+  }
+
+  element.dataset[key] = value;
+}
+
+function bindEvent(element, eventName, handler) {
+  if (!element) {
+    return;
+  }
+
+  element.addEventListener(eventName, handler);
+}
+
 function setValueSafely(element, value) {
   if (!element) {
     return;
@@ -172,8 +209,8 @@ function buildAdminHeaders() {
 }
 
 function setGuardMessage(message, tone = 'neutral') {
-  elements.guardMessage.textContent = message;
-  elements.guardMessage.dataset.tone = tone;
+  setText(elements.guardMessage, message);
+  setDatasetValue(elements.guardMessage, 'tone', tone);
 }
 
 function adaptiveConfiguration() {
@@ -217,22 +254,26 @@ function adaptiveNote(configuration) {
 function readAdaptiveConfigurationForm() {
   return {
     thresholds: {
-      observe: Number(elements.adaptiveObserveThreshold.value),
-      intervene: Number(elements.adaptiveInterveneThreshold.value),
+      observe: Number(elements.adaptiveObserveThreshold?.value || 0),
+      intervene: Number(elements.adaptiveInterveneThreshold?.value || 0),
     },
     weights: {
-      hrv: Number(elements.adaptiveHrvWeight.value),
-      gaze: Number(elements.adaptiveGazeWeight.value),
+      hrv: Number(elements.adaptiveHrvWeight?.value || 0),
+      gaze: Number(elements.adaptiveGazeWeight?.value || 0),
     },
-    distractionBoost: Number(elements.adaptiveDistractionBoost.value),
+    distractionBoost: Number(elements.adaptiveDistractionBoost?.value || 0),
     freshness: {
-      fullStrengthSeconds: Number(elements.adaptiveFullFreshness.value),
-      staleAfterSeconds: Number(elements.adaptiveStaleAfter.value),
+      fullStrengthSeconds: Number(elements.adaptiveFullFreshness?.value || 0),
+      staleAfterSeconds: Number(elements.adaptiveStaleAfter?.value || 0),
     },
   };
 }
 
 function renderLinks(container, links) {
+  if (!container) {
+    return;
+  }
+
   container.innerHTML = '';
   Object.entries(links || {}).forEach(([label, href]) => {
     const anchor = document.createElement('a');
@@ -245,6 +286,10 @@ function renderLinks(container, links) {
 }
 
 function renderLanLinks(container, lan) {
+  if (!container) {
+    return;
+  }
+
   container.innerHTML = '';
   if (!lan || !lan.length) {
     const empty = document.createElement('p');
@@ -275,6 +320,10 @@ function renderLanLinks(container, lan) {
 }
 
 function renderEvents() {
+  if (!elements.eventList) {
+    return;
+  }
+
   elements.eventList.innerHTML = '';
 
   timelineEvents.forEach((event) => {
@@ -297,17 +346,21 @@ function renderCharts() {
   const hrvHistory = currentState?.telemetry?.history?.hrv || [];
   const gazeHistory = currentState?.telemetry?.history?.gaze || [];
 
-  drawSeriesChart(
-    elements.hrvChart,
-    hrvHistory.map((point) => ({ value: point.stressScore ?? 0 })),
-    { label: 'Stress score', stroke: '#d6553d', min: 0, max: 1 },
-  );
+  if (elements.hrvChart) {
+    drawSeriesChart(
+      elements.hrvChart,
+      hrvHistory.map((point) => ({ value: point.stressScore ?? 0 })),
+      { label: 'Stress score', stroke: '#d6553d', min: 0, max: 1 },
+    );
+  }
 
-  drawSeriesChart(
-    elements.gazeChart,
-    gazeHistory.map((point) => ({ value: point.attentionScore ?? 0 })),
-    { label: 'Attention score', stroke: '#0a7a78', min: 0, max: 1 },
-  );
+  if (elements.gazeChart) {
+    drawSeriesChart(
+      elements.gazeChart,
+      gazeHistory.map((point) => ({ value: point.attentionScore ?? 0 })),
+      { label: 'Attention score', stroke: '#0a7a78', min: 0, max: 1 },
+    );
+  }
 }
 
 function buildLocalPolicy(actionName) {
@@ -438,14 +491,14 @@ function renderGuardStatus() {
   const safeguard = getSafeguardState();
 
   if (!safeguard.pinRequired) {
-    elements.guardSummary.textContent = 'No local admin PIN is configured on this host.';
-    elements.guardDetail.textContent = 'Session-phase protections still apply, but any operator on the trusted LAN can use the dashboard until ADMIN_PIN is set.';
+    setText(elements.guardSummary, 'No local admin PIN is configured on this host.');
+    setText(elements.guardDetail, 'Session-phase protections still apply, but any operator on the trusted LAN can use the dashboard until ADMIN_PIN is set.');
   } else if (safeguard.authenticated) {
-    elements.guardSummary.textContent = 'Controls are unlocked on this browser.';
-    elements.guardDetail.textContent = `${safeguard.activeUnlocks} unlocked browser${safeguard.activeUnlocks === 1 ? '' : 's'} across the local network. Sensor bridges continue to post telemetry without operator unlock.`;
+    setText(elements.guardSummary, 'Controls are unlocked on this browser.');
+    setText(elements.guardDetail, `${safeguard.activeUnlocks} unlocked browser${safeguard.activeUnlocks === 1 ? '' : 's'} across the local network. Sensor bridges continue to post telemetry without operator unlock.`);
   } else {
-    elements.guardSummary.textContent = 'Controls are locked on this browser.';
-    elements.guardDetail.textContent = 'Enter the local admin PIN on the host machine to enable hints, robot actions, session changes, and telemetry simulation.';
+    setText(elements.guardSummary, 'Controls are locked on this browser.');
+    setText(elements.guardDetail, 'Enter the local admin PIN on the host machine to enable hints, robot actions, session changes, and telemetry simulation.');
   }
 
   setElementDisabled(elements.guardPin, !safeguard.pinRequired || safeguard.authenticated);
@@ -474,6 +527,11 @@ function renderGuardStatus() {
 
   if (safeguard.sessionStatus === 'running') {
     policyEntries.push(['forceResetSession', POLICY_LABELS.forceResetSession]);
+  }
+
+  if (!elements.guardPolicyList) {
+    renderInteractionControls();
+    return;
   }
 
   elements.guardPolicyList.innerHTML = '';
@@ -507,6 +565,10 @@ function renderGuardStatus() {
 }
 
 function renderActionButtons() {
+  if (!elements.actionGrid) {
+    return;
+  }
+
   const actions = currentState?.system?.robotActions || [];
   const actionPolicy = resolvePolicy('logRobotAction');
   elements.actionGrid.innerHTML = '';
@@ -561,29 +623,43 @@ function preflightItemClass(item) {
 }
 
 function renderPreflight() {
+  const hasPreflightSurface = elements.preflightSummary
+    || elements.preflightDetail
+    || elements.preflightProgress
+    || elements.preflightUpdated
+    || elements.preflightAutomaticList;
+  if (!hasPreflightSurface) {
+    return;
+  }
+
   const preflight = currentState?.system?.preflight;
   const acknowledgements = currentState?.preflight?.acknowledgements || {};
 
   if (!preflight) {
-    elements.preflightSummary.textContent = 'Readiness details are not available yet.';
-    elements.preflightDetail.textContent = 'The server has not published the before-participant gate.';
-    elements.preflightProgress.textContent = '0 of 0 checks ready.';
-    elements.preflightUpdated.textContent = 'Manual confirmations have not been saved yet.';
-    elements.preflightAutomaticList.innerHTML = '';
+    setText(elements.preflightSummary, 'Readiness details are not available yet.');
+    setText(elements.preflightDetail, 'The server has not published the before-participant gate.');
+    setText(elements.preflightProgress, '0 of 0 checks ready.');
+    setText(elements.preflightUpdated, 'Manual confirmations have not been saved yet.');
+    setHtml(elements.preflightAutomaticList);
     return;
   }
 
-  elements.preflightSummary.textContent = preflight.summary;
-  elements.preflightDetail.textContent = preflight.detail;
-  elements.preflightProgress.textContent = `${preflight.progress?.readyCount || 0} of ${preflight.progress?.totalCount || 0} checks ready`;
-  elements.preflightProgress.dataset.tone = preflight.blockingCount > 0
-    ? 'warning'
-    : (preflight.warningCount > 0 ? 'neutral' : 'success');
-  elements.preflightUpdated.textContent = preflight.updatedAt
+  setText(elements.preflightSummary, preflight.summary);
+  setText(elements.preflightDetail, preflight.detail);
+  setText(elements.preflightProgress, `${preflight.progress?.readyCount || 0} of ${preflight.progress?.totalCount || 0} checks ready`);
+  setDatasetValue(
+    elements.preflightProgress,
+    'tone',
+    preflight.blockingCount > 0 ? 'warning' : (preflight.warningCount > 0 ? 'neutral' : 'success'),
+  );
+  setText(
+    elements.preflightUpdated,
+    preflight.updatedAt
     ? `Manual checklist last updated ${formatTimestamp(preflight.updatedAt)} by ${preflight.updatedBy || 'researcher'}.`
-    : 'Manual confirmations have not been saved yet.';
+    : 'Manual confirmations have not been saved yet.',
+  );
 
-  elements.preflightAutomaticList.innerHTML = '';
+  setHtml(elements.preflightAutomaticList);
   (preflight.automaticItems || []).forEach((item) => {
     const entry = document.createElement('li');
     entry.className = `policy-item ${preflightItemClass(item)}`;
@@ -610,7 +686,7 @@ function renderPreflight() {
     detail.textContent = item.detail;
     entry.append(detail);
 
-    elements.preflightAutomaticList.append(entry);
+    elements.preflightAutomaticList?.append(entry);
   });
 
   setCheckedSafely(elements.preflightCamera, acknowledgements.cameraFramingChecked);
@@ -692,7 +768,7 @@ function renderInteractionControls() {
     setElementDisabled(element, !simulatePolicy.allowed, simulatePolicy.reason || '');
   });
 
-  elements.resetSession.textContent = sessionStatus === 'running' ? 'Force reset session' : 'Reset session';
+  setText(elements.resetSession, sessionStatus === 'running' ? 'Force reset session' : 'Reset session');
   setElementDisabled(elements.resetSession, !resetControlPolicy.allowed, resetControlPolicy.reason || '');
 
   renderActionButtons();
@@ -703,8 +779,8 @@ function renderState() {
     return;
   }
 
-  elements.sessionId.textContent = currentState.session.id;
-  elements.sessionStarted.textContent = `Created ${formatTimestamp(currentState.session.startedAt)}`;
+  setText(elements.sessionId, currentState.session.id);
+  setText(elements.sessionStarted, `Created ${formatTimestamp(currentState.session.startedAt)}`);
 
   const session = currentState.session;
   const metadata = session.metadata || {};
@@ -715,72 +791,72 @@ function renderState() {
   setValueSafely(elements.sessionNotes, metadata.notes);
 
   const statusLabel = session.status ? session.status.toUpperCase() : 'SETUP';
-  elements.sessionStatusSummary.textContent = `${statusLabel} • ${metadata.participantId || 'participant not assigned'}`;
+  setText(elements.sessionStatusSummary, `${statusLabel} • ${metadata.participantId || 'participant not assigned'}`);
   if (session.status === 'running') {
-    elements.sessionStatusDetail.textContent = `Trial started ${formatTimestamp(session.trialStartedAt)} by ${metadata.researcher || 'researcher'}. Hints and robotic actions are now enabled.`;
+    setText(elements.sessionStatusDetail, `Trial started ${formatTimestamp(session.trialStartedAt)} by ${metadata.researcher || 'researcher'}. Hints and robotic actions are now enabled.`);
   } else if (session.status === 'completed') {
-    elements.sessionStatusDetail.textContent = session.completedSummary
+    setText(elements.sessionStatusDetail, session.completedSummary
       ? `${session.completedSummary} Completed ${formatTimestamp(session.completedAt)}. The session is now read-only until reset.`
-      : `Completed ${formatTimestamp(session.completedAt)}. The session is now read-only until reset.`;
+      : `Completed ${formatTimestamp(session.completedAt)}. The session is now read-only until reset.`);
   } else {
-    elements.sessionStatusDetail.textContent = 'Save metadata, then start the trial when the participant is ready. During setup, only session configuration and telemetry rehearsal are available.';
+    setText(elements.sessionStatusDetail, 'Save metadata, then start the trial when the participant is ready. During setup, only session configuration and telemetry rehearsal are available.');
   }
   setValueSafely(elements.sessionSummary, session.completedSummary);
 
   const adaptive = currentState.adaptive;
   const configuration = adaptive.configuration;
-  elements.adaptiveStatus.textContent = `${adaptive.status.toUpperCase()} • ${formatNumber(adaptive.score)}`;
-  elements.adaptiveReason.textContent = adaptive.reason;
-  elements.adaptiveStatus.dataset.status = adaptive.status;
+  setText(elements.adaptiveStatus, `${adaptive.status.toUpperCase()} • ${formatNumber(adaptive.score)}`);
+  setText(elements.adaptiveReason, adaptive.reason);
+  setDatasetValue(elements.adaptiveStatus, 'status', adaptive.status);
   setAdaptiveConfigurationFields(configuration);
-  elements.adaptiveConfigSummary.textContent = adaptiveSummary(configuration);
-  elements.adaptiveConfigNote.textContent = adaptiveNote(configuration);
+  setText(elements.adaptiveConfigSummary, adaptiveSummary(configuration));
+  setText(elements.adaptiveConfigNote, adaptiveNote(configuration));
 
   const connections = currentState.system.connections;
   const sensorHealth = currentState.system.sensorHealth || {};
   const watchHealth = sensorHealth.watch || {};
   const gazeHealth = sensorHealth.gaze || {};
-  elements.connectionCounts.textContent = `${connections.admin} admin / ${connections.subject} subject / ${connections.audit} audit`;
+  setText(elements.connectionCounts, `${connections.admin} admin / ${connections.subject} subject / ${connections.audit} audit`);
 
   const watchStatus = currentState.system.watchBridge;
-  elements.watchBridgeStatus.textContent = sensorHealth.overall?.summary
+  setText(elements.watchBridgeStatus, sensorHealth.overall?.summary
     || (watchStatus.lastProcessedAt
       ? `Watch file ${watchStatus.filePath} • last processed ${formatTimestamp(watchStatus.lastProcessedAt)}`
-      : `Watching ${watchStatus.filePath} for HRV updates`);
-  elements.sensorHealthSummary.textContent = sensorHealth.overall?.summary || 'Sensor health is unavailable.';
-  elements.sensorHealthDetail.textContent = sensorHealth.overall?.detail || 'The server has not published sensor health details yet.';
-  elements.watchHealthSummary.textContent = watchHealth.summary || 'Watch bridge status is unavailable.';
-  elements.watchHealthDetail.textContent = watchHealth.detail || `Watching ${watchStatus.filePath} for HRV updates.`;
-  elements.gazeHealthSummary.textContent = gazeHealth.summary || 'Gaze bridge status is unavailable.';
-  elements.gazeHealthDetail.textContent = gazeHealth.detail || 'The gaze bridge has not reported any status yet.';
-  elements.launcherSummary.textContent = `Launch the local stack with npm run launch:study, then check ${sensorHealth.overall?.issueCount || 0} active sensor issue${(sensorHealth.overall?.issueCount || 0) === 1 ? '' : 's'} here.`;
+      : `Watching ${watchStatus.filePath} for HRV updates`));
+  setText(elements.sensorHealthSummary, sensorHealth.overall?.summary || 'Sensor health is unavailable.');
+  setText(elements.sensorHealthDetail, sensorHealth.overall?.detail || 'The server has not published sensor health details yet.');
+  setText(elements.watchHealthSummary, watchHealth.summary || 'Watch bridge status is unavailable.');
+  setText(elements.watchHealthDetail, watchHealth.detail || `Watching ${watchStatus.filePath} for HRV updates.`);
+  setText(elements.gazeHealthSummary, gazeHealth.summary || 'Gaze bridge status is unavailable.');
+  setText(elements.gazeHealthDetail, gazeHealth.detail || 'The gaze bridge has not reported any status yet.');
+  setText(elements.launcherSummary, `Launch the local stack with npm run launch:study, then check ${sensorHealth.overall?.issueCount || 0} active sensor issue${(sensorHealth.overall?.issueCount || 0) === 1 ? '' : 's'} here.`);
   renderPreflight();
 
   const hrv = currentState.telemetry.hrv;
   const gaze = currentState.telemetry.gaze;
   const advisory = adaptive.advisory;
   const gazeBridge = currentState.system.gazeBridge;
-  elements.metricHr.textContent = formatNumber(hrv.metrics.hr, 0);
-  elements.metricStress.textContent = formatNumber(hrv.stressScore);
-  elements.metricStressLevel.textContent = hrv.stressLevel || 'Not Stressed';
-  elements.metricAttention.textContent = formatNumber(gaze.attentionScore);
-  elements.metricFixation.textContent = formatNumber(gaze.fixationLoss);
-  elements.hrvSource.textContent = hrv.source ? `Source: ${hrv.source}` : 'No HRV source yet';
-  elements.gazeSource.textContent = gaze.source ? `Source: ${gaze.source}` : 'No gaze source yet';
-  elements.gazeBridgeSummary.textContent = gazeBridge?.bridgeId
+  setText(elements.metricHr, formatNumber(hrv.metrics.hr, 0));
+  setText(elements.metricStress, formatNumber(hrv.stressScore));
+  setText(elements.metricStressLevel, hrv.stressLevel || 'Not Stressed');
+  setText(elements.metricAttention, formatNumber(gaze.attentionScore));
+  setText(elements.metricFixation, formatNumber(gaze.fixationLoss));
+  setText(elements.hrvSource, hrv.source ? `Source: ${hrv.source}` : 'No HRV source yet');
+  setText(elements.gazeSource, gaze.source ? `Source: ${gaze.source}` : 'No gaze source yet');
+  setText(elements.gazeBridgeSummary, gazeBridge?.bridgeId
     ? `${gazeBridge.deviceLabel || gazeBridge.bridgeId} • ${gazeBridge.active ? 'active' : 'stale'}`
-    : 'No gaze bridge connected.';
-  elements.gazeBridgeDetail.textContent = gazeBridge?.bridgeId
+    : 'No gaze bridge connected.');
+  setText(elements.gazeBridgeDetail, gazeBridge?.bridgeId
     ? `Bridge ${gazeBridge.bridgeId} via ${gazeBridge.transport || 'unknown transport'} • last frame ${formatTimestamp(gazeBridge.lastFrameAt || gazeBridge.lastHeartbeatAt)}`
-    : 'Use the Python bridge or your SDK callback to start streaming gaze frames.';
-  elements.hintPreview.textContent = currentState.hint.text || 'No hint has been sent yet.';
-  elements.latestAction.textContent = currentState.robotAction.updatedAt
+    : 'Use the Python bridge or your SDK callback to start streaming gaze frames.');
+  setText(elements.hintPreview, currentState.hint.text || 'No hint has been sent yet.');
+  setText(elements.latestAction, currentState.robotAction.updatedAt
     ? `${currentState.robotAction.label} • ${formatTimestamp(currentState.robotAction.updatedAt)}`
-    : 'No robotic action logged yet.';
-  elements.llmSummary.textContent = advisory?.summary || 'No LLM recommendation has been generated.';
-  elements.llmHint.textContent = advisory?.recommendedHint
+    : 'No robotic action logged yet.');
+  setText(elements.llmSummary, advisory?.summary || 'No LLM recommendation has been generated.');
+  setText(elements.llmHint, advisory?.recommendedHint
     ? `Suggested hint: ${advisory.recommendedHint}`
-    : 'Suggested hint: unavailable';
+    : 'Suggested hint: unavailable');
 
   renderLinks(elements.localhostLinks, currentState.system.network.localhost);
   renderLanLinks(elements.lanLinks, currentState.system.network.lan);
@@ -789,26 +865,26 @@ function renderState() {
 }
 
 function renderExportInfo() {
-  if (!exportManifest) {
+  if (!exportManifest || (!elements.currentExportLinks && !elements.exportSummary)) {
     return;
   }
 
   const current = exportManifest.sessions.find((session) => session.sessionId === exportManifest.currentSessionId);
-  elements.currentExportLinks.innerHTML = '';
+  setHtml(elements.currentExportLinks);
 
   const bundleLink = document.createElement('a');
   bundleLink.href = '/api/exports/current.bundle.json';
   bundleLink.textContent = 'Download current bundle JSON';
-  elements.currentExportLinks.append(bundleLink);
+  elements.currentExportLinks?.append(bundleLink);
 
   const csvLink = document.createElement('a');
   csvLink.href = '/api/exports/current.csv';
   csvLink.textContent = 'Download current CSV timeline';
-  elements.currentExportLinks.append(csvLink);
+  elements.currentExportLinks?.append(csvLink);
 
-  elements.exportSummary.textContent = current
+  setText(elements.exportSummary, current
     ? `${exportManifest.sessions.length} sessions available • current session has ${current.eventCount} events`
-    : `${exportManifest.sessions.length} sessions available`;
+    : `${exportManifest.sessions.length} sessions available`);
 }
 
 async function bootstrapState() {
@@ -857,10 +933,10 @@ function buildStressLevel(stressScore) {
 }
 
 async function submitSimulation() {
-  const stressScore = Number(elements.simStress.value);
-  const attentionScore = Number(elements.simAttention.value);
-  const fixationLoss = Number(elements.simFixation.value);
-  const distractionDetected = elements.simDistraction.checked;
+  const stressScore = Number(elements.simStress?.value || 0);
+  const attentionScore = Number(elements.simAttention?.value || 0);
+  const fixationLoss = Number(elements.simFixation?.value || 0);
+  const distractionDetected = Boolean(elements.simDistraction?.checked);
 
   const baselineHr = 68;
   const payload = {
@@ -890,6 +966,10 @@ async function submitSimulation() {
 }
 
 async function startCamera() {
+  if (!elements.cameraFeed || !elements.cameraStatus) {
+    return;
+  }
+
   try {
     mediaStream = await navigator.mediaDevices.getUserMedia({
       video: {
@@ -906,6 +986,10 @@ async function startCamera() {
 }
 
 function stopCamera() {
+  if (!elements.cameraFeed || !elements.cameraStatus) {
+    return;
+  }
+
   if (mediaStream) {
     mediaStream.getTracks().forEach((track) => track.stop());
     mediaStream = null;
@@ -960,7 +1044,7 @@ async function init() {
     },
   });
 
-  elements.guardForm.addEventListener('submit', async (event) => {
+  bindEvent(elements.guardForm, 'submit', async (event) => {
     event.preventDefault();
 
     try {
@@ -976,7 +1060,7 @@ async function init() {
     }
   });
 
-  elements.guardLock.addEventListener('click', async () => {
+  bindEvent(elements.guardLock, 'click', async () => {
     if (!getSafeguardState().pinRequired) {
       setGuardMessage('No admin PIN is configured, so there is nothing to lock locally.', 'neutral');
       return;
@@ -994,7 +1078,7 @@ async function init() {
     }
   });
 
-  elements.hintForm.addEventListener('submit', async (event) => {
+  bindEvent(elements.hintForm, 'submit', async (event) => {
     event.preventDefault();
     try {
       await postJson('/api/hints', { text: elements.hintText.value }, {
@@ -1007,7 +1091,7 @@ async function init() {
     }
   });
 
-  elements.sessionForm.addEventListener('submit', async (event) => {
+  bindEvent(elements.sessionForm, 'submit', async (event) => {
     event.preventDefault();
     try {
       await postJson('/api/session/configure', {
@@ -1027,7 +1111,7 @@ async function init() {
     }
   });
 
-  elements.preflightForm.addEventListener('submit', async (event) => {
+  bindEvent(elements.preflightForm, 'submit', async (event) => {
     event.preventDefault();
     try {
       await postJson('/api/preflight/acknowledgements', {
@@ -1048,7 +1132,7 @@ async function init() {
     }
   });
 
-  elements.sessionStart.addEventListener('click', async () => {
+  bindEvent(elements.sessionStart, 'click', async () => {
     try {
       await postJson('/api/session/start', {
         operator: elements.sessionResearcher.value || 'researcher',
@@ -1063,7 +1147,7 @@ async function init() {
     }
   });
 
-  elements.sessionComplete.addEventListener('click', async () => {
+  bindEvent(elements.sessionComplete, 'click', async () => {
     try {
       await postJson('/api/session/complete', {
         operator: elements.sessionResearcher.value || 'researcher',
@@ -1079,7 +1163,7 @@ async function init() {
     }
   });
 
-  elements.adaptiveConfigForm.addEventListener('submit', async (event) => {
+  bindEvent(elements.adaptiveConfigForm, 'submit', async (event) => {
     event.preventDefault();
     try {
       await postJson('/api/adaptive/config', readAdaptiveConfigurationForm(), {
@@ -1092,7 +1176,7 @@ async function init() {
     }
   });
 
-  elements.adaptiveConfigReset.addEventListener('click', async () => {
+  bindEvent(elements.adaptiveConfigReset, 'click', async () => {
     const defaults = adaptiveDefaults();
     if (!defaults) {
       return;
@@ -1109,13 +1193,15 @@ async function init() {
     }
   });
 
-  elements.clearHint.addEventListener('click', () => {
-    elements.hintText.value = '';
+  bindEvent(elements.clearHint, 'click', () => {
+    if (elements.hintText) {
+      elements.hintText.value = '';
+    }
   });
 
-  elements.useLlmHint.addEventListener('click', () => {
+  bindEvent(elements.useLlmHint, 'click', () => {
     const advisory = currentState?.adaptive?.advisory;
-    if (!advisory?.recommendedHint) {
+    if (!advisory?.recommendedHint || !elements.hintText) {
       return;
     }
 
@@ -1123,7 +1209,7 @@ async function init() {
     elements.hintText.focus();
   });
 
-  elements.simulatorForm.addEventListener('submit', async (event) => {
+  bindEvent(elements.simulatorForm, 'submit', async (event) => {
     event.preventDefault();
     try {
       await submitSimulation();
@@ -1133,24 +1219,40 @@ async function init() {
     }
   });
 
-  elements.presetObserve.addEventListener('click', () => {
-    elements.simStress.value = '0.52';
-    elements.simAttention.value = '0.48';
-    elements.simFixation.value = '0.45';
-    elements.simDistraction.checked = false;
+  bindEvent(elements.presetObserve, 'click', () => {
+    if (elements.simStress) {
+      elements.simStress.value = '0.52';
+    }
+    if (elements.simAttention) {
+      elements.simAttention.value = '0.48';
+    }
+    if (elements.simFixation) {
+      elements.simFixation.value = '0.45';
+    }
+    if (elements.simDistraction) {
+      elements.simDistraction.checked = false;
+    }
   });
 
-  elements.presetIntervene.addEventListener('click', () => {
-    elements.simStress.value = '0.88';
-    elements.simAttention.value = '0.14';
-    elements.simFixation.value = '0.82';
-    elements.simDistraction.checked = true;
+  bindEvent(elements.presetIntervene, 'click', () => {
+    if (elements.simStress) {
+      elements.simStress.value = '0.88';
+    }
+    if (elements.simAttention) {
+      elements.simAttention.value = '0.14';
+    }
+    if (elements.simFixation) {
+      elements.simFixation.value = '0.82';
+    }
+    if (elements.simDistraction) {
+      elements.simDistraction.checked = true;
+    }
   });
 
-  elements.startCamera.addEventListener('click', startCamera);
-  elements.stopCamera.addEventListener('click', stopCamera);
+  bindEvent(elements.startCamera, 'click', startCamera);
+  bindEvent(elements.stopCamera, 'click', stopCamera);
 
-  elements.resetSession.addEventListener('click', async () => {
+  bindEvent(elements.resetSession, 'click', async () => {
     const isRunning = (currentState?.session?.status || 'setup') === 'running';
     const message = isRunning
       ? 'Force reset the live session and start a fresh log immediately?'

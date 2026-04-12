@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Live Controls</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body class="admin-page">
+    <div class="page-shell">
+      <nav class="workspace-topbar" aria-label="App routes">
+        <div class="workspace-brand">
+          <p class="eyebrow">Wizard of Oz Control Application</p>
+          <strong>Operator Workspace</strong>
+        </div>
+        <div class="workspace-links">
+          <a class="workspace-link active" href="/admin">Admin</a>
+          <a class="workspace-link" href="/subject" target="_blank" rel="noreferrer">Subject display</a>
+          <a class="workspace-link" href="/audit" target="_blank" rel="noreferrer">Audit display</a>
+          <a class="workspace-link" href="/exports">Exports</a>
+        </div>
+      </nav>
+
+      <nav class="workspace-subbar" aria-label="Operator pages">
+        <a class="workspace-sub-link" href="/admin">Overview</a>
+        <a class="workspace-sub-link" href="/admin/setup">Setup</a>
+        <a class="workspace-sub-link active" href="/admin/live" aria-current="page">Live controls</a>
+        <a class="workspace-sub-link" href="/admin/monitoring">Monitoring</a>
+        <a class="workspace-sub-link" href="/admin/review">Review</a>
+      </nav>
+
+      <header class="hero hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Workspace 2</p>
+          <h1>Live Controls</h1>
+          <p class="hero-text">
+            Stay here during the run to send hints, log robot actions, and keep a close eye on the live intervention state.
+          </p>
+        </div>
+        <div class="hero-status">
+          <article class="status-card">
+            <span class="status-label">Session</span>
+            <strong id="session-id">Loading...</strong>
+            <small id="session-started">Connecting to local server...</small>
+          </article>
+          <article class="status-card adaptive">
+            <span class="status-label">Adaptive Recommendation</span>
+            <strong id="adaptive-status">Waiting for telemetry</strong>
+            <small id="adaptive-reason">The engine will flag observe or intervene states here.</small>
+          </article>
+          <article class="status-card">
+            <span class="status-label">Connections</span>
+            <strong id="connection-counts">0 admin / 0 subject / 0 audit</strong>
+            <small id="watch-bridge-status">Watch bridge idle</small>
+          </article>
+        </div>
+      </header>
+
+      <article class="callout page-banner">
+        <span class="callout-label">Operator message</span>
+        <p id="guard-message" class="inline-status">Loading safeguard status...</p>
+      </article>
+
+      <main class="workspace-main">
+        <div class="dashboard-grid">
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <p class="panel-kicker">Run state</p>
+                <h2>Session Snapshot</h2>
+              </div>
+            </div>
+            <div class="callout">
+              <span class="callout-label">Current trial state</span>
+              <p id="session-status-summary">Session is in setup.</p>
+              <p id="session-status-detail">Live interventions are only allowed during the running state.</p>
+            </div>
+            <div class="callout">
+              <span class="callout-label">Visible hint</span>
+              <p id="hint-preview">No hint has been sent yet.</p>
+            </div>
+            <div class="callout">
+              <span class="callout-label">Latest robot action</span>
+              <p id="latest-action">No robotic action logged yet.</p>
+            </div>
+          </section>
+
+          <section class="panel live-panel">
+            <div class="panel-header">
+              <div>
+                <p class="panel-kicker">Intervention</p>
+                <h2>Digital Hint Terminal</h2>
+              </div>
+              <span class="panel-note">Broadcasts immediately to `/subject`</span>
+            </div>
+            <form id="hint-form" class="stack-form">
+              <label class="field">
+                <span>Hint text</span>
+                <textarea id="hint-text" rows="5" placeholder="Type the guidance that should appear on the participant display."></textarea>
+              </label>
+              <div class="button-row">
+                <button id="hint-send" class="button button-primary" type="submit">Broadcast hint</button>
+                <button id="clear-hint" class="button button-ghost" type="button">Clear editor</button>
+              </div>
+            </form>
+            <div class="callout advisory-callout">
+              <span class="callout-label">LLM advisory</span>
+              <p id="llm-summary">No LLM recommendation has been generated.</p>
+              <p id="llm-hint">Suggested hint: unavailable</p>
+              <button id="use-llm-hint" class="button button-ghost" type="button">Load suggested hint</button>
+            </div>
+          </section>
+
+          <section class="panel live-panel">
+            <div class="panel-header">
+              <div>
+                <p class="panel-kicker">Robot audit</p>
+                <h2>Robotic Arm Action Log</h2>
+              </div>
+              <span class="panel-note">Broadcasts immediately to `/audit`</span>
+            </div>
+            <div id="action-grid" class="action-grid"></div>
+          </section>
+        </div>
+      </main>
+
+      <script type="module" src="/admin.js"></script>
+    </div>
+  </body>
+</html>

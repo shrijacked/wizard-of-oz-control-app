@@ -34,6 +34,14 @@ const CONTENT_TYPES = {
   '.svg': 'image/svg+xml',
 };
 
+const OPERATOR_ROUTE_FILES = {
+  '/admin': 'admin.html',
+  '/admin/setup': 'admin-setup.html',
+  '/admin/live': 'admin-live.html',
+  '/admin/monitoring': 'admin-monitoring.html',
+  '/admin/review': 'admin-review.html',
+};
+
 function json(response, statusCode, payload) {
   response.writeHead(statusCode, { 'content-type': 'application/json; charset=utf-8' });
   response.end(JSON.stringify(payload, null, 2));
@@ -101,6 +109,19 @@ function text(response, statusCode, payload, headers = {}) {
   response.end(payload);
 }
 
+function buildLocalhostUrls(port) {
+  return {
+    admin: `http://localhost:${port}/admin`,
+    setup: `http://localhost:${port}/admin/setup`,
+    live: `http://localhost:${port}/admin/live`,
+    monitoring: `http://localhost:${port}/admin/monitoring`,
+    review: `http://localhost:${port}/admin/review`,
+    exports: `http://localhost:${port}/exports`,
+    subject: `http://localhost:${port}/subject`,
+    audit: `http://localhost:${port}/audit`,
+  };
+}
+
 async function createApp(options = {}) {
   const port = Number(options.port || process.env.PORT || 3000);
   const publicDir = options.publicDir || path.join(process.cwd(), 'public');
@@ -144,11 +165,7 @@ async function createApp(options = {}) {
       connections,
       robotActions: ROBOT_ACTIONS,
       network: {
-        localhost: {
-          admin: `http://localhost:${port}/admin`,
-          subject: `http://localhost:${port}/subject`,
-          audit: `http://localhost:${port}/audit`,
-        },
+        localhost: buildLocalhostUrls(port),
         lan: getLocalNetworkAddresses(port),
       },
     };
@@ -194,8 +211,8 @@ async function createApp(options = {}) {
         return;
       }
 
-      if (request.method === 'GET' && pathname === '/admin') {
-        await serveFile(response, path.join(publicDir, 'admin.html'));
+      if (request.method === 'GET' && OPERATOR_ROUTE_FILES[pathname]) {
+        await serveFile(response, path.join(publicDir, OPERATOR_ROUTE_FILES[pathname]));
         return;
       }
 

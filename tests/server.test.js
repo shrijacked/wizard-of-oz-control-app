@@ -158,7 +158,7 @@ test('HTTP API updates state and exposes recent events', async () => {
   }
 });
 
-test('server serves the actual admin, subject, audit, and stylesheet assets', async () => {
+test('server serves the actual multi-page admin routes, display routes, and stylesheet assets', async () => {
   const dataDir = await fs.mkdtemp(path.join(os.tmpdir(), 'woz-public-'));
   const app = await createApp({ dataDir, port: 0 });
   await new Promise((resolve) => app.server.listen(0, '127.0.0.1', resolve));
@@ -167,18 +167,26 @@ test('server serves the actual admin, subject, audit, and stylesheet assets', as
 
   try {
     const adminHtml = await fetch(`${baseUrl}/admin`).then((response) => response.text());
+    const setupHtml = await fetch(`${baseUrl}/admin/setup`).then((response) => response.text());
+    const liveHtml = await fetch(`${baseUrl}/admin/live`).then((response) => response.text());
+    const monitoringHtml = await fetch(`${baseUrl}/admin/monitoring`).then((response) => response.text());
+    const reviewHtml = await fetch(`${baseUrl}/admin/review`).then((response) => response.text());
     const subjectHtml = await fetch(`${baseUrl}/subject`).then((response) => response.text());
     const auditHtml = await fetch(`${baseUrl}/audit`).then((response) => response.text());
     const exportsHtml = await fetch(`${baseUrl}/exports`).then((response) => response.text());
     const css = await fetch(`${baseUrl}/styles.css`).then((response) => response.text());
 
     assert.match(adminHtml, /Research Control Deck/);
-    assert.match(adminHtml, /Operator Flow/);
-    assert.match(adminHtml, /Operator Controls/);
-    assert.match(adminHtml, /Adaptive Controls/);
-    assert.match(adminHtml, /Before Participant Gate/);
-    assert.match(adminHtml, /Review And Routing/);
-    assert.match(adminHtml, /Sensor Health And Stream Status/);
+    assert.match(adminHtml, /Workspace overview/);
+    assert.match(adminHtml, /\/admin\/setup/);
+    assert.match(setupHtml, /Run Setup/);
+    assert.match(setupHtml, /Before Participant Gate/);
+    assert.match(liveHtml, /Live Controls/);
+    assert.match(liveHtml, /Digital Hint Terminal/);
+    assert.match(monitoringHtml, /Monitoring/);
+    assert.match(monitoringHtml, /Sensor Health And Stream Status/);
+    assert.match(reviewHtml, /Review And Routing/);
+    assert.match(reviewHtml, /Global Event Logger/);
     assert.match(subjectHtml, /Hint Terminal/);
     assert.match(auditHtml, /Robotic Action Monitor/);
     assert.match(exportsHtml, /Session Exports/);

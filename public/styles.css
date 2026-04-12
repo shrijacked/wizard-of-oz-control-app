@@ -134,6 +134,45 @@ select:disabled {
   border-color: transparent;
 }
 
+.workspace-subbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 250, 244, 0.72);
+  box-shadow: var(--shadow);
+}
+
+.workspace-sub-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
+  text-decoration: none;
+  color: var(--ink);
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(22, 51, 74, 0.12);
+  transition: transform 150ms ease, box-shadow 150ms ease, background 150ms ease;
+}
+
+.workspace-sub-link:hover,
+.workspace-sub-link:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(22, 51, 74, 0.12);
+}
+
+.workspace-sub-link.active {
+  background:
+    linear-gradient(135deg, rgba(10, 122, 120, 0.16), rgba(22, 51, 74, 0.1)),
+    rgba(255, 255, 255, 0.86);
+  border-color: rgba(10, 122, 120, 0.3);
+}
+
 .hero {
   display: grid;
   grid-template-columns: 1.5fr 1fr;
@@ -144,6 +183,10 @@ select:disabled {
 
 .hero-grid {
   align-items: start;
+}
+
+.page-banner {
+  margin-bottom: 22px;
 }
 
 .hero-copy,
@@ -819,6 +862,7 @@ select:disabled {
 }
 
 @media (max-width: 1080px) {
+  .workspace-subbar,
   .workspace-topbar,
   .workspace-header,
   .workspace-layout,
@@ -850,6 +894,10 @@ select:disabled {
   .workspace-topbar {
     position: static;
     padding: 14px;
+  }
+
+  .workspace-subbar {
+    padding: 10px;
   }
 
   .hero-copy,

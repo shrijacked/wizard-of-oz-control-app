@@ -16,6 +16,11 @@ function getLocalNetworkAddresses(port) {
         address: entry.address,
         urls: {
           admin: `http://${entry.address}:${port}/admin`,
+          setup: `http://${entry.address}:${port}/admin/setup`,
+          live: `http://${entry.address}:${port}/admin/live`,
+          monitoring: `http://${entry.address}:${port}/admin/monitoring`,
+          review: `http://${entry.address}:${port}/admin/review`,
+          exports: `http://${entry.address}:${port}/exports`,
           subject: `http://${entry.address}:${port}/subject`,
           audit: `http://${entry.address}:${port}/audit`,
         },
