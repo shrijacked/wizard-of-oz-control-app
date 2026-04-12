@@ -14,7 +14,7 @@ The application coordinates a live Wizard of Oz research session from one host m
 
 ```mermaid
 flowchart LR
-    webcam["USB Webcam<br/>Logitech C270"] --> admin["Admin Dashboard<br/>/admin"]
+    webcam["USB Webcam<br/>Logitech C270"] --> admin["Operator Pages<br/>/admin/*"]
     watch["HRV Watch<br/>watch.py -> watch/watch_data.json"] --> server["Local Node Server<br/>HTTP + WebSocket"]
     gaze["Gaze Detector<br/>SDK bridge / HTTP ingest"] --> server
     admin --> server
@@ -64,27 +64,27 @@ flowchart LR
 
 ### 6. Frontend route views
 
-- `admin`: dense operational UI for the researcher
+- `admin`: operator home and routing overview
+- `admin/setup`: session metadata, readiness gate, and safeguard controls
+- `admin/live`: hint terminal and robot action logging
+- `admin/monitoring`: camera, telemetry, sensor health, and adaptive controls
+- `admin/review`: exports summary, routing, simulator, and event log
 - `subject`: distraction-free hint panel
 - `audit`: large-format robotic action monitor
 - `exports`: session analytics, download center, and replay timeline
-- `admin` also exposes the operator safeguard board plus the before-participant gate with live readiness blockers
+- the admin routes together replace the old single long dashboard with dedicated task pages
 
 ## Operator information architecture
 
 ```mermaid
 flowchart LR
-    topbar["Persistent route bar"] --> admin["Admin workspace"]
+    topbar["Persistent route bar"] --> admin["Admin operator routes"]
     topbar --> exports["Export center"]
-    rail["Sticky operator rail"] --> setup["Run setup"]
-    rail --> live["Live controls"]
-    rail --> monitoring["Monitoring"]
-    rail --> review["Review and routing"]
-    admin --> rail
-    admin --> setup
-    admin --> live
-    admin --> monitoring
-    admin --> review
+    admin --> overview["/admin overview"]
+    admin --> setup["/admin/setup"]
+    admin --> live["/admin/live"]
+    admin --> monitoring["/admin/monitoring"]
+    admin --> review["/admin/review"]
 ```
 
 ## Data flow
@@ -135,7 +135,11 @@ flowchart TD
 
 ## Route map
 
-- `GET /admin`: main operator interface
+- `GET /admin`: operator overview and route hub
+- `GET /admin/setup`: session setup, readiness, and safeguard page
+- `GET /admin/live`: live intervention controls
+- `GET /admin/monitoring`: camera, telemetry, and adaptive monitoring page
+- `GET /admin/review`: export summary, routing, simulator, and event-log page
 - `GET /subject`: participant hint terminal
 - `GET /audit`: robot action audit display
 - `GET /exports`: session export center

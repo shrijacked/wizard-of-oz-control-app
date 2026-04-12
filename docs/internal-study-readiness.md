@@ -23,25 +23,26 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    boot["Launch study stack"] --> admin["Open /admin"]
-    admin --> unlock{"ADMIN_PIN enabled?"}
+    boot["Launch study stack"] --> admin["Open /admin overview"]
+    admin --> setup["Go to /admin/setup"]
+    setup --> unlock{"ADMIN_PIN enabled?"}
     unlock -- yes --> pin["Unlock this browser"]
-    unlock -- no --> setup["Save session metadata"]
-    pin --> setup
-    setup --> sensors["Verify watch and gaze feeds"]
+    unlock -- no --> save["Save session metadata"]
+    pin --> save
+    save --> sensors["Go to /admin/monitoring and verify watch and gaze feeds"]
     sensors --> displays["Open /subject and optional /audit"]
     displays --> manual["Save manual checklist confirmations"]
     manual --> gate{"Before participant gate clear?"}
     gate -- no --> fix["Resolve blockers shown on /admin"]
-    fix --> gate
-    gate -- yes --> run["Start trial and run the session"]
+    fix --> setup
+    gate -- yes --> run["Go to /admin/live and run the session"]
     run --> complete["Mark complete and export data"]
 ```
 
 ## Before first participant
 
 1. Start the stack with `npm run launch:study`.
-2. Open `/admin` on the host laptop.
+2. Open `/admin` on the host laptop, then move into `/admin/setup`.
 3. Unlock the admin browser if `ADMIN_PIN` is enabled.
 4. Save the session profile with `study id`, `participant id`, `condition`, and `researcher`.
 5. Open `/subject` on the participant-facing device and confirm the admin screen shows the subject display as connected.
@@ -53,7 +54,8 @@ flowchart TD
    subject display confirmed
    robot control board ready
    puzzle materials reset
-10. Start the trial only after the gate reports no blockers.
+10. Use `/admin/live` for hints and robot actions once the trial is running.
+11. Start the trial only after the gate reports no blockers.
 
 ## Dry-run protocol
 

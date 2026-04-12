@@ -42,6 +42,7 @@ flowchart LR
 | T15 | Add one-command study-day launcher and sensor health diagnostics | T4, T6, T7, T11, T12 | Architecture: Sensor integration plan |
 | T16 | Add a before-participant readiness gate with live blockers, manual acknowledgements, and a study-day runbook | T6, T7, T11, T12, T15 | Architecture: Before-participant gate |
 | T17 | Audit and reorganize the operator UI so task-heavy pages are easier to scan and navigate | T7, T10, T12, T16 | Docs: Operator navigation audit + Architecture: Operator information architecture |
+| T18 | Replace the single long admin page with dedicated route-based operator pages that preserve the full workflow | T7, T10, T13, T14, T17 | Architecture: Frontend route views |
 
 ## Delivery slices
 
@@ -113,6 +114,12 @@ flowchart LR
 - Audit the operator-facing pages for navigation friction
 - Add a shared route shell and sticky section rail
 - Reorganize admin and exports around operator tasks instead of a flat panel wall
+
+### Slice 13
+
+- Replace the long operator page with real admin subroutes
+- Keep setup, live, monitoring, and review as dedicated pages with shared live state
+- Verify the route contract through server tests and full verification
 
 ## Validation checklist
 
