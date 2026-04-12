@@ -183,9 +183,11 @@ test('server serves the actual multi-page admin routes, display routes, and styl
     assert.match(setupHtml, /Before Participant Gate/);
     assert.match(liveHtml, /Live Controls/);
     assert.match(liveHtml, /Digital Hint Terminal/);
+    assert.match(liveHtml, /Puzzle timer/);
     assert.match(monitoringHtml, /Monitoring/);
     assert.match(monitoringHtml, /Sensor Health And Stream Status/);
     assert.match(reviewHtml, /Review And Routing/);
+    assert.match(reviewHtml, /Puzzle duration/);
     assert.match(reviewHtml, /Global Event Logger/);
     assert.match(subjectHtml, /Hint Terminal/);
     assert.match(auditHtml, /Robotic Action Monitor/);

@@ -52,6 +52,23 @@ export function formatTimestamp(value) {
   }).format(date);
 }
 
+export function formatDurationSeconds(value) {
+  if (!Number.isFinite(value) || value < 0) {
+    return '--';
+  }
+
+  const totalSeconds = Math.round(value);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+
+  if (hours > 0) {
+    return `${hours}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+  }
+
+  return `${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+}
+
 export function connectSocket(role, handlers = {}) {
   let socket;
   let shouldReconnect = true;

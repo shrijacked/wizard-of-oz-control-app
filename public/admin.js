@@ -2,6 +2,7 @@ import {
   connectSocket,
   drawSeriesChart,
   fetchJson,
+  formatDurationSeconds,
   formatTimestamp,
   installSectionNavigation,
   postJson,
@@ -34,6 +35,8 @@ const elements = {
   sessionSave: document.querySelector('#session-save'),
   sessionStatusSummary: document.querySelector('#session-status-summary'),
   sessionStatusDetail: document.querySelector('#session-status-detail'),
+  sessionDurationSummary: document.querySelector('#session-duration-summary'),
+  sessionDurationDetail: document.querySelector('#session-duration-detail'),
   sessionSummary: document.querySelector('#session-summary'),
   sessionStart: document.querySelector('#session-start'),
   sessionComplete: document.querySelector('#session-complete'),
@@ -127,6 +130,7 @@ let exportManifest = null;
 let guardStatus = null;
 let adminToken = window.localStorage.getItem(ADMIN_TOKEN_KEY) || '';
 let statePollTimer = null;
+let durationTicker = null;
 
 function formatNumber(value, digits = 2) {
   return Number.isFinite(value) ? value.toFixed(digits) : '--';
@@ -187,6 +191,53 @@ function setCheckedSafely(element, value) {
   }
 
   element.checked = Boolean(value);
+}
+
+function parseTimestamp(value) {
+  if (!value) {
+    return null;
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return date;
+}
+
+function sessionDurationSeconds(session) {
+  const start = parseTimestamp(session?.trialStartedAt);
+  if (!start) {
+    return null;
+  }
+
+  const end = parseTimestamp(session?.completedAt) || new Date();
+  return Math.max(0, Math.round((end.getTime() - start.getTime()) / 1000));
+}
+
+function renderSessionTiming(session, metadata = {}) {
+  const durationSeconds = sessionDurationSeconds(session);
+
+  if (session?.status === 'running') {
+    setText(elements.sessionStatusDetail, `Trial started ${formatTimestamp(session.trialStartedAt)} by ${metadata.researcher || 'researcher'}. Hints and robotic actions are now enabled.`);
+    setText(elements.sessionDurationSummary, `Elapsed puzzle time: ${formatDurationSeconds(durationSeconds)}`);
+    setText(elements.sessionDurationDetail, `The timer started when the participant began the puzzle at ${formatTimestamp(session.trialStartedAt)}.`);
+    return;
+  }
+
+  if (session?.status === 'completed') {
+    setText(elements.sessionStatusDetail, session.completedSummary
+      ? `${session.completedSummary} Completed ${formatTimestamp(session.completedAt)}. The session is now read-only until reset.`
+      : `Completed ${formatTimestamp(session.completedAt)}. The session is now read-only until reset.`);
+    setText(elements.sessionDurationSummary, `Puzzle completed in ${formatDurationSeconds(durationSeconds)}`);
+    setText(elements.sessionDurationDetail, `Started ${formatTimestamp(session.trialStartedAt)} and completed ${formatTimestamp(session.completedAt)}.`);
+    return;
+  }
+
+  setText(elements.sessionStatusDetail, 'Save metadata, then start the trial when the participant is ready. During setup, only session configuration and telemetry rehearsal are available.');
+  setText(elements.sessionDurationSummary, 'Trial timer is waiting for the session to start.');
+  setText(elements.sessionDurationDetail, 'The participant completion time will appear here as soon as the puzzle begins.');
 }
 
 function setAdminToken(token) {
@@ -792,15 +843,7 @@ function renderState() {
 
   const statusLabel = session.status ? session.status.toUpperCase() : 'SETUP';
   setText(elements.sessionStatusSummary, `${statusLabel} • ${metadata.participantId || 'participant not assigned'}`);
-  if (session.status === 'running') {
-    setText(elements.sessionStatusDetail, `Trial started ${formatTimestamp(session.trialStartedAt)} by ${metadata.researcher || 'researcher'}. Hints and robotic actions are now enabled.`);
-  } else if (session.status === 'completed') {
-    setText(elements.sessionStatusDetail, session.completedSummary
-      ? `${session.completedSummary} Completed ${formatTimestamp(session.completedAt)}. The session is now read-only until reset.`
-      : `Completed ${formatTimestamp(session.completedAt)}. The session is now read-only until reset.`);
-  } else {
-    setText(elements.sessionStatusDetail, 'Save metadata, then start the trial when the participant is ready. During setup, only session configuration and telemetry rehearsal are available.');
-  }
+  renderSessionTiming(session, metadata);
   setValueSafely(elements.sessionSummary, session.completedSummary);
 
   const adaptive = currentState.adaptive;
@@ -1028,6 +1071,14 @@ async function init() {
       setGuardMessage(error.message || 'State refresh failed.', 'warning');
     });
   }, 10000);
+
+  durationTicker = window.setInterval(() => {
+    if (!currentState?.session) {
+      return;
+    }
+
+    renderSessionTiming(currentState.session, currentState.session.metadata || {});
+  }, 1000);
 
   connectSocket('admin', {
     onSnapshot(state) {
@@ -1283,6 +1334,9 @@ async function init() {
   window.addEventListener('beforeunload', () => {
     if (statePollTimer) {
       window.clearInterval(statePollTimer);
+    }
+    if (durationTicker) {
+      window.clearInterval(durationTicker);
     }
   });
 }

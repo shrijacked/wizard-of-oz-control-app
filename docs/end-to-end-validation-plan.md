@@ -164,13 +164,15 @@ Confirm the actual researcher workflow works start to finish.
 4. Send at least two hints.
 5. Log at least two robot actions.
 6. Confirm adaptive status changes using real or simulated telemetry.
-7. Mark the session complete.
+7. Confirm the live puzzle timer is advancing during the run.
+8. Mark the session complete and note the final completion duration.
 
 ### Pass criteria
 
 - no restart is required during the run
 - live controls work only when they should
 - state transitions happen in the correct order
+- the live puzzle timer advances during the active run
 - the session completes cleanly
 
 ### Evidence
@@ -179,6 +181,7 @@ Confirm the actual researcher workflow works start to finish.
 - hint text samples used
 - robot actions logged
 - adaptive status transitions observed
+- final puzzle duration shown in the operator UI
 
 ## Phase 6. Failure and recovery drills
 
@@ -232,6 +235,7 @@ Confirm the study produces complete analysis artifacts.
 - adaptive configuration
 - trial start event
 - trial completion event
+- puzzle completion duration
 - completion summary
 
 ### Pass criteria

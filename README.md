@@ -30,6 +30,7 @@ The system is designed to run on a laptop on the same Wi-Fi network as the secon
 - Automatic event logging to local files with timestamps
 - Session export page with JSON and CSV downloads
 - Session metadata and trial lifecycle controls for participant-ready runs
+- Explicit live puzzle timer plus exported completion duration for each subject run
 - Export analytics and replay timeline for post-trial review
 - Optional local admin PIN lock with browser-scoped unlock tokens
 - Session-phase protections that block hints, robot actions, and unsafe resets at the wrong time
@@ -64,7 +65,7 @@ On `/admin`, the typical operator flow is:
 4. Clear the before-participant gate, including the four manual confirmations.
 5. Start the trial when the participant is ready.
 6. Use hints, action logging, and telemetry during the run.
-7. Mark the session complete and enter an end-of-trial summary.
+7. Watch the live puzzle timer on `/admin/live`, then mark the session complete and enter an end-of-trial summary.
 8. Download the final bundle or CSV from `/exports`.
 
 Session protections are always active, even when no PIN is configured:
@@ -127,7 +128,7 @@ Launcher controls:
 
 The export center also renders:
 
-- derived session analytics such as duration, event counts, and adaptive transitions
+- derived session analytics such as puzzle duration, event counts, and adaptive transitions
 - the active adaptive configuration used for that session
 - a replay timeline built from the ordered event log
 

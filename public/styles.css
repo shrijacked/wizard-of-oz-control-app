@@ -501,6 +501,12 @@ select:disabled {
   background: rgba(255, 252, 247, 0.82);
 }
 
+.timing-callout {
+  background:
+    linear-gradient(135deg, rgba(10, 122, 120, 0.1), rgba(255, 252, 247, 0.9)),
+    rgba(255, 252, 247, 0.86);
+}
+
 .metric-card {
   padding: 16px;
   display: grid;

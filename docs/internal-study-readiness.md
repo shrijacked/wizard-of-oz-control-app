@@ -67,14 +67,16 @@ Run this before your first real participant and again after any network or hardw
 4. Send one hint and verify it appears on `/subject`.
 5. Log one robot action and verify it appears on `/audit`.
 6. Confirm the adaptive panel updates after fresh telemetry.
-7. Complete the trial.
-8. Download `current.bundle.json` and `current.csv` from `/exports`.
-9. Confirm the bundle contains:
+7. Confirm the live puzzle timer is advancing while the trial is running.
+8. Complete the trial and note the final completion duration shown on `/admin/review` or `/exports`.
+9. Download `current.bundle.json` and `current.csv` from `/exports`.
+10. Confirm the bundle contains:
    session metadata
    preflight acknowledgements
    telemetry events
    adaptive configuration
    trial start and completion events
+   puzzle completion duration
 
 ## Recovery rules
 

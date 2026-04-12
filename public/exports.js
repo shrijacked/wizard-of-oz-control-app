@@ -1,4 +1,4 @@
-import { fetchJson, formatTimestamp, installSectionNavigation } from './shared.js';
+import { fetchJson, formatDurationSeconds, formatTimestamp, installSectionNavigation } from './shared.js';
 
 const currentSessionElement = document.querySelector('#exports-current-session');
 const generatedAtElement = document.querySelector('#exports-generated-at');
@@ -32,10 +32,17 @@ function renderBundle(bundle) {
   analyticsGridElement.innerHTML = '';
 
   const analytics = bundle.analytics || {};
+  const session = bundle.state?.session || {};
+  const puzzleDuration = analytics.puzzleDurationSeconds ?? analytics.durationSeconds;
+  const timingNote = session.completedAt
+    ? `Started ${formatTimestamp(session.trialStartedAt)} • completed ${formatTimestamp(session.completedAt)}`
+    : (session.trialStartedAt
+      ? `Started ${formatTimestamp(session.trialStartedAt)}`
+      : `${analytics.totalEvents || 0} logged events`);
   analyticsGridElement.append(
     metricCard('Status', analytics.sessionStatus || 'setup', bundle.state?.session?.metadata?.condition || 'condition unavailable'),
     metricCard('Participant', analytics.participantId || 'Unassigned', bundle.state?.session?.metadata?.studyId || 'study unavailable'),
-    metricCard('Duration', analytics.durationSeconds == null ? '--' : `${analytics.durationSeconds}s`, `${analytics.totalEvents || 0} logged events`),
+    metricCard('Puzzle duration', formatDurationSeconds(puzzleDuration), timingNote),
     metricCard('Adaptive transitions', String(analytics.adaptiveTransitions || 0), `${analytics.gazeFrames || 0} gaze frames / ${analytics.hrvFrames || 0} HRV frames`),
     metricCard(
       'Adaptive rule set',
