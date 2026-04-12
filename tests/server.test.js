@@ -175,6 +175,8 @@ test('server serves the actual multi-page admin routes, display routes, and styl
     const auditHtml = await fetch(`${baseUrl}/audit`).then((response) => response.text());
     const exportsHtml = await fetch(`${baseUrl}/exports`).then((response) => response.text());
     const css = await fetch(`${baseUrl}/styles.css`).then((response) => response.text());
+    const adminControlsResponse = await fetch(`${baseUrl}/admin-controls.mjs`);
+    const adminControlsJs = await adminControlsResponse.text();
 
     assert.match(adminHtml, /Research Control Deck/);
     assert.match(adminHtml, /Workspace overview/);
@@ -195,6 +197,8 @@ test('server serves the actual multi-page admin routes, display routes, and styl
     assert.match(exportsHtml, /Export Center/);
     assert.match(exportsHtml, /Replay Timeline/);
     assert.match(css, /--teal/);
+    assert.match(adminControlsResponse.headers.get('content-type') || '', /text\/javascript/);
+    assert.match(adminControlsJs, /bindCameraControls/);
   } finally {
     await app.close();
   }

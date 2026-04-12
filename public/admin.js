@@ -7,6 +7,7 @@ import {
   installSectionNavigation,
   postJson,
 } from './shared.js';
+import { bindCameraControls } from './admin-controls.mjs';
 import { describeGuardBanner } from './admin-view.mjs';
 
 const ADMIN_TOKEN_KEY = 'woz.admin.token';
@@ -1063,6 +1064,12 @@ async function handleAdminError(error) {
 async function init() {
   setGuardMessage('Loading safeguard status...', 'neutral');
   installSectionNavigation();
+  bindCameraControls({
+    startButton: elements.startCamera,
+    stopButton: elements.stopCamera,
+    onStart: startCamera,
+    onStop: stopCamera,
+  });
 
   await Promise.all([
     bootstrapState(),
@@ -1303,9 +1310,6 @@ async function init() {
       elements.simDistraction.checked = true;
     }
   });
-
-  bindEvent(elements.startCamera, 'click', startCamera);
-  bindEvent(elements.stopCamera, 'click', stopCamera);
 
   bindEvent(elements.resetSession, 'click', async () => {
     const isRunning = (currentState?.session?.status || 'setup') === 'running';
