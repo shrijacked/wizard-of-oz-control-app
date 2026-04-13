@@ -42,10 +42,10 @@ const CONTENT_TYPES = {
 
 const OPERATOR_ROUTE_FILES = {
   '/admin': 'admin.html',
-  '/admin/setup': 'admin-setup.html',
-  '/admin/live': 'admin-live.html',
-  '/admin/monitoring': 'admin-monitoring.html',
-  '/admin/review': 'admin-review.html',
+  '/admin/setup': 'admin.html',
+  '/admin/live': 'admin.html',
+  '/admin/monitoring': 'admin.html',
+  '/admin/review': 'admin.html',
 };
 
 function json(response, statusCode, payload, headers = {}) {
@@ -77,13 +77,26 @@ function roleState(store, role, systemStatus) {
     return {
       session: state.session,
       hint: state.hint,
-      referencePuzzle: state.session.referencePuzzle,
-    };
+      puzzleSet: state.session.puzzleSet
+        ? {
+          setId: state.session.puzzleSet.setId,
+          label: state.session.puzzleSet.label,
+          subjectAsset: state.session.puzzleSet.subjectAsset,
+        }
+        : null,
+      };
   }
 
-  if (role === 'audit') {
+  if (role === 'robot' || role === 'audit') {
     return {
       session: state.session,
+      puzzleSet: state.session.puzzleSet
+        ? {
+          setId: state.session.puzzleSet.setId,
+          label: state.session.puzzleSet.label,
+          solutionAsset: state.session.puzzleSet.solutionAsset,
+        }
+        : null,
       robotAction: state.robotAction,
     };
   }
@@ -122,12 +135,8 @@ function text(response, statusCode, payload, headers = {}) {
 function buildLocalhostUrls(port) {
   return {
     admin: `http://localhost:${port}/admin`,
-    setup: `http://localhost:${port}/admin/setup`,
-    live: `http://localhost:${port}/admin/live`,
-    monitoring: `http://localhost:${port}/admin/monitoring`,
-    review: `http://localhost:${port}/admin/review`,
-    exports: `http://localhost:${port}/exports`,
     subject: `http://localhost:${port}/subject`,
+    robot: `http://localhost:${port}/robot`,
     audit: `http://localhost:${port}/audit`,
   };
 }
@@ -231,13 +240,20 @@ async function createApp(options = {}) {
         return;
       }
 
+      if (request.method === 'GET' && pathname === '/robot') {
+        await serveFile(response, path.join(publicDir, 'robot.html'));
+        return;
+      }
+
       if (request.method === 'GET' && pathname === '/audit') {
-        await serveFile(response, path.join(publicDir, 'audit.html'));
+        response.writeHead(302, { location: '/robot' });
+        response.end();
         return;
       }
 
       if (request.method === 'GET' && pathname === '/exports') {
-        await serveFile(response, path.join(publicDir, 'exports.html'));
+        response.writeHead(302, { location: '/admin' });
+        response.end();
         return;
       }
 
@@ -293,12 +309,12 @@ async function createApp(options = {}) {
           ...adminGuard.getStatusForToken(token),
           sessionStatus: state.session.status,
           permittedActions: {
-            configureSession: buildPolicy(state, 'configureSession'),
-            updatePreflight: buildPolicy(state, 'updatePreflight'),
-            startSession: buildPolicy(state, 'startSession', { preflight }),
-            completeSession: buildPolicy(state, 'completeSession'),
-            updateAdaptiveConfig: buildPolicy(state, 'updateAdaptiveConfig'),
-            setHint: buildPolicy(state, 'setHint'),
+          configureSession: buildPolicy(state, 'configureSession'),
+          updatePreflight: buildPolicy(state, 'updatePreflight'),
+          startSession: buildPolicy(state, 'startSession', { preflight }),
+          completeSession: buildPolicy(state, 'completeSession'),
+          updateAdaptiveConfig: buildPolicy(state, 'updateAdaptiveConfig'),
+          setHint: buildPolicy(state, 'setHint'),
             logRobotAction: buildPolicy(state, 'logRobotAction'),
             simulateTelemetry: buildPolicy(state, 'simulateTelemetry'),
             resetSession: buildPolicy(state, 'resetSession'),
@@ -315,6 +331,21 @@ async function createApp(options = {}) {
 
       if (request.method === 'GET' && pathname === '/api/exports') {
         json(response, 200, await store.getExportManifest());
+        return;
+      }
+
+      if (request.method === 'GET' && pathname === '/api/export/current.json') {
+        json(response, 200, await store.buildOperatorExport('current'), {
+          'content-disposition': `attachment; filename="${store.getCurrentSessionId()}.json"`,
+        });
+        return;
+      }
+
+      if (request.method === 'GET' && pathname === '/api/export/current.csv') {
+        const csv = await store.getSessionCsv('current');
+        text(response, 200, csv, {
+          'content-disposition': `attachment; filename="${store.getCurrentSessionId()}.csv"`,
+        });
         return;
       }
 
@@ -435,8 +466,8 @@ async function createApp(options = {}) {
         adminGuard.assertAuthorized(getAdminToken(request));
         assertPolicy(store.getState(), 'configureSession');
         const body = await readJsonBody(request);
-        const state = await store.selectReferencePuzzle({
-          assetId: body.assetId || null,
+        const state = await store.selectPuzzleSet({
+          setId: body.setId || null,
           actor: body.actor || 'researcher',
           source: 'admin',
         });
@@ -490,7 +521,7 @@ async function createApp(options = {}) {
 
       if (request.method === 'POST' && pathname === '/api/session/start') {
         adminGuard.assertAuthorized(getAdminToken(request));
-        assertPolicy(store.getState(), 'startSession', { preflight: getSystemStatus().preflight });
+        assertPolicy(store.getState(), 'startSession');
         const body = await readJsonBody(request);
         const state = await store.startSession({
           operator: body.operator || 'researcher',

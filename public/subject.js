@@ -8,8 +8,8 @@ const referenceImageElement = document.querySelector('#subject-reference-image')
 const referencePdfElement = document.querySelector('#subject-reference-pdf');
 const referenceMetaElement = document.querySelector('#subject-reference-meta');
 
-function renderReference(referencePuzzle) {
-  const hasReference = Boolean(referencePuzzle);
+function renderReference(asset, puzzleSet) {
+  const hasReference = Boolean(asset);
   referenceShellElement?.classList.toggle('empty', !hasReference);
 
   if (!hasReference) {
@@ -34,14 +34,14 @@ function renderReference(referencePuzzle) {
     referenceEmptyElement.hidden = true;
   }
 
-  if (referencePuzzle.displayKind === 'pdf') {
+  if (asset.displayKind === 'pdf') {
     if (referenceImageElement) {
       referenceImageElement.hidden = true;
       referenceImageElement.removeAttribute('src');
     }
     if (referencePdfElement) {
       referencePdfElement.hidden = false;
-      referencePdfElement.src = `${referencePuzzle.urlPath}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
+      referencePdfElement.src = `${asset.urlPath}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
     }
   } else {
     if (referencePdfElement) {
@@ -50,15 +50,15 @@ function renderReference(referencePuzzle) {
     }
     if (referenceImageElement) {
       referenceImageElement.hidden = false;
-      referenceImageElement.src = referencePuzzle.urlPath;
-      referenceImageElement.alt = referencePuzzle.originalName || 'Selected reference puzzle';
+      referenceImageElement.src = asset.urlPath;
+      referenceImageElement.alt = asset.originalName || 'Selected reference puzzle';
     }
   }
 
   if (referenceMetaElement) {
-    referenceMetaElement.textContent = referencePuzzle.selectedAt
-      ? `${referencePuzzle.originalName} • selected ${formatTimestamp(referencePuzzle.selectedAt)}`
-      : `${referencePuzzle.originalName} • visible for this session`;
+    referenceMetaElement.textContent = puzzleSet?.selectedAt
+      ? `${asset.originalName} • selected ${formatTimestamp(puzzleSet.selectedAt)}`
+      : `${asset.originalName} • visible for this session`;
   }
 }
 
@@ -67,7 +67,7 @@ function render(state) {
   updatedElement.textContent = state?.hint?.updatedAt
     ? `Last updated ${formatTimestamp(state.hint.updatedAt)}`
     : 'No broadcast received yet.';
-  renderReference(state?.referencePuzzle || null);
+  renderReference(state?.puzzleSet?.subjectAsset || null, state?.puzzleSet || null);
 }
 
 async function init() {

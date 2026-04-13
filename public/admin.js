@@ -1,158 +1,69 @@
 import {
   connectSocket,
-  drawSeriesChart,
   fetchJson,
   formatDurationSeconds,
   formatTimestamp,
-  installSectionNavigation,
   postJson,
 } from './shared.js';
 import { createCameraController } from './admin-camera.mjs';
 import { bindCameraControls } from './admin-controls.mjs';
-import { mergeAdminState } from './admin-state.mjs';
-import { createSessionDraftController } from './admin-session-draft.mjs';
-import { describeGuardBanner } from './admin-view.mjs';
 
 const ADMIN_TOKEN_KEY = 'woz.admin.token';
 
-const POLICY_LABELS = {
-  configureSession: 'Configure session',
-  updatePreflight: 'Update readiness checklist',
-  startSession: 'Start trial',
-  completeSession: 'Complete trial',
-  updateAdaptiveConfig: 'Tune adaptive controls',
-  setHint: 'Broadcast hint',
-  logRobotAction: 'Log robot action',
-  simulateTelemetry: 'Simulate telemetry',
-  resetSession: 'Reset session',
-  forceResetSession: 'Force reset session',
-};
-
 const elements = {
-  sessionId: document.querySelector('#session-id'),
-  sessionStarted: document.querySelector('#session-started'),
+  guardShell: document.querySelector('#guard-shell'),
+  guardForm: document.querySelector('#guard-form'),
+  guardPin: document.querySelector('#guard-pin'),
+  guardUnlock: document.querySelector('#guard-unlock'),
+  guardLock: document.querySelector('#guard-lock'),
+  guardMessage: document.querySelector('#guard-message'),
   sessionForm: document.querySelector('#session-form'),
   sessionStudyId: document.querySelector('#session-study-id'),
   sessionParticipantId: document.querySelector('#session-participant-id'),
-  sessionCondition: document.querySelector('#session-condition'),
   sessionResearcher: document.querySelector('#session-researcher'),
+  sessionCondition: document.querySelector('#session-condition'),
   sessionNotes: document.querySelector('#session-notes'),
   sessionSave: document.querySelector('#session-save'),
-  sessionStartReason: document.querySelector('#session-start-reason'),
-  sessionStatusSummary: document.querySelector('#session-status-summary'),
-  sessionStatusDetail: document.querySelector('#session-status-detail'),
-  sessionDurationSummary: document.querySelector('#session-duration-summary'),
-  sessionDurationDetail: document.querySelector('#session-duration-detail'),
-  sessionSummary: document.querySelector('#session-summary'),
-  referencePuzzleSummary: document.querySelector('#reference-puzzle-summary'),
-  referencePuzzleDetail: document.querySelector('#reference-puzzle-detail'),
-  referencePuzzlePreview: document.querySelector('#reference-puzzle-preview'),
   puzzleUploadForm: document.querySelector('#puzzle-upload-form'),
   puzzleUploadInput: document.querySelector('#puzzle-upload-input'),
   puzzleUploadSubmit: document.querySelector('#puzzle-upload-submit'),
   puzzleUploadStatus: document.querySelector('#puzzle-upload-status'),
   puzzleClearSelection: document.querySelector('#puzzle-clear-selection'),
   puzzleLibraryList: document.querySelector('#puzzle-library-list'),
+  incompleteLibraryList: document.querySelector('#incomplete-library-list'),
+  selectedSetSummary: document.querySelector('#selected-set-summary'),
+  selectedSetDetail: document.querySelector('#selected-set-detail'),
+  solutionPreview: document.querySelector('#solution-preview'),
+  sessionStatusSummary: document.querySelector('#session-status-summary'),
+  sessionStatusDetail: document.querySelector('#session-status-detail'),
+  sessionDurationSummary: document.querySelector('#session-duration-summary'),
+  sessionDurationDetail: document.querySelector('#session-duration-detail'),
+  connectionCounts: document.querySelector('#connection-counts'),
+  screenLinks: document.querySelector('#screen-links'),
   sessionStart: document.querySelector('#session-start'),
   sessionComplete: document.querySelector('#session-complete'),
-  preflightForm: document.querySelector('#preflight-form'),
-  preflightSummary: document.querySelector('#preflight-summary'),
-  preflightDetail: document.querySelector('#preflight-detail'),
-  preflightProgress: document.querySelector('#preflight-progress'),
-  preflightUpdated: document.querySelector('#preflight-updated'),
-  preflightAutomaticList: document.querySelector('#preflight-automatic-list'),
-  preflightCamera: document.querySelector('#preflight-camera'),
-  preflightSubjectDisplay: document.querySelector('#preflight-subject-display'),
-  preflightRobotBoard: document.querySelector('#preflight-robot-board'),
-  preflightMaterials: document.querySelector('#preflight-materials'),
-  preflightSave: document.querySelector('#preflight-save'),
-  guardForm: document.querySelector('#guard-form'),
-  guardPin: document.querySelector('#guard-pin'),
-  guardUnlock: document.querySelector('#guard-unlock'),
-  guardLock: document.querySelector('#guard-lock'),
-  guardSummary: document.querySelector('#guard-summary'),
-  guardDetail: document.querySelector('#guard-detail'),
-  guardMessage: document.querySelector('#guard-message'),
-  guardPolicyList: document.querySelector('#guard-policy-list'),
-  adaptiveStatus: document.querySelector('#adaptive-status'),
-  adaptiveReason: document.querySelector('#adaptive-reason'),
-  connectionCounts: document.querySelector('#connection-counts'),
-  watchBridgeStatus: document.querySelector('#watch-bridge-status'),
-  sensorHealthSummary: document.querySelector('#sensor-health-summary'),
-  sensorHealthDetail: document.querySelector('#sensor-health-detail'),
-  watchHealthSummary: document.querySelector('#watch-health-summary'),
-  watchHealthDetail: document.querySelector('#watch-health-detail'),
-  gazeHealthSummary: document.querySelector('#gaze-health-summary'),
-  gazeHealthDetail: document.querySelector('#gaze-health-detail'),
-  launcherSummary: document.querySelector('#launcher-summary'),
-  metricHr: document.querySelector('#metric-hr'),
-  metricStress: document.querySelector('#metric-stress'),
-  metricStressLevel: document.querySelector('#metric-stress-level'),
-  metricAttention: document.querySelector('#metric-attention'),
-  metricFixation: document.querySelector('#metric-fixation'),
-  gazeBridgeSummary: document.querySelector('#gaze-bridge-summary'),
-  gazeBridgeDetail: document.querySelector('#gaze-bridge-detail'),
-  hrvSource: document.querySelector('#hrv-source'),
-  gazeSource: document.querySelector('#gaze-source'),
-  hrvChart: document.querySelector('#hrv-chart'),
-  gazeChart: document.querySelector('#gaze-chart'),
-  adaptiveConfigForm: document.querySelector('#adaptive-config-form'),
-  adaptiveObserveThreshold: document.querySelector('#adaptive-observe-threshold'),
-  adaptiveInterveneThreshold: document.querySelector('#adaptive-intervene-threshold'),
-  adaptiveHrvWeight: document.querySelector('#adaptive-hrv-weight'),
-  adaptiveGazeWeight: document.querySelector('#adaptive-gaze-weight'),
-  adaptiveDistractionBoost: document.querySelector('#adaptive-distraction-boost'),
-  adaptiveFullFreshness: document.querySelector('#adaptive-full-freshness'),
-  adaptiveStaleAfter: document.querySelector('#adaptive-stale-after'),
-  adaptiveConfigSave: document.querySelector('#adaptive-config-save'),
-  adaptiveConfigReset: document.querySelector('#adaptive-config-reset'),
-  adaptiveConfigSummary: document.querySelector('#adaptive-config-summary'),
-  adaptiveConfigNote: document.querySelector('#adaptive-config-note'),
+  resetSession: document.querySelector('#reset-session'),
+  exportJsonLink: document.querySelector('#export-json-link'),
+  exportCsvLink: document.querySelector('#export-csv-link'),
   hintForm: document.querySelector('#hint-form'),
   hintText: document.querySelector('#hint-text'),
   hintSend: document.querySelector('#hint-send'),
-  hintPreview: document.querySelector('#hint-preview'),
   clearHint: document.querySelector('#clear-hint'),
-  llmSummary: document.querySelector('#llm-summary'),
-  llmHint: document.querySelector('#llm-hint'),
-  useLlmHint: document.querySelector('#use-llm-hint'),
+  hintPreview: document.querySelector('#hint-preview'),
   actionGrid: document.querySelector('#action-grid'),
   latestAction: document.querySelector('#latest-action'),
-  simulatorForm: document.querySelector('#simulator-form'),
-  simStress: document.querySelector('#sim-stress'),
-  simAttention: document.querySelector('#sim-attention'),
-  simFixation: document.querySelector('#sim-fixation'),
-  simDistraction: document.querySelector('#sim-distraction'),
-  simulateSubmit: document.querySelector('#simulate-submit'),
-  presetObserve: document.querySelector('#preset-observe'),
-  presetIntervene: document.querySelector('#preset-intervene'),
-  currentExportLinks: document.querySelector('#current-export-links'),
-  exportSummary: document.querySelector('#export-summary'),
-  localhostLinks: document.querySelector('#localhost-links'),
-  lanLinks: document.querySelector('#lan-links'),
-  eventList: document.querySelector('#event-list'),
   startCamera: document.querySelector('#start-camera'),
   stopCamera: document.querySelector('#stop-camera'),
   cameraFeed: document.querySelector('#camera-feed'),
   cameraStatus: document.querySelector('#camera-status'),
-  resetSession: document.querySelector('#reset-session'),
 };
 
 let currentState = null;
-let timelineEvents = [];
-let exportManifest = null;
 let guardStatus = null;
 let adminToken = window.localStorage.getItem(ADMIN_TOKEN_KEY) || '';
-let statePollTimer = null;
 let durationTicker = null;
-let puzzlePreviewAssetId = null;
-const sessionDraft = createSessionDraftController([
-  'studyId',
-  'participantId',
-  'condition',
-  'researcher',
-  'notes',
-]);
+let previewSetId = null;
+
 const cameraController = createCameraController({
   videoElement: elements.cameraFeed,
   statusElement: elements.cameraStatus,
@@ -167,81 +78,44 @@ const PUZZLE_ACCEPTED_TYPES = {
   '.webp': 'image/webp',
 };
 
-function formatNumber(value, digits = 2) {
-  return Number.isFinite(value) ? value.toFixed(digits) : '--';
-}
-
 function setText(element, value) {
-  if (!element) {
-    return;
+  if (element) {
+    element.textContent = value;
   }
-
-  element.textContent = value;
-}
-
-function setHtml(element, value = '') {
-  if (!element) {
-    return;
-  }
-
-  element.innerHTML = value;
-}
-
-function setDatasetValue(element, key, value) {
-  if (!element) {
-    return;
-  }
-
-  if (value == null || value === '') {
-    delete element.dataset[key];
-    return;
-  }
-
-  element.dataset[key] = value;
-}
-
-function bindEvent(element, eventName, handler) {
-  if (!element) {
-    return;
-  }
-
-  element.addEventListener(eventName, handler);
 }
 
 function setValueSafely(element, value) {
-  if (!element) {
-    return;
-  }
-
-  if (document.activeElement === element) {
+  if (!element || document.activeElement === element) {
     return;
   }
 
   element.value = value ?? '';
 }
 
-function trackSessionDraft(field, element, eventName = 'input') {
-  bindEvent(element, eventName, () => {
-    sessionDraft.noteChange(field, element?.value ?? '');
-  });
-}
-
-function setCheckedSafely(element, value) {
+function setElementDisabled(element, disabled, reason = '') {
   if (!element) {
     return;
   }
 
-  element.checked = Boolean(value);
+  element.disabled = disabled;
+  element.title = disabled ? reason : '';
+}
+
+function setAdminToken(token) {
+  adminToken = token || '';
+  if (adminToken) {
+    window.localStorage.setItem(ADMIN_TOKEN_KEY, adminToken);
+  } else {
+    window.localStorage.removeItem(ADMIN_TOKEN_KEY);
+  }
+}
+
+function buildHeaders() {
+  return adminToken ? { 'x-admin-token': adminToken } : {};
 }
 
 function guessPuzzleMimeType(name = '') {
-  const fileName = String(name || '');
-  const extensionIndex = fileName.lastIndexOf('.');
-  if (extensionIndex < 0) {
-    return '';
-  }
-
-  const extension = fileName.slice(extensionIndex).toLowerCase();
+  const extension = name.includes('.') ? name.slice(name.lastIndexOf('.')).toLowerCase() : '';
   return PUZZLE_ACCEPTED_TYPES[extension] || '';
 }
 
@@ -267,253 +141,49 @@ function readUploadFileAsBase64(file) {
   });
 }
 
-function parseTimestamp(value) {
-  if (!value) {
-    return null;
+function selectedPuzzleSet() {
+  return currentState?.session?.puzzleSet || null;
+}
+
+function availablePuzzleSets() {
+  return currentState?.assets?.puzzleSets || [];
+}
+
+function incompleteUploads() {
+  return currentState?.assets?.incompleteUploads || [];
+}
+
+function getPreviewSet() {
+  const selected = selectedPuzzleSet();
+  const allSets = availablePuzzleSets();
+
+  if (selected && (!previewSetId || previewSetId === selected.setId)) {
+    previewSetId = selected.setId;
+    return selected;
   }
 
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return null;
+  const preview = allSets.find((entry) => entry.setId === previewSetId);
+  if (preview) {
+    return preview;
   }
 
-  return date;
+  previewSetId = allSets[0]?.setId || null;
+  return allSets[0] || null;
 }
 
-function puzzleLibrary() {
-  return currentState?.assets?.puzzles || [];
-}
-
-function selectedReferencePuzzle() {
-  return currentState?.session?.referencePuzzle || null;
-}
-
-function resolvePuzzleAsset(assetId) {
-  if (!assetId) {
-    return null;
-  }
-
-  return puzzleLibrary().find((asset) => asset.assetId === assetId) || null;
-}
-
-function sessionDurationSeconds(session) {
-  const start = parseTimestamp(session?.trialStartedAt);
-  if (!start) {
-    return null;
-  }
-
-  const end = parseTimestamp(session?.completedAt) || new Date();
-  return Math.max(0, Math.round((end.getTime() - start.getTime()) / 1000));
-}
-
-function renderSessionTiming(session, metadata = {}) {
-  const durationSeconds = sessionDurationSeconds(session);
-
-  if (session?.status === 'running') {
-    setText(elements.sessionStatusDetail, `Trial started ${formatTimestamp(session.trialStartedAt)} by ${metadata.researcher || 'researcher'}. Hints and robotic actions are now enabled.`);
-    setText(elements.sessionDurationSummary, `Elapsed puzzle time: ${formatDurationSeconds(durationSeconds)}`);
-    setText(elements.sessionDurationDetail, `The timer started when the participant began the puzzle at ${formatTimestamp(session.trialStartedAt)}.`);
-    return;
-  }
-
-  if (session?.status === 'completed') {
-    setText(elements.sessionStatusDetail, session.completedSummary
-      ? `${session.completedSummary} Completed ${formatTimestamp(session.completedAt)}. The session is now read-only until reset.`
-      : `Completed ${formatTimestamp(session.completedAt)}. The session is now read-only until reset.`);
-    setText(elements.sessionDurationSummary, `Puzzle completed in ${formatDurationSeconds(durationSeconds)}`);
-    setText(elements.sessionDurationDetail, `Started ${formatTimestamp(session.trialStartedAt)} and completed ${formatTimestamp(session.completedAt)}.`);
-    return;
-  }
-
-  setText(elements.sessionStatusDetail, 'Save metadata, then start the trial when the participant is ready. During setup, only session configuration and telemetry rehearsal are available.');
-  setText(elements.sessionDurationSummary, 'Trial timer is waiting for the session to start.');
-  setText(elements.sessionDurationDetail, 'The participant completion time will appear here as soon as the puzzle begins.');
-}
-
-function setAdminToken(token) {
-  adminToken = token || '';
-
-  if (adminToken) {
-    window.localStorage.setItem(ADMIN_TOKEN_KEY, adminToken);
-    return;
-  }
-
-  window.localStorage.removeItem(ADMIN_TOKEN_KEY);
-}
-
-function referencePuzzleSummary(referencePuzzle) {
-  if (!referencePuzzle) {
-    return {
-      summary: 'No reference puzzle selected.',
-      detail: 'Choose an uploaded asset to show it beside the hint on the participant display.',
-    };
-  }
-
-  const selectionNote = referencePuzzle.selectedAt
-    ? `Selected ${formatTimestamp(referencePuzzle.selectedAt)} by ${referencePuzzle.selectedBy || 'researcher'}.`
-    : 'Selected for this session.';
-
-  return {
-    summary: referencePuzzle.originalName,
-    detail: `${referencePuzzle.displayKind === 'pdf' ? 'PDF reference' : 'Image reference'} • ${selectionNote}`,
-  };
-}
-
-function buildAdminHeaders() {
-  return adminToken
-    ? {
-      'x-admin-token': adminToken,
-    }
-    : {};
-}
-
-function setGuardMessage(message, tone = 'neutral') {
-  setText(elements.guardMessage, message);
-  setDatasetValue(elements.guardMessage, 'tone', tone);
-}
-
-function adaptiveConfiguration() {
-  return currentState?.adaptive?.configuration || null;
-}
-
-function adaptiveDefaults() {
-  return currentState?.adaptive?.defaults || currentState?.adaptive?.configuration || null;
-}
-
-function setAdaptiveConfigurationFields(configuration) {
-  if (!configuration) {
-    return;
-  }
-
-  setValueSafely(elements.adaptiveObserveThreshold, configuration.thresholds?.observe);
-  setValueSafely(elements.adaptiveInterveneThreshold, configuration.thresholds?.intervene);
-  setValueSafely(elements.adaptiveHrvWeight, configuration.weights?.hrv);
-  setValueSafely(elements.adaptiveGazeWeight, configuration.weights?.gaze);
-  setValueSafely(elements.adaptiveDistractionBoost, configuration.distractionBoost);
-  setValueSafely(elements.adaptiveFullFreshness, configuration.freshness?.fullStrengthSeconds);
-  setValueSafely(elements.adaptiveStaleAfter, configuration.freshness?.staleAfterSeconds);
-}
-
-function adaptiveSummary(configuration) {
-  if (!configuration) {
-    return 'Adaptive rules will appear here once the current state is loaded.';
-  }
-
-  return `observe at ${formatNumber(configuration.thresholds?.observe)} and intervene at ${formatNumber(configuration.thresholds?.intervene)} with HRV ${formatNumber(configuration.weights?.hrv)} / gaze ${formatNumber(configuration.weights?.gaze)} weighting.`;
-}
-
-function adaptiveNote(configuration) {
-  if (!configuration) {
-    return 'Changes are logged immediately and included in exports.';
-  }
-
-  return `Distraction boost ${formatNumber(configuration.distractionBoost)} • full freshness ${configuration.freshness?.fullStrengthSeconds || '--'}s • stale after ${configuration.freshness?.staleAfterSeconds || '--'}s.`;
-}
-
-function readAdaptiveConfigurationForm() {
-  return {
-    thresholds: {
-      observe: Number(elements.adaptiveObserveThreshold?.value || 0),
-      intervene: Number(elements.adaptiveInterveneThreshold?.value || 0),
-    },
-    weights: {
-      hrv: Number(elements.adaptiveHrvWeight?.value || 0),
-      gaze: Number(elements.adaptiveGazeWeight?.value || 0),
-    },
-    distractionBoost: Number(elements.adaptiveDistractionBoost?.value || 0),
-    freshness: {
-      fullStrengthSeconds: Number(elements.adaptiveFullFreshness?.value || 0),
-      staleAfterSeconds: Number(elements.adaptiveStaleAfter?.value || 0),
-    },
-  };
-}
-
-function renderLinks(container, links) {
+function renderAssetPreview(container, asset, emptyMessage) {
   if (!container) {
     return;
   }
 
   container.innerHTML = '';
-  Object.entries(links || {}).forEach(([label, href]) => {
-    const anchor = document.createElement('a');
-    anchor.href = href;
-    anchor.textContent = `${label}: ${href}`;
-    anchor.target = '_blank';
-    anchor.rel = 'noreferrer';
-    container.append(anchor);
-  });
-}
-
-function renderLanLinks(container, lan) {
-  if (!container) {
-    return;
-  }
-
-  container.innerHTML = '';
-  if (!lan || !lan.length) {
-    const empty = document.createElement('p');
-    empty.textContent = 'No external IPv4 interfaces detected yet.';
-    container.append(empty);
-    return;
-  }
-
-  lan.forEach((entry) => {
-    const group = document.createElement('div');
-    group.className = 'link-group';
-
-    const title = document.createElement('strong');
-    title.textContent = entry.address;
-    group.append(title);
-
-    Object.values(entry.urls).forEach((href) => {
-      const anchor = document.createElement('a');
-      anchor.href = href;
-      anchor.textContent = href;
-      anchor.target = '_blank';
-      anchor.rel = 'noreferrer';
-      group.append(anchor);
-    });
-
-    container.append(group);
-  });
-}
-
-function renderEvents() {
-  if (!elements.eventList) {
-    return;
-  }
-
-  elements.eventList.innerHTML = '';
-
-  timelineEvents.forEach((event) => {
-    const item = document.createElement('li');
-    item.className = 'event-item';
-
-    const summary = document.createElement('strong');
-    summary.textContent = event.summary;
-    item.append(summary);
-
-    const meta = document.createElement('small');
-    meta.textContent = `${event.type} • ${event.source} • ${formatTimestamp(event.timestamp)}`;
-    item.append(meta);
-
-    elements.eventList.append(item);
-  });
-}
-
-function renderReferencePuzzlePreview(asset) {
-  if (!elements.referencePuzzlePreview) {
-    return;
-  }
-
-  elements.referencePuzzlePreview.innerHTML = '';
-  elements.referencePuzzlePreview.classList.toggle('empty', !asset);
+  container.classList.toggle('empty', !asset);
 
   if (!asset) {
     const empty = document.createElement('p');
     empty.className = 'panel-note';
-    empty.textContent = 'Preview a puzzle asset here before selecting it for the participant display.';
-    elements.referencePuzzlePreview.append(empty);
+    empty.textContent = emptyMessage;
+    container.append(empty);
     return;
   }
 
@@ -522,7 +192,7 @@ function renderReferencePuzzlePreview(asset) {
     frame.className = 'reference-preview-frame';
     frame.src = `${asset.urlPath}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
     frame.title = asset.originalName;
-    elements.referencePuzzlePreview.append(frame);
+    container.append(frame);
     return;
   }
 
@@ -530,333 +200,289 @@ function renderReferencePuzzlePreview(asset) {
   image.className = 'reference-preview-image';
   image.src = asset.urlPath;
   image.alt = asset.originalName;
-  elements.referencePuzzlePreview.append(image);
+  container.append(image);
 }
 
-function renderPuzzleLibrary() {
-  const referencePuzzle = selectedReferencePuzzle();
-  const library = puzzleLibrary();
-  const summary = referencePuzzleSummary(referencePuzzle);
-  const configurePolicy = resolvePolicy('configureSession');
-
-  setText(elements.referencePuzzleSummary, summary.summary);
-  setText(elements.referencePuzzleDetail, summary.detail);
-
-  if (!puzzlePreviewAssetId || !library.some((asset) => asset.assetId === puzzlePreviewAssetId)) {
-    puzzlePreviewAssetId = referencePuzzle?.assetId || library[0]?.assetId || null;
-  }
-
-  renderReferencePuzzlePreview(resolvePuzzleAsset(puzzlePreviewAssetId) || referencePuzzle);
-
-  if (!elements.puzzleLibraryList) {
-    return;
-  }
-
-  elements.puzzleLibraryList.innerHTML = '';
-
-  if (!library.length) {
-    const empty = document.createElement('p');
-    empty.className = 'panel-note';
-    empty.textContent = 'No puzzle assets uploaded yet.';
-    elements.puzzleLibraryList.append(empty);
-    return;
-  }
-
-  library.forEach((asset) => {
-    const card = document.createElement('article');
-    card.className = 'reference-library-item';
-    if (referencePuzzle?.assetId === asset.assetId) {
-      card.classList.add('selected');
-    }
-    if (puzzlePreviewAssetId === asset.assetId) {
-      card.classList.add('previewing');
-    }
-
-    const title = document.createElement('strong');
-    title.textContent = asset.originalName;
-    card.append(title);
-
-    const meta = document.createElement('small');
-    meta.textContent = `${asset.displayKind === 'pdf' ? 'PDF' : 'Image'} • uploaded ${formatTimestamp(asset.uploadedAt)}${asset.uploadedBy ? ` by ${asset.uploadedBy}` : ''}`;
-    card.append(meta);
-
-    const actions = document.createElement('div');
-    actions.className = 'button-row';
-
-    const previewButton = document.createElement('button');
-    previewButton.type = 'button';
-    previewButton.className = 'button button-ghost';
-    previewButton.textContent = puzzlePreviewAssetId === asset.assetId ? 'Previewing' : 'Preview';
-    previewButton.disabled = puzzlePreviewAssetId === asset.assetId;
-    previewButton.addEventListener('click', () => {
-      puzzlePreviewAssetId = asset.assetId;
-      renderPuzzleLibrary();
-    });
-    actions.append(previewButton);
-
-    const selectButton = document.createElement('button');
-    selectButton.type = 'button';
-    selectButton.className = 'button button-primary';
-    selectButton.textContent = referencePuzzle?.assetId === asset.assetId ? 'Visible on subject' : 'Show on subject';
-    selectButton.disabled = !configurePolicy.allowed || referencePuzzle?.assetId === asset.assetId;
-    selectButton.title = selectButton.disabled && configurePolicy.reason ? configurePolicy.reason : '';
-    selectButton.addEventListener('click', async () => {
-      try {
-        await postJson('/api/puzzles/select', {
-          assetId: asset.assetId,
-          actor: elements.sessionResearcher?.value || currentState?.session?.metadata?.researcher || 'researcher',
-        }, {
-          headers: buildAdminHeaders(),
-        });
-        puzzlePreviewAssetId = asset.assetId;
-        setGuardMessage(`Reference puzzle switched to ${asset.originalName}.`, 'success');
-        await refreshStateSnapshot();
-        await refreshExportManifest();
-        await refreshGuardStatus();
-      } catch (error) {
-        await handleAdminError(error);
-      }
-    });
-    actions.append(selectButton);
-
-    card.append(actions);
-    elements.puzzleLibraryList.append(card);
-  });
+function connectionText() {
+  const connections = currentState?.system?.connections || {};
+  return `${connections.admin || 0} admin / ${connections.subject || 0} subject / ${connections.robot || 0} robot`;
 }
 
-function renderCharts() {
-  const hrvHistory = currentState?.telemetry?.history?.hrv || [];
-  const gazeHistory = currentState?.telemetry?.history?.gaze || [];
-
-  if (elements.hrvChart) {
-    drawSeriesChart(
-      elements.hrvChart,
-      hrvHistory.map((point) => ({ value: point.stressScore ?? 0 })),
-      { label: 'Stress score', stroke: '#d6553d', min: 0, max: 1 },
-    );
-  }
-
-  if (elements.gazeChart) {
-    drawSeriesChart(
-      elements.gazeChart,
-      gazeHistory.map((point) => ({ value: point.attentionScore ?? 0 })),
-      { label: 'Attention score', stroke: '#0a7a78', min: 0, max: 1 },
-    );
-  }
-}
-
-function buildLocalPolicy(actionName) {
+function localPolicy(action) {
   const session = currentState?.session || {};
   const status = session.status || 'setup';
-  const metadata = session.metadata || {};
-  const preflight = currentState?.system?.preflight || null;
 
-  if (actionName === 'configureSession') {
+  if (action === 'configureSession' || action === 'selectPuzzleSet') {
     return status === 'setup'
-      ? { allowed: true, reason: null }
-      : { allowed: false, reason: 'Session metadata is locked once the trial has started.' };
+      ? { allowed: true, reason: '' }
+      : { allowed: false, reason: 'Session setup is locked once the trial starts.' };
   }
 
-  if (actionName === 'updatePreflight') {
-    return status === 'setup'
-      ? { allowed: true, reason: null }
-      : { allowed: false, reason: 'The before-participant checklist is locked once the trial has started.' };
-  }
-
-  if (actionName === 'startSession') {
+  if (action === 'startSession') {
     if (status !== 'setup') {
       return { allowed: false, reason: 'Only setup sessions can be started.' };
     }
 
-    if (!metadata.studyId || !metadata.participantId || !metadata.researcher) {
-      return { allowed: false, reason: 'Study ID, participant ID, and researcher must be set before starting the trial.' };
+    if (!session.puzzleSet) {
+      return { allowed: false, reason: 'Choose a puzzle set before starting the trial.' };
     }
 
-    if ((preflight?.blockingCount || 0) > 0) {
-      return { allowed: false, reason: preflight.blockers?.[0]?.summary || 'Resolve the before-participant checklist blockers before starting the trial.' };
-    }
-
-    return { allowed: true, reason: null };
+    return { allowed: true, reason: '' };
   }
 
-  if (actionName === 'completeSession') {
+  if (action === 'completeSession') {
     return status === 'running'
-      ? { allowed: true, reason: null }
+      ? { allowed: true, reason: '' }
       : { allowed: false, reason: 'Only running sessions can be completed.' };
   }
 
-  if (actionName === 'updateAdaptiveConfig') {
-    return status === 'completed'
-      ? { allowed: false, reason: 'Adaptive controls are read-only after completion.' }
-      : { allowed: true, reason: null };
-  }
-
-  if (actionName === 'setHint' || actionName === 'logRobotAction') {
+  if (action === 'setHint' || action === 'logRobotAction') {
     return status === 'running'
-      ? { allowed: true, reason: null }
-      : { allowed: false, reason: 'Hints and robotic actions are only allowed during an active run.' };
+      ? { allowed: true, reason: '' }
+      : { allowed: false, reason: 'Hints and robot cues are only available during an active trial.' };
   }
 
-  if (actionName === 'simulateTelemetry') {
-    return status === 'completed'
-      ? { allowed: false, reason: 'Completed sessions are read-only until reset.' }
-      : { allowed: true, reason: null };
+  if (action === 'resetSession') {
+    return { allowed: true, reason: '' };
   }
 
-  if (actionName === 'resetSession') {
-    return status === 'running'
-      ? { allowed: false, reason: 'Running sessions require a forced reset confirmation.' }
-      : { allowed: true, reason: null };
-  }
-
-  if (actionName === 'forceResetSession') {
-    return { allowed: true, reason: null };
-  }
-
-  return { allowed: true, reason: null };
+  return { allowed: true, reason: '' };
 }
 
-function getSafeguardState() {
-  const pinRequired = guardStatus?.pinRequired ?? currentState?.system?.safeguards?.pinRequired ?? false;
+function resolvePolicy(action) {
+  const pinRequired = Boolean(guardStatus?.pinRequired);
+  const authenticated = pinRequired ? Boolean(guardStatus?.authenticated) : true;
 
-  return {
-    pinRequired,
-    authenticated: pinRequired ? Boolean(guardStatus?.authenticated) : true,
-    activeUnlocks: currentState?.system?.safeguards?.activeUnlocks ?? guardStatus?.activeUnlocks ?? 0,
-    permittedActions: guardStatus?.permittedActions || {},
-    sessionStatus: currentState?.session?.status ?? guardStatus?.sessionStatus ?? 'setup',
-  };
-}
-
-function resolvePolicy(actionName) {
-  const safeguard = getSafeguardState();
-  if (safeguard.pinRequired && !safeguard.authenticated) {
+  if (pinRequired && !authenticated) {
     return {
       allowed: false,
-      reason: 'Unlock this browser with the local admin PIN before using protected controls.',
+      reason: 'Unlock this browser with the admin PIN before using operator controls.',
     };
   }
 
-  return buildLocalPolicy(actionName);
+  return localPolicy(action);
 }
 
-function policyMessage(actionName, policy) {
-  if (policy.reason) {
-    return policy.reason;
-  }
-
-  if (actionName === 'forceResetSession') {
-    return 'Available if you need to abort a live run and start a fresh log immediately.';
-  }
-
-  if (actionName === 'simulateTelemetry') {
-    return 'Available during setup and live rehearsals while the session is not completed.';
-  }
-
-  if (actionName === 'updateAdaptiveConfig') {
-    return 'Available during setup and live sessions. Every change is logged into the export bundle.';
-  }
-
-  return 'Ready in the current session state.';
-}
-
-function setElementDisabled(element, disabled, reason = '') {
-  if (!element) {
+function renderGuard() {
+  const pinRequired = Boolean(guardStatus?.pinRequired);
+  if (!elements.guardShell) {
     return;
   }
 
-  element.disabled = disabled;
-  element.title = disabled ? reason : '';
+  elements.guardShell.hidden = !pinRequired;
+  if (!pinRequired) {
+    return;
+  }
+
+  const authenticated = Boolean(guardStatus?.authenticated);
+  setText(
+    elements.guardMessage,
+    authenticated
+      ? 'This browser is unlocked for operator controls.'
+      : 'Enter the admin PIN to enable the dashboard controls on this browser.',
+  );
+  setElementDisabled(elements.guardPin, authenticated);
+  setElementDisabled(elements.guardUnlock, authenticated, 'This browser is already unlocked.');
+  setElementDisabled(elements.guardLock, !authenticated, 'Unlock the browser before locking it again.');
 }
 
-function renderGuardStatus() {
-  const safeguard = getSafeguardState();
-  const banner = describeGuardBanner(safeguard);
+function renderPuzzleLibrary() {
+  const selected = selectedPuzzleSet();
+  const preview = getPreviewSet();
 
-  if (!safeguard.pinRequired) {
-    setText(elements.guardSummary, 'No local admin PIN is configured on this host.');
-    setText(elements.guardDetail, 'Session-phase protections still apply, but any operator on the trusted LAN can use the dashboard until ADMIN_PIN is set.');
-  } else if (safeguard.authenticated) {
-    setText(elements.guardSummary, 'Controls are unlocked on this browser.');
-    setText(elements.guardDetail, `${safeguard.activeUnlocks} unlocked browser${safeguard.activeUnlocks === 1 ? '' : 's'} across the local network. Sensor bridges continue to post telemetry without operator unlock.`);
+  setText(
+    elements.selectedSetSummary,
+    selected ? `Set ${selected.setId} is active for this session.` : 'No puzzle set selected yet.',
+  );
+  setText(
+    elements.selectedSetDetail,
+    selected
+      ? `Subject: ${selected.subjectAsset.originalName} • Solution: ${selected.solutionAsset.originalName}`
+      : 'Upload a subject file and a matching solution file ending in s, then choose the set.',
+  );
+  renderAssetPreview(
+    elements.solutionPreview,
+    preview?.solutionAsset || selected?.solutionAsset || null,
+    'The selected solution preview will appear here.',
+  );
+
+  if (elements.puzzleLibraryList) {
+    elements.puzzleLibraryList.innerHTML = '';
+
+    if (!availablePuzzleSets().length) {
+      const empty = document.createElement('p');
+      empty.className = 'panel-note';
+      empty.textContent = 'No complete subject and solution pairs uploaded yet.';
+      elements.puzzleLibraryList.append(empty);
+    }
+
+    availablePuzzleSets().forEach((entry) => {
+      const card = document.createElement('article');
+      card.className = 'reference-library-item';
+      if (selected?.setId === entry.setId) {
+        card.classList.add('selected');
+      }
+      if (preview?.setId === entry.setId) {
+        card.classList.add('previewing');
+      }
+
+      const title = document.createElement('strong');
+      title.textContent = `Set ${entry.setId}`;
+      card.append(title);
+
+      const meta = document.createElement('small');
+      meta.textContent = `Subject ${entry.subjectAsset.originalName} • Solution ${entry.solutionAsset.originalName}`;
+      card.append(meta);
+
+      const actions = document.createElement('div');
+      actions.className = 'button-row';
+
+      const previewButton = document.createElement('button');
+      previewButton.type = 'button';
+      previewButton.className = 'button button-ghost';
+      previewButton.textContent = preview?.setId === entry.setId ? 'Previewing' : 'Preview';
+      previewButton.disabled = preview?.setId === entry.setId;
+      previewButton.addEventListener('click', () => {
+        previewSetId = entry.setId;
+        renderPuzzleLibrary();
+      });
+      actions.append(previewButton);
+
+      const selectPolicy = resolvePolicy('selectPuzzleSet');
+      const selectButton = document.createElement('button');
+      selectButton.type = 'button';
+      selectButton.className = 'button button-primary';
+      selectButton.textContent = selected?.setId === entry.setId ? 'Selected' : 'Use set';
+      selectButton.disabled = !selectPolicy.allowed || selected?.setId === entry.setId;
+      selectButton.title = selectButton.disabled ? selectPolicy.reason : '';
+      selectButton.addEventListener('click', async () => {
+        try {
+          await postJson('/api/puzzles/select', {
+            setId: entry.setId,
+            actor: elements.sessionResearcher?.value || currentState?.session?.metadata?.researcher || 'researcher',
+          }, {
+            headers: buildHeaders(),
+          });
+          await refreshAll();
+        } catch (error) {
+          await handleError(error);
+        }
+      });
+      actions.append(selectButton);
+
+      card.append(actions);
+      elements.puzzleLibraryList.append(card);
+    });
+  }
+
+  if (elements.incompleteLibraryList) {
+    elements.incompleteLibraryList.innerHTML = '';
+
+    if (!incompleteUploads().length) {
+      const empty = document.createElement('p');
+      empty.className = 'panel-note';
+      empty.textContent = 'All uploaded files are currently paired.';
+      elements.incompleteLibraryList.append(empty);
+    }
+
+    incompleteUploads().forEach((asset) => {
+      const item = document.createElement('small');
+      item.textContent = asset.originalName;
+      elements.incompleteLibraryList.append(item);
+    });
+  }
+}
+
+function renderSession() {
+  const session = currentState?.session || {};
+  const metadata = session.metadata || {};
+  const status = session.status || 'setup';
+  const label = status.toUpperCase();
+  const durationSeconds = session.trialStartedAt
+    ? Math.max(0, Math.round(((session.completedAt ? new Date(session.completedAt) : new Date()).getTime() - new Date(session.trialStartedAt).getTime()) / 1000))
+    : null;
+
+  setValueSafely(elements.sessionStudyId, metadata.studyId);
+  setValueSafely(elements.sessionParticipantId, metadata.participantId);
+  setValueSafely(elements.sessionResearcher, metadata.researcher);
+  setValueSafely(elements.sessionCondition, metadata.condition || 'adaptive');
+  setValueSafely(elements.sessionNotes, metadata.notes);
+
+  setText(elements.sessionStatusSummary, `${label}${metadata.participantId ? ` • ${metadata.participantId}` : ''}`);
+
+  if (status === 'running') {
+    setText(elements.sessionStatusDetail, `Trial started ${formatTimestamp(session.trialStartedAt)}.`);
+    setText(elements.sessionDurationSummary, `Elapsed puzzle time: ${formatDurationSeconds(durationSeconds)}`);
+    setText(elements.sessionDurationDetail, 'Hints and robot cues are live on the two operator-facing screens.');
+  } else if (status === 'completed') {
+    setText(elements.sessionStatusDetail, `Trial completed ${formatTimestamp(session.completedAt)}.`);
+    setText(elements.sessionDurationSummary, `Puzzle completed in ${formatDurationSeconds(durationSeconds)}`);
+    setText(elements.sessionDurationDetail, 'Download the JSON export or reset the session for the next participant.');
   } else {
-    setText(elements.guardSummary, 'Controls are locked on this browser.');
-    setText(elements.guardDetail, 'Enter the local admin PIN on the host machine to enable hints, robot actions, session changes, and telemetry simulation.');
+    setText(elements.sessionStatusDetail, 'Choose a puzzle set, then start the trial when ready.');
+    setText(elements.sessionDurationSummary, 'Trial timer is waiting for the session to start.');
+    setText(elements.sessionDurationDetail, 'The completion time will appear here as soon as the puzzle begins.');
   }
 
-  setGuardMessage(banner.message, banner.tone);
-
-  setElementDisabled(elements.guardPin, !safeguard.pinRequired || safeguard.authenticated);
-  setElementDisabled(
-    elements.guardUnlock,
-    !safeguard.pinRequired || safeguard.authenticated,
-    'This browser is already unlocked.',
+  setText(elements.connectionCounts, connectionText());
+  const localhost = currentState?.system?.network?.localhost || {};
+  setText(
+    elements.screenLinks,
+    `Subject ${localhost.subject || `${window.location.origin}/subject`} • Robot ${localhost.robot || `${window.location.origin}/robot`}`,
   );
-  setElementDisabled(
-    elements.guardLock,
-    !safeguard.pinRequired || !safeguard.authenticated,
-    'Unlock the browser before locking it again.',
+  setText(elements.hintPreview, currentState?.hint?.text || 'No hint has been sent yet.');
+  setText(
+    elements.latestAction,
+    currentState?.robotAction?.updatedAt
+      ? `${currentState.robotAction.label} • ${formatTimestamp(currentState.robotAction.updatedAt)}`
+      : 'No robotic action logged yet.',
   );
 
-  const policyEntries = [
-    ['configureSession', POLICY_LABELS.configureSession],
-    ['updatePreflight', POLICY_LABELS.updatePreflight],
-    ['startSession', POLICY_LABELS.startSession],
-    ['completeSession', POLICY_LABELS.completeSession],
-    ['updateAdaptiveConfig', POLICY_LABELS.updateAdaptiveConfig],
-    ['setHint', POLICY_LABELS.setHint],
-    ['logRobotAction', POLICY_LABELS.logRobotAction],
-    ['simulateTelemetry', POLICY_LABELS.simulateTelemetry],
-    ['resetSession', POLICY_LABELS.resetSession],
-  ];
+  const startPolicy = resolvePolicy('startSession');
+  const completePolicy = resolvePolicy('completeSession');
+  const hintPolicy = resolvePolicy('setHint');
+  const actionPolicy = resolvePolicy('logRobotAction');
+  const sessionPolicy = resolvePolicy('configureSession');
+  const resetPolicy = resolvePolicy('resetSession');
 
-  if (safeguard.sessionStatus === 'running') {
-    policyEntries.push(['forceResetSession', POLICY_LABELS.forceResetSession]);
-  }
-
-  if (!elements.guardPolicyList) {
-    renderInteractionControls();
-    return;
-  }
-
-  elements.guardPolicyList.innerHTML = '';
-  policyEntries.forEach(([actionName, label]) => {
-    const policy = resolvePolicy(actionName);
-    const item = document.createElement('li');
-    item.className = `policy-item ${policy.allowed ? 'allowed' : 'blocked'}`;
-
-    const header = document.createElement('div');
-    header.className = 'policy-item-header';
-
-    const title = document.createElement('strong');
-    title.textContent = label;
-    header.append(title);
-
-    const badge = document.createElement('span');
-    badge.className = 'policy-badge';
-    badge.textContent = policy.allowed ? 'Ready' : 'Blocked';
-    header.append(badge);
-
-    item.append(header);
-
-    const detail = document.createElement('small');
-    detail.textContent = policyMessage(actionName, policy);
-    item.append(detail);
-
-    elements.guardPolicyList.append(item);
+  [
+    elements.sessionStudyId,
+    elements.sessionParticipantId,
+    elements.sessionResearcher,
+    elements.sessionCondition,
+    elements.sessionNotes,
+    elements.sessionSave,
+    elements.puzzleUploadInput,
+    elements.puzzleUploadSubmit,
+    elements.puzzleClearSelection,
+  ].forEach((element) => {
+    setElementDisabled(element, !sessionPolicy.allowed, sessionPolicy.reason);
   });
 
-  renderInteractionControls();
+  setElementDisabled(elements.sessionStart, !startPolicy.allowed, startPolicy.reason);
+  setElementDisabled(elements.sessionComplete, !completePolicy.allowed, completePolicy.reason);
+  setElementDisabled(elements.hintText, !hintPolicy.allowed, hintPolicy.reason);
+  setElementDisabled(elements.hintSend, !hintPolicy.allowed, hintPolicy.reason);
+  setElementDisabled(elements.clearHint, !hintPolicy.allowed, hintPolicy.reason);
+  setElementDisabled(elements.resetSession, !resetPolicy.allowed, resetPolicy.reason);
+
+  renderActionButtons(actionPolicy);
+
+  if (elements.exportJsonLink) {
+    elements.exportJsonLink.download = `${session.id || 'session'}.json`;
+  }
+  if (elements.exportCsvLink) {
+    elements.exportCsvLink.download = `${session.id || 'session'}.csv`;
+  }
 }
 
-function renderActionButtons() {
+function renderActionButtons(actionPolicy) {
   if (!elements.actionGrid) {
     return;
   }
 
-  const actions = currentState?.system?.robotActions || [];
-  const actionPolicy = resolvePolicy('logRobotAction');
   elements.actionGrid.innerHTML = '';
+  const actions = currentState?.system?.robotActions || [];
 
   actions.forEach((action) => {
     const button = document.createElement('button');
@@ -864,210 +490,24 @@ function renderActionButtons() {
     button.className = 'action-button';
     button.textContent = action.label;
     button.disabled = !actionPolicy.allowed;
-    button.title = actionPolicy.allowed ? '' : actionPolicy.reason || '';
+    button.title = actionPolicy.allowed ? '' : actionPolicy.reason;
     button.addEventListener('click', async () => {
       try {
         await postJson('/api/actions', {
           actionId: action.actionId,
           label: action.label,
           payload: { origin: 'admin-dashboard' },
+          actor: elements.sessionResearcher?.value || currentState?.session?.metadata?.researcher || 'researcher',
         }, {
-          headers: buildAdminHeaders(),
+          headers: buildHeaders(),
         });
-        setGuardMessage(`Logged ${action.label}.`, 'success');
+        await refreshAll();
       } catch (error) {
-        await handleAdminError(error);
+        await handleError(error);
       }
     });
     elements.actionGrid.append(button);
   });
-}
-
-function preflightBadgeText(item) {
-  if (item.status === 'ready') {
-    return 'Ready';
-  }
-
-  if (item.required) {
-    return item.status === 'warning' ? 'Attention' : 'Blocked';
-  }
-
-  return 'Recommended';
-}
-
-function preflightItemClass(item) {
-  if (item.status === 'ready') {
-    return 'allowed';
-  }
-
-  if (item.status === 'blocked') {
-    return 'blocked';
-  }
-
-  return 'warning';
-}
-
-function renderPreflight() {
-  const hasPreflightSurface = elements.preflightSummary
-    || elements.preflightDetail
-    || elements.preflightProgress
-    || elements.preflightUpdated
-    || elements.preflightAutomaticList;
-  if (!hasPreflightSurface) {
-    return;
-  }
-
-  const preflight = currentState?.system?.preflight;
-  const acknowledgements = currentState?.preflight?.acknowledgements || {};
-
-  if (!preflight) {
-    setText(elements.preflightSummary, 'Readiness details are not available yet.');
-    setText(elements.preflightDetail, 'The server has not published the before-participant gate.');
-    setText(elements.preflightProgress, '0 of 0 checks ready.');
-    setText(elements.preflightUpdated, 'Manual confirmations have not been saved yet.');
-    setHtml(elements.preflightAutomaticList);
-    return;
-  }
-
-  setText(elements.preflightSummary, preflight.summary);
-  setText(elements.preflightDetail, preflight.detail);
-  setText(elements.preflightProgress, `${preflight.progress?.readyCount || 0} of ${preflight.progress?.totalCount || 0} checks ready`);
-  setDatasetValue(
-    elements.preflightProgress,
-    'tone',
-    preflight.blockingCount > 0 ? 'warning' : (preflight.warningCount > 0 ? 'neutral' : 'success'),
-  );
-  setText(
-    elements.preflightUpdated,
-    preflight.updatedAt
-    ? `Manual checklist last updated ${formatTimestamp(preflight.updatedAt)} by ${preflight.updatedBy || 'researcher'}.`
-    : 'Manual confirmations have not been saved yet.',
-  );
-
-  setHtml(elements.preflightAutomaticList);
-  (preflight.automaticItems || []).forEach((item) => {
-    const entry = document.createElement('li');
-    entry.className = `policy-item ${preflightItemClass(item)}`;
-
-    const header = document.createElement('div');
-    header.className = 'policy-item-header';
-
-    const title = document.createElement('strong');
-    title.textContent = item.label;
-    header.append(title);
-
-    const badge = document.createElement('span');
-    badge.className = 'policy-badge';
-    badge.textContent = preflightBadgeText(item);
-    header.append(badge);
-
-    entry.append(header);
-
-    const summary = document.createElement('small');
-    summary.textContent = item.summary;
-    entry.append(summary);
-
-    const detail = document.createElement('small');
-    detail.textContent = item.detail;
-    entry.append(detail);
-
-    elements.preflightAutomaticList?.append(entry);
-  });
-
-  setCheckedSafely(elements.preflightCamera, acknowledgements.cameraFramingChecked);
-  setCheckedSafely(elements.preflightSubjectDisplay, acknowledgements.subjectDisplayChecked);
-  setCheckedSafely(elements.preflightRobotBoard, acknowledgements.robotBoardReady);
-  setCheckedSafely(elements.preflightMaterials, acknowledgements.materialsReset);
-}
-
-function renderInteractionControls() {
-  const configurePolicy = resolvePolicy('configureSession');
-  const preflightPolicy = resolvePolicy('updatePreflight');
-  const startPolicy = resolvePolicy('startSession');
-  const completePolicy = resolvePolicy('completeSession');
-  const adaptiveConfigPolicy = resolvePolicy('updateAdaptiveConfig');
-  const hintPolicy = resolvePolicy('setHint');
-  const simulatePolicy = resolvePolicy('simulateTelemetry');
-  const resetPolicy = resolvePolicy('resetSession');
-  const forceResetPolicy = resolvePolicy('forceResetSession');
-  const sessionStatus = currentState?.session?.status || 'setup';
-  const resetControlPolicy = sessionStatus === 'running' ? forceResetPolicy : resetPolicy;
-
-  [
-    elements.sessionStudyId,
-    elements.sessionParticipantId,
-    elements.sessionCondition,
-    elements.sessionResearcher,
-    elements.sessionNotes,
-    elements.sessionSave,
-    elements.puzzleUploadInput,
-    elements.puzzleUploadSubmit,
-    elements.puzzleClearSelection,
-  ].forEach((element) => {
-    setElementDisabled(element, !configurePolicy.allowed, configurePolicy.reason || '');
-  });
-
-  [
-    elements.preflightCamera,
-    elements.preflightSubjectDisplay,
-    elements.preflightRobotBoard,
-    elements.preflightMaterials,
-    elements.preflightSave,
-  ].forEach((element) => {
-    setElementDisabled(element, !preflightPolicy.allowed, preflightPolicy.reason || '');
-  });
-
-  setElementDisabled(elements.sessionStart, !startPolicy.allowed, startPolicy.reason || '');
-  setElementDisabled(elements.sessionComplete, !completePolicy.allowed, completePolicy.reason || '');
-  setElementDisabled(elements.sessionSummary, !completePolicy.allowed, completePolicy.reason || '');
-  setText(
-    elements.sessionStartReason,
-    startPolicy.allowed
-      ? 'Readiness gate cleared. You can start the trial now.'
-      : (currentState?.system?.preflight?.detail || startPolicy.reason || 'Save metadata, clear the readiness gate, then start the trial.'),
-  );
-  setDatasetValue(elements.sessionStartReason, 'tone', startPolicy.allowed ? 'success' : 'warning');
-
-  [
-    elements.adaptiveObserveThreshold,
-    elements.adaptiveInterveneThreshold,
-    elements.adaptiveHrvWeight,
-    elements.adaptiveGazeWeight,
-    elements.adaptiveDistractionBoost,
-    elements.adaptiveFullFreshness,
-    elements.adaptiveStaleAfter,
-    elements.adaptiveConfigSave,
-    elements.adaptiveConfigReset,
-  ].forEach((element) => {
-    setElementDisabled(element, !adaptiveConfigPolicy.allowed, adaptiveConfigPolicy.reason || '');
-  });
-
-  setElementDisabled(elements.hintText, !hintPolicy.allowed, hintPolicy.reason || '');
-  setElementDisabled(elements.hintSend, !hintPolicy.allowed, hintPolicy.reason || '');
-  setElementDisabled(elements.clearHint, !hintPolicy.allowed, hintPolicy.reason || '');
-  setElementDisabled(
-    elements.useLlmHint,
-    !hintPolicy.allowed || !currentState?.adaptive?.advisory?.recommendedHint,
-    hintPolicy.reason || 'No suggested hint is available yet.',
-  );
-
-  [
-    elements.simStress,
-    elements.simAttention,
-    elements.simFixation,
-    elements.simDistraction,
-    elements.simulateSubmit,
-    elements.presetObserve,
-    elements.presetIntervene,
-  ].forEach((element) => {
-    setElementDisabled(element, !simulatePolicy.allowed, simulatePolicy.reason || '');
-  });
-
-  setText(elements.resetSession, sessionStatus === 'running' ? 'Force reset session' : 'Reset session');
-  setElementDisabled(elements.resetSession, !resetControlPolicy.allowed, resetControlPolicy.reason || '');
-
-  renderActionButtons();
-  renderPuzzleLibrary();
 }
 
 function renderState() {
@@ -1075,193 +515,49 @@ function renderState() {
     return;
   }
 
-  setText(elements.sessionId, currentState.session.id);
-  setText(elements.sessionStarted, `Created ${formatTimestamp(currentState.session.startedAt)}`);
-
-  const session = currentState.session;
-  const metadata = session.metadata || {};
-  const resolvedMetadata = sessionDraft.resolve(session.id, {
-    studyId: metadata.studyId,
-    participantId: metadata.participantId,
-    condition: metadata.condition || 'adaptive',
-    researcher: metadata.researcher,
-    notes: metadata.notes,
-  });
-  setValueSafely(elements.sessionStudyId, resolvedMetadata.studyId);
-  setValueSafely(elements.sessionParticipantId, resolvedMetadata.participantId);
-  setValueSafely(elements.sessionCondition, resolvedMetadata.condition || 'adaptive');
-  setValueSafely(elements.sessionResearcher, resolvedMetadata.researcher);
-  setValueSafely(elements.sessionNotes, resolvedMetadata.notes);
-
-  const statusLabel = session.status ? session.status.toUpperCase() : 'SETUP';
-  setText(elements.sessionStatusSummary, `${statusLabel} • ${metadata.participantId || 'participant not assigned'}`);
-  renderSessionTiming(session, metadata);
-  setValueSafely(elements.sessionSummary, session.completedSummary);
+  renderGuard();
   renderPuzzleLibrary();
-
-  const adaptive = currentState.adaptive;
-  const configuration = adaptive.configuration;
-  setText(elements.adaptiveStatus, `${adaptive.status.toUpperCase()} • ${formatNumber(adaptive.score)}`);
-  setText(elements.adaptiveReason, adaptive.reason);
-  setDatasetValue(elements.adaptiveStatus, 'status', adaptive.status);
-  setAdaptiveConfigurationFields(configuration);
-  setText(elements.adaptiveConfigSummary, adaptiveSummary(configuration));
-  setText(elements.adaptiveConfigNote, adaptiveNote(configuration));
-
-  const system = currentState.system || {};
-  const connections = system.connections || { admin: 0, subject: 0, audit: 0 };
-  const sensorHealth = system.sensorHealth || {};
-  const watchHealth = sensorHealth.watch || {};
-  const gazeHealth = sensorHealth.gaze || {};
-  setText(elements.connectionCounts, `${connections.admin} admin / ${connections.subject} subject / ${connections.audit} audit`);
-
-  const watchStatus = system.watchBridge || {};
-  setText(elements.watchBridgeStatus, sensorHealth.overall?.summary
-    || (watchStatus.lastProcessedAt
-      ? `Watch file ${watchStatus.filePath} • last processed ${formatTimestamp(watchStatus.lastProcessedAt)}`
-      : `Watching ${watchStatus.filePath} for HRV updates`));
-  setText(elements.sensorHealthSummary, sensorHealth.overall?.summary || 'Sensor health is unavailable.');
-  setText(elements.sensorHealthDetail, sensorHealth.overall?.detail || 'The server has not published sensor health details yet.');
-  setText(elements.watchHealthSummary, watchHealth.summary || 'Watch bridge status is unavailable.');
-  setText(elements.watchHealthDetail, watchHealth.detail || `Watching ${watchStatus.filePath} for HRV updates.`);
-  setText(elements.gazeHealthSummary, gazeHealth.summary || 'Gaze bridge status is unavailable.');
-  setText(elements.gazeHealthDetail, gazeHealth.detail || 'The gaze bridge has not reported any status yet.');
-  setText(elements.launcherSummary, `Launch the local stack with npm run launch:study, then check ${sensorHealth.overall?.issueCount || 0} active sensor issue${(sensorHealth.overall?.issueCount || 0) === 1 ? '' : 's'} here.`);
-  renderPreflight();
-
-  const hrv = currentState.telemetry.hrv;
-  const gaze = currentState.telemetry.gaze;
-  const advisory = adaptive.advisory;
-  const gazeBridge = system.gazeBridge;
-  setText(elements.metricHr, formatNumber(hrv.metrics.hr, 0));
-  setText(elements.metricStress, formatNumber(hrv.stressScore));
-  setText(elements.metricStressLevel, hrv.stressLevel || 'Not Stressed');
-  setText(elements.metricAttention, formatNumber(gaze.attentionScore));
-  setText(elements.metricFixation, formatNumber(gaze.fixationLoss));
-  setText(elements.hrvSource, hrv.source ? `Source: ${hrv.source}` : 'No HRV source yet');
-  setText(elements.gazeSource, gaze.source ? `Source: ${gaze.source}` : 'No gaze source yet');
-  setText(elements.gazeBridgeSummary, gazeBridge?.bridgeId
-    ? `${gazeBridge.deviceLabel || gazeBridge.bridgeId} • ${gazeBridge.active ? 'active' : 'stale'}`
-    : 'No gaze bridge connected.');
-  setText(elements.gazeBridgeDetail, gazeBridge?.bridgeId
-    ? `Bridge ${gazeBridge.bridgeId} via ${gazeBridge.transport || 'unknown transport'} • last frame ${formatTimestamp(gazeBridge.lastFrameAt || gazeBridge.lastHeartbeatAt)}`
-    : 'Use the Python bridge or your SDK callback to start streaming gaze frames.');
-  setText(elements.hintPreview, currentState.hint.text || 'No hint has been sent yet.');
-  setText(elements.latestAction, currentState.robotAction.updatedAt
-    ? `${currentState.robotAction.label} • ${formatTimestamp(currentState.robotAction.updatedAt)}`
-    : 'No robotic action logged yet.');
-  setText(elements.llmSummary, advisory?.summary || 'No LLM recommendation has been generated.');
-  setText(elements.llmHint, advisory?.recommendedHint
-    ? `Suggested hint: ${advisory.recommendedHint}`
-    : 'Suggested hint: unavailable');
-
-  renderLinks(elements.localhostLinks, system.network?.localhost || {});
-  renderLanLinks(elements.lanLinks, system.network?.lan || []);
-  renderCharts();
-  renderGuardStatus();
+  renderSession();
 }
 
-function renderExportInfo() {
-  if (!exportManifest || (!elements.currentExportLinks && !elements.exportSummary)) {
-    return;
-  }
-
-  const current = exportManifest.sessions.find((session) => session.sessionId === exportManifest.currentSessionId);
-  setHtml(elements.currentExportLinks);
-
-  const bundleLink = document.createElement('a');
-  bundleLink.href = '/api/exports/current.bundle.json';
-  bundleLink.textContent = 'Download current bundle JSON';
-  bundleLink.download = `${exportManifest.currentSessionId}.bundle.json`;
-  elements.currentExportLinks?.append(bundleLink);
-
-  const csvLink = document.createElement('a');
-  csvLink.href = '/api/exports/current.csv';
-  csvLink.textContent = 'Download current CSV timeline';
-  csvLink.download = `${exportManifest.currentSessionId}.csv`;
-  elements.currentExportLinks?.append(csvLink);
-
-  setText(elements.exportSummary, current
-    ? `${exportManifest.sessions.length} sessions available • current session has ${current.eventCount} events`
-    : `${exportManifest.sessions.length} sessions available`);
-}
-
-async function bootstrapState() {
-  const [state, events] = await Promise.all([
-    fetchJson('/api/state'),
-    fetchJson('/api/events?limit=20'),
-  ]);
-  currentState = mergeAdminState(currentState, state);
-  timelineEvents = events.events;
-  renderState();
-  renderEvents();
-}
-
-async function refreshStateSnapshot() {
-  currentState = mergeAdminState(currentState, await fetchJson('/api/state'));
+async function refreshState() {
+  currentState = await fetchJson('/api/state');
   renderState();
 }
 
-async function refreshExportManifest() {
-  exportManifest = await fetchJson('/api/exports');
-  renderExportInfo();
-}
-
-async function refreshGuardStatus() {
+async function refreshGuard() {
   guardStatus = await fetchJson('/api/guard', {
-    headers: buildAdminHeaders(),
+    headers: buildHeaders(),
   });
 
   if (guardStatus.pinRequired && !guardStatus.authenticated && adminToken) {
     setAdminToken('');
   }
 
-  renderGuardStatus();
+  renderGuard();
+  renderSession();
 }
 
-function buildStressLevel(stressScore) {
-  if (stressScore >= 0.75) {
-    return 'High';
-  }
-
-  if (stressScore >= 0.45) {
-    return 'Mild';
-  }
-
-  return 'Not Stressed';
+async function refreshAll() {
+  await Promise.all([
+    refreshState(),
+    refreshGuard(),
+  ]);
 }
 
-async function submitSimulation() {
-  const stressScore = Number(elements.simStress?.value || 0);
-  const attentionScore = Number(elements.simAttention?.value || 0);
-  const fixationLoss = Number(elements.simFixation?.value || 0);
-  const distractionDetected = Boolean(elements.simDistraction?.checked);
+async function handleError(error) {
+  if (error.status === 423) {
+    setAdminToken('');
+    await refreshGuard();
+  }
 
-  const baselineHr = 68;
-  const payload = {
-    hrv: {
-      metrics: {
-        hr: Math.round(baselineHr + (stressScore * 28)),
-        sdnn: Math.max(10, Math.round(55 - (stressScore * 30))),
-        rmssd: Math.max(8, Math.round(42 - (stressScore * 24))),
-        pnn50: Math.max(4, Math.round(26 - (stressScore * 16))),
-      },
-      stressScore,
-      stressLevel: buildStressLevel(stressScore),
-      distractionDetected,
-      interpretation: 'Simulated HRV frame submitted from the dashboard.',
-      feedback: 'Simulation mode is active.',
-    },
-    gaze: {
-      attentionScore,
-      fixationLoss,
-      pupilDilation: Math.min(1, 0.35 + stressScore * 0.4),
-    },
-  };
+  if (elements.guardShell && !elements.guardShell.hidden && elements.guardMessage) {
+    setText(elements.guardMessage, error.message || 'Dashboard request failed.');
+  }
 
-  await postJson('/api/telemetry/simulate', payload, {
-    headers: buildAdminHeaders(),
-  });
+  if (![401, 409, 423].includes(error.status)) {
+    window.alert(error.message || 'Unexpected dashboard error.');
+  }
 }
 
 async function startCamera() {
@@ -1272,72 +568,30 @@ function stopCamera() {
   cameraController.stop();
 }
 
-async function handleAdminError(error) {
-  if (error.status === 423) {
-    setAdminToken('');
-  }
-
-  if (error.status === 401 || error.status === 409 || error.status === 423) {
-    setGuardMessage(error.message, 'warning');
-    await refreshGuardStatus();
-    return;
-  }
-
-  setGuardMessage(error.message || 'Unexpected dashboard error.', 'warning');
-  window.alert(error.message);
-}
-
 async function init() {
-  setGuardMessage('Loading safeguard status...', 'neutral');
-  installSectionNavigation();
   bindCameraControls({
     startButton: elements.startCamera,
     stopButton: elements.stopCamera,
     onStart: startCamera,
     onStop: stopCamera,
   });
-  trackSessionDraft('studyId', elements.sessionStudyId);
-  trackSessionDraft('participantId', elements.sessionParticipantId);
-  trackSessionDraft('condition', elements.sessionCondition, 'change');
-  trackSessionDraft('researcher', elements.sessionResearcher);
-  trackSessionDraft('notes', elements.sessionNotes);
 
-  await Promise.all([
-    bootstrapState(),
-    refreshExportManifest(),
-    refreshGuardStatus(),
-  ]);
-
-  statePollTimer = window.setInterval(() => {
-    refreshStateSnapshot().catch((error) => {
-      setGuardMessage(error.message || 'State refresh failed.', 'warning');
-    });
-  }, 10000);
+  await refreshAll();
 
   durationTicker = window.setInterval(() => {
-    if (!currentState?.session) {
-      return;
+    if (currentState?.session?.status === 'running') {
+      renderSession();
     }
-
-    renderSessionTiming(currentState.session, currentState.session.metadata || {});
   }, 1000);
 
   connectSocket('admin', {
-    onSnapshot(state) {
-      currentState = mergeAdminState(currentState, state);
+    onSnapshot(snapshot) {
+      currentState = snapshot;
       renderState();
-    },
-    onEvent(event) {
-      const existing = timelineEvents.find((entry) => entry.id === event.id);
-      if (existing) {
-        return;
-      }
-      timelineEvents = [event, ...timelineEvents].slice(0, 20);
-      renderEvents();
     },
   });
 
-  bindEvent(elements.guardForm, 'submit', async (event) => {
+  elements.guardForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
 
     try {
@@ -1346,290 +600,156 @@ async function init() {
       });
       setAdminToken(response.token);
       elements.guardPin.value = '';
-      setGuardMessage('Controls unlocked on this browser.', 'success');
-      await refreshGuardStatus();
+      await refreshGuard();
     } catch (error) {
-      await handleAdminError(error);
+      await handleError(error);
     }
   });
 
-  bindEvent(elements.guardLock, 'click', async () => {
-    if (!getSafeguardState().pinRequired) {
-      setGuardMessage('No admin PIN is configured, so there is nothing to lock locally.', 'neutral');
-      return;
-    }
-
+  elements.guardLock?.addEventListener('click', async () => {
     try {
       await postJson('/api/guard/lock', {}, {
-        headers: buildAdminHeaders(),
+        headers: buildHeaders(),
       });
       setAdminToken('');
-      setGuardMessage('Controls locked on this browser.', 'success');
-      await refreshGuardStatus();
+      await refreshGuard();
     } catch (error) {
-      await handleAdminError(error);
+      await handleError(error);
     }
   });
 
-  bindEvent(elements.hintForm, 'submit', async (event) => {
+  elements.sessionForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
     try {
-      await postJson('/api/hints', { text: elements.hintText.value }, {
-        headers: buildAdminHeaders(),
-      });
-      elements.hintText.value = '';
-      setGuardMessage('Hint broadcast to the participant display.', 'success');
-    } catch (error) {
-      await handleAdminError(error);
-    }
-  });
-
-  bindEvent(elements.sessionForm, 'submit', async (event) => {
-    event.preventDefault();
-    try {
-      currentState = mergeAdminState(currentState, await postJson('/api/session/configure', {
+      await postJson('/api/session/configure', {
         studyId: elements.sessionStudyId.value,
         participantId: elements.sessionParticipantId.value,
-        condition: elements.sessionCondition.value,
         researcher: elements.sessionResearcher.value,
+        condition: elements.sessionCondition.value,
         notes: elements.sessionNotes.value,
       }, {
-        headers: buildAdminHeaders(),
-      }));
-      renderState();
-      setGuardMessage('Session profile saved.', 'success');
-      await refreshExportManifest();
-      await refreshGuardStatus();
+        headers: buildHeaders(),
+      });
+      await refreshState();
     } catch (error) {
-      await handleAdminError(error);
+      await handleError(error);
     }
   });
 
-  bindEvent(elements.puzzleUploadForm, 'submit', async (event) => {
+  elements.puzzleUploadForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
-
     const files = [...(elements.puzzleUploadInput?.files || [])];
     if (!files.length) {
-      setText(elements.puzzleUploadStatus, 'Choose one or more puzzle files before uploading.');
+      setText(elements.puzzleUploadStatus, 'Choose one or more files before uploading.');
       return;
     }
 
     try {
-      setText(elements.puzzleUploadStatus, `Uploading ${files.length} puzzle file${files.length === 1 ? '' : 's'}...`);
-      const uploadedFiles = await Promise.all(files.map((file) => readUploadFileAsBase64(file)));
-      const result = await postJson('/api/puzzles/upload', {
-        files: uploadedFiles,
+      setText(elements.puzzleUploadStatus, `Uploading ${files.length} file${files.length === 1 ? '' : 's'}...`);
+      const preparedFiles = await Promise.all(files.map((file) => readUploadFileAsBase64(file)));
+      await postJson('/api/puzzles/upload', {
+        files: preparedFiles,
         actor: elements.sessionResearcher?.value || currentState?.session?.metadata?.researcher || 'researcher',
       }, {
-        headers: buildAdminHeaders(),
+        headers: buildHeaders(),
       });
       elements.puzzleUploadInput.value = '';
-      puzzlePreviewAssetId = result.uploaded?.at(-1)?.assetId || puzzlePreviewAssetId;
-      setText(elements.puzzleUploadStatus, `Uploaded ${result.uploaded?.length || files.length} puzzle file${files.length === 1 ? '' : 's'} into the reference library.`);
-      setGuardMessage('Puzzle library updated.', 'success');
-      await refreshStateSnapshot();
-      await refreshExportManifest();
-      await refreshGuardStatus();
+      setText(elements.puzzleUploadStatus, 'Upload complete.');
+      await refreshState();
     } catch (error) {
-      setText(elements.puzzleUploadStatus, error.message || 'Puzzle upload failed.');
-      await handleAdminError(error);
+      setText(elements.puzzleUploadStatus, error.message || 'Upload failed.');
+      await handleError(error);
     }
   });
 
-  bindEvent(elements.puzzleClearSelection, 'click', async () => {
+  elements.puzzleClearSelection?.addEventListener('click', async () => {
     try {
       await postJson('/api/puzzles/select', {
-        assetId: null,
+        setId: null,
         actor: elements.sessionResearcher?.value || currentState?.session?.metadata?.researcher || 'researcher',
       }, {
-        headers: buildAdminHeaders(),
+        headers: buildHeaders(),
       });
-      setGuardMessage('Reference puzzle cleared for this session.', 'success');
-      await refreshStateSnapshot();
-      await refreshExportManifest();
-      await refreshGuardStatus();
+      await refreshState();
     } catch (error) {
-      await handleAdminError(error);
+      await handleError(error);
     }
   });
 
-  bindEvent(elements.preflightForm, 'submit', async (event) => {
-    event.preventDefault();
-    try {
-      await postJson('/api/preflight/acknowledgements', {
-        acknowledgements: {
-          cameraFramingChecked: elements.preflightCamera.checked,
-          subjectDisplayChecked: elements.preflightSubjectDisplay.checked,
-          robotBoardReady: elements.preflightRobotBoard.checked,
-          materialsReset: elements.preflightMaterials.checked,
-        },
-        actor: elements.sessionResearcher.value || 'researcher',
-      }, {
-        headers: buildAdminHeaders(),
-      });
-      setGuardMessage('Before-participant checklist saved.', 'success');
-      await refreshGuardStatus();
-    } catch (error) {
-      await handleAdminError(error);
-    }
-  });
-
-  bindEvent(elements.sessionStart, 'click', async () => {
+  elements.sessionStart?.addEventListener('click', async () => {
     try {
       await postJson('/api/session/start', {
-        operator: elements.sessionResearcher.value || 'researcher',
+        operator: elements.sessionResearcher.value || currentState?.session?.metadata?.researcher || 'researcher',
       }, {
-        headers: buildAdminHeaders(),
+        headers: buildHeaders(),
       });
-      setGuardMessage('Trial started. Live interventions are now enabled.', 'success');
-      await refreshExportManifest();
-      await refreshGuardStatus();
+      await refreshState();
     } catch (error) {
-      await handleAdminError(error);
+      await handleError(error);
     }
   });
 
-  bindEvent(elements.sessionComplete, 'click', async () => {
+  elements.sessionComplete?.addEventListener('click', async () => {
     try {
       await postJson('/api/session/complete', {
-        operator: elements.sessionResearcher.value || 'researcher',
-        summary: elements.sessionSummary.value,
+        operator: elements.sessionResearcher.value || currentState?.session?.metadata?.researcher || 'researcher',
       }, {
-        headers: buildAdminHeaders(),
+        headers: buildHeaders(),
       });
-      setGuardMessage('Trial marked complete. The session is now read-only until reset.', 'success');
-      await refreshExportManifest();
-      await refreshGuardStatus();
+      await refreshState();
     } catch (error) {
-      await handleAdminError(error);
+      await handleError(error);
     }
   });
 
-  bindEvent(elements.adaptiveConfigForm, 'submit', async (event) => {
-    event.preventDefault();
-    try {
-      await postJson('/api/adaptive/config', readAdaptiveConfigurationForm(), {
-        headers: buildAdminHeaders(),
-      });
-      setGuardMessage('Adaptive controls updated for the current session.', 'success');
-      await refreshGuardStatus();
-    } catch (error) {
-      await handleAdminError(error);
-    }
-  });
-
-  bindEvent(elements.adaptiveConfigReset, 'click', async () => {
-    const defaults = adaptiveDefaults();
-    if (!defaults) {
-      return;
-    }
-
-    try {
-      await postJson('/api/adaptive/config', defaults, {
-        headers: buildAdminHeaders(),
-      });
-      setGuardMessage('Adaptive controls reset to the default rule set.', 'success');
-      await refreshGuardStatus();
-    } catch (error) {
-      await handleAdminError(error);
-    }
-  });
-
-  bindEvent(elements.clearHint, 'click', () => {
-    if (elements.hintText) {
-      elements.hintText.value = '';
-    }
-  });
-
-  bindEvent(elements.useLlmHint, 'click', () => {
-    const advisory = currentState?.adaptive?.advisory;
-    if (!advisory?.recommendedHint || !elements.hintText) {
-      return;
-    }
-
-    elements.hintText.value = advisory.recommendedHint;
-    elements.hintText.focus();
-  });
-
-  bindEvent(elements.simulatorForm, 'submit', async (event) => {
-    event.preventDefault();
-    try {
-      await submitSimulation();
-      setGuardMessage('Simulated telemetry pushed into the adaptive engine.', 'success');
-    } catch (error) {
-      await handleAdminError(error);
-    }
-  });
-
-  bindEvent(elements.presetObserve, 'click', () => {
-    if (elements.simStress) {
-      elements.simStress.value = '0.52';
-    }
-    if (elements.simAttention) {
-      elements.simAttention.value = '0.48';
-    }
-    if (elements.simFixation) {
-      elements.simFixation.value = '0.45';
-    }
-    if (elements.simDistraction) {
-      elements.simDistraction.checked = false;
-    }
-  });
-
-  bindEvent(elements.presetIntervene, 'click', () => {
-    if (elements.simStress) {
-      elements.simStress.value = '0.88';
-    }
-    if (elements.simAttention) {
-      elements.simAttention.value = '0.14';
-    }
-    if (elements.simFixation) {
-      elements.simFixation.value = '0.82';
-    }
-    if (elements.simDistraction) {
-      elements.simDistraction.checked = true;
-    }
-  });
-
-  bindEvent(elements.resetSession, 'click', async () => {
+  elements.resetSession?.addEventListener('click', async () => {
     const isRunning = (currentState?.session?.status || 'setup') === 'running';
-    const message = isRunning
-      ? 'Force reset the live session and start a fresh log immediately?'
-      : 'Reset the current session and start a fresh log?';
-    const confirmed = window.confirm(message);
+    const confirmed = window.confirm(
+      isRunning
+        ? 'Reset the live session and start fresh?'
+        : 'Reset the current session and clear the selected run state?',
+    );
     if (!confirmed) {
       return;
     }
 
     try {
       await postJson('/api/session/reset', {
-        requestedBy: 'researcher',
+        requestedBy: elements.sessionResearcher.value || currentState?.session?.metadata?.researcher || 'researcher',
         force: isRunning,
       }, {
-        headers: buildAdminHeaders(),
+        headers: buildHeaders(),
       });
-      timelineEvents = [];
-      setGuardMessage('Session reset. A fresh log is ready.', 'success');
-      await bootstrapState();
-      await refreshExportManifest();
-      await refreshGuardStatus();
+      previewSetId = null;
+      await refreshState();
     } catch (error) {
-      await handleAdminError(error);
+      await handleError(error);
     }
   });
 
-  window.addEventListener('resize', renderCharts);
-  window.addEventListener('beforeunload', () => {
-    if (statePollTimer) {
-      window.clearInterval(statePollTimer);
+  elements.hintForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    try {
+      await postJson('/api/hints', {
+        text: elements.hintText.value,
+        author: elements.sessionResearcher.value || currentState?.session?.metadata?.researcher || 'researcher',
+      }, {
+        headers: buildHeaders(),
+      });
+      elements.hintText.value = '';
+      await refreshState();
+    } catch (error) {
+      await handleError(error);
     }
-    if (durationTicker) {
-      window.clearInterval(durationTicker);
+  });
+
+  elements.clearHint?.addEventListener('click', () => {
+    if (elements.hintText) {
+      elements.hintText.value = '';
     }
   });
 }
 
 init().catch((error) => {
-  setGuardMessage(error.message || 'Failed to initialize the dashboard.', 'warning');
-  window.alert(error.message);
+  window.alert(error.message || 'Failed to start the dashboard.');
 });

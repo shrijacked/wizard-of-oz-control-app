@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Robot Operator Screen</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body class="display-page audit-display robot-display">
+    <main class="display-shell subject-layout">
+      <section class="display-card subject-reference-card">
+        <p class="display-kicker">Robot Operator Screen</p>
+        <h1>Solution View</h1>
+        <div id="robot-solution-shell" class="subject-reference-shell empty">
+          <p id="robot-solution-empty" class="subject-reference-empty">Waiting for the researcher to choose a puzzle set.</p>
+          <img id="robot-solution-image" class="subject-reference-image" alt="Selected puzzle solution" hidden>
+          <iframe id="robot-solution-pdf" class="subject-reference-pdf" title="Selected puzzle solution PDF" hidden></iframe>
+        </div>
+        <small id="robot-solution-meta" class="display-meta">No solution file selected yet.</small>
+      </section>
+
+      <section class="display-card">
+        <p class="display-kicker">Robot Operator Screen</p>
+        <h2>Latest robot cue</h2>
+        <p id="robot-action" class="display-message">No robot cue has been sent yet.</p>
+        <small id="robot-updated" class="display-meta">Awaiting admin input.</small>
+      </section>
+    </main>
+
+    <script type="module" src="/robot.js"></script>
+  </body>
+</html>

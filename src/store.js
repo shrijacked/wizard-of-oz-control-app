@@ -69,6 +69,8 @@ function createInitialPreflightState() {
 function createInitialAssetState() {
   return {
     puzzles: [],
+    puzzleSets: [],
+    incompleteUploads: [],
   };
 }
 
@@ -129,16 +131,117 @@ function normalizePuzzleAsset(asset = {}) {
   };
 }
 
-function createReferencePuzzleSnapshot(asset, selection = {}) {
-  const normalizedAsset = normalizePuzzleAsset(asset);
-  if (!normalizedAsset) {
+function puzzleBaseName(name = '') {
+  return path.basename(String(name || '').trim(), path.extname(String(name || '').trim()));
+}
+
+function inferPuzzleRole(asset = {}) {
+  const baseName = puzzleBaseName(asset.originalName || asset.storedFileName || '');
+  if (!baseName) {
+    return 'subject';
+  }
+
+  return baseName.endsWith('s') ? 'solution' : 'subject';
+}
+
+function inferPuzzleSetId(asset = {}) {
+  const baseName = puzzleBaseName(asset.originalName || asset.storedFileName || '');
+  if (!baseName) {
+    return '';
+  }
+
+  if (baseName.endsWith('s') && baseName.length > 1) {
+    return baseName.slice(0, -1);
+  }
+
+  return baseName;
+}
+
+function buildPuzzleCatalog(puzzles = []) {
+  const groups = new Map();
+
+  for (const asset of puzzles.map((entry) => normalizePuzzleAsset(entry)).filter(Boolean)) {
+    const setId = inferPuzzleSetId(asset);
+    if (!setId) {
+      continue;
+    }
+
+    if (!groups.has(setId)) {
+      groups.set(setId, {
+        setId,
+        label: setId,
+        subjectAssets: [],
+        solutionAssets: [],
+      });
+    }
+
+    const group = groups.get(setId);
+    if (inferPuzzleRole(asset) === 'solution') {
+      group.solutionAssets.push(asset);
+    } else {
+      group.subjectAssets.push(asset);
+    }
+  }
+
+  const usedAssetIds = new Set();
+  const puzzleSets = [];
+
+  for (const group of groups.values()) {
+    const subjectAsset = group.subjectAssets.at(-1) || null;
+    const solutionAsset = group.solutionAssets.at(-1) || null;
+    if (!subjectAsset || !solutionAsset) {
+      continue;
+    }
+
+    usedAssetIds.add(subjectAsset.assetId);
+    usedAssetIds.add(solutionAsset.assetId);
+    puzzleSets.push({
+      setId: group.setId,
+      label: group.label,
+      subjectAsset,
+      solutionAsset,
+    });
+  }
+
+  return {
+    puzzleSets: puzzleSets.sort((left, right) => left.setId.localeCompare(right.setId, undefined, { numeric: true, sensitivity: 'base' })),
+    incompleteUploads: puzzles
+      .map((entry) => normalizePuzzleAsset(entry))
+      .filter((asset) => asset && !usedAssetIds.has(asset.assetId)),
+  };
+}
+
+function createPuzzleSetSnapshot(puzzleSet, selection = {}) {
+  if (!puzzleSet) {
+    return null;
+  }
+
+  const subjectAsset = normalizePuzzleAsset(puzzleSet.subjectAsset);
+  const solutionAsset = normalizePuzzleAsset(puzzleSet.solutionAsset);
+  if (!subjectAsset || !solutionAsset) {
     return null;
   }
 
   return {
-    ...normalizedAsset,
+    setId: String(puzzleSet.setId || '').trim() || inferPuzzleSetId(subjectAsset),
+    label: String(puzzleSet.label || '').trim() || inferPuzzleSetId(subjectAsset),
+    subjectAsset,
+    solutionAsset,
     selectedAt: selection.selectedAt || null,
     selectedBy: selection.selectedBy || null,
+  };
+}
+
+function rebuildAssetState(assets = {}) {
+  const puzzles = Array.isArray(assets.puzzles)
+    ? assets.puzzles.map((asset) => normalizePuzzleAsset(asset)).filter(Boolean)
+    : [];
+  const catalog = buildPuzzleCatalog(puzzles);
+
+  return {
+    puzzles,
+    puzzleSets: catalog.puzzleSets,
+    incompleteUploads: catalog.incompleteUploads,
   };
 }
 
@@ -159,7 +262,7 @@ function createInitialState(now = new Date()) {
         researcher: '',
         notes: '',
       },
-      referencePuzzle: null,
+      puzzleSet: null,
       resetCount: 0,
     },
     hint: {
@@ -232,10 +335,13 @@ function hydrateState(parsed, now = new Date()) {
         ...initial.session.metadata,
         ...(parsed.session?.metadata || {}),
       },
-      referencePuzzle: createReferencePuzzleSnapshot(parsed.session?.referencePuzzle, {
-        selectedAt: parsed.session?.referencePuzzle?.selectedAt || null,
-        selectedBy: parsed.session?.referencePuzzle?.selectedBy || null,
-      }),
+      puzzleSet: createPuzzleSetSnapshot(
+        parsed.session?.puzzleSet || parsed.session?.referencePuzzle,
+        {
+          selectedAt: parsed.session?.puzzleSet?.selectedAt || parsed.session?.referencePuzzle?.selectedAt || null,
+          selectedBy: parsed.session?.puzzleSet?.selectedBy || parsed.session?.referencePuzzle?.selectedBy || null,
+        },
+      ),
     },
     hint: {
       ...initial.hint,
@@ -283,13 +389,7 @@ function hydrateState(parsed, now = new Date()) {
       ...(parsed.preflight || {}),
       acknowledgements: normalizePreflightAcknowledgements(parsed.preflight?.acknowledgements || {}),
     },
-    assets: {
-      ...initial.assets,
-      ...(parsed.assets || {}),
-      puzzles: Array.isArray(parsed.assets?.puzzles)
-        ? parsed.assets.puzzles.map((asset) => normalizePuzzleAsset(asset)).filter(Boolean)
-        : initial.assets.puzzles,
-    },
+    assets: rebuildAssetState(parsed.assets || initial.assets),
   };
 }
 
@@ -441,14 +541,13 @@ class ExperimentStore extends EventEmitter {
       entry.buffer,
     )));
 
-    this.state.assets = {
-      ...this.state.assets,
+    this.state.assets = rebuildAssetState({
       puzzles: [...this.state.assets.puzzles, ...preparedAssets.map((entry) => entry.asset)],
-    };
+    });
 
     const event = this.#createEvent('puzzle.library.uploaded', {
       source: meta.source || 'admin',
-      summary: `Uploaded ${preparedAssets.length} reference puzzle${preparedAssets.length === 1 ? '' : 's'}.`,
+      summary: `Uploaded ${preparedAssets.length} puzzle file${preparedAssets.length === 1 ? '' : 's'}.`,
       payload: {
         actor: uploadedBy,
         assets: clone(preparedAssets.map((entry) => entry.asset)),
@@ -456,25 +555,28 @@ class ExperimentStore extends EventEmitter {
     });
 
     await this.#persistAndBroadcast([event]);
+    const catalog = buildPuzzleCatalog(this.state.assets.puzzles);
     return {
       uploaded: preparedAssets.map((entry) => entry.asset),
+      puzzleSets: clone(catalog.puzzleSets),
+      incompleteUploads: clone(catalog.incompleteUploads),
       state: this.getState(),
     };
   }
 
-  async selectReferencePuzzle(payload = {}) {
+  async selectPuzzleSet(payload = {}) {
     const actor = payload.actor || 'researcher';
     const selectedAt = toIsoDate(this.now());
-    const assetId = String(payload.assetId || '').trim();
-    let referencePuzzle = null;
+    const setId = String(payload.setId || '').trim();
+    let puzzleSet = null;
 
-    if (assetId) {
-      const asset = this.state.assets.puzzles.find((entry) => entry.assetId === assetId);
-      if (!asset) {
-        throw new Error('Selected reference puzzle was not found in the library.');
+    if (setId) {
+      const matchedPuzzleSet = this.state.assets.puzzleSets.find((entry) => entry.setId === setId);
+      if (!matchedPuzzleSet) {
+        throw new Error('Selected puzzle set was not found in the library.');
       }
 
-      referencePuzzle = createReferencePuzzleSnapshot(asset, {
+      puzzleSet = createPuzzleSetSnapshot(matchedPuzzleSet, {
         selectedAt,
         selectedBy: actor,
       });
@@ -482,22 +584,48 @@ class ExperimentStore extends EventEmitter {
 
     this.state.session = {
       ...this.state.session,
-      referencePuzzle,
+      puzzleSet,
     };
 
-    const event = this.#createEvent('session.reference-puzzle.selected', {
+    const event = this.#createEvent('session.puzzle-set.selected', {
       source: payload.source || 'admin',
-      summary: referencePuzzle
-        ? `Reference puzzle selected: ${referencePuzzle.originalName}.`
-        : 'Reference puzzle cleared for this session.',
+      summary: puzzleSet
+        ? `Puzzle set selected: ${puzzleSet.setId}.`
+        : 'Puzzle set cleared for this session.',
       payload: {
         actor,
-        referencePuzzle: clone(referencePuzzle),
+        puzzleSet: clone(puzzleSet),
       },
     });
 
     await this.#persistAndBroadcast([event]);
     return this.getState();
+  }
+
+  async selectReferencePuzzle(payload = {}) {
+    const assetId = String(payload.assetId || '').trim();
+    if (!assetId) {
+      return this.selectPuzzleSet({
+        setId: null,
+        actor: payload.actor,
+        source: payload.source,
+      });
+    }
+
+    const matchedPuzzleSet = this.state.assets.puzzleSets.find((entry) => (
+      entry.subjectAsset?.assetId === assetId
+      || entry.solutionAsset?.assetId === assetId
+    ));
+
+    if (!matchedPuzzleSet) {
+      throw new Error('Selected puzzle set was not found in the library.');
+    }
+
+    return this.selectPuzzleSet({
+      setId: matchedPuzzleSet.setId,
+      actor: payload.actor,
+      source: payload.source,
+    });
   }
 
   async startSession(payload = {}) {
@@ -859,6 +987,52 @@ class ExperimentStore extends EventEmitter {
     };
   }
 
+  async buildOperatorExport(sessionIdInput) {
+    const sessionId = this.#resolveSessionId(sessionIdInput);
+    const events = await this.#readPersistedEvents();
+    const sessionEvents = events.filter((event) => event.sessionId === sessionId);
+    const state = sessionId === this.getCurrentSessionId()
+      ? this.getState()
+      : this.#reconstructStateFromEvents(sessionId, sessionEvents);
+    const session = state.session || {};
+    const firstEventAt = sessionEvents[0]?.timestamp || session.startedAt || null;
+    const lastEventAt = session.completedAt || sessionEvents.at(-1)?.timestamp || session.trialStartedAt || null;
+    const durationSeconds = secondsBetween(session.trialStartedAt || firstEventAt, session.completedAt || lastEventAt);
+    const interventions = sessionEvents
+      .filter((event) => event.type === 'hint.updated' || event.type === 'robot.action.logged')
+      .map((event) => {
+        if (event.type === 'hint.updated') {
+          return {
+            timestamp: event.timestamp,
+            type: 'hint',
+            text: event.payload?.text || '',
+          };
+        }
+
+        return {
+          timestamp: event.timestamp,
+          type: 'robot',
+          actionId: event.payload?.actionId || '',
+          label: event.payload?.label || '',
+        };
+      });
+
+    return {
+      sessionId,
+      startedAt: session.startedAt || null,
+      trialStartedAt: session.trialStartedAt || null,
+      completedAt: session.completedAt || null,
+      durationSeconds,
+      metadata: clone(session.metadata || {}),
+      puzzle: {
+        setId: session.puzzleSet?.setId || '',
+        subjectFile: session.puzzleSet?.subjectAsset?.originalName || '',
+        solutionFile: session.puzzleSet?.solutionAsset?.originalName || '',
+      },
+      interventions,
+    };
+  }
+
   async getSessionCsv(sessionIdInput) {
     const sessionId = this.#resolveSessionId(sessionIdInput);
     const csvPath = this.#csvPathForSession(sessionId);
@@ -1131,13 +1305,12 @@ class ExperimentStore extends EventEmitter {
         const uploadedAssets = event.payload.assets
           .map((asset) => normalizePuzzleAsset(asset))
           .filter(Boolean);
-        reconstructed.assets = {
-          ...reconstructed.assets,
+        reconstructed.assets = rebuildAssetState({
           puzzles: [
             ...reconstructed.assets.puzzles.filter((existing) => !uploadedAssets.some((asset) => asset.assetId === existing.assetId)),
             ...uploadedAssets,
           ],
-        };
+        });
       }
 
       if (event.type === 'session.started') {
@@ -1151,12 +1324,12 @@ class ExperimentStore extends EventEmitter {
         reconstructed.session.completedSummary = event.payload?.summary || null;
       }
 
-      if (event.type === 'session.reference-puzzle.selected') {
-        reconstructed.session.referencePuzzle = createReferencePuzzleSnapshot(
-          event.payload?.referencePuzzle,
+      if (event.type === 'session.reference-puzzle.selected' || event.type === 'session.puzzle-set.selected') {
+        reconstructed.session.puzzleSet = createPuzzleSetSnapshot(
+          event.payload?.puzzleSet || event.payload?.referencePuzzle,
           {
-            selectedAt: event.payload?.referencePuzzle?.selectedAt || null,
-            selectedBy: event.payload?.referencePuzzle?.selectedBy || null,
+            selectedAt: event.payload?.puzzleSet?.selectedAt || event.payload?.referencePuzzle?.selectedAt || null,
+            selectedBy: event.payload?.puzzleSet?.selectedBy || event.payload?.referencePuzzle?.selectedBy || null,
           },
         );
       }
@@ -1243,7 +1416,7 @@ class ExperimentStore extends EventEmitter {
       lastEventAt,
       latestHint: state.hint?.text || '',
       latestRobotAction: state.robotAction?.label || '',
-      referencePuzzleLabel: state.session?.referencePuzzle?.originalName || '',
+      referencePuzzleLabel: state.session?.puzzleSet?.subjectAsset?.originalName || '',
       adaptiveTransitions: counts['adaptive.status.changed'] || 0,
       hrvFrames: counts['telemetry.hrv.updated'] || 0,
       gazeFrames: counts['telemetry.gaze.updated'] || 0,

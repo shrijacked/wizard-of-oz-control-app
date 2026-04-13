@@ -4,7 +4,7 @@ const { createHash, randomUUID } = require('node:crypto');
 const { URL } = require('node:url');
 
 const WS_GUID = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
-const VALID_ROLES = new Set(['admin', 'subject', 'audit']);
+const VALID_ROLES = new Set(['admin', 'subject', 'robot', 'audit']);
 
 function encodeFrame(payload) {
   const data = Buffer.from(payload, 'utf8');
@@ -39,7 +39,8 @@ class WebSocketHub {
 
   handleUpgrade(request, socket) {
     const url = new URL(request.url, 'http://localhost');
-    const role = VALID_ROLES.has(url.searchParams.get('role')) ? url.searchParams.get('role') : 'admin';
+    const requestedRole = VALID_ROLES.has(url.searchParams.get('role')) ? url.searchParams.get('role') : 'admin';
+    const role = requestedRole === 'audit' ? 'robot' : requestedRole;
     const key = request.headers['sec-websocket-key'];
 
     if (!key || request.headers.upgrade?.toLowerCase() !== 'websocket') {
@@ -85,10 +86,12 @@ class WebSocketHub {
   }
 
   getConnectionStats() {
+    const robotConnections = [...this.clients.values()].filter((client) => client.role === 'robot').length;
     return {
       admin: [...this.clients.values()].filter((client) => client.role === 'admin').length,
       subject: [...this.clients.values()].filter((client) => client.role === 'subject').length,
-      audit: [...this.clients.values()].filter((client) => client.role === 'audit').length,
+      robot: robotConnections,
+      audit: robotConnections,
     };
   }
 

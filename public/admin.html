@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Research Control Deck</title>
+    <title>Operator Dashboard</title>
     <link rel="stylesheet" href="/styles.css">
   </head>
   <body class="admin-page">
@@ -16,166 +16,206 @@
         <div class="workspace-links">
           <a class="workspace-link active" href="/admin" aria-current="page">Admin</a>
           <a class="workspace-link" href="/subject" target="_blank" rel="noreferrer">Subject display</a>
-          <a class="workspace-link" href="/audit" target="_blank" rel="noreferrer">Audit display</a>
-          <a class="workspace-link" href="/exports">Exports</a>
+          <a class="workspace-link" href="/robot" target="_blank" rel="noreferrer">Robot screen</a>
         </div>
       </nav>
-
-      <nav class="workspace-subbar" aria-label="Operator pages">
-        <a class="workspace-sub-link active" href="/admin" aria-current="page">Overview</a>
-        <a class="workspace-sub-link" href="/admin/setup">Setup</a>
-        <a class="workspace-sub-link" href="/admin/live">Live controls</a>
-        <a class="workspace-sub-link" href="/admin/monitoring">Monitoring</a>
-        <a class="workspace-sub-link" href="/admin/review">Review</a>
-      </nav>
-
-      <header class="hero hero-grid">
-        <div class="hero-copy">
-          <p class="eyebrow">Wizard of Oz Control Application</p>
-          <h1>Research Control Deck</h1>
-          <p class="hero-text">
-            Use this overview page as the operator home base, then jump into the dedicated setup, live, monitoring, and review pages as the session moves forward.
-          </p>
-        </div>
-        <div class="hero-status">
-          <article class="status-card">
-            <span class="status-label">Session</span>
-            <strong id="session-id">Loading...</strong>
-            <small id="session-started">Connecting to local server...</small>
-          </article>
-          <article class="status-card adaptive">
-            <span class="status-label">Adaptive Recommendation</span>
-            <strong id="adaptive-status">Waiting for telemetry</strong>
-            <small id="adaptive-reason">The engine will flag observe or intervene states here.</small>
-          </article>
-          <article class="status-card">
-            <span class="status-label">Connections</span>
-            <strong id="connection-counts">0 admin / 0 subject / 0 audit</strong>
-            <small id="watch-bridge-status">Watch bridge idle</small>
-          </article>
-        </div>
-      </header>
-
-      <article class="callout page-banner">
-        <span class="callout-label">Operator message</span>
-        <p id="guard-message" class="inline-status">Loading safeguard status...</p>
-      </article>
 
       <main class="workspace-main">
         <header class="workspace-header">
           <div>
-            <p class="panel-kicker">Admin home</p>
-            <h2>Workspace overview</h2>
+            <p class="panel-kicker">Study control</p>
+            <h1>Operator Dashboard</h1>
           </div>
-          <p class="workspace-note">This page keeps the whole study state visible while giving you direct links into the focused pages for actual task work.</p>
+          <p class="workspace-note">One clean screen for camera, puzzle selection, hints, robot cues, timing, and export.</p>
         </header>
 
+        <section id="guard-shell" class="panel" hidden>
+          <div class="panel-header">
+            <div>
+              <p class="panel-kicker">Access</p>
+              <h2>Unlock controls</h2>
+            </div>
+          </div>
+          <p id="guard-message" class="inline-status">Loading access state...</p>
+          <form id="guard-form" class="button-row">
+            <input id="guard-pin" type="password" placeholder="Admin PIN">
+            <button id="guard-unlock" class="button button-primary" type="submit">Unlock</button>
+            <button id="guard-lock" class="button button-ghost" type="button">Lock</button>
+          </form>
+        </section>
+
         <div class="dashboard-grid">
-          <section class="panel">
+          <section class="panel live-panel">
             <div class="panel-header">
               <div>
-                <p class="panel-kicker">Setup</p>
-                <h2>Session And Readiness</h2>
+                <p class="panel-kicker">Live view</p>
+                <h2>Camera</h2>
               </div>
-              <a class="button button-primary" href="/admin/setup">Open setup page</a>
             </div>
-            <div class="callout">
-              <span class="callout-label">Session state</span>
-              <p id="session-status-summary">Session is in setup.</p>
-              <p id="session-status-detail">Save metadata, then start the trial when the participant is ready.</p>
+            <div class="button-row">
+              <button id="start-camera" class="button button-primary" type="button">Start camera</button>
+              <button id="stop-camera" class="button button-ghost" type="button">Stop</button>
             </div>
-            <div class="callout">
-              <span class="callout-label">Before participant gate</span>
-              <p id="preflight-summary">Checking the before-participant gate...</p>
-              <p id="preflight-detail">The server will summarize blockers here.</p>
-              <p id="preflight-progress" class="inline-status">0 of 0 checks ready.</p>
-            </div>
-            <div class="callout">
-              <span class="callout-label">Safeguards</span>
-              <p id="guard-summary">Checking safeguard status...</p>
-              <p id="guard-detail">Protected admin actions are evaluated here.</p>
+            <div class="video-frame">
+              <video id="camera-feed" autoplay muted playsinline></video>
+              <div class="video-overlay">
+                <span id="camera-status">Camera is off.</span>
+              </div>
             </div>
           </section>
 
           <section class="panel">
             <div class="panel-header">
               <div>
-                <p class="panel-kicker">Live</p>
-                <h2>Intervention Snapshot</h2>
+                <p class="panel-kicker">Solution</p>
+                <h2>Current Solution Preview</h2>
               </div>
-              <a class="button button-primary" href="/admin/live">Open live controls</a>
             </div>
             <div class="callout">
-              <span class="callout-label">Current hint</span>
+              <span class="callout-label">Selected puzzle set</span>
+              <p id="selected-set-summary">No puzzle set selected yet.</p>
+              <p id="selected-set-detail">Upload a subject file and its matching solution file ending in <code>s</code>, then choose the set for this run.</p>
+            </div>
+            <div id="solution-preview" class="reference-preview empty"></div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <p class="panel-kicker">Session</p>
+                <h2>Trial Metadata</h2>
+              </div>
+              <span class="panel-note">Optional fields for analysis quality</span>
+            </div>
+            <form id="session-form" class="stack-form">
+              <div class="field-grid">
+                <label class="field">
+                  <span>Study ID</span>
+                  <input id="session-study-id" type="text" placeholder="pilot-01">
+                </label>
+                <label class="field">
+                  <span>Participant ID</span>
+                  <input id="session-participant-id" type="text" placeholder="P-001">
+                </label>
+                <label class="field">
+                  <span>Researcher</span>
+                  <input id="session-researcher" type="text" placeholder="researcher name">
+                </label>
+                <label class="field">
+                  <span>Condition</span>
+                  <select id="session-condition">
+                    <option value="adaptive">Adaptive</option>
+                    <option value="control">Control</option>
+                  </select>
+                </label>
+              </div>
+              <label class="field">
+                <span>Notes</span>
+                <textarea id="session-notes" rows="4" placeholder="Optional run notes."></textarea>
+              </label>
+              <div class="button-row">
+                <button id="session-save" class="button button-primary" type="submit">Save profile</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <p class="panel-kicker">Puzzle library</p>
+                <h2>Upload And Choose Puzzle Set</h2>
+              </div>
+            </div>
+            <form id="puzzle-upload-form" class="stack-form">
+              <label class="field">
+                <span>Upload files</span>
+                <input id="puzzle-upload-input" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.webp">
+              </label>
+              <div class="button-row">
+                <button id="puzzle-upload-submit" class="button button-primary" type="submit">Upload files</button>
+                <button id="puzzle-clear-selection" class="button button-ghost" type="button">Clear selection</button>
+              </div>
+              <p id="puzzle-upload-status" class="panel-note">Waiting for upload.</p>
+            </form>
+            <div class="callout">
+              <span class="callout-label">Complete pairs</span>
+              <div id="puzzle-library-list" class="reference-library-list"></div>
+            </div>
+            <div class="callout">
+              <span class="callout-label">Incomplete uploads</span>
+              <div id="incomplete-library-list" class="link-list"></div>
+            </div>
+          </section>
+
+          <section class="panel live-panel">
+            <div class="panel-header">
+              <div>
+                <p class="panel-kicker">Run lifecycle</p>
+                <h2>Trial Controls</h2>
+              </div>
+            </div>
+            <div class="callout timing-callout">
+              <span class="callout-label">Status</span>
+              <p id="session-status-summary">SETUP</p>
+              <p id="session-status-detail">Choose a puzzle set, then start the trial when ready.</p>
+            </div>
+            <div class="callout">
+              <span class="callout-label">Puzzle timer</span>
+              <p id="session-duration-summary">Trial timer is waiting for the session to start.</p>
+              <p id="session-duration-detail">The completion time will appear here as soon as the puzzle begins.</p>
+            </div>
+            <div class="callout">
+              <span class="callout-label">Connections</span>
+              <p id="connection-counts">0 admin / 0 subject / 0 robot</p>
+              <p id="screen-links">Subject and robot screens are ready to open.</p>
+            </div>
+            <div class="button-row">
+              <button id="session-start" class="button button-primary" type="button">Start trial</button>
+              <button id="session-complete" class="button button-ghost" type="button">Mark complete</button>
+              <button id="reset-session" class="button button-ghost" type="button">Reset session</button>
+            </div>
+            <div class="button-row">
+              <a id="export-json-link" class="button button-primary" href="/api/export/current.json" download>Download session JSON</a>
+              <a id="export-csv-link" class="button button-ghost" href="/api/export/current.csv" download>Download CSV</a>
+            </div>
+          </section>
+
+          <section class="panel live-panel">
+            <div class="panel-header">
+              <div>
+                <p class="panel-kicker">Hinting</p>
+                <h2>Digital Hint Terminal</h2>
+              </div>
+              <span class="panel-note">Broadcasts to the subject screen</span>
+            </div>
+            <form id="hint-form" class="stack-form">
+              <label class="field">
+                <span>Hint text</span>
+                <textarea id="hint-text" rows="5" placeholder="Type the hint the subject should see."></textarea>
+              </label>
+              <div class="button-row">
+                <button id="hint-send" class="button button-primary" type="submit">Broadcast hint</button>
+                <button id="clear-hint" class="button button-ghost" type="button">Clear editor</button>
+              </div>
+            </form>
+            <div class="callout">
+              <span class="callout-label">Latest hint</span>
               <p id="hint-preview">No hint has been sent yet.</p>
             </div>
+          </section>
+
+          <section class="panel live-panel">
+            <div class="panel-header">
+              <div>
+                <p class="panel-kicker">Robot cue controls</p>
+                <h2>Robot Cue Controls</h2>
+              </div>
+              <span class="panel-note">Broadcasts to the robot screen</span>
+            </div>
+            <div id="action-grid" class="action-grid"></div>
             <div class="callout">
-              <span class="callout-label">Latest robot action</span>
+              <span class="callout-label">Latest robot cue</span>
               <p id="latest-action">No robotic action logged yet.</p>
-            </div>
-            <div class="callout advisory-callout">
-              <span class="callout-label">LLM advisory</span>
-              <p id="llm-summary">No LLM recommendation has been generated.</p>
-              <p id="llm-hint">Suggested hint: unavailable</p>
-            </div>
-          </section>
-
-          <section class="panel">
-            <div class="panel-header">
-              <div>
-                <p class="panel-kicker">Monitoring</p>
-                <h2>Telemetry Snapshot</h2>
-              </div>
-              <a class="button button-primary" href="/admin/monitoring">Open monitoring page</a>
-            </div>
-            <div class="metric-grid">
-              <article class="metric-card">
-                <span>Heart Rate</span>
-                <strong id="metric-hr">--</strong>
-                <small>BPM</small>
-              </article>
-              <article class="metric-card">
-                <span>Stress Score</span>
-                <strong id="metric-stress">0.00</strong>
-                <small id="metric-stress-level">Not Stressed</small>
-              </article>
-              <article class="metric-card">
-                <span>Attention</span>
-                <strong id="metric-attention">--</strong>
-                <small>0 to 1</small>
-              </article>
-              <article class="metric-card">
-                <span>Fixation Loss</span>
-                <strong id="metric-fixation">--</strong>
-                <small>0 to 1</small>
-              </article>
-            </div>
-            <div class="callout">
-              <span class="callout-label">Sensor health</span>
-              <p id="sensor-health-summary">Checking sensor health...</p>
-              <p id="sensor-health-detail">The server will summarize stream issues here.</p>
-            </div>
-          </section>
-
-          <section class="panel">
-            <div class="panel-header">
-              <div>
-                <p class="panel-kicker">Review</p>
-                <h2>Exports And Routing</h2>
-              </div>
-              <a class="button button-primary" href="/admin/review">Open review page</a>
-            </div>
-            <div class="callout">
-              <span class="callout-label">Export summary</span>
-              <p id="export-summary">Loading export manifest...</p>
-            </div>
-            <div class="callout">
-              <span class="callout-label">Current downloads</span>
-              <div id="current-export-links" class="link-list"></div>
-            </div>
-            <div class="callout">
-              <span class="callout-label">Host routes</span>
-              <div id="localhost-links" class="link-list"></div>
             </div>
           </section>
         </div>
