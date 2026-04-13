@@ -1,102 +1,66 @@
 # Internal Study Readiness
 
-## Purpose
+Use this as the practical runbook for a real study session with the simplified three-screen app.
 
-This runbook is the shortest path from a clean laptop to a participant-ready internal study session. It is intentionally strict. The goal is to make experiment-day setup boring, repeatable, and easy to audit after the fact.
+## Before the participant arrives
 
-For the full rehearsal ladder and pass criteria, use [end-to-end-validation-plan.md](/Users/owlxshri/Downloads/hti/docs/end-to-end-validation-plan.md). For each rehearsal, duplicate and fill [dry-run-log-template.md](/Users/owlxshri/Downloads/hti/docs/dry-run-log-template.md).
+1. Start the app with `npm start` or `npm run launch:study`.
+2. Confirm the host machine opens `http://localhost:3000/admin`.
+3. Place the camera so the puzzle workspace is clearly visible.
+4. Prepare the subject-facing and robot-facing devices on the same network.
+5. Make sure your puzzle files are named in subject and solution pairs such as `4.pdf` and `4s.pdf`.
 
-## Readiness architecture
+## Screen setup
 
-```mermaid
-flowchart LR
-    launcher["npm run launch:study"] --> server["Local server"]
-    server --> gate["Before participant gate"]
-    gate --> metadata["Session metadata complete"]
-    gate --> subject["Subject display connected"]
-    gate --> sensors["HRV + gaze telemetry live"]
-    gate --> manual["Manual confirmations saved"]
-    manual --> start["Allow trial start"]
-```
+1. Open `/admin` on the host machine.
+2. Open `/subject` on the participant device.
+3. Open `/robot` on the robot-operator device.
+4. If `ADMIN_PIN` is configured, unlock the operator browser once.
 
-## Experiment-day flow
+## Trial setup
 
-```mermaid
-flowchart TD
-    boot["Launch study stack"] --> admin["Open /admin overview"]
-    admin --> setup["Go to /admin/setup"]
-    setup --> unlock{"ADMIN_PIN enabled?"}
-    unlock -- yes --> pin["Unlock this browser"]
-    unlock -- no --> save["Save session metadata"]
-    pin --> save
-    save --> reference["Upload puzzle set and choose reference puzzle"]
-    reference --> sensors["Go to /admin/monitoring and verify watch and gaze feeds"]
-    sensors --> displays["Open /subject and optional /audit"]
-    displays --> manual["Save manual checklist confirmations"]
-    manual --> gate{"Before participant gate clear?"}
-    gate -- no --> fix["Resolve blockers shown on /admin"]
-    fix --> setup
-    gate -- yes --> run["Go to /admin/live and run the session"]
-    run --> complete["Mark complete and export data"]
-```
+1. Upload the puzzle files from the dashboard.
+2. Choose the puzzle set you want to run.
+3. Verify the subject screen shows the subject puzzle.
+4. Verify the robot screen shows the paired solution file.
+5. Start the camera preview on the dashboard.
+6. Optionally enter the study metadata fields.
 
-## Before first participant
+## During the run
 
-1. Start the stack with `npm run launch:study`.
-2. Open `/admin` on the host laptop, then move into `/admin/setup`.
-3. Unlock the admin browser if `ADMIN_PIN` is enabled.
-4. Save the session profile with `study id`, `participant id`, `condition`, and `researcher`.
-5. Upload the puzzle set on `/admin/setup`, preview the library, and choose the single reference puzzle that should stay visible on `/subject`.
-6. Open `/subject` on the participant-facing device and confirm the admin screen shows the subject display as connected and the selected reference puzzle is visible beside the hint area.
-7. Open `/audit` on a secondary device if you want a separate robot-action monitor.
-8. Confirm the watch bridge is live and at least one HRV sample has arrived.
-9. Confirm the gaze bridge is live and at least one gaze sample has arrived.
-10. Save all four manual checklist confirmations on the before-participant gate:
-   camera framing checked
-   subject display confirmed
-   robot control board ready
-   puzzle materials reset
-11. Use `/admin/live` for hints and robot actions once the trial is running.
-12. Start the trial only after the gate reports no blockers.
+1. Click `Start trial` when the participant begins.
+2. Send hints from the dashboard as needed.
+3. Use the robot cue buttons when the robot operator needs an action instruction.
+4. Watch the elapsed timer on the dashboard.
 
-## Dry-run protocol
+## Finish and export
 
-Run this before your first real participant and again after any network or hardware change.
+1. Click `Mark complete` when the participant finishes.
+2. Download the session JSON from the dashboard.
+3. Optionally download the CSV timeline too.
+4. Click `Reset session` before the next participant.
 
-1. Launch the stack.
-2. Walk through the full gate until it reports ready.
-3. Upload at least two puzzle assets and switch the active reference once so the operator flow is rehearsed.
-4. Start a mock trial.
-5. Send one hint and verify it appears on `/subject` beside the selected reference puzzle.
-6. Log one robot action and verify it appears on `/audit`.
-7. Confirm the adaptive panel updates after fresh telemetry.
-8. Confirm the live puzzle timer is advancing while the trial is running.
-9. Complete the trial and note the final completion duration shown on `/admin/review` or `/exports`.
-10. Download `current.bundle.json` and `current.csv` from `/exports`.
-11. Confirm the bundle contains:
-   session metadata
-   selected reference puzzle
-   preflight acknowledgements
-   telemetry events
-   adaptive configuration
-   trial start and completion events
-   puzzle completion duration
+## What to verify in the JSON export
 
-## Recovery rules
+- `sessionId`
+- `trialStartedAt`
+- `completedAt`
+- `durationSeconds`
+- selected `subjectFile`
+- selected `solutionFile`
+- ordered `interventions`
+- every hint intervention has a timestamp and text
+- every robot intervention has a timestamp, action ID, and label
 
-- If the subject display disconnects before start, reconnect it and wait for the gate to clear.
-- If watch or gaze telemetry is stale before start, do not begin the participant run until the gate clears.
-- If the trial is already running and telemetry goes stale, continue only if your protocol allows it and document the issue in the completion summary.
-- If setup becomes confused, use `Reset session` during setup or `Force reset session` only when a live run must be aborted.
+## Camera-only dry run
 
-## What the gate enforces
+If you only have the camera hardware available right now:
 
-The server-side readiness gate blocks `POST /api/session/start` until:
-
-- study id, participant id, and researcher are present
-- at least one subject display connection is active
-- fresh HRV telemetry has been received
-- fresh gaze telemetry has been received
-- all four manual confirmations have been saved
-
-The gate does not require `/audit`, but it will recommend opening it.
+1. Run the app normally.
+2. Upload one paired puzzle set.
+3. Open `/subject` and `/robot` on extra tabs or devices.
+4. Start the camera.
+5. Start a trial.
+6. Send at least one hint and one robot cue.
+7. Complete the trial.
+8. Download the JSON and confirm it includes the selected filenames and the two interventions.

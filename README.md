@@ -1,144 +1,98 @@
 # Wizard of Oz Control Application
 
-Local-first control software for puzzle-session research studies. The app serves three synchronized web views from one machine:
+Local-first control software for a three-screen Wizard of Oz puzzle study.
 
-- `/admin` for the primary researcher
-- `/subject` for the participant hint display
-- `/audit` for robotic action auditing
+The app now centers around one clean operator dashboard and two synchronized secondary screens:
 
-The system is designed to run on a laptop on the same Wi-Fi network as the secondary displays. It uses plain Node.js on the backend, browser-native frontend code, WebSockets for real-time updates, and file-backed logging for post-trial analysis.
+- `/admin` for the dashboard operator
+- `/subject` for the participant
+- `/robot` for the robot operator
 
-## Repository layout
+The host machine serves all three screens over the local network and keeps them synchronized with WebSockets and file-backed logging.
 
-- `docs/architecture.md`: system architecture and data flow
-- `docs/implementation-plan.md`: task traceability and staged plan
-- `docs/internal-study-readiness.md`: before-first-participant checklist and dry-run protocol
-- `src/`: backend server and services
-- `public/`: browser UIs for admin, subject, and audit routes
-- `integrations/gaze/`: vendor bridge for gaze SDKs
-- `tests/`: automated test coverage
-- `integrations/watch/watch.py`: reference watch ingestion script supplied for HRV monitoring
+## What the app does
 
-## Core capabilities
+- shows a live webcam preview on the operator dashboard
+- lets the operator upload puzzle files and auto-pair subject files with solution files using the `s` suffix convention
+- sends text hints from the dashboard to the subject screen
+- sends robot cues from the dashboard to the robot screen
+- tracks the trial lifecycle with start, completion, reset, and elapsed time
+- exports a concise session JSON with timestamps, selected puzzle filenames, and ordered interventions
+- keeps CSV timeline output available as a secondary export
+- keeps HRV and gaze ingestion routes available in the backend without making them part of the main operator workflow
 
-- Live webcam preview inside the admin dashboard
-- Real-time HRV and gaze telemetry ingestion
-- Adaptive intervention engine with heuristic fallback and optional LLM analysis
-- Researcher-tunable adaptive thresholds, weights, and freshness windows
-- Hint broadcasting to the subject display
-- Persistent puzzle library uploads with session-specific reference-puzzle selection
-- Subject display layout that keeps the chosen reference asset visible beside live hints
-- Robotic arm action logging and live audit broadcasting
-- Automatic event logging to local files with timestamps
-- Session export page with JSON and CSV downloads
-- Session metadata and trial lifecycle controls for participant-ready runs
-- Explicit live puzzle timer plus exported completion duration for each subject run
-- Export analytics and replay timeline for post-trial review
-- Optional local admin PIN lock with browser-scoped unlock tokens
-- Session-phase protections that block hints, robot actions, and unsafe resets at the wrong time
-- One-command study-day launcher for the local stack
-- Sensor health summaries with stale-stream warnings for watch and gaze inputs
+## Puzzle file pairing
 
-## Runbook
+Upload files in subject and solution pairs:
 
-See `docs/architecture.md`, `docs/implementation-plan.md`, and `docs/internal-study-readiness.md` first. Once the implementation is in place, start the local server with:
+- `1.pdf` pairs with `1s.pdf`
+- `7.png` pairs with `7s.png`
+
+Only complete pairs appear as selectable puzzle sets in the dashboard. Any unmatched file stays listed as an incomplete upload until its matching pair is added.
+
+## Routes
+
+- `GET /admin`: single operator dashboard
+- `GET /subject`: participant-facing puzzle and hint screen
+- `GET /robot`: robot-operator solution and cue screen
+- `GET /audit`: compatibility redirect to `/robot`
+- `GET /api/export/current.json`: concise primary session export
+- `GET /api/export/current.csv`: raw timeline CSV
+
+## Quick start
 
 ```bash
+npm install
 npm start
-```
-
-For experiment-day startup, use the one-command launcher:
-
-```bash
-npm run launch:study
 ```
 
 Then open:
 
 - `http://localhost:3000/admin`
 - `http://<host-ip>:3000/subject`
-- `http://<host-ip>:3000/audit`
+- `http://<host-ip>:3000/robot`
 
-On `/admin`, the typical operator flow is:
+## Operator runbook
 
-1. Unlock the dashboard first if `ADMIN_PIN` is configured on the host.
-2. Save the session profile with study ID, participant ID, condition, and notes.
-3. Upload the puzzle set on `/admin/setup` and choose the reference asset that should stay visible on `/subject`.
-4. Tune the adaptive controls for the study if the default rule set is not appropriate.
-5. Clear the before-participant gate, including the four manual confirmations.
-6. Start the trial when the participant is ready.
-7. Use hints, action logging, and telemetry during the run.
-8. Watch the live puzzle timer on `/admin/live`, then mark the session complete and enter an end-of-trial summary.
-9. Download the final bundle or CSV from `/exports`.
+1. Open `/admin` on the host machine.
+2. Upload puzzle files and choose the puzzle set for the run.
+3. Open `/subject` on the participant-facing device.
+4. Open `/robot` on the robot-operator-facing device.
+5. Start the camera preview on the dashboard.
+6. Optionally fill in study metadata.
+7. Start the trial.
+8. Send hints and robot cues from the dashboard during the run.
+9. Mark the trial complete.
+10. Download the session JSON from the dashboard.
 
-Session protections are always active, even when no PIN is configured:
+## Runtime options
 
-- hints and robot actions are blocked until the trial is running
-- completed sessions become read-only until reset
-- live sessions require an explicit force reset confirmation
+- `PORT`: listening port, default `3000`
+- `HOST`: listening host, default `0.0.0.0`
+- `ADMIN_PIN`: optional browser unlock PIN for operator actions
+- `OPENAI_API_KEY` or `ADAPTIVE_LLM_API_KEY`: optional LLM advisory support for adaptive analysis
 
-## Optional runtime configuration
+The adaptive backend and telemetry bridges can stay enabled for future hardware integration, but they do not block the simplified operator workflow.
 
-- `PORT`: override the listening port. Default is `3000`.
-- `HOST`: override the listening host. Default is `0.0.0.0`.
-- `ADMIN_PIN`: require a local PIN unlock before browser-based admin mutations are allowed.
-- `OPENAI_API_KEY` or `ADAPTIVE_LLM_API_KEY`: enable optional OpenAI-compatible adaptive advice.
-- `ADAPTIVE_LLM_ENDPOINT`: override the chat-completions endpoint.
-- `ADAPTIVE_LLM_MODEL`: override the advisory model name.
+## Sensor integration
+
+- HRV watch: run [`integrations/watch/watch.py`](/Users/owlxshri/Downloads/hti/integrations/watch/watch.py) from the repo root so it writes `watch/watch_data.json`
+- Gaze detector: post frames to `POST /api/telemetry/gaze` or use [`integrations/gaze/bridge.py`](/Users/owlxshri/Downloads/hti/integrations/gaze/bridge.py)
+
+These feeds still update backend state, but the dashboard no longer requires them before a trial can start.
 
 ## Verification
 
-Run the full local verification bundle with:
+Run the full suite with:
 
 ```bash
 npm run verify
 ```
 
-That executes the Node test suite plus Python syntax validation for the watch and gaze bridge scripts. The same checks also run in GitHub Actions on pushes and pull requests.
+That runs the Node test suite plus Python syntax validation for the watch and gaze scripts.
 
-## Sensor wiring
+## Documentation
 
-- HRV watch: run [`integrations/watch/watch.py`](/Users/owlxshri/Downloads/hti/integrations/watch/watch.py) from the repo root so it writes `watch/watch_data.json`.
-- Gaze detector: either post samples to `POST /api/telemetry/gaze` directly or run the bridge in [`integrations/gaze/bridge.py`](/Users/owlxshri/Downloads/hti/integrations/gaze/bridge.py) and connect your SDK output to it.
-- Manual or demo telemetry: use `POST /api/telemetry/simulate` or the built-in simulator on `/admin`.
-
-Bridge and sensor ingestion routes stay available without admin unlock so the external devices can keep streaming during a study:
-
-- `POST /api/telemetry/hrv`
-- `POST /api/telemetry/gaze`
-- `POST /api/bridge/gaze/heartbeat`
-- `POST /api/bridge/gaze/frame`
-
-Protected operator tuning is available through:
-
-- `POST /api/adaptive/config`
-- `POST /api/puzzles/upload`
-- `POST /api/puzzles/select`
-- `GET /api/preflight`
-- `POST /api/preflight/acknowledgements`
-
-Launcher controls:
-
-- `npm run launch:study`: starts the server, the watch bridge process, and a heartbeat-only gaze bridge
-- `LAUNCH_WATCH=0 npm run launch:study`: skips the watch process when hardware is unavailable
-- `GAZE_MODE=file-tail GAZE_FILE=/path/to/frames.jsonl npm run launch:study`: start the gaze bridge in file-tail mode
-- `GAZE_MODE=stdin-jsonl npm run launch:study`: keep the gaze bridge open for stdin-fed SDK frames
-
-## Export surface
-
-- `GET /exports`: operator-facing session export page
-- `GET /api/exports`: export manifest
-- `GET /api/exports/current.bundle.json`: current session bundle with state, events, and CSV text
-- `GET /api/exports/current.csv`: current session timeline CSV
-
-The export center also renders:
-
-- derived session analytics such as puzzle duration, event counts, and adaptive transitions
-- the reference puzzle that was shown on the participant display
-- the active adaptive configuration used for that session
-- a replay timeline built from the ordered event log
-
-## Health endpoints and operator status
-
-- `GET /health`: server and sensor health summary with `ok`, `status`, and derived watch/gaze diagnostics
-- `/admin`: now includes a before-participant gate plus a sensor-health panel that warns when watch data or gaze heartbeats go stale
+- [Architecture](/Users/owlxshri/Downloads/hti/docs/architecture.md)
+- [Internal Study Readiness](/Users/owlxshri/Downloads/hti/docs/internal-study-readiness.md)
+- [End-to-End Validation Plan](/Users/owlxshri/Downloads/hti/docs/end-to-end-validation-plan.md)
