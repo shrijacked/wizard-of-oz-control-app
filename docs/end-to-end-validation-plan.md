@@ -9,6 +9,8 @@ Prove that:
 - the operator dashboard works from a single page
 - the subject screen receives the chosen puzzle and hint
 - the robot screen receives the solution file and robot cue
+- the subject and robot screens each play an alert beep after being armed once
+- the operator dashboard shows live HRV metrics when watch data is present
 - the session export captures timestamps, selected filenames, and interventions
 
 ## Validation checklist
@@ -46,6 +48,7 @@ Expected:
 
 - `/subject` shows `1.pdf`
 - `/robot` shows `1s.pdf`
+- after clicking `Enable alert sound` once on each screen, both screens report that alert sound is ready
 
 ### 4. Trial lifecycle
 
@@ -53,9 +56,10 @@ Expected dashboard flow:
 
 1. camera can start and stop
 2. `Start trial` becomes available once a puzzle set is selected
-3. sending a hint updates `/subject`
-4. logging a robot cue updates `/robot`
-5. `Mark complete` locks further interventions
+3. sending a hint updates `/subject` and triggers one subject-screen beep
+4. logging a robot cue updates `/robot` and triggers one robot-screen beep
+5. if the watch feed is connected, `/admin` shows fresh HRV values and updated time
+6. `Mark complete` locks further interventions
 
 ### 5. Export validation
 
@@ -80,8 +84,11 @@ Expected:
 3. Upload `1.pdf` and `1s.pdf`.
 4. Select set `1`.
 5. Start the camera.
-6. Start the trial.
-7. Send one hint.
-8. Send one robot cue.
-9. Mark the trial complete.
-10. Download the JSON export and review it.
+6. Click `Enable alert sound` once on `/subject`.
+7. Click `Enable alert sound` once on `/robot`.
+8. Start the trial.
+9. Send one hint.
+10. Send one robot cue.
+11. If the watch is connected, confirm the HRV panel updates on `/admin`.
+12. Mark the trial complete.
+13. Download the JSON export and review it.

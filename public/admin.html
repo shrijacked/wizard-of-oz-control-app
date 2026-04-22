@@ -79,6 +79,55 @@
             <div id="solution-preview" class="reference-preview empty"></div>
           </section>
 
+          <section class="panel live-panel">
+            <div class="panel-header">
+              <div>
+                <p class="panel-kicker">Physiology</p>
+                <h2>HRV Telemetry</h2>
+              </div>
+              <span class="panel-note">Live watch metrics for the operator dashboard</span>
+            </div>
+            <div class="metric-grid telemetry-metric-grid">
+              <article class="metric-card">
+                <span class="callout-label">Heart rate</span>
+                <strong id="hrv-heart-rate">--</strong>
+              </article>
+              <article class="metric-card">
+                <span class="callout-label">SDNN</span>
+                <strong id="hrv-sdnn">--</strong>
+              </article>
+              <article class="metric-card">
+                <span class="callout-label">RMSSD</span>
+                <strong id="hrv-rmssd">--</strong>
+              </article>
+              <article class="metric-card">
+                <span class="callout-label">pNN50</span>
+                <strong id="hrv-pnn50">--</strong>
+              </article>
+              <article class="metric-card">
+                <span class="callout-label">Stress score</span>
+                <strong id="hrv-stress-score">--</strong>
+              </article>
+              <article class="metric-card">
+                <span class="callout-label">Stress level</span>
+                <strong id="hrv-stress-level">Awaiting data</strong>
+              </article>
+              <article class="metric-card">
+                <span class="callout-label">Distraction</span>
+                <strong id="hrv-distraction">--</strong>
+              </article>
+              <article class="metric-card">
+                <span class="callout-label">Last sample</span>
+                <strong id="hrv-updated">No HRV sample yet.</strong>
+              </article>
+            </div>
+            <div class="callout">
+              <span class="callout-label">Watch source</span>
+              <p id="hrv-source">Waiting for watch</p>
+              <p id="hrv-interpretation">Awaiting HRV data.</p>
+            </div>
+          </section>
+
           <section class="panel">
             <div class="panel-header">
               <div>

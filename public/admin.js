@@ -7,6 +7,7 @@ import {
 } from './shared.js';
 import { createCameraController } from './admin-camera.mjs';
 import { bindCameraControls } from './admin-controls.mjs';
+import { renderHrvTelemetry } from './admin-telemetry.mjs';
 
 const ADMIN_TOKEN_KEY = 'woz.admin.token';
 
@@ -34,6 +35,16 @@ const elements = {
   selectedSetSummary: document.querySelector('#selected-set-summary'),
   selectedSetDetail: document.querySelector('#selected-set-detail'),
   solutionPreview: document.querySelector('#solution-preview'),
+  hrvHeartRate: document.querySelector('#hrv-heart-rate'),
+  hrvSdnn: document.querySelector('#hrv-sdnn'),
+  hrvRmssd: document.querySelector('#hrv-rmssd'),
+  hrvPnn50: document.querySelector('#hrv-pnn50'),
+  hrvStressScore: document.querySelector('#hrv-stress-score'),
+  hrvStressLevel: document.querySelector('#hrv-stress-level'),
+  hrvDistraction: document.querySelector('#hrv-distraction'),
+  hrvUpdated: document.querySelector('#hrv-updated'),
+  hrvSource: document.querySelector('#hrv-source'),
+  hrvInterpretation: document.querySelector('#hrv-interpretation'),
   sessionStatusSummary: document.querySelector('#session-status-summary'),
   sessionStatusDetail: document.querySelector('#session-status-detail'),
   sessionDurationSummary: document.querySelector('#session-duration-summary'),
@@ -518,6 +529,18 @@ function renderState() {
   renderGuard();
   renderPuzzleLibrary();
   renderSession();
+  renderHrvTelemetry({
+    heartRate: elements.hrvHeartRate,
+    sdnn: elements.hrvSdnn,
+    rmssd: elements.hrvRmssd,
+    pnn50: elements.hrvPnn50,
+    stressScore: elements.hrvStressScore,
+    stressLevel: elements.hrvStressLevel,
+    distraction: elements.hrvDistraction,
+    source: elements.hrvSource,
+    updated: elements.hrvUpdated,
+    interpretation: elements.hrvInterpretation,
+  }, currentState);
 }
 
 async function refreshState() {

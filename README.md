@@ -16,7 +16,10 @@ The host machine serves all three screens over the local network and keeps them 
 - lets the operator upload puzzle files and auto-pair subject files with solution files using the `s` suffix convention
 - sends text hints from the dashboard to the subject screen
 - sends robot cues from the dashboard to the robot screen
+- plays a short alert beep on the subject screen when a new hint arrives
+- plays a short alert beep on the robot screen when a new robot cue arrives
 - tracks the trial lifecycle with start, completion, reset, and elapsed time
+- shows live HRV watch metrics on the operator dashboard when telemetry is available
 - exports a concise session JSON with timestamps, selected puzzle filenames, and ordered interventions
 - keeps CSV timeline output available as a secondary export
 - keeps HRV and gaze ingestion routes available in the backend without making them part of the main operator workflow
@@ -58,12 +61,14 @@ Then open:
 2. Upload puzzle files and choose the puzzle set for the run.
 3. Open `/subject` on the participant-facing device.
 4. Open `/robot` on the robot-operator-facing device.
-5. Start the camera preview on the dashboard.
-6. Optionally fill in study metadata.
-7. Start the trial.
-8. Send hints and robot cues from the dashboard during the run.
-9. Mark the trial complete.
-10. Download the session JSON from the dashboard.
+5. Tap `Enable alert sound` once on both `/subject` and `/robot` so the browser is allowed to beep.
+6. Start the camera preview on the dashboard.
+7. Optionally fill in study metadata.
+8. Start the trial.
+9. Send hints and robot cues from the dashboard during the run.
+10. Watch the HRV panel on `/admin` if the watch feed is connected.
+11. Mark the trial complete.
+12. Download the session JSON from the dashboard.
 
 ## Runtime options
 
@@ -80,6 +85,8 @@ The adaptive backend and telemetry bridges can stay enabled for future hardware 
 - Gaze detector: post frames to `POST /api/telemetry/gaze` or use [`integrations/gaze/bridge.py`](/Users/owlxshri/Downloads/hti/integrations/gaze/bridge.py)
 
 These feeds still update backend state, but the dashboard no longer requires them before a trial can start.
+
+When the watch feed is active, the `/admin` page shows heart rate, SDNN, RMSSD, pNN50, stress score, stress level, distraction flag, source, and last-update time.
 
 ## Verification
 

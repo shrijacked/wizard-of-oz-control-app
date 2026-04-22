@@ -7,8 +7,8 @@ The system is a local Node.js web server that coordinates one operator dashboard
 ```mermaid
 flowchart LR
     admin["/admin<br/>operator dashboard"] --> server["local node server<br/>http + websocket + session store"]
-    server --> subject["/subject<br/>participant puzzle + hint"]
-    server --> robot["/robot<br/>solution + robot cue"]
+    server --> subject["/subject<br/>participant puzzle + hint + beep"]
+    server --> robot["/robot<br/>solution + robot cue + beep"]
     watch["watch bridge"] --> server
     gaze["gaze bridge"] --> server
     camera["browser camera api"] --> admin
@@ -22,6 +22,7 @@ The operator dashboard is the only control surface. The other two screens are re
 ### `/admin`
 
 - starts and stops the live camera preview
+- shows live HRV watch metrics when telemetry is available
 - optionally records metadata such as study ID and participant ID
 - uploads puzzle files and chooses one logical puzzle set
 - starts, completes, and resets the trial
@@ -33,12 +34,14 @@ The operator dashboard is the only control surface. The other two screens are re
 
 - shows the chosen subject puzzle file
 - shows the latest hint from the dashboard
+- plays a short browser beep when a fresh hint arrives after the screen is armed
 - updates live over WebSockets with no refresh
 
 ### `/robot`
 
 - shows the paired solution file for the chosen puzzle set
 - shows the latest robot cue from the dashboard
+- plays a short browser beep when a fresh robot cue arrives after the screen is armed
 - updates live over WebSockets with no refresh
 
 ### `/audit`
@@ -128,8 +131,10 @@ sequenceDiagram
     Admin->>Server: start trial
     Admin->>Server: send hint
     Server-->>Subject: latest hint
+    Subject-->>Subject: play hint beep
     Admin->>Server: log robot action
     Server-->>Robot: latest robot cue
+    Robot-->>Robot: play robot beep
     Admin->>Server: complete trial
     Admin->>Server: download export
 ```
