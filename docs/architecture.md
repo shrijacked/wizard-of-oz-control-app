@@ -108,7 +108,7 @@ The session holds one selected puzzle set for the current run.
   },
   "robotAction": {
     "actionId": "function-3",
-    "label": "Function 3: Blue Triangle",
+    "label": "Function 3: Purple Triangle",
     "updatedAt": "2026-04-13T12:09:55.000Z"
   }
 }
@@ -205,7 +205,7 @@ The primary export is intentionally concise and operator-facing.
       "timestamp": "2026-04-13T12:09:55.000Z",
       "type": "robot",
       "actionId": "function-3",
-      "label": "Function 3: Blue Triangle"
+      "label": "Function 3: Purple Triangle"
     }
   ]
 }

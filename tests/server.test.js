@@ -178,7 +178,7 @@ test('subject and robot sockets receive role-specific snapshots for the selected
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         actionId: 'function-3',
-        label: 'Function 3: Blue Triangle',
+        label: 'Function 3: Purple Triangle',
       }),
     });
 
@@ -235,7 +235,7 @@ test('session flow starts without preflight, allows interventions during run, an
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         actionId: 'function-1',
-        label: 'Function 1: Move Square',
+        label: 'Function 1: Orange Triangle',
       }),
     });
     assert.equal(actionResponse.status, 200);
@@ -254,7 +254,7 @@ test('session flow starts without preflight, allows interventions during run, an
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         actionId: 'function-2',
-        label: 'Function 2: Rotate Triangle',
+        label: 'Function 2: Green Square',
       }),
     });
     assert.equal(afterCompleteAction.status, 409);
@@ -298,7 +298,7 @@ test('concise export endpoint returns timestamps, selected filenames, and ordere
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         actionId: 'function-2',
-        label: 'Function 2: Rotate Triangle',
+        label: 'Function 2: Green Square',
       }),
     });
 

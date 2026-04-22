@@ -17,13 +17,13 @@ const { summarizePreflight } = require('./preflight');
 const { assertPolicy, buildPolicy } = require('./session-policy');
 
 const ROBOT_ACTIONS = [
-  { actionId: 'function-1', label: 'Function 1: Move Square' },
-  { actionId: 'function-2', label: 'Function 2: Rotate Triangle' },
-  { actionId: 'function-3', label: 'Function 3: Blue Triangle' },
-  { actionId: 'function-4', label: 'Function 4: Lift Circle' },
-  { actionId: 'function-5', label: 'Function 5: Shift Hexagon' },
-  { actionId: 'function-6', label: 'Function 6: Nudge Edge' },
-  { actionId: 'function-7', label: 'Function 7: Reset Pose' },
+  { actionId: 'function-1', label: 'Function 1: Orange Triangle' },
+  { actionId: 'function-2', label: 'Function 2: Green Square' },
+  { actionId: 'function-3', label: 'Function 3: Purple Triangle' },
+  { actionId: 'function-4', label: 'Function 4: Pink Triangle' },
+  { actionId: 'function-5', label: 'Function 5: Yellow Parallelogram' },
+  { actionId: 'function-6', label: 'Function 6: Blue Triangle' },
+  { actionId: 'function-7', label: 'Function 7: Red Triangle' },
 ];
 
 const CONTENT_TYPES = {

@@ -23,7 +23,7 @@ test('store persists hints, actions, and telemetry to disk-backed state', async 
   const { store, dataDir } = await createStore();
 
   await store.setHint({ text: 'Try the outer edge first.' });
-  await store.logRobotAction({ actionId: 'function-3', label: 'Function 3: Blue Triangle' });
+  await store.logRobotAction({ actionId: 'function-3', label: 'Function 3: Purple Triangle' });
   await store.ingestGazeTelemetry({
     attentionScore: 0.3,
     fixationLoss: 0.7,
@@ -130,7 +130,7 @@ test('store can start without preflight data and build the concise operator expo
 
   await store.startSession({ operator: 'Shrijacked' });
   await store.setHint({ text: 'Try the outer edge first.' });
-  await store.logRobotAction({ actionId: 'function-2', label: 'Function 2: Rotate Triangle' });
+  await store.logRobotAction({ actionId: 'function-2', label: 'Function 2: Green Square' });
   await store.completeSession({
     operator: 'Shrijacked',
     summary: 'Participant completed the puzzle steadily.',
@@ -145,7 +145,7 @@ test('store can start without preflight data and build the concise operator expo
   assert.equal(conciseExport.interventions.length, 2);
   assert.deepEqual(conciseExport.interventions.map((entry) => entry.type), ['hint', 'robot']);
   assert.equal(conciseExport.interventions[0].text, 'Try the outer edge first.');
-  assert.equal(conciseExport.interventions[1].label, 'Function 2: Rotate Triangle');
+  assert.equal(conciseExport.interventions[1].label, 'Function 2: Green Square');
   assert.ok(Number.isFinite(conciseExport.durationSeconds));
   assert.equal('adaptive' in conciseExport, false);
   assert.equal('preflight' in conciseExport, false);
