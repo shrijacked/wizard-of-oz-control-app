@@ -5,7 +5,18 @@ const assert = require('node:assert/strict');
 
 const { buildLaunchPlan } = require('../src/study-launcher');
 
-test('study launcher builds a server, watch, and heartbeat-only gaze plan by default', () => {
+test('study launcher binds to all interfaces by default while keeping internal bridge traffic on localhost', () => {
+  const plan = buildLaunchPlan({
+    port: 3030,
+  });
+
+  assert.equal(plan.host, '0.0.0.0');
+  assert.equal(plan.server.env.HOST, '0.0.0.0');
+  assert.equal(plan.server.env.PORT, '3030');
+  assert.equal(plan.gaze.args.includes('http://127.0.0.1:3030'), true);
+});
+
+test('study launcher builds a server, watch, and heartbeat-only gaze plan for an explicit host override', () => {
   const plan = buildLaunchPlan({
     host: '127.0.0.1',
     port: 3030,
@@ -13,6 +24,7 @@ test('study launcher builds a server, watch, and heartbeat-only gaze plan by def
 
   assert.equal(plan.server.label, 'server');
   assert.deepEqual(plan.server.args, ['src/server.js']);
+  assert.equal(plan.server.env.HOST, '127.0.0.1');
   assert.equal(plan.server.env.PORT, '3030');
 
   assert.equal(plan.watch.label, 'watch');

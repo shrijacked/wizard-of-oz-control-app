@@ -20,9 +20,14 @@ function boolFrom(value, fallback = true) {
 }
 
 function parseLauncherOptions(options = {}) {
-  const host = String(options.host || process.env.HOST || '127.0.0.1').trim() || '127.0.0.1';
+  const host = String(options.host || process.env.HOST || '0.0.0.0').trim() || '0.0.0.0';
   const port = Number(options.port || process.env.PORT || 3000);
   const pythonCommand = String(options.pythonCommand || process.env.PYTHON_BIN || 'python3').trim() || 'python3';
+  const internalServerHost = String(
+    options.internalServerHost
+      || process.env.INTERNAL_SERVER_HOST
+      || (host === '0.0.0.0' ? '127.0.0.1' : host),
+  ).trim() || '127.0.0.1';
 
   const gaze = {
     enabled: boolFrom(options.gaze?.enabled ?? process.env.LAUNCH_GAZE, true),
@@ -42,7 +47,7 @@ function parseLauncherOptions(options = {}) {
     pythonCommand,
     enableWatch: boolFrom(options.enableWatch ?? process.env.LAUNCH_WATCH, true),
     watchAutoCalibrate: boolFrom(options.watchAutoCalibrate ?? process.env.WATCH_AUTO_CALIBRATE, true),
-    serverUrl: options.serverUrl || `http://${host}:${port}`,
+    serverUrl: options.serverUrl || `http://${internalServerHost}:${port}`,
     gaze,
   };
 }
