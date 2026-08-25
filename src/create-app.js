@@ -15,16 +15,11 @@ const { LlmAdvisor } = require('./llm-advisor');
 const { summarizeSensorHealth } = require('./sensor-health');
 const { summarizePreflight } = require('./preflight');
 const { assertPolicy, buildPolicy } = require('./session-policy');
+const { loadStudyConfig } = require('./study-config');
 
-const ROBOT_ACTIONS = [
-  { actionId: 'function-1', label: 'Function 1: Orange Triangle' },
-  { actionId: 'function-2', label: 'Function 2: Green Square' },
-  { actionId: 'function-3', label: 'Function 3: Purple Triangle' },
-  { actionId: 'function-4', label: 'Function 4: Pink Triangle' },
-  { actionId: 'function-5', label: 'Function 5: Yellow Parallelogram' },
-  { actionId: 'function-6', label: 'Function 6: Blue Triangle' },
-  { actionId: 'function-7', label: 'Function 7: Red Triangle' },
-];
+// Requests carry base64-encoded puzzle uploads (up to ~8 MB raw), so the JSON
+// body cap sits above that with headroom but still bounds memory per request.
+const MAX_REQUEST_BODY_BYTES = 16 * 1024 * 1024;
 
 const CONTENT_TYPES = {
   '.css': 'text/css; charset=utf-8',
@@ -56,10 +51,17 @@ function json(response, statusCode, payload, headers = {}) {
   response.end(JSON.stringify(payload, null, 2));
 }
 
-async function readJsonBody(request) {
+async function readJsonBody(request, maxBytes = MAX_REQUEST_BODY_BYTES) {
   const chunks = [];
+  let total = 0;
 
   for await (const chunk of request) {
+    total += chunk.length;
+    if (total > maxBytes) {
+      const error = new Error('Request body is too large.');
+      error.statusCode = 413;
+      throw error;
+    }
     chunks.push(chunk);
   }
 
@@ -75,28 +77,24 @@ function roleState(store, role, systemStatus) {
 
   if (role === 'subject') {
     return {
-      session: state.session,
+      session: {
+        status: state.session.status,
+        activeRound: state.session.activeRound
+          ? { index: state.session.activeRound.index }
+          : null,
+      },
       hint: state.hint,
-      puzzleSet: state.session.puzzleSet
-        ? {
-          setId: state.session.puzzleSet.setId,
-          label: state.session.puzzleSet.label,
-          subjectAsset: state.session.puzzleSet.subjectAsset,
-        }
-        : null,
-      };
+    };
   }
 
   if (role === 'robot' || role === 'audit') {
     return {
-      session: state.session,
-      puzzleSet: state.session.puzzleSet
-        ? {
-          setId: state.session.puzzleSet.setId,
-          label: state.session.puzzleSet.label,
-          solutionAsset: state.session.puzzleSet.solutionAsset,
-        }
-        : null,
+      session: {
+        status: state.session.status,
+        activeRound: state.session.activeRound
+          ? { index: state.session.activeRound.index }
+          : null,
+      },
       robotAction: state.robotAction,
     };
   }
@@ -144,14 +142,36 @@ function buildLocalhostUrls(port) {
 async function createApp(options = {}) {
   const port = Number(options.port || process.env.PORT || 3000);
   const publicDir = options.publicDir || path.join(process.cwd(), 'public');
+  const studyConfig = options.studyConfig || loadStudyConfig();
   const adminGuard = options.adminGuard || new AdminGuard({
     pin: options.adminPin,
   });
+  const tangramPuzzlesDir = options.tangramPuzzlesDir === null || options.seedPuzzles === false
+    ? null
+    : (options.tangramPuzzlesDir || path.resolve(process.cwd(), studyConfig.tangramPuzzlesDir || 'tangram puzzles'));
   const store = options.store || new ExperimentStore({
     dataDir: options.dataDir,
     adaptiveEngine: options.adaptiveEngine,
     llmAdvisor: options.llmAdvisor || new LlmAdvisor(),
+    plannedRounds: studyConfig.plannedRounds,
+    tangramPuzzlesDir,
   });
+
+  // Tracks whether each display device has reported in (connected + sound armed)
+  // so the operator can see readiness before starting a sitting.
+  const screenReadiness = {
+    subject: { ready: false, updatedAt: null },
+    robot: { ready: false, updatedAt: null },
+  };
+  const cameraStatus = {
+    live: false,
+    deviceLabel: null,
+    deviceId: null,
+    updatedAt: null,
+  };
+
+  const pieceById = new Map(studyConfig.pieces.map((piece) => [piece.id, piece]));
+  const pieceByLabel = new Map(studyConfig.pieces.map((piece) => [piece.label.toLowerCase(), piece]));
   const watchBridge = options.watchBridge || new WatchBridge({
     store,
     watchFilePath: options.watchFilePath || path.join(process.cwd(), 'watch', 'watch_data.json'),
@@ -174,15 +194,34 @@ async function createApp(options = {}) {
       sessionStatus: state.session.status,
       watchBridge: watchStatus,
       gazeBridge: gazeStatus,
+      telemetry: state.telemetry,
     });
 
     return {
       watchBridge: watchStatus,
       gazeBridge: gazeStatus,
       sensorHealth,
+      camera: { ...cameraStatus },
       safeguards: adminGuard.getPublicStatus(),
       connections,
-      robotActions: ROBOT_ACTIONS,
+      study: {
+        plannedRounds: studyConfig.plannedRounds,
+        slotCount: studyConfig.slotCount,
+        pieces: studyConfig.pieces,
+        hintPresets: studyConfig.hintPresets,
+      },
+      screens: {
+        subject: {
+          connected: (connections.subject || 0) > 0,
+          ready: screenReadiness.subject.ready,
+          updatedAt: screenReadiness.subject.updatedAt,
+        },
+        robot: {
+          connected: (connections.robot || 0) > 0,
+          ready: screenReadiness.robot.ready,
+          updatedAt: screenReadiness.robot.updatedAt,
+        },
+      },
       network: {
         localhost: buildLocalhostUrls(port),
         lan: getLocalNetworkAddresses(port),
@@ -281,6 +320,9 @@ async function createApp(options = {}) {
 
       if (request.method === 'GET' && pathname === '/api/state') {
         const role = url.searchParams.get('role') || 'admin';
+        if (role === 'admin') {
+          adminGuard.assertAuthorized(getAdminToken(request));
+        }
         json(response, 200, roleState(store, role, getSystemStatus()));
         return;
       }
@@ -309,12 +351,15 @@ async function createApp(options = {}) {
           ...adminGuard.getStatusForToken(token),
           sessionStatus: state.session.status,
           permittedActions: {
-          configureSession: buildPolicy(state, 'configureSession'),
-          updatePreflight: buildPolicy(state, 'updatePreflight'),
-          startSession: buildPolicy(state, 'startSession', { preflight }),
-          completeSession: buildPolicy(state, 'completeSession'),
-          updateAdaptiveConfig: buildPolicy(state, 'updateAdaptiveConfig'),
-          setHint: buildPolicy(state, 'setHint'),
+            configureSession: buildPolicy(state, 'configureSession'),
+            queueRounds: buildPolicy(state, 'queueRounds'),
+            updatePreflight: buildPolicy(state, 'updatePreflight'),
+            startSession: buildPolicy(state, 'startSession', { preflight }),
+            startRound: buildPolicy(state, 'startRound'),
+            completeRound: buildPolicy(state, 'completeRound'),
+            completeSession: buildPolicy(state, 'completeSession'),
+            updateAdaptiveConfig: buildPolicy(state, 'updateAdaptiveConfig'),
+            setHint: buildPolicy(state, 'setHint'),
             logRobotAction: buildPolicy(state, 'logRobotAction'),
             simulateTelemetry: buildPolicy(state, 'simulateTelemetry'),
             resetSession: buildPolicy(state, 'resetSession'),
@@ -330,11 +375,13 @@ async function createApp(options = {}) {
       }
 
       if (request.method === 'GET' && pathname === '/api/exports') {
+        adminGuard.assertAuthorized(getAdminToken(request));
         json(response, 200, await store.getExportManifest());
         return;
       }
 
       if (request.method === 'GET' && pathname === '/api/export/current.json') {
+        adminGuard.assertAuthorized(getAdminToken(request));
         json(response, 200, await store.buildOperatorExport('current'), {
           'content-disposition': `attachment; filename="${store.getCurrentSessionId()}.json"`,
         });
@@ -342,6 +389,7 @@ async function createApp(options = {}) {
       }
 
       if (request.method === 'GET' && pathname === '/api/export/current.csv') {
+        adminGuard.assertAuthorized(getAdminToken(request));
         const csv = await store.getSessionCsv('current');
         text(response, 200, csv, {
           'content-disposition': `attachment; filename="${store.getCurrentSessionId()}.csv"`,
@@ -350,6 +398,7 @@ async function createApp(options = {}) {
       }
 
       if (request.method === 'GET' && pathname.startsWith('/api/exports/')) {
+        adminGuard.assertAuthorized(getAdminToken(request));
         const slug = pathname.slice('/api/exports/'.length);
 
         if (slug.endsWith('.bundle.json')) {
@@ -403,11 +452,39 @@ async function createApp(options = {}) {
         adminGuard.assertAuthorized(getAdminToken(request));
         assertPolicy(store.getState(), 'logRobotAction');
         const body = await readJsonBody(request);
+
+        const requestedPieceId = String(body.pieceId || body.actionId || '').trim();
+        const requestedLabel = String(body.pieceLabel || '').trim();
+        const piece = pieceById.get(requestedPieceId) || pieceByLabel.get(requestedLabel.toLowerCase());
+        if (!piece) {
+          json(response, 400, { error: 'Unknown puzzle piece for this robot cue.' });
+          return;
+        }
+
+        const slot = Number(body.slot);
+        if (!Number.isInteger(slot) || slot < 1 || slot > studyConfig.slotCount) {
+          json(response, 400, { error: `Slot must be a whole number between 1 and ${studyConfig.slotCount}.` });
+          return;
+        }
+
         const state = await store.logRobotAction({
-          actionId: body.actionId,
-          label: body.label,
-          payload: body.payload || {},
+          pieceId: piece.id,
+          pieceLabel: piece.label,
+          slot,
+          payload: { ...(body.payload || {}), color: piece.color },
           actor: body.actor || 'researcher',
+          source: 'admin',
+        });
+        json(response, 200, state);
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/hints/clear') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        assertPolicy(store.getState(), 'logRobotAction');
+        const body = await readJsonBody(request);
+        const state = await store.clearHint({
+          author: body.author || 'researcher',
           source: 'admin',
         });
         json(response, 200, state);
@@ -462,16 +539,67 @@ async function createApp(options = {}) {
         return;
       }
 
-      if (request.method === 'POST' && pathname === '/api/puzzles/select') {
+      if (request.method === 'POST' && pathname === '/api/rounds/queue') {
         adminGuard.assertAuthorized(getAdminToken(request));
-        assertPolicy(store.getState(), 'configureSession');
+        assertPolicy(store.getState(), 'queueRounds');
         const body = await readJsonBody(request);
-        const state = await store.selectPuzzleSet({
-          setId: body.setId || null,
+        const state = await store.queuePuzzleSets({
+          setIds: Array.isArray(body.setIds) ? body.setIds : [],
           actor: body.actor || 'researcher',
           source: 'admin',
         });
         json(response, 200, state);
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/rounds/start') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        assertPolicy(store.getState(), 'startRound');
+        const body = await readJsonBody(request);
+        const state = await store.startRound({
+          operator: body.operator || 'researcher',
+          source: 'admin',
+        });
+        json(response, 200, state);
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/rounds/complete') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        assertPolicy(store.getState(), 'completeRound');
+        const body = await readJsonBody(request);
+        const state = await store.completeRound({
+          operator: body.operator || 'researcher',
+          source: 'admin',
+        });
+        json(response, 200, state);
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/camera/status') {
+        const body = await readJsonBody(request);
+        cameraStatus.live = Boolean(body.live);
+        cameraStatus.deviceLabel = body.deviceLabel ? String(body.deviceLabel).trim() : null;
+        cameraStatus.deviceId = body.deviceId ? String(body.deviceId).trim() : null;
+        cameraStatus.updatedAt = new Date().toISOString();
+        hub.broadcastSnapshots();
+        json(response, 200, { ok: true, camera: { ...cameraStatus } });
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/screens/ready') {
+        const body = await readJsonBody(request);
+        const role = body.role === 'robot' ? 'robot' : (body.role === 'subject' ? 'subject' : null);
+        if (!role) {
+          json(response, 400, { error: 'A valid screen role is required.' });
+          return;
+        }
+        screenReadiness[role] = {
+          ready: Boolean(body.ready),
+          updatedAt: new Date().toISOString(),
+        };
+        hub.broadcastSnapshots();
+        json(response, 200, { ok: true, role, ready: screenReadiness[role].ready });
         return;
       }
 
@@ -510,6 +638,7 @@ async function createApp(options = {}) {
         const state = await store.configureSession({
           studyId: body.studyId,
           participantId: body.participantId,
+          sittingNumber: body.sittingNumber,
           condition: body.condition,
           researcher: body.researcher,
           notes: body.notes,
@@ -521,7 +650,7 @@ async function createApp(options = {}) {
 
       if (request.method === 'POST' && pathname === '/api/session/start') {
         adminGuard.assertAuthorized(getAdminToken(request));
-        assertPolicy(store.getState(), 'startSession');
+        assertPolicy(store.getState(), 'startSession', { preflight: getSystemStatus().preflight });
         const body = await readJsonBody(request);
         const state = await store.startSession({
           operator: body.operator || 'researcher',
@@ -571,20 +700,35 @@ async function createApp(options = {}) {
 
       json(response, 404, { error: 'Not found' });
     } catch (error) {
-      json(response, error.statusCode || 500, {
-        error: error.message || 'Unexpected server error',
-      });
+      const statusCode = error.statusCode || 500;
+      // When we reject an oversized body the client may still be streaming, so
+      // close the connection to abort the upload rather than hanging.
+      const headers = statusCode === 413 ? { connection: 'close' } : {};
+      if (!response.headersSent) {
+        json(response, statusCode, {
+          error: error.message || 'Unexpected server error',
+        }, headers);
+      }
     }
   });
 
   server.on('upgrade', (request, socket) => {
-    const url = new URL(request.url, 'http://localhost');
-    if (url.pathname !== '/ws') {
-      socket.destroy();
-      return;
-    }
+    try {
+      const url = new URL(request.url, 'http://localhost');
+      if (url.pathname !== '/ws') {
+        socket.destroy();
+        return;
+      }
 
-    hub.handleUpgrade(request, socket);
+      hub.handleUpgrade(request, socket);
+    } catch (error) {
+      // A malformed upgrade request must never take the server down mid-session.
+      try {
+        socket.destroy();
+      } catch (destroyError) {
+        // Ignore secondary teardown failures.
+      }
+    }
   });
 
   return {
@@ -594,7 +738,7 @@ async function createApp(options = {}) {
     watchBridge,
     gazeBridge,
     hub,
-    robotActions: ROBOT_ACTIONS,
+    studyConfig,
     close() {
       watchBridge.stop();
       hub.close();
@@ -613,7 +757,6 @@ async function createApp(options = {}) {
 }
 
 module.exports = {
-  ROBOT_ACTIONS,
   createApp,
   readJsonBody,
   roleState,

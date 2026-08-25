@@ -3,104 +3,75 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const {
-  createInitialPreflightAcknowledgements,
-  summarizePreflight,
-} = require('../src/preflight');
+const { summarizePreflight } = require('../src/preflight');
 
-test('preflight blocks setup when required metadata, signals, or manual confirmations are missing', () => {
+function readySystem() {
+  return {
+    screens: {
+      subject: { connected: true, ready: true },
+      robot: { connected: true, ready: true },
+    },
+    camera: { live: true, deviceLabel: 'HD Pro Webcam C270' },
+    sensorHealth: {
+      watch: { state: 'healthy', detail: 'HRV sample 1s ago.' },
+      gaze: { state: 'healthy', detail: 'Gaze frame 1s ago.' },
+    },
+  };
+}
+
+test('preflight blocks setup when screens, camera, or sensors are missing', () => {
   const summary = summarizePreflight({
     state: {
       session: {
         status: 'setup',
+        plannedRounds: 3,
         metadata: {
-          studyId: '',
-          participantId: 'P-001',
+          participantId: '',
           researcher: '',
+          sittingNumber: 1,
         },
-      },
-      telemetry: {
-        hrv: { updatedAt: null },
-        gaze: { updatedAt: null },
-      },
-      preflight: {
-        acknowledgements: createInitialPreflightAcknowledgements(),
+        queue: [],
       },
     },
     system: {
-      connections: {
-        subject: 0,
-        audit: 0,
+      screens: {
+        subject: { connected: false, ready: false },
+        robot: { connected: false, ready: false },
       },
+      camera: { live: false },
       sensorHealth: {
-        watch: {
-          level: 'info',
-          summary: 'Watch telemetry is waiting for its first sample.',
-          detail: 'Waiting for the first HRV sample.',
-        },
-        gaze: {
-          level: 'info',
-          summary: 'Attention stream is waiting for a bridge connection.',
-          detail: 'Waiting for a gaze bridge.',
-        },
+        watch: { state: 'waiting', summary: 'Watch telemetry is waiting for its first sample.' },
+        gaze: { state: 'waiting', summary: 'Pupil Core has not sent a gaze frame yet.' },
       },
     },
   });
 
-  assert.equal(summary.phase, 'setup');
   assert.equal(summary.requiredReady, false);
   assert.ok(summary.blockingCount >= 6);
-  assert.match(summary.summary, /must be cleared before the trial can start/i);
   assert.ok(summary.blockers.some((item) => item.id === 'metadata'));
-  assert.ok(summary.blockers.some((item) => item.id === 'subject-display'));
-  assert.ok(summary.warnings.some((item) => item.id === 'audit-display'));
+  assert.ok(summary.blockers.some((item) => item.id === 'camera'));
+  assert.ok(summary.blockers.some((item) => item.id === 'robot-display'));
+  assert.ok(summary.blockers.some((item) => item.id === 'gaze-telemetry'));
 });
 
-test('preflight marks setup ready once required checklist items are satisfied', () => {
+test('preflight marks setup ready once sitting queue, screens, camera, and sensors are live', () => {
   const summary = summarizePreflight({
     state: {
       session: {
         status: 'setup',
+        plannedRounds: 3,
         metadata: {
-          studyId: 'pilot-01',
           participantId: 'P-001',
           researcher: 'Shrijacked',
+          sittingNumber: 2,
         },
-      },
-      telemetry: {
-        hrv: { updatedAt: '2026-04-09T12:00:10.000Z' },
-        gaze: { updatedAt: '2026-04-09T12:00:12.000Z' },
-      },
-      preflight: {
-        acknowledgements: {
-          cameraFramingChecked: true,
-          subjectDisplayChecked: true,
-          robotBoardReady: true,
-          materialsReset: true,
-        },
+        queue: [{ setId: '4' }, { setId: '5' }, { setId: '6' }],
       },
     },
-    system: {
-      connections: {
-        subject: 1,
-        audit: 0,
-      },
-      sensorHealth: {
-        watch: {
-          level: 'healthy',
-          detail: 'Last HRV sample was processed 2s ago.',
-        },
-        gaze: {
-          level: 'healthy',
-          detail: 'Bridge Tobii 4C was seen 1s ago.',
-        },
-      },
-    },
+    system: readySystem(),
   });
 
   assert.equal(summary.requiredReady, true);
   assert.equal(summary.blockingCount, 0);
-  assert.equal(summary.warningCount, 1);
   assert.match(summary.summary, /ready for participant/i);
-  assert.ok(summary.warnings.some((item) => item.id === 'audit-display'));
 });

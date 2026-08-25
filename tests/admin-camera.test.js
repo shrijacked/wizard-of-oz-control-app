@@ -217,3 +217,14 @@ test('camera controller stops all tracks and clears the preview', async () => {
   assert.equal(videoElement.srcObject, null);
   assert.match(statusElement.textContent, /camera is off/i);
 });
+
+test('camera controller prefers a Logitech C270 device id', async () => {
+  const { preferredCameraDeviceId } = await loadAdminCameraModule();
+  const chosen = preferredCameraDeviceId([
+    { kind: 'videoinput', deviceId: 'built-in', label: 'FaceTime HD Camera' },
+    { kind: 'videoinput', deviceId: 'c270-id', label: 'HD Pro Webcam C270' },
+    { kind: 'audioinput', deviceId: 'mic', label: 'Microphone' },
+  ]);
+
+  assert.equal(chosen, 'c270-id');
+});

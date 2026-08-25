@@ -24,12 +24,29 @@ test('sensor health marks the watch bridge stale after its threshold elapses', (
   assert.equal(watch.stale, true);
 });
 
-test('sensor health treats an active gaze heartbeat as healthy', () => {
+test('sensor health treats heartbeat-only gaze as waiting for a frame', () => {
   const now = new Date('2026-04-09T12:00:00.000Z');
   const gaze = summarizeGazeHealth({
-    bridgeId: 'tobii-bridge',
-    deviceLabel: 'Tobii 4C',
-    transport: 'sdk-http',
+    bridgeId: 'pupil-core',
+    deviceLabel: 'Pupil Core',
+    transport: 'pupil-zmq',
+    lastHeartbeatAt: '2026-04-09T11:59:57.000Z',
+    lastFrameAt: null,
+    active: true,
+    staleAfterMs: 15000,
+    lastError: null,
+  }, now);
+
+  assert.equal(gaze.state, 'waiting');
+  assert.match(gaze.detail, /heartbeat/i);
+});
+
+test('sensor health treats a recent gaze frame as healthy', () => {
+  const now = new Date('2026-04-09T12:00:00.000Z');
+  const gaze = summarizeGazeHealth({
+    bridgeId: 'pupil-core',
+    deviceLabel: 'Pupil Core',
+    transport: 'pupil-zmq',
     lastHeartbeatAt: '2026-04-09T11:59:57.000Z',
     lastFrameAt: '2026-04-09T11:59:58.000Z',
     active: true,
@@ -39,7 +56,6 @@ test('sensor health treats an active gaze heartbeat as healthy', () => {
 
   assert.equal(gaze.level, 'healthy');
   assert.equal(gaze.state, 'healthy');
-  assert.equal(gaze.summary.includes('healthy'), true);
 });
 
 test('sensor health summarizes running-session warnings across bridges', () => {
@@ -64,7 +80,8 @@ test('sensor health summarizes running-session warnings across bridges', () => {
   }, now);
 
   assert.equal(health.overall.level, 'warning');
-  assert.ok(health.overall.summary.includes('Attention'));
+  assert.match(health.overall.summary, /stale/i);
+  assert.match(health.overall.summary, /gaze frame/i);
   assert.equal(health.watch.state, 'stale');
   assert.equal(health.gaze.state, 'waiting');
 });

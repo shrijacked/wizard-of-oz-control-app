@@ -17,6 +17,46 @@ function ageSeconds(timestamp, now = new Date()) {
 function summarizeWatchHealth(status = {}, now = new Date(), options = {}) {
   const staleAfterMs = Number(options.staleAfterMs || status.staleAfterMs || 90000);
   const processedAgeSeconds = ageSeconds(status.lastProcessedAt, now);
+  const telemetryAgeSeconds = ageSeconds(options.telemetryUpdatedAt, now);
+  const liveAgeSeconds = processedAgeSeconds ?? telemetryAgeSeconds;
+
+  if (status.lastError) {
+    return {
+      name: 'watch',
+      level: 'error',
+      state: 'error',
+      stale: false,
+      ageSeconds: liveAgeSeconds,
+      summary: 'Watch bridge reported an error.',
+      detail: status.lastError,
+    };
+  }
+
+  if (status.lastProcessedAt || options.telemetryUpdatedAt) {
+    if (liveAgeSeconds != null && (liveAgeSeconds * 1000) > staleAfterMs) {
+      return {
+        name: 'watch',
+        level: 'warning',
+        state: 'stale',
+        stale: true,
+        ageSeconds: liveAgeSeconds,
+        summary: 'Watch telemetry is stale.',
+        detail: `The last HRV sample was ${liveAgeSeconds}s ago.`,
+      };
+    }
+
+    return {
+      name: 'watch',
+      level: 'healthy',
+      state: 'healthy',
+      stale: false,
+      ageSeconds: liveAgeSeconds,
+      summary: 'Watch telemetry looks healthy.',
+      detail: liveAgeSeconds == null
+        ? 'HRV samples are flowing.'
+        : `The last HRV sample was processed ${liveAgeSeconds}s ago.`,
+    };
+  }
 
   if (!status.active) {
     return {
@@ -30,58 +70,20 @@ function summarizeWatchHealth(status = {}, now = new Date(), options = {}) {
     };
   }
 
-  if (status.lastError) {
-    return {
-      name: 'watch',
-      level: 'error',
-      state: 'error',
-      stale: false,
-      ageSeconds: processedAgeSeconds,
-      summary: 'Watch bridge reported an error.',
-      detail: status.lastError,
-    };
-  }
-
-  if (!status.lastProcessedAt) {
-    return {
-      name: 'watch',
-      level: 'info',
-      state: 'waiting',
-      stale: false,
-      ageSeconds: null,
-      summary: 'Watch telemetry is waiting for its first sample.',
-      detail: `Watching ${status.filePath || 'watch/watch_data.json'} for new HRV entries.`,
-    };
-  }
-
-  if (processedAgeSeconds != null && (processedAgeSeconds * 1000) > staleAfterMs) {
-    return {
-      name: 'watch',
-      level: 'warning',
-      state: 'stale',
-      stale: true,
-      ageSeconds: processedAgeSeconds,
-      summary: 'Watch telemetry is stale.',
-      detail: `The last HRV sample was processed ${processedAgeSeconds}s ago.`,
-    };
-  }
-
   return {
     name: 'watch',
-    level: 'healthy',
-    state: 'healthy',
+    level: 'info',
+    state: 'waiting',
     stale: false,
-    ageSeconds: processedAgeSeconds,
-    summary: 'Watch telemetry looks healthy.',
-    detail: processedAgeSeconds == null
-      ? 'HRV samples are flowing.'
-      : `The last HRV sample was processed ${processedAgeSeconds}s ago.`,
+    ageSeconds: null,
+    summary: 'Watch telemetry is waiting for its first sample.',
+    detail: `Watching ${status.filePath || 'watch/watch_data.json'} for new HRV entries.`,
   };
 }
 
 function summarizeGazeHealth(status = {}, now = new Date()) {
-  const lastSeenAt = status.lastFrameAt || status.lastHeartbeatAt || null;
-  const seenAgeSeconds = ageSeconds(lastSeenAt, now);
+  const staleAfterMs = Number(status.staleAfterMs || 15000);
+  const frameAgeSeconds = ageSeconds(status.lastFrameAt, now);
 
   if (status.lastError) {
     return {
@@ -89,35 +91,35 @@ function summarizeGazeHealth(status = {}, now = new Date()) {
       level: 'error',
       state: 'error',
       stale: false,
-      ageSeconds: seenAgeSeconds,
-      summary: 'Attention stream reported an error.',
+      ageSeconds: frameAgeSeconds,
+      summary: 'Pupil Core reported an error.',
       detail: status.lastError,
     };
   }
 
-  if (!status.bridgeId) {
+  if (!status.lastFrameAt) {
     return {
       name: 'gaze',
       level: 'info',
       state: 'waiting',
       stale: false,
       ageSeconds: null,
-      summary: 'Attention stream is waiting for a bridge connection.',
-      detail: 'Start the gaze bridge or SDK connector to begin sending heartbeats.',
+      summary: 'Pupil Core has not sent a gaze frame yet.',
+      detail: status.bridgeId
+        ? `Bridge ${status.deviceLabel || status.bridgeId} is connected, but no gaze frame has arrived. Heartbeats are not enough.`
+        : 'Start Pupil Capture and the Pupil Core bridge so gaze frames reach this app.',
     };
   }
 
-  if (!status.active) {
+  if (frameAgeSeconds != null && (frameAgeSeconds * 1000) > staleAfterMs) {
     return {
       name: 'gaze',
       level: 'warning',
       state: 'stale',
       stale: true,
-      ageSeconds: seenAgeSeconds,
-      summary: 'Attention stream is stale.',
-      detail: seenAgeSeconds == null
-        ? `Bridge ${status.deviceLabel || status.bridgeId} has not delivered a recent heartbeat.`
-        : `Bridge ${status.deviceLabel || status.bridgeId} was last seen ${seenAgeSeconds}s ago.`,
+      ageSeconds: frameAgeSeconds,
+      summary: 'Pupil Core gaze is stale.',
+      detail: `The last gaze frame was received ${frameAgeSeconds}s ago.`,
     };
   }
 
@@ -126,11 +128,11 @@ function summarizeGazeHealth(status = {}, now = new Date()) {
     level: 'healthy',
     state: 'healthy',
     stale: false,
-    ageSeconds: seenAgeSeconds,
-    summary: 'Attention stream looks healthy.',
-    detail: seenAgeSeconds == null
-      ? `Bridge ${status.deviceLabel || status.bridgeId} is connected.`
-      : `Bridge ${status.deviceLabel || status.bridgeId} was seen ${seenAgeSeconds}s ago.`,
+    ageSeconds: frameAgeSeconds,
+    summary: 'Pupil Core gaze looks healthy.',
+    detail: frameAgeSeconds == null
+      ? `Bridge ${status.deviceLabel || status.bridgeId} is sending gaze frames.`
+      : `The last gaze frame was received ${frameAgeSeconds}s ago.`,
   };
 }
 
@@ -151,7 +153,10 @@ function severityRank(level) {
 }
 
 function summarizeSensorHealth(input = {}, now = new Date(), options = {}) {
-  const watch = summarizeWatchHealth(input.watchBridge || {}, now, options.watch || {});
+  const watch = summarizeWatchHealth(input.watchBridge || {}, now, {
+    ...(options.watch || {}),
+    telemetryUpdatedAt: input.telemetry?.hrv?.updatedAt,
+  });
   const gaze = summarizeGazeHealth(input.gazeBridge || {}, now);
   const sessionStatus = input.sessionStatus || 'setup';
 

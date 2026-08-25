@@ -82,7 +82,13 @@ export function connectSocket(role, handlers = {}) {
     });
 
     socket.addEventListener('message', (event) => {
-      const payload = JSON.parse(event.data);
+      let payload;
+      try {
+        payload = JSON.parse(event.data);
+      } catch {
+        return;
+      }
+
       if (payload.type === 'state.snapshot') {
         handlers.onSnapshot?.(payload.data, payload.system);
       }
@@ -108,6 +114,34 @@ export function connectSocket(role, handlers = {}) {
       socket?.close();
     },
   };
+}
+
+export async function reportScreenReady(role, ready) {
+  try {
+    await postJson('/api/screens/ready', {
+      role,
+      ready: Boolean(ready),
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export function setConnectionBadge(element, status) {
+  if (!element) {
+    return;
+  }
+
+  const labels = {
+    connected: 'Connected',
+    reconnecting: 'Reconnecting…',
+    offline: 'Connection lost',
+  };
+
+  element.hidden = status === 'connected';
+  element.dataset.status = status;
+  element.textContent = labels[status] || labels.offline;
 }
 
 export function installSectionNavigation(selector = '[data-section-link]') {

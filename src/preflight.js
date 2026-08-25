@@ -1,55 +1,10 @@
 'use strict';
 
-const MANUAL_PREFLIGHT_ITEMS = Object.freeze([
-  {
-    id: 'cameraFramingChecked',
-    label: 'Camera framing checked',
-    detail: 'The overhead webcam shows the full puzzle area and participant workspace.',
-  },
-  {
-    id: 'subjectDisplayChecked',
-    label: 'Subject display confirmed',
-    detail: 'The participant can clearly see the hint screen and it stays distraction-free.',
-  },
-  {
-    id: 'robotBoardReady',
-    label: 'Robot control board ready',
-    detail: 'The manual robot controller is reachable and the seven preset actions are available.',
-  },
-  {
-    id: 'materialsReset',
-    label: 'Puzzle materials reset',
-    detail: 'Puzzle pieces, props, and trial materials are reset for a fresh run.',
-  },
-]);
-
-function createInitialPreflightAcknowledgements() {
-  return Object.fromEntries(MANUAL_PREFLIGHT_ITEMS.map((item) => [item.id, false]));
-}
-
-function normalizePreflightAcknowledgements(input = {}) {
-  const next = createInitialPreflightAcknowledgements();
-
-  for (const item of MANUAL_PREFLIGHT_ITEMS) {
-    if (Object.hasOwn(input, item.id)) {
-      next[item.id] = Boolean(input[item.id]);
-    }
-  }
-
-  return next;
-}
-
-function automaticIssueStatus(phase) {
-  return phase === 'setup' ? 'blocked' : 'warning';
-}
+const { queueMatchesSitting, setIdsForSitting } = require('./sitting-queue');
 
 function metadataChecklistItem(session = {}) {
   const metadata = session.metadata || {};
   const missing = [];
-
-  if (!String(metadata.studyId || '').trim()) {
-    missing.push('study ID');
-  }
 
   if (!String(metadata.participantId || '').trim()) {
     missing.push('participant ID');
@@ -59,15 +14,19 @@ function metadataChecklistItem(session = {}) {
     missing.push('researcher');
   }
 
+  if (!Number.isFinite(Number(metadata.sittingNumber)) || Number(metadata.sittingNumber) < 1) {
+    missing.push('sitting number');
+  }
+
   if (missing.length === 0) {
     return {
       id: 'metadata',
       kind: 'automatic',
       required: true,
       status: 'ready',
-      label: 'Session metadata complete',
-      summary: 'Study, participant, and researcher metadata are complete.',
-      detail: `Study ${metadata.studyId} • participant ${metadata.participantId} • researcher ${metadata.researcher}.`,
+      label: 'Sitting profile saved',
+      summary: 'Participant, researcher, and sitting number are saved.',
+      detail: `Participant ${metadata.participantId} • researcher ${metadata.researcher} • sitting ${metadata.sittingNumber}.`,
     };
   }
 
@@ -76,66 +35,77 @@ function metadataChecklistItem(session = {}) {
     kind: 'automatic',
     required: true,
     status: automaticIssueStatus(session.status || 'setup'),
-    label: 'Session metadata complete',
-    summary: `Add ${missing.join(', ')} before starting the trial.`,
-    detail: 'The before-participant checklist requires those identifiers so exports stay analyzable later.',
+    label: 'Sitting profile saved',
+    summary: `Add ${missing.join(', ')} before starting the sitting.`,
+    detail: 'The export needs those identifiers so later analysis can match the sitting.',
   };
 }
 
-function subjectDisplayChecklistItem(phase, connections = {}) {
-  const subjectCount = Number(connections.subject || 0);
+function automaticIssueStatus(phase) {
+  return phase === 'setup' ? 'blocked' : 'warning';
+}
 
-  if (subjectCount >= 1) {
+function sittingQueueChecklistItem(session = {}) {
+  const sittingNumber = session.metadata?.sittingNumber || 1;
+  const plannedRounds = Number(session.plannedRounds) || 3;
+  const expected = setIdsForSitting(sittingNumber).slice(0, plannedRounds);
+  const queue = Array.isArray(session.queue) ? session.queue : [];
+
+  if (queueMatchesSitting(queue, sittingNumber, plannedRounds)) {
     return {
-      id: 'subject-display',
+      id: 'sitting-queue',
       kind: 'automatic',
       required: true,
       status: 'ready',
-      label: 'Subject display connected',
-      summary: 'The participant hint display is connected.',
-      detail: `${subjectCount} subject display connection${subjectCount === 1 ? '' : 's'} active on the local network.`,
+      label: 'Sitting puzzles queued',
+      summary: `Sitting ${sittingNumber} is queued as puzzles ${expected.join(', ')}.`,
+      detail: `Round order is ${expected.join(' → ')}.`,
     };
   }
 
   return {
-    id: 'subject-display',
+    id: 'sitting-queue',
     kind: 'automatic',
     required: true,
-    status: automaticIssueStatus(phase),
-    label: 'Subject display connected',
-    summary: 'Open /subject on the participant display before starting.',
-    detail: 'The subject screen needs an active WebSocket connection so hints appear instantly during the run.',
+    status: automaticIssueStatus(session.status || 'setup'),
+    label: 'Sitting puzzles queued',
+    summary: `Sitting ${sittingNumber} needs puzzles ${expected.join(', ')} in that order.`,
+    detail: 'Save the sitting profile after the tangram library has loaded, or upload the missing pair files.',
   };
 }
 
-function telemetryChecklistItem({
+function screenChecklistItem({
   id,
   label,
+  noun,
+  path,
   phase,
-  updatedAt,
-  health = {},
-  waitingDetail,
+  connected,
+  ready,
 }) {
-  const acceptsDirectIngest = updatedAt && health.state !== 'stale' && health.state !== 'offline' && health.level !== 'error';
-
-  if (acceptsDirectIngest) {
+  if (connected && ready) {
     return {
       id,
       kind: 'automatic',
       required: true,
       status: 'ready',
       label,
-      summary: `${label} is live.`,
-      detail: health.detail || `Last sample received at ${updatedAt}.`,
+      summary: `${noun} screen is connected and the alert sound is armed.`,
+      detail: `Open ${path}, tap once, and keep that tab in the foreground.`,
     };
   }
 
-  const summary = updatedAt
-    ? (health.summary || `${label} needs attention.`)
-    : `No ${label.toLowerCase()} sample has been received yet.`;
-  const detail = updatedAt
-    ? (health.detail || waitingDetail)
-    : waitingDetail;
+  if (connected) {
+    return {
+      id,
+      kind: 'automatic',
+      required: true,
+      status: automaticIssueStatus(phase),
+      label,
+      summary: `${noun} screen is connected, but the alert sound is not armed yet.`,
+      detail: `Tap once on ${path} so new messages play a beep.`,
+    };
+  }
 
   return {
     id,
@@ -143,99 +113,127 @@ function telemetryChecklistItem({
     required: true,
     status: automaticIssueStatus(phase),
     label,
-    summary,
-    detail,
+    summary: `Open ${path} on the ${noun.toLowerCase()} device before starting.`,
+    detail: `The ${noun.toLowerCase()} screen needs a live WebSocket connection.`,
   };
 }
 
-function auditChecklistItem(connections = {}) {
-  const auditCount = Number(connections.audit || 0);
-
-  if (auditCount >= 1) {
+function cameraChecklistItem(system = {}, phase = 'setup') {
+  const camera = system.camera || {};
+  if (camera.live) {
     return {
-      id: 'audit-display',
+      id: 'camera',
       kind: 'automatic',
-      required: false,
+      required: true,
       status: 'ready',
-      label: 'Audit display connected',
-      summary: 'An audit display is connected.',
-      detail: `${auditCount} audit display connection${auditCount === 1 ? '' : 's'} active on the local network.`,
+      label: 'C270 camera live',
+      summary: camera.deviceLabel
+        ? `Camera is live (${camera.deviceLabel}).`
+        : 'Operator camera is live.',
+      detail: 'Keep the table workspace in frame for the whole sitting.',
     };
   }
 
   return {
-    id: 'audit-display',
+    id: 'camera',
     kind: 'automatic',
-    required: false,
-    status: 'warning',
-    label: 'Audit display connected',
-    summary: 'Audit display is optional, but opening /audit gives the team a second view of robot actions.',
-    detail: 'You can proceed without it, but a phone or tablet on /audit makes manual action logging easier to verify.',
+    required: true,
+    status: automaticIssueStatus(phase),
+    label: 'C270 camera live',
+    summary: 'Start the Logitech C270 on the operator dashboard.',
+    detail: 'Choose the C270 in the camera list, then click Start camera.',
   };
 }
 
-function manualChecklistItems(acknowledgements = {}, phase = 'setup') {
-  return MANUAL_PREFLIGHT_ITEMS.map((item) => {
-    const acknowledged = Boolean(acknowledgements[item.id]);
-
+function telemetryChecklistItem({
+  id,
+  label,
+  phase,
+  health = {},
+  waitingDetail,
+}) {
+  if (health.state === 'healthy') {
     return {
-      id: item.id,
-      kind: 'manual',
+      id,
+      kind: 'automatic',
       required: true,
-      acknowledged,
-      status: acknowledged ? 'ready' : automaticIssueStatus(phase),
-      label: item.label,
-      summary: acknowledged ? `${item.label} is confirmed.` : `Confirm ${item.label.toLowerCase()} before the run.`,
-      detail: item.detail,
+      status: 'ready',
+      label,
+      summary: `${label} is live.`,
+      detail: health.detail || `${label} samples are arriving.`,
     };
-  });
+  }
+
+  return {
+    id,
+    kind: 'automatic',
+    required: true,
+    status: automaticIssueStatus(phase),
+    label,
+    summary: health.summary || `No ${label.toLowerCase()} sample has been received yet.`,
+    detail: health.detail || waitingDetail,
+  };
 }
 
 function summarizePreflight(input = {}) {
   const state = input.state || {};
   const system = input.system || {};
   const phase = state.session?.status || 'setup';
-  const telemetry = state.telemetry || {};
+  const screens = system.screens || {};
   const sensorHealth = system.sensorHealth || {};
-  const acknowledgements = normalizePreflightAcknowledgements(state.preflight?.acknowledgements || {});
 
-  const automaticItems = [
+  const items = [
     metadataChecklistItem(state.session || {}),
-    subjectDisplayChecklistItem(phase, system.connections || {}),
+    sittingQueueChecklistItem(state.session || {}),
+    screenChecklistItem({
+      id: 'subject-display',
+      label: 'Subject screen ready',
+      noun: 'Subject',
+      path: '/subject',
+      phase,
+      connected: Boolean(screens.subject?.connected || Number(system.connections?.subject || 0) > 0),
+      ready: Boolean(screens.subject?.ready),
+    }),
+    screenChecklistItem({
+      id: 'robot-display',
+      label: 'Robot screen ready',
+      noun: 'Robot',
+      path: '/robot',
+      phase,
+      connected: Boolean(screens.robot?.connected || Number(system.connections?.robot || 0) > 0),
+      ready: Boolean(screens.robot?.ready),
+    }),
+    cameraChecklistItem(system, phase),
     telemetryChecklistItem({
       id: 'watch-telemetry',
-      label: 'HRV telemetry',
+      label: 'Maxim H Band',
       phase,
-      updatedAt: telemetry.hrv?.updatedAt,
       health: sensorHealth.watch || {},
-      waitingDetail: 'Run the watch bridge and confirm a fresh HRV sample arrives before the participant begins.',
+      waitingDetail: 'Wear the band, start the watch script, and wait until heart rate appears.',
     }),
     telemetryChecklistItem({
       id: 'gaze-telemetry',
-      label: 'Gaze telemetry',
+      label: 'Pupil Core',
       phase,
-      updatedAt: telemetry.gaze?.updatedAt,
       health: sensorHealth.gaze || {},
-      waitingDetail: 'Start the gaze bridge or SDK connector and confirm a fresh attention sample arrives before the participant begins.',
+      waitingDetail: 'Start Pupil Capture with the Core headset, then confirm gaze frames are flowing.',
     }),
-    auditChecklistItem(system.connections || {}),
   ];
-  const manualItems = manualChecklistItems(acknowledgements, phase);
-  const items = [...automaticItems, ...manualItems];
+
   const blockers = items.filter((item) => item.status === 'blocked');
   const warnings = items.filter((item) => item.status === 'warning');
   const readyCount = items.filter((item) => item.status === 'ready').length;
   const requiredReady = blockers.length === 0;
 
   let summary = 'Ready for participant.';
-  let detail = 'The participant-facing display, telemetry feeds, and manual setup confirmations all look ready.';
+  let detail = 'Screens, camera, watch, Pupil Core, and the sitting queue are ready.';
 
   if (phase === 'setup') {
     if (blockers.length > 0) {
-      summary = `${blockers.length} blocker${blockers.length === 1 ? '' : 's'} must be cleared before the trial can start.`;
+      summary = `${blockers.length} blocker${blockers.length === 1 ? '' : 's'} must be cleared before the sitting can start.`;
       detail = blockers.map((item) => item.summary).join(' ');
     } else if (warnings.length > 0) {
-      summary = `Ready for participant with ${warnings.length} recommendation${warnings.length === 1 ? '' : 's'}.`;
+      summary = `Ready for participant with ${warnings.length} warning${warnings.length === 1 ? '' : 's'}.`;
       detail = warnings.map((item) => item.summary).join(' ');
     }
   } else if (phase === 'running') {
@@ -244,13 +242,13 @@ function summarizePreflight(input = {}) {
       detail = warnings.map((item) => item.summary).join(' ');
     } else {
       summary = 'Live run status still looks healthy.';
-      detail = 'The setup gate was cleared and the participant-facing dependencies still look healthy.';
+      detail = 'The setup gate was cleared and the live dependencies still look healthy.';
     }
   } else if (phase === 'completed') {
     summary = 'Session completed. Reset before running the readiness gate again.';
     detail = warnings.length > 0
       ? warnings.map((item) => item.summary).join(' ')
-      : 'Exports and notes are ready for post-trial review.';
+      : 'Exports are ready for the next participant.';
   }
 
   return {
@@ -268,17 +266,21 @@ function summarizePreflight(input = {}) {
     },
     blockers,
     warnings,
-    automaticItems,
-    manualItems,
-    acknowledgements,
+    automaticItems: items,
+    manualItems: [],
+    items,
+    acknowledgements: {},
     updatedAt: state.preflight?.updatedAt || null,
     updatedBy: state.preflight?.updatedBy || null,
   };
 }
 
 module.exports = {
-  MANUAL_PREFLIGHT_ITEMS,
-  createInitialPreflightAcknowledgements,
-  normalizePreflightAcknowledgements,
+  createInitialPreflightAcknowledgements() {
+    return {};
+  },
+  normalizePreflightAcknowledgements() {
+    return {};
+  },
   summarizePreflight,
 };
