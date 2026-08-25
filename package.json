@@ -6,8 +6,9 @@
   "scripts": {
     "launch:study": "node src/study-launcher.js",
     "start": "node src/server.js",
+    "study:reset": "node scripts/study-reset.js",
     "test": "node --test",
-    "test:python": "python3 -X pycache_prefix=/tmp/hti-pycache -m py_compile integrations/gaze/bridge.py integrations/watch/watch.py",
+    "test:python": "python3 -X pycache_prefix=/tmp/hti-pycache -m py_compile integrations/gaze/bridge.py integrations/gaze/pupil_core_bridge.py integrations/watch/watch.py",
     "verify": "npm test && npm run test:python"
   }
 }

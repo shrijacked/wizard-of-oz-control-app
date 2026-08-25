@@ -16,7 +16,7 @@ test('study launcher binds to all interfaces by default while keeping internal b
   assert.equal(plan.gaze.args.includes('http://127.0.0.1:3030'), true);
 });
 
-test('study launcher builds a server, watch, and heartbeat-only gaze plan for an explicit host override', () => {
+test('study launcher builds a server, watch, and Pupil Core gaze plan by default', () => {
   const plan = buildLaunchPlan({
     host: '127.0.0.1',
     port: 3030,
@@ -34,8 +34,7 @@ test('study launcher builds a server, watch, and heartbeat-only gaze plan for an
 
   assert.equal(plan.gaze.label, 'gaze');
   assert.equal(plan.gaze.command, 'python3');
-  assert.equal(plan.gaze.args.includes('--mode'), true);
-  assert.equal(plan.gaze.args.includes('heartbeat-only'), true);
+  assert.equal(plan.gaze.args.includes('integrations/gaze/pupil_core_bridge.py'), true);
   assert.equal(plan.gaze.args.includes('http://127.0.0.1:3030'), true);
 });
 

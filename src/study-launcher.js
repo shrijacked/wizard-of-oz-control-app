@@ -31,12 +31,14 @@ function parseLauncherOptions(options = {}) {
 
   const gaze = {
     enabled: boolFrom(options.gaze?.enabled ?? process.env.LAUNCH_GAZE, true),
-    mode: String(options.gaze?.mode || process.env.GAZE_MODE || 'heartbeat-only').trim() || 'heartbeat-only',
+    mode: String(options.gaze?.mode || process.env.GAZE_MODE || 'pupil-core').trim() || 'pupil-core',
     file: options.gaze?.file || process.env.GAZE_FILE || null,
     bridgeId: String(options.gaze?.bridgeId || process.env.GAZE_BRIDGE_ID || 'gaze-bridge').trim() || 'gaze-bridge',
     deviceLabel: String(options.gaze?.deviceLabel || process.env.GAZE_DEVICE_LABEL || 'Configured gaze device').trim() || 'Configured gaze device',
     transport: String(options.gaze?.transport || process.env.GAZE_TRANSPORT || 'sdk-http').trim() || 'sdk-http',
     sdkName: options.gaze?.sdkName || process.env.GAZE_SDK_NAME || null,
+    pupilHost: String(options.gaze?.pupilHost || process.env.PUPIL_HOST || '127.0.0.1').trim() || '127.0.0.1',
+    pupilPort: Number(options.gaze?.pupilPort || process.env.PUPIL_PORT || 50020),
     heartbeatInterval: Number(options.gaze?.heartbeatInterval || process.env.GAZE_HEARTBEAT_INTERVAL || 5),
     pollSeconds: Number(options.gaze?.pollSeconds || process.env.GAZE_POLL_SECONDS || 0.5),
   };
@@ -87,33 +89,51 @@ function buildLaunchPlan(rawOptions = {}) {
   }
 
   if (options.gaze.enabled) {
-    const gazeArgs = [
-      'integrations/gaze/bridge.py',
-      '--server', options.serverUrl,
-      '--bridge-id', options.gaze.bridgeId,
-      '--device-label', options.gaze.deviceLabel,
-      '--transport', options.gaze.transport,
-      '--mode', options.gaze.mode,
-      '--heartbeat-interval', String(options.gaze.heartbeatInterval),
-      '--poll-seconds', String(options.gaze.pollSeconds),
-    ];
+    if (options.gaze.mode === 'pupil-core') {
+      plan.gaze = {
+        label: 'gaze',
+        command: options.pythonCommand,
+        args: [
+          'integrations/gaze/pupil_core_bridge.py',
+          '--server', options.serverUrl,
+          '--host', options.gaze.pupilHost,
+          '--port', String(options.gaze.pupilPort),
+          '--bridge-id', options.gaze.bridgeId,
+          '--device-label', options.gaze.deviceLabel || 'Pupil Core',
+        ],
+        env: {},
+        optional: true,
+        autoInput: [],
+      };
+    } else {
+      const gazeArgs = [
+        'integrations/gaze/bridge.py',
+        '--server', options.serverUrl,
+        '--bridge-id', options.gaze.bridgeId,
+        '--device-label', options.gaze.deviceLabel,
+        '--transport', options.gaze.transport,
+        '--mode', options.gaze.mode,
+        '--heartbeat-interval', String(options.gaze.heartbeatInterval),
+        '--poll-seconds', String(options.gaze.pollSeconds),
+      ];
 
-    if (options.gaze.sdkName) {
-      gazeArgs.push('--sdk-name', String(options.gaze.sdkName));
+      if (options.gaze.sdkName) {
+        gazeArgs.push('--sdk-name', String(options.gaze.sdkName));
+      }
+
+      if (options.gaze.mode === 'file-tail' && options.gaze.file) {
+        gazeArgs.push('--file', options.gaze.file);
+      }
+
+      plan.gaze = {
+        label: 'gaze',
+        command: options.pythonCommand,
+        args: gazeArgs,
+        env: {},
+        optional: true,
+        autoInput: [],
+      };
     }
-
-    if (options.gaze.mode === 'file-tail' && options.gaze.file) {
-      gazeArgs.push('--file', options.gaze.file);
-    }
-
-    plan.gaze = {
-      label: 'gaze',
-      command: options.pythonCommand,
-      args: gazeArgs,
-      env: {},
-      optional: true,
-      autoInput: [],
-    };
   }
 
   return plan;

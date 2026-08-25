@@ -1,19 +1,39 @@
 # Gaze Bridge
 
-This integration provides a concrete bridge process for vendor gaze SDKs. It translates raw device frames into the app's normalized gaze telemetry format and sends them to the local server.
+The study sitting uses **Pupil Labs Pupil Core**. Capture’s Network API is ZMQ on port `50020`. Heartbeats are not enough: the start gate needs a recent gaze **frame**.
 
-## What it does
+## Pupil Core (default)
 
-- sends bridge heartbeats to `POST /api/bridge/gaze/heartbeat`
-- sends normalized gaze frames to `POST /api/bridge/gaze/frame`
-- supports two acquisition modes out of the box:
-  - `stdin-jsonl`: read raw SDK frames from standard input
-  - `file-tail`: tail a local JSONL file produced by another process
-  - `heartbeat-only`: keep the bridge alive and visible in the dashboard before frames are flowing
+1. Start Pupil Capture and put on the Core headset.
+2. Confirm the Network API is enabled.
+3. Keep Capture on the **glasses** world camera. Do not let it grab the Logitech C270.
+4. Start the app with `npm run launch:study`, or run the bridge directly:
 
-## Quick start
+```bash
+python3 integrations/gaze/pupil_core_bridge.py \
+  --server http://127.0.0.1:3000 \
+  --host 127.0.0.1 \
+  --port 50020
+```
 
-Run the app server first, then start the bridge:
+The bridge:
+
+- REQ `SUB_PORT` from Capture
+- subscribes to `gaze` and `pupil`
+- maps `confidence` → `attentionScore`, `1 - confidence` → `fixationLoss`, pupil diameter → `pupilDilation`
+- POSTs heartbeats to `/api/bridge/gaze/heartbeat` and frames to `/api/bridge/gaze/frame`
+
+Needs `pyzmq` and `msgpack`:
+
+```bash
+python3 -m pip install pyzmq msgpack
+```
+
+Calibration stays in Pupil Capture. This app only needs a live gaze stream.
+
+## Generic SDK bridge (rehearsal fallback)
+
+[`bridge.py`](bridge.py) still exists for stdin/file-tail/heartbeat-only rehearsal:
 
 ```bash
 python3 integrations/gaze/bridge.py \
@@ -24,32 +44,12 @@ python3 integrations/gaze/bridge.py \
   --mode stdin-jsonl
 ```
 
-Then pipe one JSON object per line into the bridge. Example frame shapes that are accepted:
-
-```json
-{"focus": 0.32, "fixationLoss": 0.61, "pupil": 0.54}
-```
-
-```json
-{"metrics": {"attentionScore": 0.44, "fixation_loss": 0.48, "pupilDilation": 0.41}}
-```
-
-## Integrating a real SDK
-
-In your SDK callback, serialize each frame to JSON and write it to stdin or a JSONL file. The bridge already understands several common aliases:
-
-- `attentionScore`, `attention`, `focus`, `focusScore`, `engagement`
-- `fixationLoss`, `fixation_loss`, `gazeLoss`, `fixationInstability`
-- `pupilDilation`, `pupil`, `pupil_size`, `dilation`
-
-That keeps the SDK-specific code very small while preserving one stable interface at the server.
+`heartbeat-only` mode will **not** clear the sitting start gate.
 
 ## Experiment-day launcher
-
-The repository also includes:
 
 ```bash
 npm run launch:study
 ```
 
-By default that starts the gaze bridge in `heartbeat-only` mode so the admin dashboard can confirm the bridge is alive before real SDK frames are connected.
+By default that starts [`pupil_core_bridge.py`](pupil_core_bridge.py). Override with `GAZE_MODE=file-tail` only when you are not using Capture.
