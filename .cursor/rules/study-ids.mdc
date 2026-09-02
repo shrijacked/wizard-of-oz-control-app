@@ -1,0 +1,42 @@
+---
+description: How to name Study ID and Participant ID for HTI sittings
+alwaysApply: true
+---
+
+# Study and participant IDs
+
+Use these names on the admin sitting profile. They show up in exports and camera files (`table-{participant}-sitting{n}-{take}.webm`).
+
+## Study ID = collection day
+
+Format: `hti-YYYYMMDD`
+
+- One ID per calendar day of data collection
+- Example: `hti-20260902`
+
+Do not put the participant number or sitting number in the study ID.
+
+## Participant ID = person, not sitting
+
+Format: `P##` (letter P + two digits, no spaces, no extra hyphens)
+
+- Example: `P01`, `P02`, `P03`
+- Reuse the same `P##` for that person’s sitting 1, 2, and 3
+- Sitting stays in the Sitting dropdown only
+
+## Allowed characters
+
+Letters, numbers, `.`, `_`, `-` only. No spaces, slashes, or `..`.
+
+```text
+# Good
+Study ID: hti-20260902
+Participant ID: P01
+Sitting: 2
+Camera file: table-P01-sitting2-1.webm
+
+# Bad
+Study ID: pilot-01          (no date, collides across days)
+Participant ID: P-001       (extra hyphen, sitting is not in this field)
+Participant ID: owl / 3     (unsafe for filenames)
+```

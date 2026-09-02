@@ -1,25 +1,46 @@
-import { connectSocket, fetchJson, formatTimestamp } from './shared.js';
+import {
+  connectSocket,
+  fetchJson,
+  formatTimestamp,
+  reportScreenReady,
+  setConnectionBadge,
+} from './shared.js';
 import { createAudioCueController } from './audio-cue.mjs';
-import { createUpdateCueTracker } from './display-alerts.mjs';
+import { createDelayedCueScheduler, createUpdateCueTracker, remainingDelayMs } from './display-alerts.mjs';
 
 const actionElement = document.querySelector('#robot-action');
 const updatedElement = document.querySelector('#robot-updated');
-const solutionShellElement = document.querySelector('#robot-solution-shell');
-const solutionEmptyElement = document.querySelector('#robot-solution-empty');
-const solutionImageElement = document.querySelector('#robot-solution-image');
-const solutionPdfElement = document.querySelector('#robot-solution-pdf');
-const solutionMetaElement = document.querySelector('#robot-solution-meta');
 const soundToggleElement = document.querySelector('#robot-sound-toggle');
 const soundStatusElement = document.querySelector('#robot-sound-status');
+const connectionBadgeElement = document.querySelector('#connection-badge');
+const historyElement = document.querySelector('#robot-history');
+
+const cueHistory = [];
 
 const soundController = createAudioCueController({
   frequency: 560,
   durationMs: 200,
   gainValue: 0.05,
 });
-const robotAlertTracker = createUpdateCueTracker({
+const ROBOT_MOVE_WARNING_MS = 10_000;
+const moveAlertScheduler = createDelayedCueScheduler({
+  delayMs: ROBOT_MOVE_WARNING_MS,
   onCue: async () => {
     await soundController.beep();
+  },
+});
+const robotAlertTracker = createUpdateCueTracker({
+  onCue: async (token) => {
+    await soundController.beep();
+    const remaining = remainingDelayMs(token, ROBOT_MOVE_WARNING_MS);
+    if (remaining <= -2000) {
+      return;
+    }
+    if (remaining <= 0) {
+      await soundController.beep();
+      return;
+    }
+    moveAlertScheduler.schedule(token, remaining);
   },
 });
 
@@ -36,7 +57,8 @@ async function armAlertSound() {
       soundToggleElement.textContent = 'Alert sound ready';
       soundToggleElement.disabled = true;
     }
-    setSoundStatus('Alert sound is armed on this robot screen.');
+    setSoundStatus('Alert sound is armed. This screen is ready for the sitting.');
+    await reportScreenReady('robot', true);
     return true;
   }
 
@@ -64,56 +86,78 @@ function installAutoArm() {
   });
 }
 
-function renderSolution(asset, puzzleSet) {
-  const hasSolution = Boolean(asset);
-  solutionShellElement?.classList.toggle('empty', !hasSolution);
-
-  if (!hasSolution) {
-    solutionEmptyElement.hidden = false;
-    solutionImageElement.hidden = true;
-    solutionImageElement.removeAttribute('src');
-    solutionPdfElement.hidden = true;
-    solutionPdfElement.removeAttribute('src');
-    solutionMetaElement.textContent = 'No solution file selected yet.';
+function rememberCue(robotAction) {
+  if (!robotAction?.updatedAt || !robotAction.label) {
     return;
   }
 
-  solutionEmptyElement.hidden = true;
-
-  if (asset.displayKind === 'pdf') {
-    solutionImageElement.hidden = true;
-    solutionImageElement.removeAttribute('src');
-    solutionPdfElement.hidden = false;
-    solutionPdfElement.src = `${asset.urlPath}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
-  } else {
-    solutionPdfElement.hidden = true;
-    solutionPdfElement.removeAttribute('src');
-    solutionImageElement.hidden = false;
-    solutionImageElement.src = asset.urlPath;
-    solutionImageElement.alt = asset.originalName || 'Selected puzzle solution';
+  if (cueHistory[0]?.updatedAt === robotAction.updatedAt) {
+    return;
   }
 
-  solutionMetaElement.textContent = puzzleSet?.selectedAt
-    ? `${asset.originalName} • selected ${formatTimestamp(puzzleSet.selectedAt)}`
-    : `${asset.originalName} • visible for this session`;
+  cueHistory.unshift({
+    label: robotAction.label,
+    updatedAt: robotAction.updatedAt,
+  });
+  cueHistory.splice(3);
+}
+
+function renderHistory() {
+  if (!historyElement) {
+    return;
+  }
+
+  historyElement.innerHTML = '';
+  cueHistory.forEach((entry, index) => {
+    const item = document.createElement('li');
+    item.textContent = index === 0
+      ? entry.label
+      : `${entry.label} • ${formatTimestamp(entry.updatedAt)}`;
+    historyElement.append(item);
+  });
 }
 
 function render(state) {
   const robotAction = state?.robotAction || {};
-  actionElement.textContent = robotAction.label || 'No robot cue has been sent yet.';
-  updatedElement.textContent = robotAction.updatedAt
-    ? `Last updated ${formatTimestamp(robotAction.updatedAt)}`
-    : 'Awaiting admin input.';
-  renderSolution(state?.puzzleSet?.solutionAsset || null, state?.puzzleSet || null);
+  if (actionElement) {
+    actionElement.textContent = robotAction.updatedAt
+      ? (robotAction.label || 'No robot cue has been sent yet.')
+      : 'No robot cue has been sent yet.';
+  }
+  if (updatedElement) {
+    updatedElement.textContent = robotAction.updatedAt
+      ? `Last updated ${formatTimestamp(robotAction.updatedAt)}`
+      : 'Awaiting admin input.';
+  }
+  rememberCue(robotAction.updatedAt ? robotAction : null);
+  renderHistory();
 }
 
 async function init() {
-  const state = await fetchJson('/api/state?role=robot');
-  robotAlertTracker.prime(state?.robotAction?.updatedAt || null);
-  render(state);
+  setConnectionBadge(connectionBadgeElement, 'reconnecting');
+
+  try {
+    const state = await fetchJson('/api/state?role=robot');
+    robotAlertTracker.prime(state?.robotAction?.updatedAt || null);
+    render(state);
+  } catch {
+    if (actionElement) {
+      actionElement.textContent = 'Waiting for the researcher to reconnect this screen.';
+    }
+  }
+
   installAutoArm();
 
   connectSocket('robot', {
+    onOpen() {
+      setConnectionBadge(connectionBadgeElement, 'connected');
+      if (soundController.isArmed()) {
+        reportScreenReady('robot', true);
+      }
+    },
+    onClose() {
+      setConnectionBadge(connectionBadgeElement, 'reconnecting');
+    },
     onSnapshot(snapshot) {
       robotAlertTracker.push(snapshot?.robotAction?.updatedAt || null).catch(() => {
         setSoundStatus('Alert sound failed while trying to play the latest robot cue.');
@@ -123,6 +167,4 @@ async function init() {
   });
 }
 
-init().catch((error) => {
-  actionElement.textContent = error.message;
-});
+init();

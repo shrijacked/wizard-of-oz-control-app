@@ -4,15 +4,18 @@ function buildPolicy(state, action, options = {}) {
   const session = state.session || {};
   const status = session.status || 'setup';
   const metadata = session.metadata || {};
+  const queue = Array.isArray(session.queue) ? session.queue : [];
+  const rounds = Array.isArray(session.rounds) ? session.rounds : [];
+  const activeRound = session.activeRound || null;
   const force = Boolean(options.force);
 
   const allow = () => ({ allowed: true, reason: null });
   const deny = (reason) => ({ allowed: false, reason });
 
-  if (action === 'configureSession') {
+  if (action === 'configureSession' || action === 'queueRounds') {
     return status === 'setup'
       ? allow()
-      : deny('Session metadata is locked once the trial has started.');
+      : deny('Session setup is locked once the sitting has started.');
   }
 
   if (action === 'updatePreflight') {
@@ -26,23 +29,56 @@ function buildPolicy(state, action, options = {}) {
       return deny('Only setup sessions can be started.');
     }
 
-    if (!session.puzzleSet) {
-      return deny('Choose a puzzle set before starting the trial.');
+    if (queue.length === 0) {
+      return deny('Queue at least one puzzle before starting the sitting.');
+    }
+
+    const preflight = options.preflight;
+    if (!preflight || preflight.requiredReady !== true) {
+      return deny((preflight && preflight.summary) || 'Sitting readiness is not complete.');
     }
 
     return allow();
   }
 
+  if (action === 'startRound') {
+    if (status !== 'running') {
+      return deny('Start the sitting before opening a round.');
+    }
+
+    if (activeRound) {
+      return deny('Finish the current round before starting the next one.');
+    }
+
+    if (rounds.length >= queue.length) {
+      return deny('All queued puzzles for this sitting have been played.');
+    }
+
+    return allow();
+  }
+
+  if (action === 'completeRound') {
+    return status === 'running' && activeRound
+      ? allow()
+      : deny('There is no active round to complete.');
+  }
+
   if (action === 'completeSession') {
     return status === 'running'
       ? allow()
-      : deny('Only running sessions can be completed.');
+      : deny('Only running sittings can be completed.');
   }
 
   if (action === 'setHint' || action === 'logRobotAction') {
-    return status === 'running'
-      ? allow()
-      : deny('Hints and robotic actions are only allowed during an active run.');
+    if (status !== 'running') {
+      return deny('Hints and robot cues are only allowed during an active sitting.');
+    }
+
+    if (!activeRound) {
+      return deny('Start a round before sending hints or robot cues.');
+    }
+
+    return allow();
   }
 
   if (action === 'simulateTelemetry') {

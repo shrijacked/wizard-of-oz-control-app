@@ -3,7 +3,16 @@
 const os = require('node:os');
 
 function getLocalNetworkAddresses(port) {
-  const interfaces = os.networkInterfaces();
+  let interfaces;
+  try {
+    interfaces = os.networkInterfaces();
+  } catch (error) {
+    // Some locked-down environments deny interface enumeration. LAN URLs are a
+    // convenience, not a requirement, so degrade gracefully instead of failing
+    // the whole status endpoint.
+    return [];
+  }
+
   const addresses = [];
 
   for (const entries of Object.values(interfaces)) {

@@ -6,12 +6,12 @@ The system is a local Node.js web server that coordinates one operator dashboard
 
 ```mermaid
 flowchart LR
-    admin["/admin<br/>operator dashboard"] --> server["local node server<br/>http + websocket + session store"]
-    server --> subject["/subject<br/>participant puzzle + hint + beep"]
-    server --> robot["/robot<br/>solution + robot cue + beep"]
-    watch["watch bridge"] --> server
-    gaze["gaze bridge"] --> server
-    camera["browser camera api"] --> admin
+    admin["/admin<br/>camera + solution + hint/robot controls"] --> server["local node server<br/>http + websocket + session store"]
+    server --> subject["/subject<br/>hint + beep"]
+    server --> robot["/robot<br/>piece + slot cue + beep"]
+    watch["Maxim H Band"] --> server
+    gaze["Pupil Core"] --> server
+    camera["C270"] --> admin
     server --> export["concise session json<br/>and csv timeline"]
 ```
 
@@ -21,26 +21,26 @@ The operator dashboard is the only control surface. The other two screens are re
 
 ### `/admin`
 
-- starts and stops the live camera preview
-- shows live HRV watch metrics when telemetry is available
-- optionally records metadata such as study ID and participant ID
-- uploads puzzle files and chooses one logical puzzle set
-- starts, completes, and resets the trial
+- starts and stops the live C270 preview before the sitting can begin
+- shows live HRV and Pupil gaze metrics
+- records metadata such as study ID, participant ID, and sitting number
+- auto-queues the three tangram pairs for that sitting; upload is a fallback
+- starts the sitting, then starts and completes each round
 - broadcasts hints to the participant
-- broadcasts robot cues to the robot operator
+- broadcasts robot cues as piece + numbered slot
 - downloads the session JSON and CSV exports
 
 ### `/subject`
 
-- shows the chosen subject puzzle file
-- shows the latest hint from the dashboard
+- shows only the latest written hint from the dashboard
+- does not receive the puzzle PDF; the physical tangram is on the table
 - plays a short browser beep when a fresh hint arrives after the screen is armed
 - updates live over WebSockets with no refresh
 
 ### `/robot`
 
-- shows the paired solution file for the chosen puzzle set
-- shows the latest robot cue from the dashboard
+- shows only the latest piece-and-slot cue from the dashboard
+- does not receive the solution PDF; the operator keeps that on `/admin`
 - plays a short browser beep when a fresh robot cue arrives after the screen is armed
 - updates live over WebSockets with no refresh
 
@@ -70,10 +70,13 @@ Rules:
 - `1.pdf` pairs with `1s.pdf`
 - only complete pairs become selectable sets
 - unmatched uploads stay visible in the dashboard as incomplete files
+- saving sitting 1/2/3 auto-queues puzzles 1–3 / 4–6 / 7–9 from `tangram puzzles/`
+
+`POST /api/session/start` is denied unless preflight `requiredReady` is true: sitting profile, sitting queue, subject and robot screens armed, C270 live, watch sample, and a recent Pupil gaze frame.
 
 ## State model
 
-The session holds one selected puzzle set for the current run.
+The session holds a queue of puzzle sets for one sitting, plus the finished rounds and the active round. `puzzleSet` is the currently displayed pair (the active round).
 
 ```json
 {
@@ -157,9 +160,11 @@ sequenceDiagram
 - `POST /api/session/complete`
 - `POST /api/session/reset`
 - `POST /api/puzzles/upload`
-- `POST /api/puzzles/select`
+- `POST /api/rounds/queue`
 - `POST /api/hints`
 - `POST /api/actions`
+- `POST /api/camera/status`
+- `POST /api/screens/ready`
 
 ### Export APIs
 

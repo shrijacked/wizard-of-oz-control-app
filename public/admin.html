@@ -6,12 +6,20 @@
     <title>Operator Dashboard</title>
     <link rel="stylesheet" href="/styles.css">
   </head>
-  <body class="admin-page">
+  <body class="admin-page" data-session-phase="setup">
     <div class="page-shell">
       <nav class="workspace-topbar" aria-label="App routes">
         <div class="workspace-brand">
           <p class="eyebrow">Wizard of Oz Control Application</p>
           <strong>Operator Workspace</strong>
+        </div>
+        <div class="health-pills" aria-label="Live connection status">
+          <span id="link-status" class="pill" data-status="reconnecting">Link: connecting</span>
+          <span id="subject-health" class="pill" data-status="offline">Subject: offline</span>
+          <span id="robot-health" class="pill" data-status="offline">Robot: offline</span>
+          <span id="camera-health" class="pill" data-status="offline">Camera: off</span>
+          <span id="watch-health" class="pill" data-status="offline">Watch: waiting</span>
+          <span id="gaze-health" class="pill" data-status="offline">Pupil: waiting</span>
         </div>
         <div class="workspace-links">
           <a class="workspace-link active" href="/admin" aria-current="page">Admin</a>
@@ -26,7 +34,7 @@
             <p class="panel-kicker">Study control</p>
             <h1>Operator Dashboard</h1>
           </div>
-          <p class="workspace-note">One clean screen for camera, puzzle selection, hints, robot cues, timing, and export.</p>
+          <p id="mode-note" class="workspace-note">Set up the sitting, then run three rounds from one live deck.</p>
         </header>
 
         <section id="guard-shell" class="panel" hidden>
@@ -44,230 +52,303 @@
           </form>
         </section>
 
-        <div class="dashboard-grid">
-          <section class="panel live-panel">
-            <div class="panel-header">
-              <div>
-                <p class="panel-kicker">Live view</p>
-                <h2>Camera</h2>
+        <section id="mode-setup" class="mode-setup">
+          <div class="dashboard-grid">
+            <section class="panel">
+              <div class="panel-header">
+                <div>
+                  <p class="panel-kicker">Session</p>
+                  <h2>Sitting profile</h2>
+                </div>
+                <span class="panel-note">Study ID is the day: hti-YYYYMMDD. Participant ID is the person: P01, P02. Same P## for sittings 1–3.</span>
               </div>
-            </div>
-            <div class="button-row">
-              <button id="start-camera" class="button button-primary" type="button">Start camera</button>
-              <button id="stop-camera" class="button button-ghost" type="button">Stop</button>
-            </div>
-            <div class="video-frame">
-              <video id="camera-feed" autoplay muted playsinline></video>
-              <div class="video-overlay">
-                <span id="camera-status">Camera is off.</span>
-              </div>
-            </div>
-          </section>
+              <form id="session-form" class="stack-form">
+                <div class="field-grid">
+                  <label class="field">
+                    <span>Study ID</span>
+                    <input id="session-study-id" type="text" placeholder="hti-20260902">
+                  </label>
+                  <label class="field">
+                    <span>Participant ID</span>
+                    <input id="session-participant-id" type="text" placeholder="P01">
+                  </label>
+                  <label class="field">
+                    <span>Researcher</span>
+                    <input id="session-researcher" type="text" placeholder="researcher name">
+                  </label>
+                  <label class="field">
+                    <span>Sitting</span>
+                    <select id="session-sitting-number">
+                      <option value="1">Sitting 1</option>
+                      <option value="2">Sitting 2</option>
+                      <option value="3">Sitting 3</option>
+                    </select>
+                  </label>
+                  <label class="field">
+                    <span>Condition</span>
+                    <select id="session-condition">
+                      <option value="adaptive">Adaptive</option>
+                      <option value="control">Control</option>
+                    </select>
+                  </label>
+                </div>
+                <label class="field">
+                  <span>Notes</span>
+                  <textarea id="session-notes" rows="2" placeholder="Optional run notes."></textarea>
+                </label>
+                <div class="button-row">
+                  <button id="session-save" class="button button-primary" type="submit">Save profile</button>
+                </div>
+              </form>
+            </section>
 
+            <section class="panel queue-panel">
+              <div class="panel-header">
+                <div>
+                  <p class="panel-kicker">Puzzle library</p>
+                  <h2>Upload and queue</h2>
+                </div>
+              </div>
+              <form id="puzzle-upload-form" class="stack-form">
+                <p class="panel-note">Sitting 1 uses puzzles 1–3, sitting 2 uses 4–6, sitting 3 uses 7–9. Those pairs load from the tangram puzzles folder when you save the profile.</p>
+                <label class="field">
+                  <span>Replace a file (optional)</span>
+                  <input id="puzzle-upload-input" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.webp">
+                </label>
+                <div class="button-row">
+                  <button id="puzzle-upload-submit" class="button button-primary" type="submit">Upload files</button>
+                  <button id="puzzle-clear-selection" class="button button-ghost" type="button">Clear queue</button>
+                </div>
+                <p id="puzzle-upload-status" class="panel-note">Waiting for upload.</p>
+              </form>
+              <div class="library-split">
+                <div class="callout">
+                  <span class="callout-label">This sitting's queue</span>
+                  <div id="queue-list" class="queue-list"></div>
+                </div>
+                <div class="callout">
+                  <span class="callout-label">Complete pairs</span>
+                  <div id="puzzle-library-list" class="reference-library-list"></div>
+                </div>
+              </div>
+              <div class="callout">
+                <span class="callout-label">Incomplete uploads</span>
+                <div id="incomplete-library-list" class="link-list"></div>
+              </div>
+            </section>
+
+            <section class="panel live-panel panel-wide">
+              <div class="panel-header">
+                <div>
+                  <p class="panel-kicker">Readiness</p>
+                  <h2>Begin sitting</h2>
+                </div>
+              </div>
+              <div id="readiness-list" class="readiness-list"></div>
+              <p id="screen-links" class="panel-note">Start the C270 in the camera panel, then return here to begin. Pupil Capture must use the glasses camera, not the Logitech.</p>
+              <div class="button-row">
+                <button id="session-start" class="button button-primary" type="button">Begin sitting</button>
+                <button id="reset-session-setup" class="button button-ghost" type="button">Reset session</button>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section id="mode-run" class="mode-run" hidden>
+          <div class="run-deck">
+            <div class="run-column run-column-sensors">
+              <section class="panel live-panel run-panel-camera">
+                <div class="panel-header">
+                  <div>
+                    <p class="panel-kicker">Live view</p>
+                    <h2>Camera</h2>
+                  </div>
+                  <div class="button-row camera-controls">
+                    <label class="field">
+                      <span>Camera</span>
+                      <select id="camera-device"></select>
+                    </label>
+                    <button id="start-camera" class="button button-primary" type="button">Start camera</button>
+                    <button id="stop-camera" class="button button-ghost" type="button">Stop</button>
+                    <button id="start-recording" class="button button-primary" type="button">Record</button>
+                    <button id="stop-recording" class="button button-ghost" type="button">Stop recording</button>
+                    <button id="download-recording" class="button button-ghost" type="button">Download last take</button>
+                  </div>
+                </div>
+                <div class="video-frame">
+                  <video id="camera-feed" autoplay muted playsinline></video>
+                  <div class="video-overlay">
+                    <span id="camera-status">Camera is off.</span>
+                    <span id="recording-status"></span>
+                  </div>
+                </div>
+              </section>
+
+              <section class="panel run-panel-hrv">
+                <div class="panel-header">
+                  <div>
+                    <p class="panel-kicker">Physiology</p>
+                    <h2>HRV</h2>
+                  </div>
+                </div>
+                <div class="metric-grid telemetry-metric-grid compact-metrics">
+                  <article class="metric-card">
+                    <span class="callout-label">Heart rate</span>
+                    <strong id="hrv-heart-rate">--</strong>
+                  </article>
+                  <article class="metric-card">
+                    <span class="callout-label">RMSSD</span>
+                    <strong id="hrv-rmssd">--</strong>
+                  </article>
+                  <article class="metric-card">
+                    <span class="callout-label">Stress</span>
+                    <strong id="hrv-stress-level">Awaiting data</strong>
+                  </article>
+                  <article class="metric-card">
+                    <span class="callout-label">Last sample</span>
+                    <strong id="hrv-updated">No HRV sample yet.</strong>
+                  </article>
+                  <article class="metric-card">
+                    <span class="callout-label">Gaze confidence</span>
+                    <strong id="gaze-attention">--</strong>
+                  </article>
+                  <article class="metric-card">
+                    <span class="callout-label">Last gaze frame</span>
+                    <strong id="gaze-updated">No Pupil frame yet.</strong>
+                  </article>
+                </div>
+                <div hidden>
+                  <strong id="hrv-sdnn">--</strong>
+                  <strong id="hrv-pnn50">--</strong>
+                  <strong id="hrv-stress-score">--</strong>
+                  <strong id="hrv-distraction">--</strong>
+                  <p id="hrv-source">Waiting for watch</p>
+                  <p id="hrv-interpretation">Awaiting HRV data.</p>
+                </div>
+              </section>
+            </div>
+
+            <div class="run-column run-column-trial">
+              <section class="panel run-panel-solution">
+                <div class="panel-header">
+                  <div>
+                    <p class="panel-kicker">Solution</p>
+                    <h2>Current Solution Preview</h2>
+                  </div>
+                </div>
+                <div class="callout timing-callout">
+                  <span class="callout-label">Round</span>
+                  <p id="round-summary">Waiting to start round 1.</p>
+                  <p id="session-duration-summary">Timer waiting.</p>
+                  <p id="session-duration-detail" class="panel-note">Start the round when the participant begins this puzzle.</p>
+                </div>
+                <div id="solution-preview" class="reference-preview empty"></div>
+                <p id="selected-set-summary" hidden>No puzzle set selected yet.</p>
+                <p id="selected-set-detail" hidden></p>
+              </section>
+            </div>
+
+            <div class="run-column run-column-trial">
+              <section class="panel live-panel run-panel-hints">
+                <div class="panel-header">
+                  <div>
+                    <p class="panel-kicker">Hinting</p>
+                    <h2>Digital Hint Terminal</h2>
+                  </div>
+                </div>
+                <div id="hint-presets" class="preset-row"></div>
+                <form id="hint-form" class="stack-form">
+                  <label class="field">
+                    <span>Hint text</span>
+                    <textarea id="hint-text" rows="2" placeholder="Type the hint the subject should see."></textarea>
+                  </label>
+                  <div class="button-row">
+                    <button id="hint-send" class="button button-primary" type="submit">Broadcast hint</button>
+                    <button id="hint-save-preset" class="button button-ghost" type="button">Save as preset</button>
+                    <button id="clear-hint" class="button button-ghost" type="button">Clear subject screen</button>
+                  </div>
+                </form>
+                <div class="callout">
+                  <span class="callout-label">Latest hint</span>
+                  <p id="hint-preview">No hint has been sent yet.</p>
+                </div>
+              </section>
+
+              <section class="panel live-panel run-panel-robot">
+                <div class="panel-header">
+                  <div>
+                    <p class="panel-kicker">Robot cue controls</p>
+                    <h2>Robot Cue Controls</h2>
+                  </div>
+                  <span class="panel-note">Piece, then slot</span>
+                </div>
+                <p class="panel-note">1. Choose the piece. 2. Choose the numbered slot.</p>
+                <div id="piece-grid" class="action-grid"></div>
+                <div id="slot-grid" class="slot-grid"></div>
+                <div class="button-row">
+                  <button id="send-robot-cue" class="button button-primary" type="button">Send robot cue</button>
+                </div>
+                <div class="callout">
+                  <span class="callout-label">Latest robot cue</span>
+                  <p id="latest-action">No robotic action logged yet.</p>
+                </div>
+              </section>
+
+              <div class="run-ops">
+                <section class="panel live-panel run-panel-round">
+                  <div class="panel-header">
+                    <div>
+                      <p class="panel-kicker">Run lifecycle</p>
+                      <h2>Round controls</h2>
+                    </div>
+                  </div>
+                  <div class="callout">
+                    <span class="callout-label">Status</span>
+                    <p id="session-status-summary">SETUP</p>
+                    <p id="session-status-detail">Queue puzzles, then begin the sitting.</p>
+                  </div>
+                  <div class="button-row">
+                    <button id="round-start" class="button button-primary" type="button">Start round</button>
+                    <button id="round-complete" class="button button-ghost" type="button">Complete round</button>
+                  </div>
+                  <div class="button-row">
+                    <button id="session-complete" class="button button-ghost" type="button">End sitting</button>
+                    <button id="reset-session" class="button button-ghost" type="button">Reset session</button>
+                  </div>
+                </section>
+
+                <section class="panel run-panel-log">
+                  <div class="panel-header">
+                    <div>
+                      <p class="panel-kicker">Log</p>
+                      <h2>This round</h2>
+                    </div>
+                  </div>
+                  <ol id="intervention-log" class="intervention-log"></ol>
+                </section>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="mode-review" class="mode-review" hidden>
           <section class="panel">
             <div class="panel-header">
               <div>
-                <p class="panel-kicker">Solution</p>
-                <h2>Current Solution Preview</h2>
+                <p class="panel-kicker">Review</p>
+                <h2>Sitting complete</h2>
               </div>
             </div>
-            <div class="callout">
-              <span class="callout-label">Selected puzzle set</span>
-              <p id="selected-set-summary">No puzzle set selected yet.</p>
-              <p id="selected-set-detail">Upload a subject file and its matching solution file ending in <code>s</code>, then choose the set for this run.</p>
-            </div>
-            <div id="solution-preview" class="reference-preview empty"></div>
-          </section>
-
-          <section class="panel live-panel">
-            <div class="panel-header">
-              <div>
-                <p class="panel-kicker">Physiology</p>
-                <h2>HRV Telemetry</h2>
-              </div>
-              <span class="panel-note">Live watch metrics for the operator dashboard</span>
-            </div>
-            <div class="metric-grid telemetry-metric-grid">
-              <article class="metric-card">
-                <span class="callout-label">Heart rate</span>
-                <strong id="hrv-heart-rate">--</strong>
-              </article>
-              <article class="metric-card">
-                <span class="callout-label">SDNN</span>
-                <strong id="hrv-sdnn">--</strong>
-              </article>
-              <article class="metric-card">
-                <span class="callout-label">RMSSD</span>
-                <strong id="hrv-rmssd">--</strong>
-              </article>
-              <article class="metric-card">
-                <span class="callout-label">pNN50</span>
-                <strong id="hrv-pnn50">--</strong>
-              </article>
-              <article class="metric-card">
-                <span class="callout-label">Stress score</span>
-                <strong id="hrv-stress-score">--</strong>
-              </article>
-              <article class="metric-card">
-                <span class="callout-label">Stress level</span>
-                <strong id="hrv-stress-level">Awaiting data</strong>
-              </article>
-              <article class="metric-card">
-                <span class="callout-label">Distraction</span>
-                <strong id="hrv-distraction">--</strong>
-              </article>
-              <article class="metric-card">
-                <span class="callout-label">Last sample</span>
-                <strong id="hrv-updated">No HRV sample yet.</strong>
-              </article>
-            </div>
-            <div class="callout">
-              <span class="callout-label">Watch source</span>
-              <p id="hrv-source">Waiting for watch</p>
-              <p id="hrv-interpretation">Awaiting HRV data.</p>
-            </div>
-          </section>
-
-          <section class="panel">
-            <div class="panel-header">
-              <div>
-                <p class="panel-kicker">Session</p>
-                <h2>Trial Metadata</h2>
-              </div>
-              <span class="panel-note">Optional fields for analysis quality</span>
-            </div>
-            <form id="session-form" class="stack-form">
-              <div class="field-grid">
-                <label class="field">
-                  <span>Study ID</span>
-                  <input id="session-study-id" type="text" placeholder="pilot-01">
-                </label>
-                <label class="field">
-                  <span>Participant ID</span>
-                  <input id="session-participant-id" type="text" placeholder="P-001">
-                </label>
-                <label class="field">
-                  <span>Researcher</span>
-                  <input id="session-researcher" type="text" placeholder="researcher name">
-                </label>
-                <label class="field">
-                  <span>Condition</span>
-                  <select id="session-condition">
-                    <option value="adaptive">Adaptive</option>
-                    <option value="control">Control</option>
-                  </select>
-                </label>
-              </div>
-              <label class="field">
-                <span>Notes</span>
-                <textarea id="session-notes" rows="4" placeholder="Optional run notes."></textarea>
-              </label>
-              <div class="button-row">
-                <button id="session-save" class="button button-primary" type="submit">Save profile</button>
-              </div>
-            </form>
-          </section>
-
-          <section class="panel">
-            <div class="panel-header">
-              <div>
-                <p class="panel-kicker">Puzzle library</p>
-                <h2>Upload And Choose Puzzle Set</h2>
-              </div>
-            </div>
-            <form id="puzzle-upload-form" class="stack-form">
-              <label class="field">
-                <span>Upload files</span>
-                <input id="puzzle-upload-input" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.webp">
-              </label>
-              <div class="button-row">
-                <button id="puzzle-upload-submit" class="button button-primary" type="submit">Upload files</button>
-                <button id="puzzle-clear-selection" class="button button-ghost" type="button">Clear selection</button>
-              </div>
-              <p id="puzzle-upload-status" class="panel-note">Waiting for upload.</p>
-            </form>
-            <div class="callout">
-              <span class="callout-label">Complete pairs</span>
-              <div id="puzzle-library-list" class="reference-library-list"></div>
-            </div>
-            <div class="callout">
-              <span class="callout-label">Incomplete uploads</span>
-              <div id="incomplete-library-list" class="link-list"></div>
-            </div>
-          </section>
-
-          <section class="panel live-panel">
-            <div class="panel-header">
-              <div>
-                <p class="panel-kicker">Run lifecycle</p>
-                <h2>Trial Controls</h2>
-              </div>
-            </div>
-            <div class="callout timing-callout">
-              <span class="callout-label">Status</span>
-              <p id="session-status-summary">SETUP</p>
-              <p id="session-status-detail">Choose a puzzle set, then start the trial when ready.</p>
-            </div>
-            <div class="callout">
-              <span class="callout-label">Puzzle timer</span>
-              <p id="session-duration-summary">Trial timer is waiting for the session to start.</p>
-              <p id="session-duration-detail">The completion time will appear here as soon as the puzzle begins.</p>
-            </div>
-            <div class="callout">
-              <span class="callout-label">Connections</span>
-              <p id="connection-counts">0 admin / 0 subject / 0 robot</p>
-              <p id="screen-links">Subject and robot screens are ready to open.</p>
-            </div>
+            <p id="review-summary" class="workspace-note">Download the export, then reset for the next participant.</p>
+            <div id="review-recordings" class="review-recordings"></div>
+            <div id="review-rounds" class="review-rounds"></div>
             <div class="button-row">
-              <button id="session-start" class="button button-primary" type="button">Start trial</button>
-              <button id="session-complete" class="button button-ghost" type="button">Mark complete</button>
-              <button id="reset-session" class="button button-ghost" type="button">Reset session</button>
-            </div>
-            <div class="button-row">
-              <a id="export-json-link" class="button button-primary" href="/api/export/current.json" download>Download session JSON</a>
-              <a id="export-csv-link" class="button button-ghost" href="/api/export/current.csv" download>Download CSV</a>
+              <button id="export-json-link" class="button button-primary" type="button">Download session JSON</button>
+              <button id="export-csv-link" class="button button-ghost" type="button">Download CSV</button>
+              <button id="reset-session-review" class="button button-ghost" type="button">Reset for next participant</button>
             </div>
           </section>
-
-          <section class="panel live-panel">
-            <div class="panel-header">
-              <div>
-                <p class="panel-kicker">Hinting</p>
-                <h2>Digital Hint Terminal</h2>
-              </div>
-              <span class="panel-note">Broadcasts to the subject screen</span>
-            </div>
-            <form id="hint-form" class="stack-form">
-              <label class="field">
-                <span>Hint text</span>
-                <textarea id="hint-text" rows="5" placeholder="Type the hint the subject should see."></textarea>
-              </label>
-              <div class="button-row">
-                <button id="hint-send" class="button button-primary" type="submit">Broadcast hint</button>
-                <button id="clear-hint" class="button button-ghost" type="button">Clear editor</button>
-              </div>
-            </form>
-            <div class="callout">
-              <span class="callout-label">Latest hint</span>
-              <p id="hint-preview">No hint has been sent yet.</p>
-            </div>
-          </section>
-
-          <section class="panel live-panel">
-            <div class="panel-header">
-              <div>
-                <p class="panel-kicker">Robot cue controls</p>
-                <h2>Robot Cue Controls</h2>
-              </div>
-              <span class="panel-note">Broadcasts to the robot screen</span>
-            </div>
-            <div id="action-grid" class="action-grid"></div>
-            <div class="callout">
-              <span class="callout-label">Latest robot cue</span>
-              <p id="latest-action">No robotic action logged yet.</p>
-            </div>
-          </section>
-        </div>
+        </section>
       </main>
     </div>
 

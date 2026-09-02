@@ -59,6 +59,7 @@ test('camera controller starts preview, attaches the stream, and plays the video
   });
   assert.equal(videoElement.srcObject, stream);
   assert.equal(videoElement.playCalls, 1);
+  assert.equal(controller.getStream(), stream);
   assert.match(statusElement.textContent, /live webcam preview active/i);
 });
 
@@ -77,7 +78,7 @@ test('camera controller reports a clear message when camera APIs are unavailable
   assert.match(statusElement.textContent, /camera api is not available/i);
 });
 
-test('camera controller falls back to default video constraints when preferred constraints are rejected', async () => {
+test('camera controller falls back to default video constraints when no specific camera was requested', async () => {
   const { createCameraController } = await loadAdminCameraModule();
   const videoElement = createVideoElement();
   const statusElement = createStatusElement();
@@ -113,6 +114,68 @@ test('camera controller falls back to default video constraints when preferred c
   });
   assert.equal(videoElement.srcObject, stream);
   assert.match(statusElement.textContent, /live webcam preview active/i);
+});
+
+test('camera controller does not report live when the selected camera fails and another device would be substituted', async () => {
+  const { createCameraController } = await loadAdminCameraModule();
+  const videoElement = createVideoElement();
+  const statusElement = createStatusElement();
+  const requested = [];
+  const reports = [];
+  const fallbackStream = {
+    getTracks() {
+      return [{
+        stop() {},
+        label: 'FaceTime HD Camera',
+        getSettings() {
+          return { deviceId: 'facetime' };
+        },
+      }];
+    },
+    getVideoTracks() {
+      return this.getTracks();
+    },
+  };
+
+  const controller = createCameraController({
+    videoElement,
+    statusElement,
+    storage: {
+      getItem() {
+        return 'c270-id';
+      },
+      setItem() {},
+    },
+    mediaDevices: {
+      async enumerateDevices() {
+        return [
+          { kind: 'videoinput', deviceId: 'c270-id', label: 'HD Pro Webcam C270' },
+          { kind: 'videoinput', deviceId: 'facetime', label: 'FaceTime HD Camera' },
+        ];
+      },
+      async getUserMedia(constraints) {
+        requested.push(constraints);
+        const requestedId = constraints.video?.deviceId?.exact || constraints.video?.deviceId?.ideal;
+        if (constraints.video === true || requestedId === 'facetime') {
+          return fallbackStream;
+        }
+        const error = new Error('Constraints not supported');
+        error.name = 'OverconstrainedError';
+        throw error;
+      },
+    },
+    onStatusChange(status) {
+      reports.push(status);
+    },
+  });
+
+  await controller.start();
+
+  assert.equal(controller.getStatus().live, false);
+  assert.equal(videoElement.srcObject, null);
+  assert.equal(requested.some((constraints) => constraints.video === true), false);
+  assert.ok(reports.every((status) => status.live === false));
+  assert.match(statusElement.textContent, /unable to start camera/i);
 });
 
 test('camera controller explains permission denial clearly', async () => {
@@ -215,5 +278,17 @@ test('camera controller stops all tracks and clears the preview', async () => {
 
   assert.deepEqual(stopped, ['video', 'audio']);
   assert.equal(videoElement.srcObject, null);
+  assert.equal(controller.getStream(), null);
   assert.match(statusElement.textContent, /camera is off/i);
+});
+
+test('camera controller prefers a Logitech C270 device id', async () => {
+  const { preferredCameraDeviceId } = await loadAdminCameraModule();
+  const chosen = preferredCameraDeviceId([
+    { kind: 'videoinput', deviceId: 'built-in', label: 'FaceTime HD Camera' },
+    { kind: 'videoinput', deviceId: 'c270-id', label: 'HD Pro Webcam C270' },
+    { kind: 'audioinput', deviceId: 'mic', label: 'Microphone' },
+  ]);
+
+  assert.equal(chosen, 'c270-id');
 });

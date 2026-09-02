@@ -14,7 +14,7 @@ function tinyPdfBase64() {
 
 async function startApp(options = {}) {
   const dataDir = await fs.mkdtemp(path.join(os.tmpdir(), 'woz-app-'));
-  const app = await createApp({ dataDir, port: 0, ...options });
+  const app = await createApp({ dataDir, port: 0, seedPuzzles: false, ...options });
   await new Promise((resolve) => app.server.listen(0, '127.0.0.1', resolve));
   const address = app.server.address();
 
@@ -47,15 +47,94 @@ async function uploadPuzzlePair(baseUrl, label = '1') {
   return response.json();
 }
 
-async function selectPuzzlePair(baseUrl, setId = '1') {
-  const response = await fetch(`${baseUrl}/api/puzzles/select`, {
+async function postJson(baseUrl, pathname, body = {}, headers = {}) {
+  return fetch(`${baseUrl}${pathname}`, {
     method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({
-      setId,
-      actor: 'Shrijacked',
-    }),
+    headers: { 'content-type': 'application/json', ...headers },
+    body: JSON.stringify(body),
   });
+}
+
+async function queuePuzzles(baseUrl, setIds) {
+  const response = await postJson(baseUrl, '/api/rounds/queue', { setIds, actor: 'Shrijacked' });
+  assert.equal(response.status, 200);
+  return response.json();
+}
+
+async function uploadSittingPairs(baseUrl, sittingNumber = 1) {
+  const start = ((Number(sittingNumber) - 1) * 3) + 1;
+  for (const label of [start, start + 1, start + 2]) {
+    await uploadPuzzlePair(baseUrl, String(label));
+  }
+}
+
+async function markSensorsLive(baseUrl) {
+  const camera = await postJson(baseUrl, '/api/camera/status', {
+    live: true,
+    deviceLabel: 'HD Pro Webcam C270',
+  });
+  assert.equal(camera.status, 200);
+
+  const hrv = await postJson(baseUrl, '/api/telemetry/hrv', {
+    metrics: { hr: 72, rmssd: 30 },
+    stressLevel: 'Not Stressed',
+  });
+  assert.equal(hrv.status, 200);
+
+  const heartbeat = await postJson(baseUrl, '/api/bridge/gaze/heartbeat', {
+    bridgeId: 'pupil-core',
+    deviceLabel: 'Pupil Core',
+  });
+  assert.equal(heartbeat.status, 200);
+
+  const frame = await postJson(baseUrl, '/api/bridge/gaze/frame', {
+    bridgeId: 'pupil-core',
+    deviceLabel: 'Pupil Core',
+    frame: {
+      attentionScore: 0.82,
+      fixationLoss: 0.18,
+      pupilDilation: 0.44,
+    },
+  });
+  assert.equal(frame.status, 200);
+}
+
+async function connectDisplayScreens(baseUrl) {
+  const wsBase = baseUrl.replace('http://', 'ws://');
+  const subject = await readSubjectSocket(wsBase);
+  const robot = await readRobotSocket(wsBase);
+  const subjectReady = await postJson(baseUrl, '/api/screens/ready', { role: 'subject', ready: true });
+  const robotReady = await postJson(baseUrl, '/api/screens/ready', { role: 'robot', ready: true });
+  assert.equal(subjectReady.status, 200);
+  assert.equal(robotReady.status, 200);
+  return { subject, robot };
+}
+
+async function prepareSitting(baseUrl, options = {}) {
+  const sittingNumber = options.sittingNumber || 1;
+  await postJson(baseUrl, '/api/session/configure', {
+    studyId: options.studyId || 'pilot-01',
+    participantId: options.participantId || 'P-001',
+    researcher: options.researcher || 'Shrijacked',
+    sittingNumber,
+    notes: options.notes || '',
+  });
+  await uploadSittingPairs(baseUrl, sittingNumber);
+  await markSensorsLive(baseUrl);
+  const screens = await connectDisplayScreens(baseUrl);
+  return screens;
+}
+
+async function startSitting(baseUrl) {
+  const response = await postJson(baseUrl, '/api/session/start', { operator: 'Shrijacked' });
+  if (response.status !== 200) {
+    assert.equal(response.status, 200, await response.text());
+  }
+  return response.json();
+}
+
+async function startRound(baseUrl) {
+  const response = await postJson(baseUrl, '/api/rounds/start', { operator: 'Shrijacked' });
   assert.equal(response.status, 200);
   return response.json();
 }
@@ -92,10 +171,12 @@ test('server serves the simplified three-screen routes and aliases /audit to /ro
     assert.match(adminHtml, /Operator Dashboard/i);
     assert.match(adminHtml, /Start camera/i);
     assert.match(adminHtml, /Robot cue controls/i);
+    assert.match(adminHtml, /Begin sitting/i);
+    assert.match(adminHtml, /id="round-start"/);
     assert.match(subjectHtml, /Participant Display/i);
-    assert.match(subjectHtml, /Hint Terminal/i);
+    assert.match(subjectHtml, />Hint</i);
     assert.match(robotHtml, /Robot Operator Screen/i);
-    assert.match(robotHtml, /Latest robot cue/i);
+    assert.match(robotHtml, /Move this piece/i);
     assert.ok([200, 302, 307, 308].includes(auditResponse.status));
   } finally {
     await app.close();
@@ -137,50 +218,49 @@ test('uploading paired files creates a selectable puzzle set and leaves unmatche
     assert.equal(payload.incompleteUploads.length, 1);
     assert.equal(payload.incompleteUploads[0].originalName, '2.pdf');
 
-    await selectPuzzlePair(baseUrl, '1');
+    await queuePuzzles(baseUrl, ['1']);
+    const screens = await connectDisplayScreens(baseUrl);
+    await markSensorsLive(baseUrl);
+    await postJson(baseUrl, '/api/session/configure', {
+      participantId: 'P-001',
+      researcher: 'Shrijacked',
+      sittingNumber: 1,
+    });
+    await uploadPuzzlePair(baseUrl, '2');
+    await uploadPuzzlePair(baseUrl, '3');
+    await startSitting(baseUrl);
+    await startRound(baseUrl);
 
     const state = await fetch(`${baseUrl}/api/state`).then((res) => res.json());
-    assert.equal(state.session.puzzleSet.setId, '1');
+    assert.equal(state.session.activeRound.index, 1);
+    assert.equal(state.session.activeRound.puzzle.setId, '1');
     assert.equal(state.session.puzzleSet.subjectAsset.originalName, '1.pdf');
     assert.equal(state.session.puzzleSet.solutionAsset.originalName, '1s.pdf');
+    screens.subject.socket.close();
+    screens.robot.socket.close();
   } finally {
     await app.close();
   }
 });
 
-test('subject and robot sockets receive role-specific snapshots for the selected puzzle pair and live interventions', async () => {
+test('subject and robot sockets receive role-specific snapshots for live interventions', async () => {
   const { app, baseUrl } = await startApp();
-  const wsBase = baseUrl.replace('http://', 'ws://');
 
   try {
-    await uploadPuzzlePair(baseUrl, '3');
-    await selectPuzzlePair(baseUrl, '3');
+    const { subject, robot } = await prepareSitting(baseUrl, { sittingNumber: 1 });
+    const { socket: subjectSocket, messages: subjectMessages } = subject;
+    const { socket: robotSocket, messages: robotMessages } = robot;
 
-    const { socket: subjectSocket, messages: subjectMessages } = await readSubjectSocket(wsBase);
-    const { socket: robotSocket, messages: robotMessages } = await readRobotSocket(wsBase);
+    await startSitting(baseUrl);
+    await startRound(baseUrl);
 
-    await fetch(`${baseUrl}/api/session/start`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        operator: 'Shrijacked',
-      }),
+    await postJson(baseUrl, '/api/hints', { text: 'Try the blue piece next.' });
+
+    const cueResponse = await postJson(baseUrl, '/api/actions', {
+      pieceId: 'purple-triangle',
+      slot: 4,
     });
-
-    await fetch(`${baseUrl}/api/hints`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ text: 'Try the blue piece next.' }),
-    });
-
-    await fetch(`${baseUrl}/api/actions`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        actionId: 'function-3',
-        label: 'Function 3: Purple Triangle',
-      }),
-    });
+    assert.equal(cueResponse.status, 200);
 
     await new Promise((resolve) => setTimeout(resolve, 100));
 
@@ -188,11 +268,13 @@ test('subject and robot sockets receive role-specific snapshots for the selected
     const robotState = robotMessages.at(-1).data;
 
     assert.equal(subjectState.hint.text, 'Try the blue piece next.');
-    assert.equal(subjectState.puzzleSet.subjectAsset.originalName, '3.pdf');
+    assert.equal('puzzleSet' in subjectState, false);
     assert.equal('robotAction' in subjectState, false);
 
-    assert.equal(robotState.robotAction.actionId, 'function-3');
-    assert.equal(robotState.puzzleSet.solutionAsset.originalName, '3s.pdf');
+    assert.equal(robotState.robotAction.pieceLabel, 'Purple Triangle');
+    assert.equal(robotState.robotAction.slot, 4);
+    assert.equal(robotState.robotAction.label, 'Move PURPLE TRIANGLE to slot 4');
+    assert.equal('puzzleSet' in robotState, false);
     assert.equal('hint' in robotState, false);
 
     subjectSocket.close();
@@ -202,121 +284,117 @@ test('subject and robot sockets receive role-specific snapshots for the selected
   }
 });
 
-test('session flow starts without preflight, allows interventions during run, and blocks them after completion', async () => {
+test('interventions require an active round and are blocked between rounds and after completion', async () => {
   const { app, baseUrl } = await startApp();
 
   try {
-    await uploadPuzzlePair(baseUrl, '4');
-    await selectPuzzlePair(baseUrl, '4');
+    const screens = await prepareSitting(baseUrl, { sittingNumber: 1 });
 
-    const beforeStartHint = await fetch(`${baseUrl}/api/hints`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ text: 'Blocked before start.' }),
-    });
+    // Cannot start the sitting until a puzzle is queued (it is), but a hint is
+    // blocked until both the sitting and a round are open.
+    const beforeStartHint = await postJson(baseUrl, '/api/hints', { text: 'Blocked before start.' });
     assert.equal(beforeStartHint.status, 409);
 
-    const startResponse = await fetch(`${baseUrl}/api/session/start`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ operator: 'Shrijacked' }),
-    });
-    assert.equal(startResponse.status, 200);
+    await startSitting(baseUrl);
 
-    const hintResponse = await fetch(`${baseUrl}/api/hints`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ text: 'Allowed after start.' }),
-    });
+    // Sitting is running but no round is open yet — still blocked.
+    const beforeRoundHint = await postJson(baseUrl, '/api/hints', { text: 'Blocked before round.' });
+    assert.equal(beforeRoundHint.status, 409);
+
+    await startRound(baseUrl);
+
+    const hintResponse = await postJson(baseUrl, '/api/hints', { text: 'Allowed during round.' });
     assert.equal(hintResponse.status, 200);
 
-    const actionResponse = await fetch(`${baseUrl}/api/actions`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        actionId: 'function-1',
-        label: 'Function 1: Orange Triangle',
-      }),
-    });
+    const actionResponse = await postJson(baseUrl, '/api/actions', { pieceId: 'orange-triangle', slot: 2 });
     assert.equal(actionResponse.status, 200);
 
-    const completeResponse = await fetch(`${baseUrl}/api/session/complete`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        operator: 'Shrijacked',
-      }),
-    });
+    const completeRound = await postJson(baseUrl, '/api/rounds/complete', { operator: 'Shrijacked' });
+    assert.equal(completeRound.status, 200);
+
+    // Round closed — interventions blocked again.
+    const betweenRoundsHint = await postJson(baseUrl, '/api/hints', { text: 'Blocked between rounds.' });
+    assert.equal(betweenRoundsHint.status, 409);
+
+    const completeResponse = await postJson(baseUrl, '/api/session/complete', { operator: 'Shrijacked' });
     assert.equal(completeResponse.status, 200);
 
-    const afterCompleteAction = await fetch(`${baseUrl}/api/actions`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        actionId: 'function-2',
-        label: 'Function 2: Green Square',
-      }),
-    });
+    const afterCompleteAction = await postJson(baseUrl, '/api/actions', { pieceId: 'green-square', slot: 1 });
     assert.equal(afterCompleteAction.status, 409);
+    screens.subject.socket.close();
+    screens.robot.socket.close();
   } finally {
     await app.close();
   }
 });
 
-test('concise export endpoint returns timestamps, selected filenames, and ordered interventions only', async () => {
+test('a full sitting records three rounds with attributed interventions in the export', async () => {
   const { app, baseUrl } = await startApp();
 
   try {
-    await fetch(`${baseUrl}/api/session/configure`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        studyId: 'pilot-01',
-        participantId: 'P-001',
-        researcher: 'Shrijacked',
-        notes: 'camera-only dry run',
-      }),
+    const screens = await prepareSitting(baseUrl, {
+      studyId: 'pilot-09',
+      participantId: 'P-020',
+      sittingNumber: 2,
     });
+    await startSitting(baseUrl);
 
-    await uploadPuzzlePair(baseUrl, '5');
-    await selectPuzzlePair(baseUrl, '5');
+    for (let round = 1; round <= 3; round += 1) {
+      await startRound(baseUrl);
+      await postJson(baseUrl, '/api/hints', { text: `Round ${round} hint.` });
+      await postJson(baseUrl, '/api/actions', { pieceId: 'blue-triangle', slot: round });
+      const complete = await postJson(baseUrl, '/api/rounds/complete', { operator: 'Shrijacked' });
+      assert.equal(complete.status, 200);
+    }
 
-    await fetch(`${baseUrl}/api/session/start`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ operator: 'Shrijacked' }),
+    // A fourth round is not allowed once the queue is exhausted.
+    const fourthRound = await postJson(baseUrl, '/api/rounds/start', { operator: 'Shrijacked' });
+    assert.equal(fourthRound.status, 409);
+
+    await postJson(baseUrl, '/api/session/complete', { operator: 'Shrijacked' });
+
+    const exportPayload = await fetch(`${baseUrl}/api/export/current.json`).then((response) => response.json());
+    assert.equal(exportPayload.metadata.sittingNumber, 2);
+    assert.equal(exportPayload.roundsCompleted, 3);
+    assert.equal(exportPayload.rounds.length, 3);
+    assert.equal(exportPayload.rounds[0].puzzle.setId, '4');
+    assert.equal(exportPayload.rounds[2].puzzle.setId, '6');
+    assert.deepEqual(exportPayload.rounds[1].interventions.map((entry) => entry.type), ['hint', 'robot']);
+    assert.equal(exportPayload.rounds[1].interventions[1].piece, 'Blue Triangle');
+    assert.equal(exportPayload.rounds[1].interventions[1].slot, 2);
+    screens.subject.socket.close();
+    screens.robot.socket.close();
+  } finally {
+    await app.close();
+  }
+});
+
+test('the round export carries metadata, per-round filenames, and ordered interventions only', async () => {
+  const { app, baseUrl } = await startApp();
+
+  try {
+    const screens = await prepareSitting(baseUrl, {
+      studyId: 'pilot-01',
+      participantId: 'P-001',
+      notes: 'camera-only dry run',
     });
+    await startSitting(baseUrl);
+    await startRound(baseUrl);
 
-    await fetch(`${baseUrl}/api/hints`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ text: 'Try the outer edge first.' }),
-    });
-
-    await fetch(`${baseUrl}/api/actions`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        actionId: 'function-2',
-        label: 'Function 2: Green Square',
-      }),
-    });
-
-    await fetch(`${baseUrl}/api/session/complete`, {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ operator: 'Shrijacked' }),
-    });
+    await postJson(baseUrl, '/api/hints', { text: 'Try the outer edge first.' });
+    await postJson(baseUrl, '/api/actions', { pieceId: 'green-square', slot: 3 });
+    await postJson(baseUrl, '/api/session/complete', { operator: 'Shrijacked' });
 
     const exportResponse = await fetch(`${baseUrl}/api/export/current.json`);
     assert.equal(exportResponse.status, 200);
     const payload = await exportResponse.json();
 
     assert.equal(payload.metadata.participantId, 'P-001');
-    assert.equal(payload.puzzle.subjectFile, '5.pdf');
-    assert.equal(payload.puzzle.solutionFile, '5s.pdf');
-    assert.deepEqual(payload.interventions.map((entry) => entry.type), ['hint', 'robot']);
-    assert.ok(Number.isFinite(payload.durationSeconds));
+    assert.equal(payload.rounds.length, 1);
+    assert.equal(payload.rounds[0].puzzle.subjectFile, '1.pdf');
+    assert.equal(payload.rounds[0].puzzle.solutionFile, '1s.pdf');
+    assert.deepEqual(payload.rounds[0].interventions.map((entry) => entry.type), ['hint', 'robot']);
+    assert.ok(Number.isFinite(payload.totalDurationSeconds));
     assert.equal('adaptive' in payload, false);
     assert.equal('events' in payload, false);
     assert.equal('state' in payload, false);
@@ -324,6 +402,147 @@ test('concise export endpoint returns timestamps, selected filenames, and ordere
     const csv = await fetch(`${baseUrl}/api/export/current.csv`).then((response) => response.text());
     assert.match(csv, /hint\.updated/);
     assert.match(csv, /robot\.action\.logged/);
+    screens.subject.socket.close();
+    screens.robot.socket.close();
+  } finally {
+    await app.close();
+  }
+});
+
+test('admin controls and exports are gated by the PIN when ADMIN_PIN is set', async () => {
+  const { app, baseUrl } = await startApp({ adminPin: '2468' });
+
+  try {
+    // Without a token, mutating admin routes and admin reads are locked (423).
+    const lockedConfigure = await postJson(baseUrl, '/api/session/configure', { participantId: 'P-1' });
+    assert.equal(lockedConfigure.status, 423);
+
+    const lockedExport = await fetch(`${baseUrl}/api/export/current.json`);
+    assert.equal(lockedExport.status, 423);
+
+    const lockedAdminState = await fetch(`${baseUrl}/api/state?role=admin`);
+    assert.equal(lockedAdminState.status, 423);
+
+    // A wrong PIN is rejected.
+    const badUnlock = await postJson(baseUrl, '/api/guard/unlock', { pin: '0000' });
+    assert.equal(badUnlock.status, 401);
+
+    // The subject screen still reads its own state without a token.
+    const subjectState = await fetch(`${baseUrl}/api/state?role=subject`);
+    assert.equal(subjectState.status, 200);
+
+    // A correct PIN yields a token that unlocks admin routes.
+    const unlock = await postJson(baseUrl, '/api/guard/unlock', { pin: '2468' });
+    assert.equal(unlock.status, 200);
+    const { token } = await unlock.json();
+    assert.ok(token);
+
+    const authedConfigure = await fetch(`${baseUrl}/api/session/configure`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-admin-token': token },
+      body: JSON.stringify({ participantId: 'P-1' }),
+    });
+    assert.equal(authedConfigure.status, 200);
+  } finally {
+    await app.close();
+  }
+});
+
+test('csv export rejects a path-traversal session identifier', async () => {
+  const { app, baseUrl } = await startApp();
+
+  try {
+    const response = await fetch(`${baseUrl}/api/exports/..secret.csv`);
+    assert.equal(response.status, 400);
+  } finally {
+    await app.close();
+  }
+});
+
+test('oversized request bodies are rejected with 413', async () => {
+  const { app, baseUrl } = await startApp();
+
+  try {
+    const huge = 'x'.repeat(17 * 1024 * 1024);
+    let status = null;
+    try {
+      const response = await fetch(`${baseUrl}/api/session/configure`, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ notes: huge }),
+      });
+      status = response.status;
+    } catch (error) {
+      // Closing the connection to abort the oversized upload can surface as a
+      // client-side network error, which is also a valid rejection.
+      status = 'connection-closed';
+    }
+    assert.ok(status === 413 || status === 'connection-closed', `expected rejection, got ${status}`);
+  } finally {
+    await app.close();
+  }
+});
+
+test('display screens can report sound-armed readiness only while that display is connected', async () => {
+  const { app, baseUrl } = await startApp();
+
+  try {
+    const spoofed = await postJson(baseUrl, '/api/screens/ready', { role: 'subject', ready: true });
+    assert.equal(spoofed.status, 409);
+
+    const { socket } = await readSubjectSocket(baseUrl.replace('http://', 'ws://'));
+    const ready = await postJson(baseUrl, '/api/screens/ready', { role: 'subject', ready: true });
+    assert.equal(ready.status, 200);
+
+    const state = await fetch(`${baseUrl}/api/state`).then((response) => response.json());
+    assert.equal(state.system.screens.subject.ready, true);
+    assert.equal(state.system.screens.subject.connected, true);
+    assert.equal(state.system.screens.robot.ready, false);
+
+    const invalid = await postJson(baseUrl, '/api/screens/ready', { role: 'admin', ready: true });
+    assert.equal(invalid.status, 400);
+
+    socket.close();
+    await new Promise((resolve) => socket.addEventListener('close', resolve, { once: true }));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    const afterDisconnect = await fetch(`${baseUrl}/api/state`).then((response) => response.json());
+    assert.equal(afterDisconnect.system.screens.subject.connected, false);
+    assert.equal(afterDisconnect.system.screens.subject.ready, false);
+  } finally {
+    await app.close();
+  }
+});
+
+test('camera live status cannot be spoofed without the admin PIN unlock', async () => {
+  const { app, baseUrl } = await startApp({ adminPin: '2468' });
+
+  try {
+    const spoofed = await postJson(baseUrl, '/api/camera/status', {
+      live: true,
+      deviceLabel: 'HD Pro Webcam C270',
+    });
+    assert.equal(spoofed.status, 423);
+
+    const health = await fetch(`${baseUrl}/health`).then((response) => response.json());
+    const cameraItem = health.preflight.items.find((item) => item.id === 'camera');
+    assert.ok(cameraItem);
+    assert.notEqual(cameraItem.status, 'ready');
+
+    const unlock = await postJson(baseUrl, '/api/guard/unlock', { pin: '2468' });
+    assert.equal(unlock.status, 200);
+    const { token } = await unlock.json();
+    const authed = await postJson(baseUrl, '/api/camera/status', {
+      live: true,
+      deviceLabel: 'HD Pro Webcam C270',
+    }, {
+      'x-admin-token': token,
+    });
+    assert.equal(authed.status, 200);
+
+    const liveHealth = await fetch(`${baseUrl}/health`).then((response) => response.json());
+    const liveCamera = liveHealth.preflight.items.find((item) => item.id === 'camera');
+    assert.equal(liveCamera.status, 'ready');
   } finally {
     await app.close();
   }
@@ -338,12 +557,122 @@ test('camera controller assets remain reachable from the single admin page build
     const cameraModuleResponse = await fetch(`${baseUrl}/admin-camera.mjs`);
     const cameraModule = await cameraModuleResponse.text();
 
+    assert.match(adminHtml, /id="camera-device"/);
     assert.match(adminHtml, /id="start-camera"/);
     assert.match(adminHtml, /id="stop-camera"/);
+    assert.match(adminHtml, /class="library-split"/);
+    assert.match(adminHtml, /run-column-sensors/);
+    assert.match(adminHtml, /run-panel-camera/);
+    assert.match(adminHtml, /run-panel-hints/);
+    assert.match(adminHtml, /id="hint-save-preset"/);
+    assert.match(adminHtml, /class="run-ops"/);
+    const styles = await fetch(`${baseUrl}/styles.css`).then((response) => response.text());
+    assert.match(styles, /body\[data-session-phase="setup"\] \.run-column-sensors \{\s*display: contents;/);
+    assert.doesNotMatch(
+      styles,
+      /body\[data-session-phase="setup"\] \.run-column-trial \{\s*display:\s*none/,
+      'setup must show solution, hint, and robot panels so the operator board is visible before Begin sitting',
+    );
+    assert.match(
+      styles,
+      /body\[data-session-phase="setup"\] \.run-deck \{[\s\S]*?grid-template-areas:\s*"cam cam sol"\s*"hrv hint robot"/,
+      'setup must use the camera|solution / HRV|hint|robot board, not a camera-only pair',
+    );
+    assert.match(styles, /grid-template-areas:\s*"ops ops ops"\s*"cam cam sol"\s*"hrv hint robot"/);
+    assert.match(
+      styles,
+      /body:is\(\[data-session-phase="setup"\], \[data-session-phase="running"\]\) \.run-panel-robot \.action-button \{[\s\S]*?min-height:\s*28px/,
+      'robot cue buttons stay compact on the live board so the camera cell keeps its size',
+    );
+    assert.match(
+      styles,
+      /body\[data-session-phase="setup"\] \.run-deck \{[\s\S]*?grid-template-rows:\s*minmax\([^)]+\)\s+auto/,
+      'setup bottom row must size to HRV, hint, and robot content instead of clipping them',
+    );
     assert.match(adminModule, /bindCameraControls/);
+    assert.match(adminModule, /shouldShowCameraControls/);
     assert.match(cameraModuleResponse.headers.get('content-type') || '', /text\/javascript/);
     assert.match(cameraModule, /Requesting camera access/i);
   } finally {
     await app.close();
+  }
+});
+
+test('starting a sitting is rejected until camera, watch, and Pupil frames are live', async () => {
+  const { app, baseUrl } = await startApp();
+
+  try {
+    await postJson(baseUrl, '/api/session/configure', {
+      participantId: 'P-001',
+      researcher: 'Shrijacked',
+      sittingNumber: 1,
+    });
+    await uploadSittingPairs(baseUrl, 1);
+    const blocked = await postJson(baseUrl, '/api/session/start', { operator: 'Shrijacked' });
+    assert.equal(blocked.status, 409);
+
+    const screens = await connectDisplayScreens(baseUrl);
+    const stillBlocked = await postJson(baseUrl, '/api/session/start', { operator: 'Shrijacked' });
+    assert.equal(stillBlocked.status, 409);
+
+    await postJson(baseUrl, '/api/camera/status', {
+      live: true,
+      deviceLabel: 'HD Pro Webcam C270',
+    });
+    await postJson(baseUrl, '/api/telemetry/hrv', {
+      metrics: { hr: 72, rmssd: 30 },
+      stressLevel: 'Not Stressed',
+    });
+    await postJson(baseUrl, '/api/bridge/gaze/heartbeat', {
+      bridgeId: 'pupil-core',
+      deviceLabel: 'Pupil Core',
+    });
+    const heartbeatOnly = await postJson(baseUrl, '/api/session/start', { operator: 'Shrijacked' });
+    assert.equal(heartbeatOnly.status, 409);
+
+    await postJson(baseUrl, '/api/bridge/gaze/frame', {
+      bridgeId: 'pupil-core',
+      deviceLabel: 'Pupil Core',
+      frame: {
+        attentionScore: 0.82,
+        fixationLoss: 0.18,
+        pupilDilation: 0.44,
+      },
+    });
+    await startSitting(baseUrl);
+    screens.subject.socket.close();
+    screens.robot.socket.close();
+  } finally {
+    await app.close();
+  }
+});
+
+test('hint presets can be updated and persist into the next admin state snapshot', async () => {
+  const configPath = path.join(os.tmpdir(), `woz-presets-${Date.now()}.json`);
+  await fs.writeFile(configPath, JSON.stringify({
+    plannedRounds: 3,
+    slotCount: 7,
+    hintPresets: ['Try rotating that piece.'],
+  }));
+  const { app, baseUrl } = await startApp({
+    studyConfigPath: configPath,
+  });
+
+  try {
+    const saved = await postJson(baseUrl, '/api/hint-presets', {
+      presets: ['Try rotating that piece.', 'Look at the outline.'],
+    });
+    assert.equal(saved.status, 200);
+    const body = await saved.json();
+    assert.deepEqual(body.hintPresets, ['Try rotating that piece.', 'Look at the outline.']);
+
+    const state = await fetch(`${baseUrl}/api/state`).then((response) => response.json());
+    assert.deepEqual(state.system.study.hintPresets, ['Try rotating that piece.', 'Look at the outline.']);
+
+    const disk = JSON.parse(await fs.readFile(configPath, 'utf8'));
+    assert.deepEqual(disk.hintPresets, ['Try rotating that piece.', 'Look at the outline.']);
+  } finally {
+    await app.close();
+    await fs.unlink(configPath).catch(() => {});
   }
 });

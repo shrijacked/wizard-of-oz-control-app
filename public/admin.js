@@ -6,12 +6,29 @@ import {
   postJson,
 } from './shared.js';
 import { createCameraController } from './admin-camera.mjs';
-import { bindCameraControls } from './admin-controls.mjs';
+import { canUseWebmRecorder, createCameraRecorder } from './admin-camera-recorder.mjs';
+import {
+  bindCameraControls,
+  latestDownloadableRecording,
+  recordingsToDownloadAfterSitting,
+  shouldAutoStartSittingRecording,
+  shouldShowCameraControls,
+} from './admin-controls.mjs';
 import { renderHrvTelemetry } from './admin-telemetry.mjs';
 
 const ADMIN_TOKEN_KEY = 'woz.admin.token';
 
 const elements = {
+  modeNote: document.querySelector('#mode-note'),
+  modeSetup: document.querySelector('#mode-setup'),
+  modeRun: document.querySelector('#mode-run'),
+  modeReview: document.querySelector('#mode-review'),
+  linkStatus: document.querySelector('#link-status'),
+  subjectHealth: document.querySelector('#subject-health'),
+  robotHealth: document.querySelector('#robot-health'),
+  cameraHealth: document.querySelector('#camera-health'),
+  watchHealth: document.querySelector('#watch-health'),
+  gazeHealth: document.querySelector('#gaze-health'),
   guardShell: document.querySelector('#guard-shell'),
   guardForm: document.querySelector('#guard-form'),
   guardPin: document.querySelector('#guard-pin'),
@@ -22,6 +39,7 @@ const elements = {
   sessionStudyId: document.querySelector('#session-study-id'),
   sessionParticipantId: document.querySelector('#session-participant-id'),
   sessionResearcher: document.querySelector('#session-researcher'),
+  sessionSittingNumber: document.querySelector('#session-sitting-number'),
   sessionCondition: document.querySelector('#session-condition'),
   sessionNotes: document.querySelector('#session-notes'),
   sessionSave: document.querySelector('#session-save'),
@@ -32,9 +50,12 @@ const elements = {
   puzzleClearSelection: document.querySelector('#puzzle-clear-selection'),
   puzzleLibraryList: document.querySelector('#puzzle-library-list'),
   incompleteLibraryList: document.querySelector('#incomplete-library-list'),
+  queueList: document.querySelector('#queue-list'),
+  readinessList: document.querySelector('#readiness-list'),
   selectedSetSummary: document.querySelector('#selected-set-summary'),
   selectedSetDetail: document.querySelector('#selected-set-detail'),
   solutionPreview: document.querySelector('#solution-preview'),
+  roundSummary: document.querySelector('#round-summary'),
   hrvHeartRate: document.querySelector('#hrv-heart-rate'),
   hrvSdnn: document.querySelector('#hrv-sdnn'),
   hrvRmssd: document.querySelector('#hrv-rmssd'),
@@ -49,36 +70,90 @@ const elements = {
   sessionStatusDetail: document.querySelector('#session-status-detail'),
   sessionDurationSummary: document.querySelector('#session-duration-summary'),
   sessionDurationDetail: document.querySelector('#session-duration-detail'),
-  connectionCounts: document.querySelector('#connection-counts'),
   screenLinks: document.querySelector('#screen-links'),
   sessionStart: document.querySelector('#session-start'),
   sessionComplete: document.querySelector('#session-complete'),
+  roundStart: document.querySelector('#round-start'),
+  roundComplete: document.querySelector('#round-complete'),
   resetSession: document.querySelector('#reset-session'),
+  resetSessionSetup: document.querySelector('#reset-session-setup'),
+  resetSessionReview: document.querySelector('#reset-session-review'),
   exportJsonLink: document.querySelector('#export-json-link'),
   exportCsvLink: document.querySelector('#export-csv-link'),
+  reviewSummary: document.querySelector('#review-summary'),
+  reviewRounds: document.querySelector('#review-rounds'),
   hintForm: document.querySelector('#hint-form'),
   hintText: document.querySelector('#hint-text'),
   hintSend: document.querySelector('#hint-send'),
+  hintSavePreset: document.querySelector('#hint-save-preset'),
   clearHint: document.querySelector('#clear-hint'),
   hintPreview: document.querySelector('#hint-preview'),
-  actionGrid: document.querySelector('#action-grid'),
+  hintPresets: document.querySelector('#hint-presets'),
+  pieceGrid: document.querySelector('#piece-grid'),
+  slotGrid: document.querySelector('#slot-grid'),
+  sendRobotCue: document.querySelector('#send-robot-cue'),
   latestAction: document.querySelector('#latest-action'),
+  interventionLog: document.querySelector('#intervention-log'),
   startCamera: document.querySelector('#start-camera'),
   stopCamera: document.querySelector('#stop-camera'),
+  startRecording: document.querySelector('#start-recording'),
+  stopRecording: document.querySelector('#stop-recording'),
+  downloadRecording: document.querySelector('#download-recording'),
+  cameraDevice: document.querySelector('#camera-device'),
   cameraFeed: document.querySelector('#camera-feed'),
   cameraStatus: document.querySelector('#camera-status'),
+  recordingStatus: document.querySelector('#recording-status'),
+  reviewRecordings: document.querySelector('#review-recordings'),
+  gazeAttention: document.querySelector('#gaze-attention'),
+  gazeUpdated: document.querySelector('#gaze-updated'),
 };
 
 let currentState = null;
 let guardStatus = null;
 let adminToken = window.localStorage.getItem(ADMIN_TOKEN_KEY) || '';
 let durationTicker = null;
-let previewSetId = null;
+let selectedPieceId = null;
+let selectedSlot = null;
+let lastHintToken = null;
+let lastRobotToken = null;
+const liveLog = [];
 
 const cameraController = createCameraController({
   videoElement: elements.cameraFeed,
   statusElement: elements.cameraStatus,
+  selectElement: elements.cameraDevice,
   mediaDevices: window.navigator?.mediaDevices || null,
+  async onStatusChange(status) {
+    try {
+      await postJson('/api/camera/status', {
+        live: Boolean(status.live),
+        deviceLabel: status.deviceLabel || '',
+        deviceId: status.deviceId || '',
+      }, {
+        headers: buildHeaders(),
+      });
+    } catch {
+      // Camera status is best-effort; the preview still works locally.
+    }
+  },
+});
+
+const webmRecorderSupported = canUseWebmRecorder();
+const cameraRecorder = createCameraRecorder({
+  createRecording: () => postJson('/api/camera/recordings', {}, { headers: buildHeaders() }),
+  uploadChunk: uploadRecordingChunk,
+  finalizeRecording: (recordingId, options = {}) => postJson(`/api/camera/recordings/${recordingId}/finalize`, {
+    token: options.token,
+    reason: options.partial ? 'partial' : 'stop',
+  }, {
+    headers: buildHeaders(),
+  }),
+  onStatus(message) {
+    setText(elements.recordingStatus, message);
+    if (elements.recordingStatus) {
+      elements.recordingStatus.dataset.active = cameraRecorder.getActive().active ? 'true' : 'false';
+    }
+  },
 });
 
 const PUZZLE_ACCEPTED_TYPES = {
@@ -125,6 +200,44 @@ function buildHeaders() {
   return adminToken ? { 'x-admin-token': adminToken } : {};
 }
 
+function formatRecordingClock(startedAt) {
+  const elapsed = Math.max(0, Math.floor((Date.now() - Number(startedAt || 0)) / 1000));
+  return `${String(Math.floor(elapsed / 60)).padStart(2, '0')}:${String(elapsed % 60).padStart(2, '0')}`;
+}
+
+async function uploadRecordingChunk(recordingId, index, blob) {
+  const response = await fetch(`/api/camera/recordings/${recordingId}/chunk`, {
+    method: 'POST',
+    headers: {
+      ...buildHeaders(),
+      'content-type': 'application/octet-stream',
+      'x-chunk-index': String(index),
+    },
+    body: blob,
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    const error = new Error(body.error || `Recording upload failed with status ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
+}
+
+function actorName() {
+  return elements.sessionResearcher?.value
+    || currentState?.session?.metadata?.researcher
+    || 'researcher';
+}
+
+function studyConfig() {
+  return currentState?.system?.study || {
+    plannedRounds: 3,
+    slotCount: 7,
+    pieces: [],
+    hintPresets: [],
+  };
+}
+
 function guessPuzzleMimeType(name = '') {
   const extension = name.includes('.') ? name.slice(name.lastIndexOf('.')).toLowerCase() : '';
   return PUZZLE_ACCEPTED_TYPES[extension] || '';
@@ -152,10 +265,6 @@ function readUploadFileAsBase64(file) {
   });
 }
 
-function selectedPuzzleSet() {
-  return currentState?.session?.puzzleSet || null;
-}
-
 function availablePuzzleSets() {
   return currentState?.assets?.puzzleSets || [];
 }
@@ -164,22 +273,8 @@ function incompleteUploads() {
   return currentState?.assets?.incompleteUploads || [];
 }
 
-function getPreviewSet() {
-  const selected = selectedPuzzleSet();
-  const allSets = availablePuzzleSets();
-
-  if (selected && (!previewSetId || previewSetId === selected.setId)) {
-    previewSetId = selected.setId;
-    return selected;
-  }
-
-  const preview = allSets.find((entry) => entry.setId === previewSetId);
-  if (preview) {
-    return preview;
-  }
-
-  previewSetId = allSets[0]?.setId || null;
-  return allSets[0] || null;
+function sessionQueue() {
+  return currentState?.session?.queue || [];
 }
 
 function renderAssetPreview(container, asset, emptyMessage) {
@@ -203,6 +298,13 @@ function renderAssetPreview(container, asset, emptyMessage) {
     frame.className = 'reference-preview-frame';
     frame.src = `${asset.urlPath}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`;
     frame.title = asset.originalName;
+    frame.addEventListener('error', () => {
+      container.innerHTML = '';
+      const failed = document.createElement('p');
+      failed.className = 'panel-note';
+      failed.textContent = 'The solution file could not be loaded.';
+      container.append(failed);
+    });
     container.append(frame);
     return;
   }
@@ -211,49 +313,71 @@ function renderAssetPreview(container, asset, emptyMessage) {
   image.className = 'reference-preview-image';
   image.src = asset.urlPath;
   image.alt = asset.originalName;
+  image.addEventListener('error', () => {
+    container.innerHTML = '';
+    const failed = document.createElement('p');
+    failed.className = 'panel-note';
+    failed.textContent = 'The solution file could not be loaded.';
+    container.append(failed);
+  });
   container.append(image);
-}
-
-function connectionText() {
-  const connections = currentState?.system?.connections || {};
-  return `${connections.admin || 0} admin / ${connections.subject || 0} subject / ${connections.robot || 0} robot`;
 }
 
 function localPolicy(action) {
   const session = currentState?.session || {};
   const status = session.status || 'setup';
+  const queue = session.queue || [];
+  const rounds = session.rounds || [];
+  const activeRound = session.activeRound || null;
 
-  if (action === 'configureSession' || action === 'selectPuzzleSet') {
+  if (action === 'configureSession' || action === 'queueRounds') {
     return status === 'setup'
       ? { allowed: true, reason: '' }
-      : { allowed: false, reason: 'Session setup is locked once the trial starts.' };
+      : { allowed: false, reason: 'Session setup is locked once the sitting has started.' };
   }
 
   if (action === 'startSession') {
     if (status !== 'setup') {
       return { allowed: false, reason: 'Only setup sessions can be started.' };
     }
-
-    if (!session.puzzleSet) {
-      return { allowed: false, reason: 'Choose a puzzle set before starting the trial.' };
+    if (queue.length === 0) {
+      return { allowed: false, reason: 'Queue at least one puzzle before starting the sitting.' };
     }
-
     return { allowed: true, reason: '' };
+  }
+
+  if (action === 'startRound') {
+    if (status !== 'running') {
+      return { allowed: false, reason: 'Start the sitting before opening a round.' };
+    }
+    if (activeRound) {
+      return { allowed: false, reason: 'Finish the current round before starting the next one.' };
+    }
+    if (rounds.length >= queue.length) {
+      return { allowed: false, reason: 'All queued puzzles for this sitting have been played.' };
+    }
+    return { allowed: true, reason: '' };
+  }
+
+  if (action === 'completeRound') {
+    return status === 'running' && activeRound
+      ? { allowed: true, reason: '' }
+      : { allowed: false, reason: 'There is no active round to complete.' };
   }
 
   if (action === 'completeSession') {
     return status === 'running'
       ? { allowed: true, reason: '' }
-      : { allowed: false, reason: 'Only running sessions can be completed.' };
+      : { allowed: false, reason: 'Only running sittings can be completed.' };
   }
 
   if (action === 'setHint' || action === 'logRobotAction') {
-    return status === 'running'
-      ? { allowed: true, reason: '' }
-      : { allowed: false, reason: 'Hints and robot cues are only available during an active trial.' };
-  }
-
-  if (action === 'resetSession') {
+    if (status !== 'running') {
+      return { allowed: false, reason: 'Hints and robot cues are only available during an active sitting.' };
+    }
+    if (!activeRound) {
+      return { allowed: false, reason: 'Start a round before sending hints or robot cues.' };
+    }
     return { allowed: true, reason: '' };
   }
 
@@ -272,6 +396,63 @@ function resolvePolicy(action) {
   }
 
   return localPolicy(action);
+}
+
+function setPill(element, status, label) {
+  if (!element) {
+    return;
+  }
+
+  element.dataset.status = status;
+  element.textContent = label;
+}
+
+function renderHealth() {
+  const screens = currentState?.system?.screens || {};
+  const subject = screens.subject || {};
+  const robot = screens.robot || {};
+  const camera = currentState?.system?.camera || {};
+  const sensorHealth = currentState?.system?.sensorHealth || {};
+
+  if (subject.ready) {
+    setPill(elements.subjectHealth, 'ready', 'Subject: ready');
+  } else if (subject.connected) {
+    setPill(elements.subjectHealth, 'connected', 'Subject: connected, sound off');
+  } else {
+    setPill(elements.subjectHealth, 'offline', 'Subject: offline');
+  }
+
+  if (robot.ready) {
+    setPill(elements.robotHealth, 'ready', 'Robot: ready');
+  } else if (robot.connected) {
+    setPill(elements.robotHealth, 'connected', 'Robot: connected, sound off');
+  } else {
+    setPill(elements.robotHealth, 'offline', 'Robot: offline');
+  }
+
+  if (camera.live) {
+    setPill(elements.cameraHealth, 'ready', camera.deviceLabel ? `Camera: ${camera.deviceLabel}` : 'Camera: live');
+  } else {
+    setPill(elements.cameraHealth, 'offline', 'Camera: off');
+  }
+
+  const watchState = sensorHealth.watch?.state;
+  if (watchState === 'healthy') {
+    setPill(elements.watchHealth, 'ready', 'Watch: live');
+  } else if (watchState === 'stale' || watchState === 'error') {
+    setPill(elements.watchHealth, 'connected', 'Watch: check band');
+  } else {
+    setPill(elements.watchHealth, 'offline', 'Watch: waiting');
+  }
+
+  const gazeState = sensorHealth.gaze?.state;
+  if (gazeState === 'healthy') {
+    setPill(elements.gazeHealth, 'ready', 'Pupil: live');
+  } else if (gazeState === 'stale' || gazeState === 'error') {
+    setPill(elements.gazeHealth, 'connected', 'Pupil: check Capture');
+  } else {
+    setPill(elements.gazeHealth, 'offline', 'Pupil: waiting');
+  }
 }
 
 function renderGuard() {
@@ -297,29 +478,65 @@ function renderGuard() {
   setElementDisabled(elements.guardLock, !authenticated, 'Unlock the browser before locking it again.');
 }
 
-function renderPuzzleLibrary() {
-  const selected = selectedPuzzleSet();
-  const preview = getPreviewSet();
+function renderModes() {
+  const status = currentState?.session?.status || 'setup';
+  if (elements.modeSetup) {
+    elements.modeSetup.hidden = status !== 'setup';
+  }
+  if (elements.modeRun) {
+    elements.modeRun.hidden = !shouldShowCameraControls(status);
+  }
+  if (elements.modeReview) {
+    elements.modeReview.hidden = status !== 'completed';
+  }
+  document.body.dataset.sessionPhase = status;
 
-  setText(
-    elements.selectedSetSummary,
-    selected ? `Set ${selected.setId} is active for this session.` : 'No puzzle set selected yet.',
-  );
-  setText(
-    elements.selectedSetDetail,
-    selected
-      ? `Subject: ${selected.subjectAsset.originalName} • Solution: ${selected.solutionAsset.originalName}`
-      : 'Upload a subject file and a matching solution file ending in s, then choose the set.',
-  );
-  renderAssetPreview(
-    elements.solutionPreview,
-    preview?.solutionAsset || selected?.solutionAsset || null,
-    'The selected solution preview will appear here.',
-  );
+  if (status === 'running') {
+    setText(elements.modeNote, 'Live sitting. Camera, solution, hints, and robot cues stay on this deck.');
+  } else if (status === 'completed') {
+    setText(elements.modeNote, 'Sitting complete. Download the export, then reset for the next participant.');
+  } else {
+    setText(elements.modeNote, 'Start the C270, arm both screens, and wait for Watch and Pupil before beginning.');
+  }
+}
+
+async function persistQueue(setIds) {
+  await postJson('/api/rounds/queue', {
+    setIds,
+    actor: actorName(),
+  }, {
+    headers: buildHeaders(),
+  });
+  await refreshState();
+}
+
+function renderQueueAndLibrary() {
+  const queue = sessionQueue();
+  const queuedIds = new Set(queue.map((entry) => entry.setId));
+
+  if (elements.queueList) {
+    elements.queueList.innerHTML = '';
+    if (!queue.length) {
+      const empty = document.createElement('p');
+      empty.className = 'panel-note';
+      empty.textContent = 'Save the sitting profile to auto-queue that sitting\'s three puzzles.';
+      elements.queueList.append(empty);
+    }
+
+    queue.forEach((entry, index) => {
+      const row = document.createElement('div');
+      row.className = 'queue-item';
+      const title = document.createElement('strong');
+      title.textContent = `${index + 1}. Set ${entry.setId}`;
+      const meta = document.createElement('small');
+      meta.textContent = `${entry.subjectAsset.originalName} / ${entry.solutionAsset.originalName}`;
+      row.append(title, meta);
+      elements.queueList.append(row);
+    });
+  }
 
   if (elements.puzzleLibraryList) {
     elements.puzzleLibraryList.innerHTML = '';
-
     if (!availablePuzzleSets().length) {
       const empty = document.createElement('p');
       empty.className = 'panel-note';
@@ -330,65 +547,37 @@ function renderPuzzleLibrary() {
     availablePuzzleSets().forEach((entry) => {
       const card = document.createElement('article');
       card.className = 'reference-library-item';
-      if (selected?.setId === entry.setId) {
+      if (queuedIds.has(entry.setId)) {
         card.classList.add('selected');
-      }
-      if (preview?.setId === entry.setId) {
-        card.classList.add('previewing');
       }
 
       const title = document.createElement('strong');
       title.textContent = `Set ${entry.setId}`;
-      card.append(title);
-
       const meta = document.createElement('small');
       meta.textContent = `Subject ${entry.subjectAsset.originalName} • Solution ${entry.solutionAsset.originalName}`;
-      card.append(meta);
-
-      const actions = document.createElement('div');
-      actions.className = 'button-row';
-
-      const previewButton = document.createElement('button');
-      previewButton.type = 'button';
-      previewButton.className = 'button button-ghost';
-      previewButton.textContent = preview?.setId === entry.setId ? 'Previewing' : 'Preview';
-      previewButton.disabled = preview?.setId === entry.setId;
-      previewButton.addEventListener('click', () => {
-        previewSetId = entry.setId;
-        renderPuzzleLibrary();
-      });
-      actions.append(previewButton);
-
-      const selectPolicy = resolvePolicy('selectPuzzleSet');
-      const selectButton = document.createElement('button');
-      selectButton.type = 'button';
-      selectButton.className = 'button button-primary';
-      selectButton.textContent = selected?.setId === entry.setId ? 'Selected' : 'Use set';
-      selectButton.disabled = !selectPolicy.allowed || selected?.setId === entry.setId;
-      selectButton.title = selectButton.disabled ? selectPolicy.reason : '';
-      selectButton.addEventListener('click', async () => {
+      const add = document.createElement('button');
+      add.type = 'button';
+      add.className = 'button button-primary';
+      const queuePolicy = resolvePolicy('queueRounds');
+      const alreadyQueued = queuedIds.has(entry.setId);
+      add.textContent = alreadyQueued ? 'In queue' : 'Add to queue';
+      add.disabled = !queuePolicy.allowed || alreadyQueued;
+      add.title = add.disabled ? (alreadyQueued ? 'This set is already queued.' : queuePolicy.reason) : '';
+      add.addEventListener('click', async () => {
         try {
-          await postJson('/api/puzzles/select', {
-            setId: entry.setId,
-            actor: elements.sessionResearcher?.value || currentState?.session?.metadata?.researcher || 'researcher',
-          }, {
-            headers: buildHeaders(),
-          });
-          await refreshAll();
+          await persistQueue([...queue.map((item) => item.setId), entry.setId]);
         } catch (error) {
           await handleError(error);
         }
       });
-      actions.append(selectButton);
 
-      card.append(actions);
+      card.append(title, meta, add);
       elements.puzzleLibraryList.append(card);
     });
   }
 
   if (elements.incompleteLibraryList) {
     elements.incompleteLibraryList.innerHTML = '';
-
     if (!incompleteUploads().length) {
       const empty = document.createElement('p');
       empty.className = 'panel-note';
@@ -404,42 +593,263 @@ function renderPuzzleLibrary() {
   }
 }
 
+function readinessChecks() {
+  const preflight = currentState?.system?.preflight || {};
+  const items = preflight.items || preflight.automaticItems || [];
+  if (items.length) {
+    return items.map((item) => ({
+      ok: item.status === 'ready',
+      label: item.summary || item.label,
+    }));
+  }
+
+  return [{ ok: false, label: 'Waiting for readiness from the server.' }];
+}
+
+function renderReadiness() {
+  const checks = readinessChecks();
+  if (elements.readinessList) {
+    elements.readinessList.innerHTML = '';
+    checks.forEach((check) => {
+      const item = document.createElement('p');
+      item.className = check.ok ? 'readiness-ok' : 'readiness-wait';
+      item.textContent = `${check.ok ? 'Ready' : 'Waiting'} — ${check.label}`;
+      elements.readinessList.append(item);
+    });
+  }
+
+  const startPolicy = resolvePolicy('startSession');
+  const blocked = checks.find((check) => !check.ok);
+  const preflightBlocked = currentState?.system?.preflight?.requiredReady === false;
+  const canStart = startPolicy.allowed && !blocked && !preflightBlocked;
+  setElementDisabled(
+    elements.sessionStart,
+    !canStart,
+    blocked ? blocked.label : (preflightBlocked ? currentState.system.preflight.summary : startPolicy.reason),
+  );
+}
+
+function rememberInterventions() {
+  const hint = currentState?.hint || {};
+  const robot = currentState?.robotAction || {};
+  const activeRound = currentState?.session?.activeRound;
+
+  if (hint.updatedAt && hint.updatedAt !== lastHintToken) {
+    lastHintToken = hint.updatedAt;
+    if (hint.text && activeRound) {
+      liveLog.unshift({
+        at: hint.updatedAt,
+        label: `Hint: ${hint.text}`,
+        round: activeRound.index,
+      });
+    }
+  }
+
+  if (robot.updatedAt && robot.updatedAt !== lastRobotToken) {
+    lastRobotToken = robot.updatedAt;
+    if (robot.label && activeRound) {
+      liveLog.unshift({
+        at: robot.updatedAt,
+        label: robot.label,
+        round: activeRound.index,
+      });
+    }
+  }
+
+  liveLog.splice(20);
+}
+
+function renderInterventionLog() {
+  if (!elements.interventionLog) {
+    return;
+  }
+
+  elements.interventionLog.innerHTML = '';
+  const activeIndex = currentState?.session?.activeRound?.index;
+  const rows = liveLog.filter((entry) => !activeIndex || entry.round === activeIndex);
+  if (!rows.length) {
+    const empty = document.createElement('li');
+    empty.textContent = 'No interventions in this round yet.';
+    elements.interventionLog.append(empty);
+    return;
+  }
+
+  rows.forEach((entry) => {
+    const item = document.createElement('li');
+    item.textContent = `${formatTimestamp(entry.at)} — ${entry.label}`;
+    elements.interventionLog.append(item);
+  });
+}
+
+async function persistHintPresets(presets) {
+  await postJson('/api/hint-presets', { presets }, {
+    headers: buildHeaders(),
+  });
+  await refreshState();
+}
+
+function renderHintPresets(hintPolicy) {
+  if (!elements.hintPresets) {
+    return;
+  }
+
+  elements.hintPresets.innerHTML = '';
+  studyConfig().hintPresets.forEach((preset) => {
+    const chip = document.createElement('div');
+    chip.className = 'preset-chip';
+
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'button button-ghost';
+    button.textContent = preset;
+    button.addEventListener('click', async () => {
+      if (elements.hintText) {
+        elements.hintText.value = preset;
+      }
+      if (!hintPolicy.allowed) {
+        return;
+      }
+      try {
+        await postJson('/api/hints', {
+          text: preset,
+          author: actorName(),
+        }, {
+          headers: buildHeaders(),
+        });
+        await refreshState();
+      } catch (error) {
+        await handleError(error);
+      }
+    });
+
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'preset-remove';
+    remove.setAttribute('aria-label', `Remove preset: ${preset}`);
+    remove.textContent = '×';
+    remove.addEventListener('click', async (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      try {
+        await persistHintPresets(studyConfig().hintPresets.filter((entry) => entry !== preset));
+      } catch (error) {
+        await handleError(error);
+      }
+    });
+
+    chip.append(button, remove);
+    elements.hintPresets.append(chip);
+  });
+}
+
+function renderRobotComposer(actionPolicy) {
+  const pieces = studyConfig().pieces || [];
+  const slotCount = studyConfig().slotCount || 7;
+
+  if (elements.pieceGrid) {
+    elements.pieceGrid.innerHTML = '';
+    pieces.forEach((piece) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'action-button';
+      if (selectedPieceId === piece.id) {
+        button.classList.add('selected');
+      }
+      button.textContent = piece.label;
+      button.style.setProperty('--piece-color', piece.color);
+      button.disabled = !actionPolicy.allowed;
+      button.title = actionPolicy.allowed ? '' : actionPolicy.reason;
+      button.addEventListener('click', () => {
+        selectedPieceId = piece.id;
+        renderRobotComposer(actionPolicy);
+      });
+      elements.pieceGrid.append(button);
+    });
+  }
+
+  if (elements.slotGrid) {
+    elements.slotGrid.innerHTML = '';
+    for (let slot = 1; slot <= slotCount; slot += 1) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'slot-button';
+      if (selectedSlot === slot) {
+        button.classList.add('selected');
+      }
+      button.textContent = String(slot);
+      button.disabled = !actionPolicy.allowed;
+      button.addEventListener('click', () => {
+        selectedSlot = slot;
+        renderRobotComposer(actionPolicy);
+      });
+      elements.slotGrid.append(button);
+    }
+  }
+
+  const canSend = actionPolicy.allowed && selectedPieceId && selectedSlot;
+  setElementDisabled(
+    elements.sendRobotCue,
+    !canSend,
+    actionPolicy.allowed ? 'Choose a piece and a slot first.' : actionPolicy.reason,
+  );
+}
+
 function renderSession() {
   const session = currentState?.session || {};
   const metadata = session.metadata || {};
   const status = session.status || 'setup';
-  const label = status.toUpperCase();
-  const durationSeconds = session.trialStartedAt
-    ? Math.max(0, Math.round(((session.completedAt ? new Date(session.completedAt) : new Date()).getTime() - new Date(session.trialStartedAt).getTime()) / 1000))
+  const activeRound = session.activeRound;
+  const completedRounds = session.rounds || [];
+  const queue = session.queue || [];
+  const planned = session.plannedRounds || studyConfig().plannedRounds;
+  const timerStart = activeRound?.startedAt || session.trialStartedAt;
+  const timerEnd = activeRound?.completedAt || session.completedAt;
+  const durationSeconds = timerStart
+    ? Math.max(0, Math.round(((timerEnd ? new Date(timerEnd) : new Date()).getTime() - new Date(timerStart).getTime()) / 1000))
     : null;
 
   setValueSafely(elements.sessionStudyId, metadata.studyId);
   setValueSafely(elements.sessionParticipantId, metadata.participantId);
   setValueSafely(elements.sessionResearcher, metadata.researcher);
+  setValueSafely(elements.sessionSittingNumber, String(metadata.sittingNumber || 1));
   setValueSafely(elements.sessionCondition, metadata.condition || 'adaptive');
   setValueSafely(elements.sessionNotes, metadata.notes);
 
-  setText(elements.sessionStatusSummary, `${label}${metadata.participantId ? ` • ${metadata.participantId}` : ''}`);
+  const label = status.toUpperCase();
+  setText(elements.sessionStatusSummary, `${label}${metadata.participantId ? ` • ${metadata.participantId}` : ''}${metadata.sittingNumber ? ` • sitting ${metadata.sittingNumber}` : ''}`);
 
-  if (status === 'running') {
-    setText(elements.sessionStatusDetail, `Trial started ${formatTimestamp(session.trialStartedAt)}.`);
-    setText(elements.sessionDurationSummary, `Elapsed puzzle time: ${formatDurationSeconds(durationSeconds)}`);
-    setText(elements.sessionDurationDetail, 'Hints and robot cues are live on the two operator-facing screens.');
+  if (status === 'running' && activeRound) {
+    setText(elements.sessionStatusDetail, `Round ${activeRound.index} of ${queue.length || planned} is live.`);
+    setText(elements.roundSummary, `Round ${activeRound.index} of ${queue.length || planned} • Set ${activeRound.puzzle?.setId || ''}`);
+    setText(elements.sessionDurationSummary, `Elapsed: ${formatDurationSeconds(durationSeconds)}`);
+    setText(elements.sessionDurationDetail, `Started ${formatTimestamp(activeRound.startedAt)}.`);
+  } else if (status === 'running') {
+    const nextIndex = completedRounds.length + 1;
+    setText(elements.sessionStatusDetail, completedRounds.length
+      ? `Round ${completedRounds.length} finished. Start the next one when ready.`
+      : 'Sitting is open. Start round 1 when the participant begins.');
+    setText(elements.roundSummary, nextIndex <= queue.length
+      ? `Next: round ${nextIndex} • Set ${queue[nextIndex - 1]?.setId || ''}`
+      : 'All queued rounds are finished. End the sitting.');
+    setText(elements.sessionDurationSummary, 'Round timer is waiting.');
+    setText(elements.sessionDurationDetail, 'The timer starts when you open a round.');
   } else if (status === 'completed') {
-    setText(elements.sessionStatusDetail, `Trial completed ${formatTimestamp(session.completedAt)}.`);
-    setText(elements.sessionDurationSummary, `Puzzle completed in ${formatDurationSeconds(durationSeconds)}`);
-    setText(elements.sessionDurationDetail, 'Download the JSON export or reset the session for the next participant.');
+    setText(elements.sessionStatusDetail, `Sitting completed ${formatTimestamp(session.completedAt)}.`);
+    setText(elements.roundSummary, `${completedRounds.length} round${completedRounds.length === 1 ? '' : 's'} recorded.`);
+    setText(elements.sessionDurationSummary, `Sitting time ${formatDurationSeconds(durationSeconds)}`);
+    setText(elements.sessionDurationDetail, 'Download the JSON export or reset for the next participant.');
   } else {
-    setText(elements.sessionStatusDetail, 'Choose a puzzle set, then start the trial when ready.');
-    setText(elements.sessionDurationSummary, 'Trial timer is waiting for the session to start.');
-    setText(elements.sessionDurationDetail, 'The completion time will appear here as soon as the puzzle begins.');
+    setText(elements.sessionStatusDetail, 'Save the profile, queue puzzles, then begin the sitting.');
+    setText(elements.roundSummary, 'Waiting to start round 1.');
+    setText(elements.sessionDurationSummary, 'Timer waiting.');
+    setText(elements.sessionDurationDetail, 'Start the round when the participant begins this puzzle.');
   }
 
-  setText(elements.connectionCounts, connectionText());
   const localhost = currentState?.system?.network?.localhost || {};
+  const lanUrls = (currentState?.system?.network?.lan || [])[0]?.urls || {};
   setText(
     elements.screenLinks,
-    `Subject ${localhost.subject || `${window.location.origin}/subject`} • Robot ${localhost.robot || `${window.location.origin}/robot`}`,
+    `Subject ${lanUrls.subject || localhost.subject || `${window.location.origin}/subject`} • Robot ${lanUrls.robot || localhost.robot || `${window.location.origin}/robot`}`,
   );
   setText(elements.hintPreview, currentState?.hint?.text || 'No hint has been sent yet.');
   setText(
@@ -449,17 +859,30 @@ function renderSession() {
       : 'No robotic action logged yet.',
   );
 
-  const startPolicy = resolvePolicy('startSession');
-  const completePolicy = resolvePolicy('completeSession');
+  const previewAsset = activeRound?.puzzle?.solutionAsset || session.puzzleSet?.solutionAsset || null;
+  renderAssetPreview(
+    elements.solutionPreview,
+    previewAsset,
+    'The solution for the active round will appear here.',
+  );
+  setText(
+    elements.selectedSetSummary,
+    previewAsset ? `Set ${activeRound?.puzzle?.setId || session.puzzleSet?.setId} is on screen.` : 'No puzzle set selected yet.',
+  );
+
+  const configurePolicy = resolvePolicy('configureSession');
   const hintPolicy = resolvePolicy('setHint');
   const actionPolicy = resolvePolicy('logRobotAction');
-  const sessionPolicy = resolvePolicy('configureSession');
+  const startRoundPolicy = resolvePolicy('startRound');
+  const completeRoundPolicy = resolvePolicy('completeRound');
+  const completePolicy = resolvePolicy('completeSession');
   const resetPolicy = resolvePolicy('resetSession');
 
   [
     elements.sessionStudyId,
     elements.sessionParticipantId,
     elements.sessionResearcher,
+    elements.sessionSittingNumber,
     elements.sessionCondition,
     elements.sessionNotes,
     elements.sessionSave,
@@ -467,68 +890,151 @@ function renderSession() {
     elements.puzzleUploadSubmit,
     elements.puzzleClearSelection,
   ].forEach((element) => {
-    setElementDisabled(element, !sessionPolicy.allowed, sessionPolicy.reason);
+    setElementDisabled(element, !configurePolicy.allowed, configurePolicy.reason);
   });
 
-  setElementDisabled(elements.sessionStart, !startPolicy.allowed, startPolicy.reason);
+  setElementDisabled(elements.roundStart, !startRoundPolicy.allowed, startRoundPolicy.reason);
+  setElementDisabled(elements.roundComplete, !completeRoundPolicy.allowed, completeRoundPolicy.reason);
   setElementDisabled(elements.sessionComplete, !completePolicy.allowed, completePolicy.reason);
   setElementDisabled(elements.hintText, !hintPolicy.allowed, hintPolicy.reason);
   setElementDisabled(elements.hintSend, !hintPolicy.allowed, hintPolicy.reason);
   setElementDisabled(elements.clearHint, !hintPolicy.allowed, hintPolicy.reason);
-  setElementDisabled(elements.resetSession, !resetPolicy.allowed, resetPolicy.reason);
+  [elements.resetSession, elements.resetSessionSetup, elements.resetSessionReview].forEach((element) => {
+    setElementDisabled(element, !resetPolicy.allowed, resetPolicy.reason);
+  });
 
-  renderActionButtons(actionPolicy);
+  renderHintPresets(hintPolicy);
+  renderRobotComposer(actionPolicy);
+}
 
-  if (elements.exportJsonLink) {
-    elements.exportJsonLink.download = `${session.id || 'session'}.json`;
-  }
-  if (elements.exportCsvLink) {
-    elements.exportCsvLink.download = `${session.id || 'session'}.csv`;
+function renderRecordingControls() {
+  const live = Boolean(cameraController.getStatus().live);
+  const active = cameraRecorder.getActive();
+  const latest = latestDownloadableRecording(currentState?.session?.recordings || []);
+  const canRecord = webmRecorderSupported && live && !active.active;
+
+  setElementDisabled(
+    elements.startRecording,
+    !canRecord,
+    webmRecorderSupported
+      ? (live ? 'A recording is already in progress.' : 'Start the camera before recording.')
+      : 'Recording needs Chrome WebM on this laptop.',
+  );
+  setElementDisabled(elements.stopRecording, !active.active, 'No recording is in progress.');
+  setElementDisabled(
+    elements.downloadRecording,
+    !latest,
+    'Save a camera take before downloading.',
+  );
+  setElementDisabled(elements.startCamera, active.active, 'Stop recording before switching the camera.');
+  setElementDisabled(elements.cameraDevice, active.active, 'Stop recording before switching the camera.');
+
+  if (elements.recordingStatus) {
+    if (active.active) {
+      setText(elements.recordingStatus, `Recording ${formatRecordingClock(active.startedAt)} · ${active.filename}`);
+      elements.recordingStatus.dataset.active = 'true';
+    } else if (!webmRecorderSupported) {
+      setText(elements.recordingStatus, 'Recording needs Chrome WebM on this laptop.');
+      elements.recordingStatus.dataset.active = 'false';
+    } else if (!elements.recordingStatus.textContent) {
+      setText(elements.recordingStatus, latest ? `Last take: ${latest.filename}` : '');
+      elements.recordingStatus.dataset.active = 'false';
+    } else {
+      elements.recordingStatus.dataset.active = 'false';
+    }
   }
 }
 
-function renderActionButtons(actionPolicy) {
-  if (!elements.actionGrid) {
+function renderReviewRecordings() {
+  if (!elements.reviewRecordings) {
     return;
   }
 
-  elements.actionGrid.innerHTML = '';
-  const actions = currentState?.system?.robotActions || [];
+  const recordings = (currentState?.session?.recordings || [])
+    .filter((entry) => entry.status === 'saved' || entry.status === 'partial');
+  elements.reviewRecordings.innerHTML = '';
+  if (!recordings.length) {
+    const empty = document.createElement('p');
+    empty.className = 'panel-note';
+    empty.textContent = 'No camera takes were saved in this sitting.';
+    elements.reviewRecordings.append(empty);
+    return;
+  }
 
-  actions.forEach((action) => {
+  recordings.forEach((entry) => {
+    const row = document.createElement('div');
+    row.className = 'review-recording';
+    const label = document.createElement('p');
+    label.className = 'panel-note';
+    label.textContent = `${entry.status === 'partial' ? 'Partial' : 'Saved'} · ${entry.filename}`;
     const button = document.createElement('button');
+    button.className = 'button button-ghost';
     button.type = 'button';
-    button.className = 'action-button';
-    button.textContent = action.label;
-    button.disabled = !actionPolicy.allowed;
-    button.title = actionPolicy.allowed ? '' : actionPolicy.reason;
+    button.textContent = 'Download take';
     button.addEventListener('click', async () => {
       try {
-        await postJson('/api/actions', {
-          actionId: action.actionId,
-          label: action.label,
-          payload: { origin: 'admin-dashboard' },
-          actor: elements.sessionResearcher?.value || currentState?.session?.metadata?.researcher || 'researcher',
-        }, {
-          headers: buildHeaders(),
-        });
-        await refreshAll();
+        await downloadExport(`/api/camera/recordings/${entry.id}`, entry.filename);
       } catch (error) {
         await handleError(error);
       }
     });
-    elements.actionGrid.append(button);
+    row.append(label, button);
+    elements.reviewRecordings.append(row);
+  });
+}
+
+function renderReview() {
+  const session = currentState?.session || {};
+  const metadata = session.metadata || {};
+  const rounds = session.rounds || [];
+  setText(
+    elements.reviewSummary,
+    `${metadata.participantId || 'Unnamed participant'} • sitting ${metadata.sittingNumber || 1} • ${rounds.length} round${rounds.length === 1 ? '' : 's'}.`,
+  );
+  renderReviewRecordings();
+
+  if (!elements.reviewRounds) {
+    return;
+  }
+
+  elements.reviewRounds.innerHTML = '';
+  if (!rounds.length) {
+    const empty = document.createElement('p');
+    empty.className = 'panel-note';
+    empty.textContent = 'No rounds were recorded in this sitting.';
+    elements.reviewRounds.append(empty);
+    return;
+  }
+
+  rounds.forEach((round) => {
+    const card = document.createElement('article');
+    card.className = 'review-round';
+    const title = document.createElement('strong');
+    title.textContent = `Round ${round.index} • Set ${round.puzzle?.setId || ''}`;
+    const meta = document.createElement('p');
+    meta.className = 'panel-note';
+    meta.textContent = `${round.puzzle?.subjectAsset?.originalName || ''} / ${round.puzzle?.solutionAsset?.originalName || ''} • ${formatDurationSeconds(round.durationSeconds)}`;
+    card.append(title, meta);
+    elements.reviewRounds.append(card);
   });
 }
 
 function renderState() {
   if (!currentState) {
+    renderGuard();
     return;
   }
 
+  rememberInterventions();
   renderGuard();
-  renderPuzzleLibrary();
+  renderModes();
+  renderHealth();
+  renderQueueAndLibrary();
+  renderReadiness();
   renderSession();
+  renderInterventionLog();
+  renderReview();
+  renderRecordingControls();
   renderHrvTelemetry({
     heartRate: elements.hrvHeartRate,
     sdnn: elements.hrvSdnn,
@@ -541,10 +1047,24 @@ function renderState() {
     updated: elements.hrvUpdated,
     interpretation: elements.hrvInterpretation,
   }, currentState);
+
+  const gaze = currentState?.telemetry?.gaze || {};
+  if (elements.gazeAttention) {
+    elements.gazeAttention.textContent = Number.isFinite(gaze.attentionScore)
+      ? Number(gaze.attentionScore).toFixed(2)
+      : '--';
+  }
+  if (elements.gazeUpdated) {
+    elements.gazeUpdated.textContent = gaze.updatedAt
+      ? formatTimestamp(gaze.updatedAt)
+      : 'No Pupil frame yet.';
+  }
 }
 
 async function refreshState() {
-  currentState = await fetchJson('/api/state');
+  currentState = await fetchJson('/api/state', {
+    headers: buildHeaders(),
+  });
   renderState();
 }
 
@@ -558,14 +1078,18 @@ async function refreshGuard() {
   }
 
   renderGuard();
-  renderSession();
 }
 
 async function refreshAll() {
-  await Promise.all([
-    refreshState(),
-    refreshGuard(),
-  ]);
+  await refreshGuard();
+  const pinRequired = Boolean(guardStatus?.pinRequired);
+  const authenticated = pinRequired ? Boolean(guardStatus?.authenticated) : true;
+  if (!authenticated) {
+    renderGuard();
+    return;
+  }
+
+  await refreshState();
 }
 
 async function handleError(error) {
@@ -583,12 +1107,126 @@ async function handleError(error) {
   }
 }
 
-async function startCamera() {
-  await cameraController.start();
+async function downloadExport(url, filename) {
+  const response = await fetch(url, {
+    headers: buildHeaders(),
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    const error = new Error(body.error || `Download failed with status ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
+
+  const blob = await response.blob();
+  const objectUrl = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = objectUrl;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(objectUrl);
 }
 
-function stopCamera() {
+async function resetSession() {
+  const isRunning = (currentState?.session?.status || 'setup') === 'running';
+  const confirmed = window.confirm(
+    isRunning
+      ? 'Reset the live sitting and start fresh?'
+      : 'Reset the current session and clear the selected run state?',
+  );
+  if (!confirmed) {
+    return;
+  }
+
+  await cameraRecorder.stop({ silent: true });
+  await postJson('/api/session/reset', {
+    requestedBy: actorName(),
+    force: isRunning,
+  }, {
+    headers: buildHeaders(),
+  });
+  selectedPieceId = null;
+  selectedSlot = null;
+  liveLog.splice(0, liveLog.length);
+  lastHintToken = null;
+  lastRobotToken = null;
+  await refreshState();
+}
+
+async function startCamera() {
+  await cameraRecorder.stop({ silent: true });
+  await cameraController.start();
+  renderRecordingControls();
+}
+
+async function stopCamera() {
+  await cameraRecorder.stop();
   cameraController.stop();
+  renderRecordingControls();
+}
+
+async function startRecording() {
+  await cameraRecorder.start(cameraController.getStream());
+  renderRecordingControls();
+}
+
+async function stopRecording() {
+  await cameraRecorder.stop();
+  renderRecordingControls();
+}
+
+async function downloadLastTake() {
+  const latest = latestDownloadableRecording(currentState?.session?.recordings || []);
+  if (!latest) {
+    return;
+  }
+  await downloadExport(`/api/camera/recordings/${latest.id}`, latest.filename);
+}
+
+async function downloadSittingFootage(recordings = currentState?.session?.recordings || []) {
+  const takes = recordingsToDownloadAfterSitting(recordings);
+  for (const take of takes) {
+    await downloadExport(`/api/camera/recordings/${take.id}`, take.filename);
+  }
+}
+
+async function autoStartSittingRecording() {
+  if (!shouldAutoStartSittingRecording({
+    cameraLive: Boolean(cameraController.getStatus().live),
+    recorderActive: Boolean(cameraRecorder.getActive().active),
+  })) {
+    return;
+  }
+
+  try {
+    await startRecording();
+  } catch (error) {
+    setText(elements.recordingStatus, error.message === 'Not found'
+      ? 'Recording API is missing. Restart node src/server.js, then begin again.'
+      : (error.message || 'Unable to start the sitting recording.'));
+  }
+}
+
+function finalizeRecordingOnUnload() {
+  cameraRecorder.flush();
+  const active = cameraRecorder.getActive();
+  if (!active.recordingId || !active.finalizeToken) {
+    return;
+  }
+
+  const url = `/api/camera/recordings/${active.recordingId}/finalize`;
+  const payload = JSON.stringify({ token: active.finalizeToken, reason: 'unload' });
+  if (navigator.sendBeacon) {
+    navigator.sendBeacon(url, new Blob([payload], { type: 'application/json' }));
+    return;
+  }
+
+  fetch(url, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: payload,
+    keepalive: true,
+  }).catch(() => {});
 }
 
 async function init() {
@@ -598,16 +1236,61 @@ async function init() {
     onStart: startCamera,
     onStop: stopCamera,
   });
+  elements.startRecording?.addEventListener('click', async () => {
+    try {
+      await startRecording();
+    } catch (error) {
+      setText(
+        elements.recordingStatus,
+        error.message === 'Not found'
+          ? 'Recording API is missing. Restart node src/server.js, then Record again.'
+          : (error.message || 'Unable to start recording.'),
+      );
+      await handleError(error);
+    }
+  });
+  elements.stopRecording?.addEventListener('click', async () => {
+    try {
+      await stopRecording();
+    } catch (error) {
+      await handleError(error);
+    }
+  });
+  elements.downloadRecording?.addEventListener('click', async () => {
+    try {
+      await downloadLastTake();
+    } catch (error) {
+      await handleError(error);
+    }
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      cameraRecorder.flush();
+    }
+  });
+  window.addEventListener('pagehide', finalizeRecordingOnUnload);
+  window.addEventListener('beforeunload', finalizeRecordingOnUnload);
+  cameraController.refreshDeviceList().catch(() => {});
 
+  setPill(elements.linkStatus, 'reconnecting', 'Link: connecting');
   await refreshAll();
 
   durationTicker = window.setInterval(() => {
     if (currentState?.session?.status === 'running') {
       renderSession();
     }
+    if (cameraRecorder.getActive().active) {
+      renderRecordingControls();
+    }
   }, 1000);
 
   connectSocket('admin', {
+    onOpen() {
+      setPill(elements.linkStatus, 'ready', 'Link: live');
+    },
+    onClose() {
+      setPill(elements.linkStatus, 'reconnecting', 'Link: reconnecting');
+    },
     onSnapshot(snapshot) {
       currentState = snapshot;
       renderState();
@@ -616,14 +1299,13 @@ async function init() {
 
   elements.guardForm?.addEventListener('submit', async (event) => {
     event.preventDefault();
-
     try {
       const response = await postJson('/api/guard/unlock', {
         pin: elements.guardPin.value,
       });
       setAdminToken(response.token);
       elements.guardPin.value = '';
-      await refreshGuard();
+      await refreshAll();
     } catch (error) {
       await handleError(error);
     }
@@ -648,6 +1330,7 @@ async function init() {
         studyId: elements.sessionStudyId.value,
         participantId: elements.sessionParticipantId.value,
         researcher: elements.sessionResearcher.value,
+        sittingNumber: Number(elements.sessionSittingNumber.value || 1),
         condition: elements.sessionCondition.value,
         notes: elements.sessionNotes.value,
       }, {
@@ -672,7 +1355,7 @@ async function init() {
       const preparedFiles = await Promise.all(files.map((file) => readUploadFileAsBase64(file)));
       await postJson('/api/puzzles/upload', {
         files: preparedFiles,
-        actor: elements.sessionResearcher?.value || currentState?.session?.metadata?.researcher || 'researcher',
+        actor: actorName(),
       }, {
         headers: buildHeaders(),
       });
@@ -687,13 +1370,7 @@ async function init() {
 
   elements.puzzleClearSelection?.addEventListener('click', async () => {
     try {
-      await postJson('/api/puzzles/select', {
-        setId: null,
-        actor: elements.sessionResearcher?.value || currentState?.session?.metadata?.researcher || 'researcher',
-      }, {
-        headers: buildHeaders(),
-      });
-      await refreshState();
+      await persistQueue([]);
     } catch (error) {
       await handleError(error);
     }
@@ -702,10 +1379,40 @@ async function init() {
   elements.sessionStart?.addEventListener('click', async () => {
     try {
       await postJson('/api/session/start', {
-        operator: elements.sessionResearcher.value || currentState?.session?.metadata?.researcher || 'researcher',
+        operator: actorName(),
       }, {
         headers: buildHeaders(),
       });
+      await refreshState();
+      await autoStartSittingRecording();
+    } catch (error) {
+      await handleError(error);
+    }
+  });
+
+  elements.roundStart?.addEventListener('click', async () => {
+    try {
+      liveLog.splice(0, liveLog.length);
+      await postJson('/api/rounds/start', {
+        operator: actorName(),
+      }, {
+        headers: buildHeaders(),
+      });
+      await refreshState();
+    } catch (error) {
+      await handleError(error);
+    }
+  });
+
+  elements.roundComplete?.addEventListener('click', async () => {
+    try {
+      await postJson('/api/rounds/complete', {
+        operator: actorName(),
+      }, {
+        headers: buildHeaders(),
+      });
+      selectedPieceId = null;
+      selectedSlot = null;
       await refreshState();
     } catch (error) {
       await handleError(error);
@@ -714,37 +1421,61 @@ async function init() {
 
   elements.sessionComplete?.addEventListener('click', async () => {
     try {
+      await cameraRecorder.stop();
       await postJson('/api/session/complete', {
-        operator: elements.sessionResearcher.value || currentState?.session?.metadata?.researcher || 'researcher',
+        operator: actorName(),
       }, {
         headers: buildHeaders(),
       });
       await refreshState();
+      await downloadSittingFootage();
     } catch (error) {
       await handleError(error);
     }
   });
 
-  elements.resetSession?.addEventListener('click', async () => {
-    const isRunning = (currentState?.session?.status || 'setup') === 'running';
-    const confirmed = window.confirm(
-      isRunning
-        ? 'Reset the live session and start fresh?'
-        : 'Reset the current session and clear the selected run state?',
-    );
-    if (!confirmed) {
+  const resetHandler = async () => {
+    try {
+      await resetSession();
+    } catch (error) {
+      await handleError(error);
+    }
+  };
+  elements.resetSession?.addEventListener('click', resetHandler);
+  elements.resetSessionSetup?.addEventListener('click', resetHandler);
+  elements.resetSessionReview?.addEventListener('click', resetHandler);
+
+  elements.exportJsonLink?.addEventListener('click', async () => {
+    try {
+      const sessionId = currentState?.session?.id || 'session';
+      await downloadExport('/api/export/current.json', `${sessionId}.json`);
+    } catch (error) {
+      await handleError(error);
+    }
+  });
+
+  elements.exportCsvLink?.addEventListener('click', async () => {
+    try {
+      const sessionId = currentState?.session?.id || 'session';
+      await downloadExport('/api/export/current.csv', `${sessionId}.csv`);
+    } catch (error) {
+      await handleError(error);
+    }
+  });
+
+  elements.hintSavePreset?.addEventListener('click', async () => {
+    const text = String(elements.hintText?.value || '').trim();
+    if (!text) {
+      return;
+    }
+
+    const presets = [...studyConfig().hintPresets];
+    if (presets.includes(text)) {
       return;
     }
 
     try {
-      await postJson('/api/session/reset', {
-        requestedBy: elements.sessionResearcher.value || currentState?.session?.metadata?.researcher || 'researcher',
-        force: isRunning,
-      }, {
-        headers: buildHeaders(),
-      });
-      previewSetId = null;
-      await refreshState();
+      await persistHintPresets([...presets, text]);
     } catch (error) {
       await handleError(error);
     }
@@ -755,7 +1486,7 @@ async function init() {
     try {
       await postJson('/api/hints', {
         text: elements.hintText.value,
-        author: elements.sessionResearcher.value || currentState?.session?.metadata?.researcher || 'researcher',
+        author: actorName(),
       }, {
         headers: buildHeaders(),
       });
@@ -766,9 +1497,39 @@ async function init() {
     }
   });
 
-  elements.clearHint?.addEventListener('click', () => {
-    if (elements.hintText) {
-      elements.hintText.value = '';
+  elements.clearHint?.addEventListener('click', async () => {
+    try {
+      await postJson('/api/hints/clear', {
+        author: actorName(),
+      }, {
+        headers: buildHeaders(),
+      });
+      if (elements.hintText) {
+        elements.hintText.value = '';
+      }
+      await refreshState();
+    } catch (error) {
+      await handleError(error);
+    }
+  });
+
+  elements.sendRobotCue?.addEventListener('click', async () => {
+    if (!selectedPieceId || !selectedSlot) {
+      return;
+    }
+
+    try {
+      await postJson('/api/actions', {
+        pieceId: selectedPieceId,
+        slot: selectedSlot,
+        payload: { origin: 'admin-dashboard' },
+        actor: actorName(),
+      }, {
+        headers: buildHeaders(),
+      });
+      await refreshState();
+    } catch (error) {
+      await handleError(error);
     }
   });
 }

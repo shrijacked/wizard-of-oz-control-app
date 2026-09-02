@@ -22,7 +22,14 @@ if platform.system() == 'Windows':
 
 import numpy as np
 from bleak import BleakClient, BleakScanner
-from pylsl import StreamInfo, StreamOutlet
+
+try:
+    from pylsl import StreamInfo, StreamOutlet
+    HAS_LSL = True
+except ImportError:
+    StreamInfo = None
+    StreamOutlet = None
+    HAS_LSL = False
 
 # --- PARAMETERS ------------------------------------------------
 BASELINE_DURATION = 60.0  # seconds
@@ -72,10 +79,17 @@ class HRVProcessor:
         self.raw_hr_data = []
 
         # LSL stream: 4 channels (HR, SDNN, RMSSD, pNN50)
-        self.stream_info = StreamInfo(
-            "HRV_CognitiveLoad", "HRV", 4, 1, "float32", "hrvuid12345"
-        )
-        self.lsl_outlet = StreamOutlet(self.stream_info)
+        self.stream_info = None
+        self.lsl_outlet = None
+        if HAS_LSL:
+            self.stream_info = StreamInfo(
+                "HRV_CognitiveLoad", "HRV", 4, 1, "float32", "hrvuid12345"
+            )
+            self.lsl_outlet = StreamOutlet(self.stream_info)
+        else:
+            logger.warning("pylsl is not installed. JSON watch output still works.")
+
+        self.last_live_write_time = None
 
         # State
         self.session_start_time = None
@@ -259,6 +273,8 @@ class HRVProcessor:
             }
         )
 
+        self.write_live_heart_rate(heart_rate, timestamp)
+
         # Baseline collection (calibration)
         if (
             not self.baseline_complete
@@ -351,6 +367,31 @@ class HRVProcessor:
         diffs = np.abs(np.diff(vals)) * 1000
         return float(100 * np.sum(diffs > thresh) / len(diffs))
 
+    def write_live_heart_rate(self, heart_rate, timestamp):
+        """Write a live HR sample so the sitting gate can pass during baseline."""
+        if self.last_live_write_time is not None and timestamp - self.last_live_write_time < 2:
+            return
+
+        self.last_live_write_time = timestamp
+        calibrating = not self.baseline_complete
+        self.save_to_json({
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "watch_data": {
+                "is_baseline": False,
+                "current_metrics": {
+                    "hr": heart_rate,
+                    "sdnn": self.baseline_metrics.get("sdnn", 0) if self.baseline_metrics else 0,
+                    "rmssd": self.baseline_metrics.get("rmssd", 0) if self.baseline_metrics else 0,
+                    "pnn50": self.baseline_metrics.get("pnn50", 0) if self.baseline_metrics else 0,
+                },
+                "stress_score": 0,
+                "stress_level": "Calibrating" if calibrating else "Not Stressed",
+                "distraction_detected": False,
+                "interpretation": "Watch live — calibrating baseline." if calibrating else "Heart rate sample received from the band.",
+                "feedback": "Keep the band on." if calibrating else "HRV monitoring is running.",
+            },
+        })
+
     def compute_baseline_metrics(self):
         """Compute and LSL-stream the baseline HRV metrics."""
         logger.info("Computing baseline metrics...")
@@ -372,8 +413,8 @@ class HRVProcessor:
             f"pNN50={b['pnn50']:.1f}%"
         )
 
-        # stream baseline
-        self.lsl_outlet.push_sample([b["hr"], b["sdnn"], b["rmssd"], b["pnn50"]])
+        if self.lsl_outlet:
+            self.lsl_outlet.push_sample([b["hr"], b["sdnn"], b["rmssd"], b["pnn50"]])
 
         # Save baseline to persistent file
         self.save_baseline_to_file()
@@ -532,7 +573,8 @@ class HRVProcessor:
             current_rmssd if current_rmssd is not None else 0,
             current_pnn50 if current_pnn50 is not None else 0,
         ]
-        self.lsl_outlet.push_sample(current_lsl)
+        if self.lsl_outlet:
+            self.lsl_outlet.push_sample(current_lsl)
 
         # Save metrics to both the original location and the new JSON file
         rec = {
