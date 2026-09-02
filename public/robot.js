@@ -6,7 +6,7 @@ import {
   setConnectionBadge,
 } from './shared.js';
 import { createAudioCueController } from './audio-cue.mjs';
-import { createUpdateCueTracker } from './display-alerts.mjs';
+import { createDelayedCueScheduler, createUpdateCueTracker, remainingDelayMs } from './display-alerts.mjs';
 
 const actionElement = document.querySelector('#robot-action');
 const updatedElement = document.querySelector('#robot-updated');
@@ -22,9 +22,25 @@ const soundController = createAudioCueController({
   durationMs: 200,
   gainValue: 0.05,
 });
-const robotAlertTracker = createUpdateCueTracker({
+const ROBOT_MOVE_WARNING_MS = 10_000;
+const moveAlertScheduler = createDelayedCueScheduler({
+  delayMs: ROBOT_MOVE_WARNING_MS,
   onCue: async () => {
     await soundController.beep();
+  },
+});
+const robotAlertTracker = createUpdateCueTracker({
+  onCue: async (token) => {
+    await soundController.beep();
+    const remaining = remainingDelayMs(token, ROBOT_MOVE_WARNING_MS);
+    if (remaining <= -2000) {
+      return;
+    }
+    if (remaining <= 0) {
+      await soundController.beep();
+      return;
+    }
+    moveAlertScheduler.schedule(token, remaining);
   },
 });
 

@@ -47,10 +47,10 @@ async function uploadPuzzlePair(baseUrl, label = '1') {
   return response.json();
 }
 
-async function postJson(baseUrl, pathname, body = {}) {
+async function postJson(baseUrl, pathname, body = {}, headers = {}) {
   return fetch(`${baseUrl}${pathname}`, {
     method: 'POST',
-    headers: { 'content-type': 'application/json' },
+    headers: { 'content-type': 'application/json', ...headers },
     body: JSON.stringify(body),
   });
 }
@@ -483,19 +483,66 @@ test('oversized request bodies are rejected with 413', async () => {
   }
 });
 
-test('display screens can report sound-armed readiness to the operator', async () => {
+test('display screens can report sound-armed readiness only while that display is connected', async () => {
   const { app, baseUrl } = await startApp();
 
   try {
+    const spoofed = await postJson(baseUrl, '/api/screens/ready', { role: 'subject', ready: true });
+    assert.equal(spoofed.status, 409);
+
+    const { socket } = await readSubjectSocket(baseUrl.replace('http://', 'ws://'));
     const ready = await postJson(baseUrl, '/api/screens/ready', { role: 'subject', ready: true });
     assert.equal(ready.status, 200);
 
     const state = await fetch(`${baseUrl}/api/state`).then((response) => response.json());
     assert.equal(state.system.screens.subject.ready, true);
+    assert.equal(state.system.screens.subject.connected, true);
     assert.equal(state.system.screens.robot.ready, false);
 
     const invalid = await postJson(baseUrl, '/api/screens/ready', { role: 'admin', ready: true });
     assert.equal(invalid.status, 400);
+
+    socket.close();
+    await new Promise((resolve) => socket.addEventListener('close', resolve, { once: true }));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    const afterDisconnect = await fetch(`${baseUrl}/api/state`).then((response) => response.json());
+    assert.equal(afterDisconnect.system.screens.subject.connected, false);
+    assert.equal(afterDisconnect.system.screens.subject.ready, false);
+  } finally {
+    await app.close();
+  }
+});
+
+test('camera live status cannot be spoofed without the admin PIN unlock', async () => {
+  const { app, baseUrl } = await startApp({ adminPin: '2468' });
+
+  try {
+    const spoofed = await postJson(baseUrl, '/api/camera/status', {
+      live: true,
+      deviceLabel: 'HD Pro Webcam C270',
+    });
+    assert.equal(spoofed.status, 423);
+
+    const health = await fetch(`${baseUrl}/health`).then((response) => response.json());
+    const cameraItem = health.preflight.items.find((item) => item.id === 'camera');
+    assert.ok(cameraItem);
+    assert.notEqual(cameraItem.status, 'ready');
+
+    const unlock = await postJson(baseUrl, '/api/guard/unlock', { pin: '2468' });
+    assert.equal(unlock.status, 200);
+    const { token } = await unlock.json();
+    const authed = await postJson(baseUrl, '/api/camera/status', {
+      live: true,
+      deviceLabel: 'HD Pro Webcam C270',
+    }, {
+      'x-admin-token': token,
+    });
+    assert.equal(authed.status, 200);
+
+    const liveHealth = await fetch(`${baseUrl}/health`).then((response) => response.json());
+    const liveCamera = liveHealth.preflight.items.find((item) => item.id === 'camera');
+    assert.equal(liveCamera.status, 'ready');
   } finally {
     await app.close();
   }
@@ -513,8 +560,37 @@ test('camera controller assets remain reachable from the single admin page build
     assert.match(adminHtml, /id="camera-device"/);
     assert.match(adminHtml, /id="start-camera"/);
     assert.match(adminHtml, /id="stop-camera"/);
+    assert.match(adminHtml, /class="library-split"/);
+    assert.match(adminHtml, /run-column-sensors/);
+    assert.match(adminHtml, /run-panel-camera/);
+    assert.match(adminHtml, /run-panel-hints/);
+    assert.match(adminHtml, /id="hint-save-preset"/);
+    assert.match(adminHtml, /class="run-ops"/);
+    const styles = await fetch(`${baseUrl}/styles.css`).then((response) => response.text());
+    assert.match(styles, /body\[data-session-phase="setup"\] \.run-column-sensors \{\s*display: contents;/);
+    assert.doesNotMatch(
+      styles,
+      /body\[data-session-phase="setup"\] \.run-column-trial \{\s*display:\s*none/,
+      'setup must show solution, hint, and robot panels so the operator board is visible before Begin sitting',
+    );
+    assert.match(
+      styles,
+      /body\[data-session-phase="setup"\] \.run-deck \{[\s\S]*?grid-template-areas:\s*"cam cam sol"\s*"hrv hint robot"/,
+      'setup must use the camera|solution / HRV|hint|robot board, not a camera-only pair',
+    );
+    assert.match(styles, /grid-template-areas:\s*"ops ops ops"\s*"cam cam sol"\s*"hrv hint robot"/);
+    assert.match(
+      styles,
+      /body:is\(\[data-session-phase="setup"\], \[data-session-phase="running"\]\) \.run-panel-robot \.action-button \{[\s\S]*?min-height:\s*28px/,
+      'robot cue buttons stay compact on the live board so the camera cell keeps its size',
+    );
+    assert.match(
+      styles,
+      /body\[data-session-phase="setup"\] \.run-deck \{[\s\S]*?grid-template-rows:\s*minmax\([^)]+\)\s+auto/,
+      'setup bottom row must size to HRV, hint, and robot content instead of clipping them',
+    );
     assert.match(adminModule, /bindCameraControls/);
-    assert.match(adminModule, /modeRun\.hidden = status === 'completed'/);
+    assert.match(adminModule, /shouldShowCameraControls/);
     assert.match(cameraModuleResponse.headers.get('content-type') || '', /text\/javascript/);
     assert.match(cameraModule, /Requesting camera access/i);
   } finally {
@@ -568,5 +644,35 @@ test('starting a sitting is rejected until camera, watch, and Pupil frames are l
     screens.robot.socket.close();
   } finally {
     await app.close();
+  }
+});
+
+test('hint presets can be updated and persist into the next admin state snapshot', async () => {
+  const configPath = path.join(os.tmpdir(), `woz-presets-${Date.now()}.json`);
+  await fs.writeFile(configPath, JSON.stringify({
+    plannedRounds: 3,
+    slotCount: 7,
+    hintPresets: ['Try rotating that piece.'],
+  }));
+  const { app, baseUrl } = await startApp({
+    studyConfigPath: configPath,
+  });
+
+  try {
+    const saved = await postJson(baseUrl, '/api/hint-presets', {
+      presets: ['Try rotating that piece.', 'Look at the outline.'],
+    });
+    assert.equal(saved.status, 200);
+    const body = await saved.json();
+    assert.deepEqual(body.hintPresets, ['Try rotating that piece.', 'Look at the outline.']);
+
+    const state = await fetch(`${baseUrl}/api/state`).then((response) => response.json());
+    assert.deepEqual(state.system.study.hintPresets, ['Try rotating that piece.', 'Look at the outline.']);
+
+    const disk = JSON.parse(await fs.readFile(configPath, 'utf8'));
+    assert.deepEqual(disk.hintPresets, ['Try rotating that piece.', 'Look at the outline.']);
+  } finally {
+    await app.close();
+    await fs.unlink(configPath).catch(() => {});
   }
 });

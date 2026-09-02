@@ -15,6 +15,11 @@ const {
 const { LlmAdvisor } = require('./llm-advisor');
 const { createInitialPreflightAcknowledgements, normalizePreflightAcknowledgements } = require('./preflight');
 const { setIdsForSitting } = require('./sitting-queue');
+const {
+  normalizeRecordings,
+  publicRecording,
+  recordingFileName,
+} = require('./camera-recordings');
 
 const MAX_HISTORY_POINTS = 60;
 const MAX_TIMELINE_EVENTS = 200;
@@ -291,6 +296,7 @@ function createInitialState(now = new Date(), options = {}) {
       activeRound: null,
       puzzleSet: null,
       resetCount: 0,
+      recordings: [],
     },
     hint: {
       text: '',
@@ -382,6 +388,14 @@ function hydrateState(parsed, now = new Date()) {
           selectedBy: parsed.session?.puzzleSet?.selectedBy || null,
         },
       ),
+      recordings: normalizeRecordings(parsed.session?.recordings).map((entry) => {
+        const source = (parsed.session?.recordings || []).find((item) => item?.id === entry.id) || {};
+        return {
+          ...entry,
+          lastIndex: Number.isFinite(source.lastIndex) ? source.lastIndex : -1,
+          updatedAt: source.updatedAt || entry.startedAt,
+        };
+      }),
     },
     hint: {
       ...initial.hint,
@@ -471,6 +485,8 @@ class ExperimentStore extends EventEmitter {
     this.dataDir = options.dataDir || path.join(process.cwd(), 'data');
     this.exportDir = path.join(this.dataDir, 'export');
     this.puzzleDir = path.join(this.dataDir, 'puzzles');
+    this.recordingsDir = path.join(this.dataDir, 'recordings');
+    this.recordingTokens = new Map();
     this.statePath = path.join(this.dataDir, 'state.json');
     this.eventsPath = path.join(this.dataDir, 'events.jsonl');
     this.adaptiveEngine = options.adaptiveEngine || new AdaptiveEngine();
@@ -492,6 +508,7 @@ class ExperimentStore extends EventEmitter {
     await fs.mkdir(this.dataDir, { recursive: true });
     await fs.mkdir(this.exportDir, { recursive: true });
     await fs.mkdir(this.puzzleDir, { recursive: true });
+    await fs.mkdir(this.recordingsDir, { recursive: true });
 
     try {
       const raw = await fs.readFile(this.statePath, 'utf8');
@@ -518,6 +535,8 @@ class ExperimentStore extends EventEmitter {
     }
 
     await this.#ensureCsvFile();
+    await this.#loadRecordingTokens();
+    await this.promoteStaleCameraRecordings();
     await this.seedPuzzleLibraryFromDir();
   }
 
@@ -533,7 +552,191 @@ class ExperimentStore extends EventEmitter {
     return this.state.session.id;
   }
 
+  recordingFilePath(recordingId) {
+    return path.join(this.recordingsDir, this.state.session.id, `${recordingId}.webm`);
+  }
+
+  getCameraRecording(recordingId) {
+    return (this.state.session.recordings || []).find((entry) => entry.id === recordingId) || null;
+  }
+
+  async promoteStaleCameraRecordings() {
+    const staleAfterMs = 20_000;
+    const nowMs = this.now().getTime();
+    let changed = false;
+    for (const entry of this.state.session.recordings || []) {
+      if (entry.status !== 'recording') {
+        continue;
+      }
+      const updatedMs = Date.parse(entry.updatedAt || entry.startedAt || '') || 0;
+      if (nowMs - updatedMs < staleAfterMs) {
+        continue;
+      }
+      entry.status = 'partial';
+      entry.endedAt = toIsoDate(this.now());
+      this.recordingTokens.delete(entry.id);
+      changed = true;
+    }
+    if (changed) {
+      await this.#saveRecordingTokens();
+      await this.#persistAndBroadcast([{
+        id: randomUUID(),
+        timestamp: toIsoDate(this.now()),
+        sessionId: this.state.session.id,
+        type: 'camera_recording_stale',
+        source: 'system',
+        summary: 'Stale camera recording marked partial.',
+        payload: {},
+      }]);
+    }
+  }
+
+  async finalizeOpenCameraRecordings({ reason } = {}) {
+    for (const entry of [...(this.state.session.recordings || [])]) {
+      if (entry.status === 'recording') {
+        await this.finalizeCameraRecording(entry.id, { reason: reason || 'stop' });
+      }
+    }
+  }
+
+  async createCameraRecording() {
+    await this.promoteStaleCameraRecordings();
+    if ((this.state.session.recordings || []).some((entry) => entry.status === 'recording')) {
+      const error = new Error('A recording is already in progress.');
+      error.statusCode = 409;
+      throw error;
+    }
+
+    const id = randomUUID();
+    const token = randomUUID();
+    const take = (this.state.session.recordings || []).length + 1;
+    const timestamp = toIsoDate(this.now());
+    const filename = recordingFileName({
+      participantId: this.state.session.metadata.participantId,
+      sittingNumber: this.state.session.metadata.sittingNumber,
+      take,
+    });
+    this.state.session.recordings = [
+      ...(this.state.session.recordings || []),
+      {
+        id,
+        startedAt: timestamp,
+        endedAt: null,
+        bytes: 0,
+        lastIndex: -1,
+        mimeType: 'video/webm',
+        filename,
+        status: 'recording',
+        updatedAt: timestamp,
+      },
+    ];
+    this.recordingTokens.set(id, token);
+    await fs.mkdir(path.dirname(this.recordingFilePath(id)), { recursive: true });
+    await this.#saveRecordingTokens();
+    await this.#persistAndBroadcast([{
+      id: randomUUID(),
+      timestamp,
+      sessionId: this.state.session.id,
+      type: 'camera_recording_started',
+      source: 'admin',
+      summary: `Camera recording started (${filename}).`,
+      payload: { recordingId: id, filename },
+    }]);
+    return { recordingId: id, filename, finalizeToken: token };
+  }
+
+  async appendCameraRecordingChunk(recordingId, chunkIndex, buffer) {
+    const record = this.getCameraRecording(recordingId);
+    if (!record || record.status !== 'recording') {
+      const error = new Error('Recording is not open.');
+      error.statusCode = 409;
+      throw error;
+    }
+    if (!Number.isInteger(chunkIndex) || chunkIndex !== record.lastIndex + 1) {
+      const error = new Error('Chunk index is out of order.');
+      error.statusCode = 409;
+      throw error;
+    }
+    if (!Buffer.isBuffer(buffer) || buffer.length === 0) {
+      const error = new Error('Chunk body is required.');
+      error.statusCode = 400;
+      throw error;
+    }
+
+    await fs.appendFile(this.recordingFilePath(recordingId), buffer);
+    record.lastIndex = chunkIndex;
+    record.bytes += buffer.length;
+    record.updatedAt = toIsoDate(this.now());
+    await this.#writeState();
+    return { accepted: true, lastIndex: record.lastIndex, bytes: record.bytes };
+  }
+
+  async finalizeCameraRecording(recordingId, { token, reason } = {}) {
+    const record = this.getCameraRecording(recordingId);
+    if (!record) {
+      const error = new Error('Recording not found.');
+      error.statusCode = 404;
+      throw error;
+    }
+    if (record.status !== 'recording') {
+      return { ok: true, alreadyFinalized: true, status: record.status, bytes: record.bytes };
+    }
+
+    if (token) {
+      const expected = this.recordingTokens.get(recordingId);
+      if (!expected || expected !== token) {
+        const error = new Error('Invalid finalize token.');
+        error.statusCode = 403;
+        throw error;
+      }
+    }
+
+    record.status = record.bytes > 0 ? 'saved' : 'partial';
+    record.endedAt = toIsoDate(this.now());
+    record.updatedAt = record.endedAt;
+    this.recordingTokens.delete(recordingId);
+    await this.#saveRecordingTokens();
+    await this.#persistAndBroadcast([{
+      id: randomUUID(),
+      timestamp: record.endedAt,
+      sessionId: this.state.session.id,
+      type: 'camera_recording_finalized',
+      source: 'admin',
+      summary: `Camera recording ${record.status} (${record.filename}).`,
+      payload: { recordingId, status: record.status, bytes: record.bytes, reason: reason || 'stop' },
+    }]);
+    return { ok: true, alreadyFinalized: false, status: record.status, bytes: record.bytes };
+  }
+
+  recordingTokensPath() {
+    return path.join(this.recordingsDir, this.state.session.id, 'tokens.json');
+  }
+
+  async #loadRecordingTokens() {
+    this.recordingTokens = new Map();
+    try {
+      const parsed = JSON.parse(await fs.readFile(this.recordingTokensPath(), 'utf8'));
+      if (parsed && typeof parsed === 'object') {
+        this.recordingTokens = new Map(Object.entries(parsed).filter(([id, token]) => id && token));
+      }
+    } catch (error) {
+      if (error.code !== 'ENOENT') {
+        this.recordingTokens = new Map();
+      }
+    }
+  }
+
+  async #saveRecordingTokens() {
+    await fs.mkdir(path.dirname(this.recordingTokensPath()), { recursive: true });
+    await fs.writeFile(
+      this.recordingTokensPath(),
+      `${JSON.stringify(Object.fromEntries(this.recordingTokens), null, 2)}\n`,
+    );
+  }
+
   async resetSession(meta = {}) {
+    await this.finalizeOpenCameraRecordings({ reason: 'reset' });
+    this.recordingTokens.clear();
     const previousResetCount = Number(this.state?.session?.resetCount || 0);
     const preservedBaseline = clone(this.state?.telemetry?.hrv?.baseline || null);
     const preservedAssets = clone(this.state?.assets || createInitialAssetState());
@@ -889,7 +1092,27 @@ class ExperimentStore extends EventEmitter {
     return this.getState();
   }
 
+  async copyDownloadableRecordingsToExport() {
+    const sessionId = this.state.session.id;
+    const destDir = path.join(this.exportDir, sessionId);
+    await fs.mkdir(destDir, { recursive: true });
+    for (const entry of this.state.session.recordings || []) {
+      if (entry.status !== 'saved' && entry.status !== 'partial') {
+        continue;
+      }
+      try {
+        await fs.copyFile(this.recordingFilePath(entry.id), path.join(destDir, entry.filename));
+      } catch (error) {
+        if (error.code !== 'ENOENT') {
+          throw error;
+        }
+      }
+    }
+  }
+
   async completeSession(payload = {}) {
+    await this.finalizeOpenCameraRecordings({ reason: 'complete' });
+    await this.copyDownloadableRecordingsToExport();
     const events = [];
 
     // Auto-close a round that is still open so the sitting always ends cleanly.
@@ -1310,6 +1533,7 @@ class ExperimentStore extends EventEmitter {
       roundsCompleted: rounds.length,
       totalDurationSeconds,
       rounds,
+      recordings: (session.recordings || []).map((entry) => publicRecording(entry)),
     };
   }
 

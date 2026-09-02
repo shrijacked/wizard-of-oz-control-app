@@ -1,5 +1,6 @@
 'use strict';
 
+const { createReadStream } = require('node:fs');
 const fs = require('node:fs/promises');
 const http = require('node:http');
 const path = require('node:path');
@@ -15,7 +16,7 @@ const { LlmAdvisor } = require('./llm-advisor');
 const { summarizeSensorHealth } = require('./sensor-health');
 const { summarizePreflight } = require('./preflight');
 const { assertPolicy, buildPolicy } = require('./session-policy');
-const { loadStudyConfig } = require('./study-config');
+const { loadStudyConfig, normalizeStudyConfig, saveStudyConfig } = require('./study-config');
 
 // Requests carry base64-encoded puzzle uploads (up to ~8 MB raw), so the JSON
 // body cap sits above that with headroom but still bounds memory per request.
@@ -32,6 +33,7 @@ const CONTENT_TYPES = {
   '.pdf': 'application/pdf',
   '.png': 'image/png',
   '.svg': 'image/svg+xml',
+  '.webm': 'video/webm',
   '.webp': 'image/webp',
 };
 
@@ -70,6 +72,62 @@ async function readJsonBody(request, maxBytes = MAX_REQUEST_BODY_BYTES) {
   }
 
   return JSON.parse(Buffer.concat(chunks).toString('utf8'));
+}
+
+async function readBinaryBody(request, maxBytes = MAX_REQUEST_BODY_BYTES) {
+  const chunks = [];
+  let total = 0;
+
+  for await (const chunk of request) {
+    total += chunk.length;
+    if (total > maxBytes) {
+      const error = new Error('Request body is too large.');
+      error.statusCode = 413;
+      throw error;
+    }
+    chunks.push(chunk);
+  }
+
+  return Buffer.concat(chunks);
+}
+
+function parseCameraRecordingPath(pathname) {
+  const match = String(pathname || '').match(/^\/api\/camera\/recordings(?:\/([^/]+)(?:\/(chunk|finalize))?)?$/);
+  if (!match) {
+    return null;
+  }
+
+  return {
+    recordingId: match[1] || null,
+    action: match[2] || null,
+  };
+}
+
+function isRecordingId(value) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(value || ''));
+}
+
+async function serveCameraRecording(response, filePath, filename) {
+  try {
+    const stat = await fs.stat(filePath);
+    response.writeHead(200, {
+      'content-type': 'video/webm',
+      'content-length': stat.size,
+      'content-disposition': `attachment; filename="${String(filename || 'table-recording.webm').replace(/"/g, '')}"`,
+    });
+    await new Promise((resolve, reject) => {
+      const stream = createReadStream(filePath);
+      stream.on('error', reject);
+      response.on('finish', resolve);
+      stream.pipe(response);
+    });
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      json(response, 404, { error: 'Recording file not found.' });
+      return;
+    }
+    throw error;
+  }
 }
 
 function roleState(store, role, systemStatus) {
@@ -142,7 +200,12 @@ function buildLocalhostUrls(port) {
 async function createApp(options = {}) {
   const port = Number(options.port || process.env.PORT || 3000);
   const publicDir = options.publicDir || path.join(process.cwd(), 'public');
-  const studyConfig = options.studyConfig || loadStudyConfig();
+  const defaultStudyConfigPath = path.join(process.cwd(), 'config', 'study.json');
+  const studyConfigPath = options.studyConfigPath
+    || (options.studyConfig ? null : defaultStudyConfigPath);
+  const studyConfig = normalizeStudyConfig(
+    options.studyConfig || loadStudyConfig(studyConfigPath || defaultStudyConfigPath),
+  );
   const adminGuard = options.adminGuard || new AdminGuard({
     pin: options.adminPin,
   });
@@ -242,10 +305,24 @@ async function createApp(options = {}) {
     };
   };
 
+  const clearDisconnectedScreenReadiness = (stats) => {
+    for (const role of ['subject', 'robot']) {
+      if ((stats[role] || 0) > 0 || !screenReadiness[role].ready) {
+        continue;
+      }
+
+      screenReadiness[role] = {
+        ready: false,
+        updatedAt: new Date().toISOString(),
+      };
+    }
+  };
+
   const hub = new WebSocketHub({
     getStateForRole: (role) => roleState(store, role, getSystemStatus()),
     getSystemStatus,
-    onConnectionStatsChanged() {
+    onConnectionStatsChanged(stats) {
+      clearDisconnectedScreenReadiness(stats);
       hub.broadcastSnapshots();
     },
   });
@@ -388,6 +465,22 @@ async function createApp(options = {}) {
         return;
       }
 
+      if (request.method === 'GET' && pathname.startsWith('/api/camera/recordings')) {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        const recordingPath = parseCameraRecordingPath(pathname);
+        if (!recordingPath?.recordingId || recordingPath.action || !isRecordingId(recordingPath.recordingId)) {
+          json(response, 404, { error: 'Recording not found.' });
+          return;
+        }
+        const record = store.getCameraRecording(recordingPath.recordingId);
+        if (!record) {
+          json(response, 404, { error: 'Recording not found.' });
+          return;
+        }
+        await serveCameraRecording(response, store.recordingFilePath(record.id), record.filename);
+        return;
+      }
+
       if (request.method === 'GET' && pathname === '/api/export/current.csv') {
         adminGuard.assertAuthorized(getAdminToken(request));
         const csv = await store.getSessionCsv('current');
@@ -433,6 +526,22 @@ async function createApp(options = {}) {
             }
           }
         }
+      }
+
+      if (request.method === 'POST' && pathname === '/api/hint-presets') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        const body = await readJsonBody(request);
+        const next = normalizeStudyConfig({
+          ...studyConfig,
+          hintPresets: Array.isArray(body.presets) ? body.presets : body.hintPresets,
+        });
+        studyConfig.hintPresets = next.hintPresets;
+        if (studyConfigPath) {
+          saveStudyConfig(studyConfig, studyConfigPath);
+        }
+        hub.broadcastSnapshots();
+        json(response, 200, { hintPresets: studyConfig.hintPresets });
+        return;
       }
 
       if (request.method === 'POST' && pathname === '/api/hints') {
@@ -577,6 +686,7 @@ async function createApp(options = {}) {
       }
 
       if (request.method === 'POST' && pathname === '/api/camera/status') {
+        adminGuard.assertAuthorized(getAdminToken(request));
         const body = await readJsonBody(request);
         cameraStatus.live = Boolean(body.live);
         cameraStatus.deviceLabel = body.deviceLabel ? String(body.deviceLabel).trim() : null;
@@ -587,12 +697,65 @@ async function createApp(options = {}) {
         return;
       }
 
+      if (request.method === 'POST' && pathname.startsWith('/api/camera/recordings')) {
+        const recordingPath = parseCameraRecordingPath(pathname);
+        if (!recordingPath) {
+          json(response, 404, { error: 'Not found' });
+          return;
+        }
+
+        if (!recordingPath.recordingId && !recordingPath.action) {
+          adminGuard.assertAuthorized(getAdminToken(request));
+          await readJsonBody(request);
+          json(response, 200, await store.createCameraRecording());
+          return;
+        }
+
+        if (!isRecordingId(recordingPath.recordingId)) {
+          json(response, 404, { error: 'Recording not found.' });
+          return;
+        }
+
+        if (recordingPath.action === 'chunk') {
+          adminGuard.assertAuthorized(getAdminToken(request));
+          const chunkIndex = Number(request.headers['x-chunk-index']);
+          const buffer = await readBinaryBody(request);
+          json(response, 200, await store.appendCameraRecordingChunk(
+            recordingPath.recordingId,
+            Number.isInteger(chunkIndex) ? chunkIndex : Number.NaN,
+            buffer,
+          ));
+          return;
+        }
+
+        if (recordingPath.action === 'finalize') {
+          const body = await readJsonBody(request);
+          if (!body.token) {
+            adminGuard.assertAuthorized(getAdminToken(request));
+          }
+          json(response, 200, await store.finalizeCameraRecording(recordingPath.recordingId, {
+            token: body.token,
+            reason: body.reason || 'stop',
+          }));
+          return;
+        }
+
+        json(response, 404, { error: 'Not found' });
+        return;
+      }
+
       if (request.method === 'POST' && pathname === '/api/screens/ready') {
         const body = await readJsonBody(request);
         const role = body.role === 'robot' ? 'robot' : (body.role === 'subject' ? 'subject' : null);
         if (!role) {
           json(response, 400, { error: 'A valid screen role is required.' });
           return;
+        }
+        const connected = (hub.getConnectionStats()[role] || 0) > 0;
+        if (body.ready && !connected) {
+          const error = new Error('That screen must be connected before it can be marked ready.');
+          error.statusCode = 409;
+          throw error;
         }
         screenReadiness[role] = {
           ready: Boolean(body.ready),

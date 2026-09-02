@@ -98,22 +98,52 @@ export function createCameraController({
     return { video, audio: false };
   }
 
+  function openedDeviceId(stream) {
+    const track = stream.getVideoTracks?.()[0];
+    return track?.getSettings?.()?.deviceId || '';
+  }
+
+  async function openCamera(requestedDeviceId) {
+    const attempts = requestedDeviceId
+      ? [
+        videoConstraints(requestedDeviceId, true),
+        { video: { deviceId: { exact: requestedDeviceId } }, audio: false },
+      ]
+      : [
+        videoConstraints(null, false),
+        { video: true, audio: false },
+      ];
+
+    let lastError = null;
+    for (const constraints of attempts) {
+      try {
+        return await mediaDevices.getUserMedia(constraints);
+      } catch (error) {
+        lastError = error;
+        const retryable = error?.name === 'OverconstrainedError' || error?.name === 'NotFoundError';
+        if (!retryable) {
+          throw error;
+        }
+      }
+    }
+
+    throw lastError;
+  }
+
   async function requestCameraStream() {
     const devices = await listDevices();
     populateSelect(devices);
     selectedDeviceId = selectElement?.value || preferredCameraDeviceId(devices, selectedDeviceId);
-
-    try {
-      return await mediaDevices.getUserMedia(videoConstraints(selectedDeviceId, Boolean(selectedDeviceId)));
-    } catch (error) {
-      if (error?.name === 'OverconstrainedError' || error?.name === 'NotFoundError') {
-        return mediaDevices.getUserMedia({
-          video: true,
-          audio: false,
-        });
-      }
+    const requestedDeviceId = selectedDeviceId;
+    const stream = await openCamera(requestedDeviceId);
+    const actualDeviceId = openedDeviceId(stream);
+    if (requestedDeviceId && actualDeviceId && actualDeviceId !== requestedDeviceId) {
+      stream.getTracks?.().forEach((track) => track.stop());
+      const error = new Error('the selected camera could not be opened. Another camera was not substituted.');
+      error.name = 'NotFoundError';
       throw error;
     }
+    return stream;
   }
 
   async function refreshDeviceList() {
@@ -189,6 +219,10 @@ export function createCameraController({
     };
   }
 
+  function getStream() {
+    return live ? mediaStream : null;
+  }
+
   selectElement?.addEventListener('change', () => {
     selectedDeviceId = selectElement.value;
     if (storage && selectedDeviceId) {
@@ -200,6 +234,7 @@ export function createCameraController({
     start,
     stop,
     getStatus,
+    getStream,
     refreshDeviceList,
   };
 }

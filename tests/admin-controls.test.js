@@ -63,3 +63,41 @@ test('bindCameraControls tolerates missing buttons', async () => {
     });
   });
 });
+
+test('camera controls stay available after the sitting completes so the operator can stop the preview', async () => {
+  const { shouldShowCameraControls } = await loadAdminControlsModule();
+
+  assert.equal(shouldShowCameraControls('setup'), true);
+  assert.equal(shouldShowCameraControls('running'), true);
+  assert.equal(shouldShowCameraControls('completed'), true);
+});
+
+test('latest downloadable recording skips an in-progress take', async () => {
+  const { latestDownloadableRecording } = await loadAdminControlsModule();
+
+  assert.equal(latestDownloadableRecording([
+    { id: 'a', status: 'saved', filename: 'one.webm' },
+    { id: 'b', status: 'recording', filename: 'two.webm' },
+  ])?.id, 'a');
+});
+
+test('finished sittings download every saved or partial take, not the in-progress one', async () => {
+  const { recordingsToDownloadAfterSitting } = await loadAdminControlsModule();
+
+  assert.deepEqual(
+    recordingsToDownloadAfterSitting([
+      { id: 'a', status: 'saved', filename: 'one.webm' },
+      { id: 'b', status: 'recording', filename: 'two.webm' },
+      { id: 'c', status: 'partial', filename: 'three.webm' },
+    ]).map((entry) => entry.id),
+    ['a', 'c'],
+  );
+});
+
+test('a live camera should start recording when the sitting begins if no take is already running', async () => {
+  const { shouldAutoStartSittingRecording } = await loadAdminControlsModule();
+
+  assert.equal(shouldAutoStartSittingRecording({ cameraLive: true, recorderActive: false }), true);
+  assert.equal(shouldAutoStartSittingRecording({ cameraLive: true, recorderActive: true }), false);
+  assert.equal(shouldAutoStartSittingRecording({ cameraLive: false, recorderActive: false }), false);
+});

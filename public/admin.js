@@ -6,7 +6,14 @@ import {
   postJson,
 } from './shared.js';
 import { createCameraController } from './admin-camera.mjs';
-import { bindCameraControls } from './admin-controls.mjs';
+import { canUseWebmRecorder, createCameraRecorder } from './admin-camera-recorder.mjs';
+import {
+  bindCameraControls,
+  latestDownloadableRecording,
+  recordingsToDownloadAfterSitting,
+  shouldAutoStartSittingRecording,
+  shouldShowCameraControls,
+} from './admin-controls.mjs';
 import { renderHrvTelemetry } from './admin-telemetry.mjs';
 
 const ADMIN_TOKEN_KEY = 'woz.admin.token';
@@ -78,6 +85,7 @@ const elements = {
   hintForm: document.querySelector('#hint-form'),
   hintText: document.querySelector('#hint-text'),
   hintSend: document.querySelector('#hint-send'),
+  hintSavePreset: document.querySelector('#hint-save-preset'),
   clearHint: document.querySelector('#clear-hint'),
   hintPreview: document.querySelector('#hint-preview'),
   hintPresets: document.querySelector('#hint-presets'),
@@ -88,9 +96,14 @@ const elements = {
   interventionLog: document.querySelector('#intervention-log'),
   startCamera: document.querySelector('#start-camera'),
   stopCamera: document.querySelector('#stop-camera'),
+  startRecording: document.querySelector('#start-recording'),
+  stopRecording: document.querySelector('#stop-recording'),
+  downloadRecording: document.querySelector('#download-recording'),
   cameraDevice: document.querySelector('#camera-device'),
   cameraFeed: document.querySelector('#camera-feed'),
   cameraStatus: document.querySelector('#camera-status'),
+  recordingStatus: document.querySelector('#recording-status'),
+  reviewRecordings: document.querySelector('#review-recordings'),
   gazeAttention: document.querySelector('#gaze-attention'),
   gazeUpdated: document.querySelector('#gaze-updated'),
 };
@@ -121,6 +134,24 @@ const cameraController = createCameraController({
       });
     } catch {
       // Camera status is best-effort; the preview still works locally.
+    }
+  },
+});
+
+const webmRecorderSupported = canUseWebmRecorder();
+const cameraRecorder = createCameraRecorder({
+  createRecording: () => postJson('/api/camera/recordings', {}, { headers: buildHeaders() }),
+  uploadChunk: uploadRecordingChunk,
+  finalizeRecording: (recordingId, options = {}) => postJson(`/api/camera/recordings/${recordingId}/finalize`, {
+    token: options.token,
+    reason: options.partial ? 'partial' : 'stop',
+  }, {
+    headers: buildHeaders(),
+  }),
+  onStatus(message) {
+    setText(elements.recordingStatus, message);
+    if (elements.recordingStatus) {
+      elements.recordingStatus.dataset.active = cameraRecorder.getActive().active ? 'true' : 'false';
     }
   },
 });
@@ -167,6 +198,29 @@ function setAdminToken(token) {
 
 function buildHeaders() {
   return adminToken ? { 'x-admin-token': adminToken } : {};
+}
+
+function formatRecordingClock(startedAt) {
+  const elapsed = Math.max(0, Math.floor((Date.now() - Number(startedAt || 0)) / 1000));
+  return `${String(Math.floor(elapsed / 60)).padStart(2, '0')}:${String(elapsed % 60).padStart(2, '0')}`;
+}
+
+async function uploadRecordingChunk(recordingId, index, blob) {
+  const response = await fetch(`/api/camera/recordings/${recordingId}/chunk`, {
+    method: 'POST',
+    headers: {
+      ...buildHeaders(),
+      'content-type': 'application/octet-stream',
+      'x-chunk-index': String(index),
+    },
+    body: blob,
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    const error = new Error(body.error || `Recording upload failed with status ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
 }
 
 function actorName() {
@@ -430,7 +484,7 @@ function renderModes() {
     elements.modeSetup.hidden = status !== 'setup';
   }
   if (elements.modeRun) {
-    elements.modeRun.hidden = status === 'completed';
+    elements.modeRun.hidden = !shouldShowCameraControls(status);
   }
   if (elements.modeReview) {
     elements.modeReview.hidden = status !== 'completed';
@@ -627,6 +681,13 @@ function renderInterventionLog() {
   });
 }
 
+async function persistHintPresets(presets) {
+  await postJson('/api/hint-presets', { presets }, {
+    headers: buildHeaders(),
+  });
+  await refreshState();
+}
+
 function renderHintPresets(hintPolicy) {
   if (!elements.hintPresets) {
     return;
@@ -634,12 +695,20 @@ function renderHintPresets(hintPolicy) {
 
   elements.hintPresets.innerHTML = '';
   studyConfig().hintPresets.forEach((preset) => {
+    const chip = document.createElement('div');
+    chip.className = 'preset-chip';
+
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'button button-ghost';
     button.textContent = preset;
-    button.disabled = !hintPolicy.allowed;
     button.addEventListener('click', async () => {
+      if (elements.hintText) {
+        elements.hintText.value = preset;
+      }
+      if (!hintPolicy.allowed) {
+        return;
+      }
       try {
         await postJson('/api/hints', {
           text: preset,
@@ -652,7 +721,24 @@ function renderHintPresets(hintPolicy) {
         await handleError(error);
       }
     });
-    elements.hintPresets.append(button);
+
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'preset-remove';
+    remove.setAttribute('aria-label', `Remove preset: ${preset}`);
+    remove.textContent = '×';
+    remove.addEventListener('click', async (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      try {
+        await persistHintPresets(studyConfig().hintPresets.filter((entry) => entry !== preset));
+      } catch (error) {
+        await handleError(error);
+      }
+    });
+
+    chip.append(button, remove);
+    elements.hintPresets.append(chip);
   });
 }
 
@@ -821,6 +907,82 @@ function renderSession() {
   renderRobotComposer(actionPolicy);
 }
 
+function renderRecordingControls() {
+  const live = Boolean(cameraController.getStatus().live);
+  const active = cameraRecorder.getActive();
+  const latest = latestDownloadableRecording(currentState?.session?.recordings || []);
+  const canRecord = webmRecorderSupported && live && !active.active;
+
+  setElementDisabled(
+    elements.startRecording,
+    !canRecord,
+    webmRecorderSupported
+      ? (live ? 'A recording is already in progress.' : 'Start the camera before recording.')
+      : 'Recording needs Chrome WebM on this laptop.',
+  );
+  setElementDisabled(elements.stopRecording, !active.active, 'No recording is in progress.');
+  setElementDisabled(
+    elements.downloadRecording,
+    !latest,
+    'Save a camera take before downloading.',
+  );
+  setElementDisabled(elements.startCamera, active.active, 'Stop recording before switching the camera.');
+  setElementDisabled(elements.cameraDevice, active.active, 'Stop recording before switching the camera.');
+
+  if (elements.recordingStatus) {
+    if (active.active) {
+      setText(elements.recordingStatus, `Recording ${formatRecordingClock(active.startedAt)} · ${active.filename}`);
+      elements.recordingStatus.dataset.active = 'true';
+    } else if (!webmRecorderSupported) {
+      setText(elements.recordingStatus, 'Recording needs Chrome WebM on this laptop.');
+      elements.recordingStatus.dataset.active = 'false';
+    } else if (!elements.recordingStatus.textContent) {
+      setText(elements.recordingStatus, latest ? `Last take: ${latest.filename}` : '');
+      elements.recordingStatus.dataset.active = 'false';
+    } else {
+      elements.recordingStatus.dataset.active = 'false';
+    }
+  }
+}
+
+function renderReviewRecordings() {
+  if (!elements.reviewRecordings) {
+    return;
+  }
+
+  const recordings = (currentState?.session?.recordings || [])
+    .filter((entry) => entry.status === 'saved' || entry.status === 'partial');
+  elements.reviewRecordings.innerHTML = '';
+  if (!recordings.length) {
+    const empty = document.createElement('p');
+    empty.className = 'panel-note';
+    empty.textContent = 'No camera takes were saved in this sitting.';
+    elements.reviewRecordings.append(empty);
+    return;
+  }
+
+  recordings.forEach((entry) => {
+    const row = document.createElement('div');
+    row.className = 'review-recording';
+    const label = document.createElement('p');
+    label.className = 'panel-note';
+    label.textContent = `${entry.status === 'partial' ? 'Partial' : 'Saved'} · ${entry.filename}`;
+    const button = document.createElement('button');
+    button.className = 'button button-ghost';
+    button.type = 'button';
+    button.textContent = 'Download take';
+    button.addEventListener('click', async () => {
+      try {
+        await downloadExport(`/api/camera/recordings/${entry.id}`, entry.filename);
+      } catch (error) {
+        await handleError(error);
+      }
+    });
+    row.append(label, button);
+    elements.reviewRecordings.append(row);
+  });
+}
+
 function renderReview() {
   const session = currentState?.session || {};
   const metadata = session.metadata || {};
@@ -829,6 +991,7 @@ function renderReview() {
     elements.reviewSummary,
     `${metadata.participantId || 'Unnamed participant'} • sitting ${metadata.sittingNumber || 1} • ${rounds.length} round${rounds.length === 1 ? '' : 's'}.`,
   );
+  renderReviewRecordings();
 
   if (!elements.reviewRounds) {
     return;
@@ -871,6 +1034,7 @@ function renderState() {
   renderSession();
   renderInterventionLog();
   renderReview();
+  renderRecordingControls();
   renderHrvTelemetry({
     heartRate: elements.hrvHeartRate,
     sdnn: elements.hrvSdnn,
@@ -974,6 +1138,7 @@ async function resetSession() {
     return;
   }
 
+  await cameraRecorder.stop({ silent: true });
   await postJson('/api/session/reset', {
     requestedBy: actorName(),
     force: isRunning,
@@ -989,11 +1154,79 @@ async function resetSession() {
 }
 
 async function startCamera() {
+  await cameraRecorder.stop({ silent: true });
   await cameraController.start();
+  renderRecordingControls();
 }
 
-function stopCamera() {
+async function stopCamera() {
+  await cameraRecorder.stop();
   cameraController.stop();
+  renderRecordingControls();
+}
+
+async function startRecording() {
+  await cameraRecorder.start(cameraController.getStream());
+  renderRecordingControls();
+}
+
+async function stopRecording() {
+  await cameraRecorder.stop();
+  renderRecordingControls();
+}
+
+async function downloadLastTake() {
+  const latest = latestDownloadableRecording(currentState?.session?.recordings || []);
+  if (!latest) {
+    return;
+  }
+  await downloadExport(`/api/camera/recordings/${latest.id}`, latest.filename);
+}
+
+async function downloadSittingFootage(recordings = currentState?.session?.recordings || []) {
+  const takes = recordingsToDownloadAfterSitting(recordings);
+  for (const take of takes) {
+    await downloadExport(`/api/camera/recordings/${take.id}`, take.filename);
+  }
+}
+
+async function autoStartSittingRecording() {
+  if (!shouldAutoStartSittingRecording({
+    cameraLive: Boolean(cameraController.getStatus().live),
+    recorderActive: Boolean(cameraRecorder.getActive().active),
+  })) {
+    return;
+  }
+
+  try {
+    await startRecording();
+  } catch (error) {
+    setText(elements.recordingStatus, error.message === 'Not found'
+      ? 'Recording API is missing. Restart node src/server.js, then begin again.'
+      : (error.message || 'Unable to start the sitting recording.'));
+  }
+}
+
+function finalizeRecordingOnUnload() {
+  cameraRecorder.flush();
+  const active = cameraRecorder.getActive();
+  if (!active.recordingId || !active.finalizeToken) {
+    return;
+  }
+
+  const url = `/api/camera/recordings/${active.recordingId}/finalize`;
+  const payload = JSON.stringify({ token: active.finalizeToken, reason: 'unload' });
+  if (navigator.sendBeacon) {
+    navigator.sendBeacon(url, new Blob([payload], { type: 'application/json' }));
+    return;
+  }
+
+  fetch(url, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: payload,
+    keepalive: true,
+  }).catch(() => {});
 }
 
 async function init() {
@@ -1003,6 +1236,40 @@ async function init() {
     onStart: startCamera,
     onStop: stopCamera,
   });
+  elements.startRecording?.addEventListener('click', async () => {
+    try {
+      await startRecording();
+    } catch (error) {
+      setText(
+        elements.recordingStatus,
+        error.message === 'Not found'
+          ? 'Recording API is missing. Restart node src/server.js, then Record again.'
+          : (error.message || 'Unable to start recording.'),
+      );
+      await handleError(error);
+    }
+  });
+  elements.stopRecording?.addEventListener('click', async () => {
+    try {
+      await stopRecording();
+    } catch (error) {
+      await handleError(error);
+    }
+  });
+  elements.downloadRecording?.addEventListener('click', async () => {
+    try {
+      await downloadLastTake();
+    } catch (error) {
+      await handleError(error);
+    }
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') {
+      cameraRecorder.flush();
+    }
+  });
+  window.addEventListener('pagehide', finalizeRecordingOnUnload);
+  window.addEventListener('beforeunload', finalizeRecordingOnUnload);
   cameraController.refreshDeviceList().catch(() => {});
 
   setPill(elements.linkStatus, 'reconnecting', 'Link: connecting');
@@ -1011,6 +1278,9 @@ async function init() {
   durationTicker = window.setInterval(() => {
     if (currentState?.session?.status === 'running') {
       renderSession();
+    }
+    if (cameraRecorder.getActive().active) {
+      renderRecordingControls();
     }
   }, 1000);
 
@@ -1114,6 +1384,7 @@ async function init() {
         headers: buildHeaders(),
       });
       await refreshState();
+      await autoStartSittingRecording();
     } catch (error) {
       await handleError(error);
     }
@@ -1150,12 +1421,14 @@ async function init() {
 
   elements.sessionComplete?.addEventListener('click', async () => {
     try {
+      await cameraRecorder.stop();
       await postJson('/api/session/complete', {
         operator: actorName(),
       }, {
         headers: buildHeaders(),
       });
       await refreshState();
+      await downloadSittingFootage();
     } catch (error) {
       await handleError(error);
     }
@@ -1185,6 +1458,24 @@ async function init() {
     try {
       const sessionId = currentState?.session?.id || 'session';
       await downloadExport('/api/export/current.csv', `${sessionId}.csv`);
+    } catch (error) {
+      await handleError(error);
+    }
+  });
+
+  elements.hintSavePreset?.addEventListener('click', async () => {
+    const text = String(elements.hintText?.value || '').trim();
+    if (!text) {
+      return;
+    }
+
+    const presets = [...studyConfig().hintPresets];
+    if (presets.includes(text)) {
+      return;
+    }
+
+    try {
+      await persistHintPresets([...presets, text]);
     } catch (error) {
       await handleError(error);
     }

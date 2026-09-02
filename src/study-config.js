@@ -44,7 +44,7 @@ function normalizeStudyConfig(raw = {}) {
     : [];
 
   const hintPresets = Array.isArray(raw.hintPresets)
-    ? raw.hintPresets.map((entry) => String(entry || '').trim()).filter(Boolean)
+    ? raw.hintPresets.map((entry) => String(entry || '').trim()).filter(Boolean).slice(0, 24)
     : [];
 
   const tangramPuzzlesDir = String(raw.tangramPuzzlesDir || '').trim()
@@ -76,8 +76,23 @@ function loadStudyConfig(configPath = path.join(process.cwd(), 'config', 'study.
   }
 }
 
+function saveStudyConfig(config, configPath = path.join(process.cwd(), 'config', 'study.json')) {
+  const normalized = normalizeStudyConfig(config);
+  const payload = {
+    plannedRounds: normalized.plannedRounds,
+    slotCount: normalized.slotCount,
+    tangramPuzzlesDir: normalized.tangramPuzzlesDir,
+    pieces: normalized.pieces,
+    hintPresets: normalized.hintPresets,
+  };
+  fs.mkdirSync(path.dirname(configPath), { recursive: true });
+  fs.writeFileSync(configPath, `${JSON.stringify(payload, null, 2)}\n`);
+  return normalized;
+}
+
 module.exports = {
   DEFAULT_STUDY_CONFIG,
   normalizeStudyConfig,
   loadStudyConfig,
+  saveStudyConfig,
 };
