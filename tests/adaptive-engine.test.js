@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 
 const { AdaptiveEngine } = require('../src/adaptive-engine');
 
-test('adaptive engine recommends intervene when both HRV and gaze suggest high strain', () => {
+test('adaptive engine recommends intervene when HRV suggests high strain', () => {
   const engine = new AdaptiveEngine();
   const now = new Date('2026-04-01T12:00:00.000Z');
   const result = engine.evaluate({
@@ -15,12 +15,6 @@ test('adaptive engine recommends intervene when both HRV and gaze suggest high s
         stressScore: 0.9,
         stressLevel: 'High',
         distractionDetected: true,
-      },
-      gaze: {
-        updatedAt: now.toISOString(),
-        attentionScore: 0.1,
-        fixationLoss: 0.9,
-        pupilDilation: 0.8,
       },
     },
   }, now);
@@ -40,12 +34,6 @@ test('adaptive engine falls back to normal when telemetry is stale', () => {
         stressLevel: 'High',
         distractionDetected: true,
       },
-      gaze: {
-        updatedAt: '2026-04-01T11:58:30.000Z',
-        attentionScore: 0.05,
-        fixationLoss: 0.95,
-        pupilDilation: 0.9,
-      },
     },
   }, now);
 
@@ -64,22 +52,12 @@ test('adaptive engine honors custom configuration from state', () => {
         stressLevel: 'Mild',
         distractionDetected: true,
       },
-      gaze: {
-        updatedAt: now.toISOString(),
-        attentionScore: 0.5,
-        fixationLoss: 0.4,
-        pupilDilation: 0.3,
-      },
     },
     adaptive: {
       configuration: {
         thresholds: {
           observe: 0.3,
           intervene: 0.5,
-        },
-        weights: {
-          hrv: 0.8,
-          gaze: 0.2,
         },
         distractionBoost: 0.2,
         freshness: {
@@ -93,6 +71,6 @@ test('adaptive engine honors custom configuration from state', () => {
   assert.equal(result.status, 'intervene');
   assert.equal(result.configuration.thresholds.observe, 0.3);
   assert.equal(result.configuration.thresholds.intervene, 0.5);
-  assert.equal(result.configuration.weights.hrv, 0.8);
+  assert.equal(result.configuration.weights.hrv, 1);
   assert.equal(result.configuration.freshness.staleAfterSeconds, 180);
 });

@@ -19,14 +19,17 @@ function metadataChecklistItem(session = {}) {
   }
 
   if (missing.length === 0) {
+    const fullStudy = Array.isArray(session.schedule) && session.schedule.length >= 9;
     return {
       id: 'metadata',
       kind: 'automatic',
       required: true,
       status: 'ready',
-      label: 'Sitting profile saved',
-      summary: 'Participant, researcher, and sitting number are saved.',
-      detail: `Participant ${metadata.participantId} • researcher ${metadata.researcher} • sitting ${metadata.sittingNumber}.`,
+      label: fullStudy ? 'Study profile saved' : 'Sitting profile saved',
+      summary: fullStudy ? 'Participant and researcher IDs are saved.' : 'Participant, researcher, and sitting number are saved.',
+      detail: fullStudy
+        ? `Participant ${metadata.participantId} • researcher ${metadata.researcher}.`
+        : `Participant ${metadata.participantId} • researcher ${metadata.researcher} • sitting ${metadata.sittingNumber}.`,
     };
   }
 
@@ -46,6 +49,30 @@ function automaticIssueStatus(phase) {
 }
 
 function sittingQueueChecklistItem(session = {}) {
+  const schedule = Array.isArray(session.schedule) ? session.schedule : [];
+  if (schedule.length >= 9) {
+    if (schedule.length === session.plannedRounds) {
+      return {
+        id: 'study-schedule',
+        kind: 'automatic',
+        required: true,
+        status: 'ready',
+        label: 'Nine-round study schedule generated',
+        summary: `Nine puzzles are assigned across ${session.conditionOrder?.join(' → ') || 'three conditions'}.`,
+        detail: `Randomization seed: ${session.randomizationSeed || 'saved with session'}.`,
+      };
+    }
+    return {
+      id: 'study-schedule',
+      kind: 'automatic',
+      required: true,
+      status: automaticIssueStatus(session.status || 'setup'),
+      label: 'Nine-round study schedule generated',
+      summary: 'All nine puzzle pairs must be available before the randomized schedule can be generated.',
+      detail: 'The schedule assigns three puzzles to each counterbalanced condition block.',
+    };
+  }
+
   const sittingNumber = session.metadata?.sittingNumber || 1;
   const plannedRounds = Number(session.plannedRounds) || 3;
   const expected = setIdsForSitting(sittingNumber).slice(0, plannedRounds);
@@ -72,6 +99,51 @@ function sittingQueueChecklistItem(session = {}) {
     summary: `Sitting ${sittingNumber} needs puzzles ${expected.join(', ')} in that order.`,
     detail: 'Save the sitting profile after the tangram library has loaded, or upload the missing pair files.',
   };
+}
+
+function participantProfileChecklistItems(session = {}) {
+  if (!Array.isArray(session.schedule) || session.schedule.length < 9) {
+    return [];
+  }
+  const admin = session.participantProfiles?.admin;
+  const subject = session.participantProfiles?.subject;
+  const phase = session.status || 'setup';
+  const items = [];
+
+  items.push(subject?.consented && subject?.instructionsAcknowledged && Number.isFinite(subject?.expectedEfficacy)
+    ? {
+      id: 'participant-profile', kind: 'automatic', required: true, status: 'ready',
+      label: 'Participant consent and baseline complete',
+      summary: 'The participant submitted demographics, consent, instructions acknowledgement, and the baseline rating.',
+      detail: 'The participant-facing copy is saved with a timestamp.',
+    }
+    : {
+      id: 'participant-profile', kind: 'automatic', required: true, status: automaticIssueStatus(phase),
+      label: 'Participant consent and baseline complete',
+      summary: 'The participant must complete the opening section on the subject screen.',
+      detail: 'Age, gender, consent, instructions acknowledgement, and expected efficacy are required.',
+    });
+
+  let profilesMatch = false;
+  if (admin?.consented && subject?.consented) {
+    profilesMatch = admin.age === subject.age
+      && admin.gender === subject.gender
+      && String(admin.genderSelfDescribe || '') === String(subject.genderSelfDescribe || '');
+  }
+  items.push(profilesMatch
+    ? {
+      id: 'profile-crosscheck', kind: 'automatic', required: true, status: 'ready',
+      label: 'Researcher cross-check matches',
+      summary: 'The admin and participant demographic entries match.',
+      detail: 'Both copies remain in the export for auditing.',
+    }
+    : {
+      id: 'profile-crosscheck', kind: 'automatic', required: true, status: automaticIssueStatus(phase),
+      label: 'Researcher cross-check matches',
+      summary: admin ? 'The admin and participant entries do not match yet.' : 'Complete the researcher cross-check on the admin screen.',
+      detail: 'Confirm age, gender, and consent against the participant entry.',
+    });
+  return items;
 }
 
 function screenChecklistItem({
@@ -184,6 +256,7 @@ function summarizePreflight(input = {}) {
 
   const items = [
     metadataChecklistItem(state.session || {}),
+    ...participantProfileChecklistItems(state.session || {}),
     sittingQueueChecklistItem(state.session || {}),
     screenChecklistItem({
       id: 'subject-display',
@@ -211,13 +284,6 @@ function summarizePreflight(input = {}) {
       health: sensorHealth.watch || {},
       waitingDetail: 'Wear the band, start the watch script, and wait until heart rate appears.',
     }),
-    telemetryChecklistItem({
-      id: 'gaze-telemetry',
-      label: 'Pupil Core',
-      phase,
-      health: sensorHealth.gaze || {},
-      waitingDetail: 'Start Pupil Capture with the Core headset, then confirm gaze frames are flowing.',
-    }),
   ];
 
   const blockers = items.filter((item) => item.status === 'blocked');
@@ -226,7 +292,7 @@ function summarizePreflight(input = {}) {
   const requiredReady = blockers.length === 0;
 
   let summary = 'Ready for participant.';
-  let detail = 'Screens, camera, watch, Pupil Core, and the sitting queue are ready.';
+  let detail = 'Screens, camera, watch, and the sitting queue are ready.';
 
   if (phase === 'setup') {
     if (blockers.length > 0) {

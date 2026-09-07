@@ -2,218 +2,69 @@
 
 ## Summary
 
-The system is a local Node.js web server that coordinates one operator dashboard and two secondary screens over the same network.
+The local Node.js server coordinates one researcher dashboard and two secondary screens over the same network. One persisted session represents one participant's complete nine-puzzle study.
 
 ```mermaid
 flowchart LR
-    admin["/admin<br/>camera + solution + hint/robot controls"] --> server["local node server<br/>http + websocket + session store"]
-    server --> subject["/subject<br/>hint + beep"]
-    server --> robot["/robot<br/>piece + slot cue + beep"]
+    admin["/admin<br/>study control + camera + sensor signals"] --> server["local Node server<br/>HTTP + WebSocket + file store"]
+    server --> subject["/subject<br/>onboarding + timer + hints + surveys"]
+    server --> robot["/robot<br/>piece + slot cue"]
     watch["Maxim H Band"] --> server
-    gaze["Pupil Core"] --> server
     camera["C270"] --> admin
-    server --> export["concise session json<br/>and csv timeline"]
+    server --> export["participant JSON<br/>and event CSV"]
 ```
 
-The operator dashboard is the only control surface. The other two screens are read-only displays.
+## Study and randomization model
+
+- Participant IDs are auto-reserved as `P01`, `P02`, and so on. The persistent registry prevents reuse.
+- The participant number selects one of the six permutations of control, constant intervention, and adaptive intervention. Sequential IDs distribute the orders evenly.
+- The nine complete puzzle pairs are globally shuffled with a saved seed. Three consecutive shuffled puzzles are assigned to each sitting.
+- The assigned condition is constant within a sitting. All rounds, sittings, surveys, interventions, and telemetry stay in one participant session.
+- The next round is blocked until the preceding questionnaire is submitted. After rounds 3 and 6, the researcher must also begin the next sitting.
 
 ## Screen responsibilities
 
 ### `/admin`
 
-- starts and stops the live C270 preview before the sitting can begin
-- shows live HRV and Pupil gaze metrics
-- records metadata such as study ID, participant ID, and sitting number
-- auto-queues the three tangram pairs for that sitting; upload is a fallback
-- starts the sitting, then starts and completes each round
-- broadcasts hints to the participant
-- broadcasts robot cues as piece + numbered slot
-- downloads the session JSON and CSV exports
+- shows the participant ID, condition order, and randomized schedule
+- saves the researcher demographic/consent copy and configurable round/reminder timing
+- starts, pauses, resumes, and completes rounds and opens sittings 2 and 3
+- shows the C270, solution, HRV, adaptive spike highlight, and constant reminder
+- disables hints and robot movements in control rounds
+- requests watch recalibration between rounds or sittings
+- can skip a per-round survey only after recording a reason
+- ends the study only after all nine rounds and questionnaires are complete
 
 ### `/subject`
 
-- shows only the latest written hint from the dashboard
-- does not receive the puzzle PDF; the physical tangram is on the table
-- plays a short browser beep when a fresh hint arrives after the screen is armed
-- updates live over WebSockets with no refresh
+- collects demographics, consent, instruction acknowledgement, and baseline expected efficacy under the auto-assigned ID
+- displays a pause-aware countdown and distinct start, midpoint, end, hint, and robot-action sound patterns
+- shows six workload questions after every round and four additional intervention questions outside control
+- shows breaks after rounds 3 and 6, then the final helpfulness, efficacy, trust, automation-bias, and comment block
 
 ### `/robot`
 
-- shows only the latest piece-and-slot cue from the dashboard
-- does not receive the solution PDF; the operator keeps that on `/admin`
-- plays a short browser beep when a fresh robot cue arrives after the screen is armed
-- updates live over WebSockets with no refresh
+- shows only the latest piece-and-slot cue
+- plays a loud movement sound pattern and later reminder after browser audio is armed
 
-### `/audit`
+## Puzzle pairing and start gate
 
-- compatibility redirect to `/robot`
+The filename convention pairs `1.pdf` with `1s.pdf`, through `9.pdf` with `9s.pdf`. Only complete pairs enter the schedule; unmatched files remain visible as incomplete uploads.
 
-## Puzzle pairing model
+`POST /api/session/start` requires saved researcher and participant IDs, nine scheduled pairs, matching participant/researcher profiles, armed subject and robot screens, live C270, and healthy calibrated watch telemetry.
 
-The app groups uploads into puzzle sets using the filename suffix convention.
+## Main APIs
 
-```mermaid
-flowchart TD
-    upload["uploaded files"] --> parse["parse basename"]
-    parse --> subject["subject asset<br/>1.pdf"]
-    parse --> solution["solution asset<br/>1s.pdf"]
-    subject --> pair["set id = 1"]
-    solution --> pair
-    pair --> dashboard["selectable puzzle set"]
-    parse --> incomplete["unmatched upload<br/>shown but not selectable"]
-```
+- Session: `POST /api/session/configure`, `/start`, `/resume-sitting`, `/complete`, `/reset`
+- Rounds: `POST /api/rounds/start`, `/pause`, `/resume`, `/complete`
+- Participant data: `POST /api/participant/profile`, `/api/surveys/round`, `/api/surveys/final`
+- Researcher override: `POST /api/surveys/round/skip`
+- Interventions: `POST /api/hints`, `/api/hints/clear`, `/api/actions`
+- Watch: `POST /api/watch/calibrate`
+- Exports: `GET /api/export/current.json`, `/api/export/current.csv`
 
-Rules:
+## Persistence and export
 
-- a subject asset is a file whose basename does not end in `s`
-- a solution asset is a file whose basename ends in `s`
-- `1.pdf` pairs with `1s.pdf`
-- only complete pairs become selectable sets
-- unmatched uploads stay visible in the dashboard as incomplete files
-- saving sitting 1/2/3 auto-queues puzzles 1–3 / 4–6 / 7–9 from `tangram puzzles/`
+`data/state.json` stores resumable current state. `data/events.jsonl` and per-session CSV files retain the ordered audit trail. `data/participant-registry.json` prevents ID reuse across resets.
 
-`POST /api/session/start` is denied unless preflight `requiredReady` is true: sitting profile, sitting queue, subject and robot screens armed, C270 live, watch sample, and a recent Pupil gaze frame.
-
-## State model
-
-The session holds a queue of puzzle sets for one sitting, plus the finished rounds and the active round. `puzzleSet` is the currently displayed pair (the active round).
-
-```json
-{
-  "session": {
-    "id": "session-20260413-120000",
-    "status": "running",
-    "trialStartedAt": "2026-04-13T12:03:00.000Z",
-    "completedAt": null,
-    "metadata": {
-      "studyId": "pilot-01",
-      "participantId": "P-001",
-      "condition": "adaptive",
-      "researcher": "shrijak",
-      "notes": "pilot run"
-    },
-    "puzzleSet": {
-      "setId": "1",
-      "label": "1",
-      "subjectAsset": {
-        "originalName": "1.pdf",
-        "urlPath": "/media/puzzles/subject-file.pdf"
-      },
-      "solutionAsset": {
-        "originalName": "1s.pdf",
-        "urlPath": "/media/puzzles/solution-file.pdf"
-      }
-    }
-  },
-  "hint": {
-    "text": "try the outer edge first",
-    "updatedAt": "2026-04-13T12:07:10.000Z"
-  },
-  "robotAction": {
-    "actionId": "function-3",
-    "label": "Function 3: Purple Triangle",
-    "updatedAt": "2026-04-13T12:09:55.000Z"
-  }
-}
-```
-
-The backend still stores telemetry and adaptive state, but those are no longer part of the main operator workflow or the primary export.
-
-## Data flow
-
-```mermaid
-sequenceDiagram
-    participant Admin as Dashboard Operator
-    participant Server as Local Server
-    participant Subject as Subject Screen
-    participant Robot as Robot Screen
-
-    Admin->>Server: upload files and select puzzle set
-    Server-->>Subject: selected subject asset
-    Server-->>Robot: selected solution asset
-    Admin->>Server: start trial
-    Admin->>Server: send hint
-    Server-->>Subject: latest hint
-    Subject-->>Subject: play hint beep
-    Admin->>Server: log robot action
-    Server-->>Robot: latest robot cue
-    Robot-->>Robot: play robot beep
-    Admin->>Server: complete trial
-    Admin->>Server: download export
-```
-
-## Routes and APIs
-
-### Pages
-
-- `GET /admin`
-- `GET /subject`
-- `GET /robot`
-- `GET /audit`
-
-### State and mutation APIs
-
-- `GET /api/state`
-- `GET /api/events?limit=N`
-- `POST /api/session/configure`
-- `POST /api/session/start`
-- `POST /api/session/complete`
-- `POST /api/session/reset`
-- `POST /api/puzzles/upload`
-- `POST /api/rounds/queue`
-- `POST /api/hints`
-- `POST /api/actions`
-- `POST /api/camera/status`
-- `POST /api/screens/ready`
-
-### Export APIs
-
-- `GET /api/export/current.json`
-- `GET /api/export/current.csv`
-
-### Optional integration APIs
-
-- `POST /api/telemetry/hrv`
-- `POST /api/telemetry/gaze`
-- `POST /api/bridge/gaze/heartbeat`
-- `POST /api/bridge/gaze/frame`
-
-## Export format
-
-The primary export is intentionally concise and operator-facing.
-
-```json
-{
-  "sessionId": "session-20260413-120000",
-  "startedAt": "2026-04-13T12:00:00.000Z",
-  "trialStartedAt": "2026-04-13T12:03:00.000Z",
-  "completedAt": "2026-04-13T12:18:42.000Z",
-  "durationSeconds": 942,
-  "metadata": {
-    "studyId": "pilot-01",
-    "participantId": "P-001",
-    "researcher": "shrijak",
-    "notes": "pilot run"
-  },
-  "puzzle": {
-    "setId": "1",
-    "subjectFile": "1.pdf",
-    "solutionFile": "1s.pdf"
-  },
-  "interventions": [
-    {
-      "timestamp": "2026-04-13T12:07:10.000Z",
-      "type": "hint",
-      "text": "try the outer edge first"
-    },
-    {
-      "timestamp": "2026-04-13T12:09:55.000Z",
-      "type": "robot",
-      "actionId": "function-3",
-      "label": "Function 3: Purple Triangle"
-    }
-  ]
-}
-```
-
-The CSV remains available as a raw timeline for downstream analysis.
+The main JSON export includes both profile copies, condition order, randomization seed, schedule, pause-aware round durations, interventions, every round survey or documented skip, the final survey, and recording metadata.

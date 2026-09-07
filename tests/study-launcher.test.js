@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 
 const { buildLaunchPlan } = require('../src/study-launcher');
 
-test('study launcher binds to all interfaces by default while keeping internal bridge traffic on localhost', () => {
+test('study launcher binds the server to all interfaces by default', () => {
   const plan = buildLaunchPlan({
     port: 3030,
   });
@@ -13,10 +13,10 @@ test('study launcher binds to all interfaces by default while keeping internal b
   assert.equal(plan.host, '0.0.0.0');
   assert.equal(plan.server.env.HOST, '0.0.0.0');
   assert.equal(plan.server.env.PORT, '3030');
-  assert.equal(plan.gaze.args.includes('http://127.0.0.1:3030'), true);
+  assert.equal(plan.gaze, undefined);
 });
 
-test('study launcher builds a server, watch, and Pupil Core gaze plan by default', () => {
+test('study launcher builds a server and watch plan without gaze by default', () => {
   const plan = buildLaunchPlan({
     host: '127.0.0.1',
     port: 3030,
@@ -32,28 +32,16 @@ test('study launcher builds a server, watch, and Pupil Core gaze plan by default
   assert.deepEqual(plan.watch.args, ['integrations/watch/watch.py']);
   assert.equal(plan.watch.optional, true);
 
-  assert.equal(plan.gaze.label, 'gaze');
-  assert.equal(plan.gaze.command, 'python3');
-  assert.equal(plan.gaze.args.includes('integrations/gaze/pupil_core_bridge.py'), true);
-  assert.equal(plan.gaze.args.includes('http://127.0.0.1:3030'), true);
+  assert.equal(plan.gaze, undefined);
 });
 
-test('study launcher supports file-tail gaze mode and disabling optional bridges', () => {
+test('study launcher can disable the optional watch bridge', () => {
   const plan = buildLaunchPlan({
     host: '127.0.0.1',
     port: 3040,
     enableWatch: false,
-    gaze: {
-      enabled: true,
-      mode: 'file-tail',
-      file: '/tmp/gaze.jsonl',
-      bridgeId: 'pupil-bridge',
-      deviceLabel: 'Pupil Labs',
-    },
   });
 
   assert.equal(plan.watch, null);
-  assert.equal(plan.gaze.args.includes('file-tail'), true);
-  assert.equal(plan.gaze.args.includes('/tmp/gaze.jsonl'), true);
-  assert.equal(plan.gaze.args.includes('pupil-bridge'), true);
+  assert.equal(plan.gaze, undefined);
 });

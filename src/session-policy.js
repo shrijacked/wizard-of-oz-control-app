@@ -7,6 +7,7 @@ function buildPolicy(state, action, options = {}) {
   const queue = Array.isArray(session.queue) ? session.queue : [];
   const rounds = Array.isArray(session.rounds) ? session.rounds : [];
   const activeRound = session.activeRound || null;
+  const fullStudy = Array.isArray(session.schedule) && session.schedule.length >= 9;
   const force = Boolean(options.force);
 
   const allow = () => ({ allowed: true, reason: null });
@@ -50,6 +51,18 @@ function buildPolicy(state, action, options = {}) {
       return deny('Finish the current round before starting the next one.');
     }
 
+    if (fullStudy && session.awaitingRoundSurvey) {
+      return deny(`Complete the round ${session.awaitingRoundSurvey} questionnaire before starting the next round.`);
+    }
+
+    if (fullStudy && session.betweenSittings) {
+      return deny('The study is between sittings. Begin the next sitting before starting its first round.');
+    }
+
+    if (fullStudy && (session.finalSurveyRequired || session.finalSurvey)) {
+      return deny('All nine rounds are finished. Complete the end-of-study flow.');
+    }
+
     if (rounds.length >= queue.length) {
       return deny('All queued puzzles for this sitting have been played.');
     }
@@ -64,6 +77,17 @@ function buildPolicy(state, action, options = {}) {
   }
 
   if (action === 'completeSession') {
+    if (fullStudy) {
+      if (activeRound) {
+        return deny('Complete the active round and its questionnaire before ending the study.');
+      }
+      if (rounds.length < session.schedule.length) {
+        return deny('All nine rounds must be completed before ending the study.');
+      }
+      if (session.awaitingRoundSurvey || session.finalSurveyRequired || !session.finalSurvey) {
+        return deny('The participant must finish the remaining questionnaires before the study can end.');
+      }
+    }
     return status === 'running'
       ? allow()
       : deny('Only running sittings can be completed.');
@@ -78,7 +102,33 @@ function buildPolicy(state, action, options = {}) {
       return deny('Start a round before sending hints or robot cues.');
     }
 
+    if (activeRound.condition === 'control') {
+      return deny('Hints and robot movements are disabled during control rounds.');
+    }
+
     return allow();
+  }
+
+  if (action === 'pauseRound') {
+    if (status !== 'running' || !activeRound) {
+      return deny('Start a round before pausing its timer.');
+    }
+    return activeRound.pauseStartedAt
+      ? deny('The round timer is already paused.')
+      : allow();
+  }
+
+  if (action === 'resumeRound') {
+    if (status !== 'running' || !activeRound?.pauseStartedAt) {
+      return deny('Pause the active round before resuming its timer.');
+    }
+    return allow();
+  }
+
+  if (action === 'resumeSitting') {
+    return status === 'running' && session.betweenSittings
+      ? allow()
+      : deny('The study is not currently between sittings.');
   }
 
   if (action === 'simulateTelemetry') {

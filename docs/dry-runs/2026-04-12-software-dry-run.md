@@ -45,7 +45,7 @@
 
 - Status: partial
 - HRV feed live: yes, through the watch bridge file path
-- Gaze feed live: yes, through the gaze bridge heartbeat and simulated frame path
+- Gaze feed result: retired from the experiment after this historical dry run
 - Watch stale warning check: yes
 - Gaze stale warning check: yes for bridge heartbeat behavior, not with the real device
 - Notes:
@@ -100,8 +100,8 @@
 - Ready to advance to next rehearsal step: yes
 - Safe for internal participant run: not yet
 - Open issues:
-  - one real-hardware rehearsal is still required for the actual watch and gaze setup
+  - one real-hardware rehearsal is still required for the actual watch setup
   - refresh and reconnect drills with the physical devices are still pending
 - Follow-up actions:
-  - run the same ladder on the real experiment laptop with the actual watch and gaze devices
+  - run the same ladder on the real experiment laptop with the actual watch and camera
   - complete at least one physical dry run and one pilot-student run before collecting internal-study data

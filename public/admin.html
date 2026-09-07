@@ -19,7 +19,6 @@
           <span id="robot-health" class="pill" data-status="offline">Robot: offline</span>
           <span id="camera-health" class="pill" data-status="offline">Camera: off</span>
           <span id="watch-health" class="pill" data-status="offline">Watch: waiting</span>
-          <span id="gaze-health" class="pill" data-status="offline">Pupil: waiting</span>
         </div>
         <div class="workspace-links">
           <a class="workspace-link active" href="/admin" aria-current="page">Admin</a>
@@ -34,7 +33,7 @@
             <p class="panel-kicker">Study control</p>
             <h1>Operator Dashboard</h1>
           </div>
-          <p id="mode-note" class="workspace-note">Set up the sitting, then run three rounds from one live deck.</p>
+          <p id="mode-note" class="workspace-note">Set up one participant, then run nine rounds across three sittings.</p>
         </header>
 
         <section id="guard-shell" class="panel" hidden>
@@ -58,9 +57,9 @@
               <div class="panel-header">
                 <div>
                   <p class="panel-kicker">Session</p>
-                  <h2>Sitting profile</h2>
+                  <h2>Participant study profile</h2>
                 </div>
-                <span class="panel-note">Study ID is the day: hti-YYYYMMDD. Participant ID is the person: P01, P02. Same P## for sittings 1–3.</span>
+                <span class="panel-note">The next P## is reserved automatically. The same record continues through all three sittings.</span>
               </div>
               <form id="session-form" class="stack-form">
                 <div class="field-grid">
@@ -77,20 +76,40 @@
                     <input id="session-researcher" type="text" placeholder="researcher name">
                   </label>
                   <label class="field">
-                    <span>Sitting</span>
-                    <select id="session-sitting-number">
-                      <option value="1">Sitting 1</option>
-                      <option value="2">Sitting 2</option>
-                      <option value="3">Sitting 3</option>
-                    </select>
+                    <span>Round duration (seconds)</span>
+                    <input id="session-round-duration" type="number" min="30" step="1" value="300">
                   </label>
                   <label class="field">
-                    <span>Condition</span>
-                    <select id="session-condition">
-                      <option value="adaptive">Adaptive</option>
-                      <option value="control">Control</option>
+                    <span>Constant reminder interval (seconds)</span>
+                    <input id="session-constant-interval" type="number" min="5" step="1" value="30">
+                  </label>
+                  <label class="field">
+                    <span>Age (researcher copy)</span>
+                    <input id="admin-participant-age" type="number" min="18" max="120" step="1">
+                  </label>
+                  <label class="field">
+                    <span>Gender (researcher copy)</span>
+                    <select id="admin-participant-gender">
+                      <option value="">Select…</option>
+                      <option value="woman">Woman</option>
+                      <option value="man">Man</option>
+                      <option value="non-binary">Non-binary</option>
+                      <option value="self-describe">Self-describe</option>
+                      <option value="prefer-not-to-say">Prefer not to say</option>
                     </select>
                   </label>
+                  <label id="admin-gender-self-field" class="field" hidden>
+                    <span>Self-described gender</span>
+                    <input id="admin-participant-gender-self" type="text" maxlength="120">
+                  </label>
+                </div>
+                <label class="consent-row">
+                  <input id="admin-participant-consent" type="checkbox">
+                  <span id="admin-consent-statement">I confirm that the participant gave consent using the statement shown on their screen.</span>
+                </label>
+                <div class="callout">
+                  <span class="callout-label">Assigned condition order</span>
+                  <p id="condition-order-summary">Saved after the participant ID and nine puzzle pairs are available.</p>
                 </div>
                 <label class="field">
                   <span>Notes</span>
@@ -110,7 +129,7 @@
                 </div>
               </div>
               <form id="puzzle-upload-form" class="stack-form">
-                <p class="panel-note">Sitting 1 uses puzzles 1–3, sitting 2 uses 4–6, sitting 3 uses 7–9. Those pairs load from the tangram puzzles folder when you save the profile.</p>
+                <p class="panel-note">Nine puzzle pairs are shuffled once for this participant, then assigned to the three counterbalanced condition blocks.</p>
                 <label class="field">
                   <span>Replace a file (optional)</span>
                   <input id="puzzle-upload-input" type="file" multiple accept=".pdf,.png,.jpg,.jpeg,.webp">
@@ -123,7 +142,7 @@
               </form>
               <div class="library-split">
                 <div class="callout">
-                  <span class="callout-label">This sitting's queue</span>
+                  <span class="callout-label">Participant's nine-round schedule</span>
                   <div id="queue-list" class="queue-list"></div>
                 </div>
                 <div class="callout">
@@ -137,17 +156,28 @@
               </div>
             </section>
 
+            <section class="panel panel-wide">
+              <div class="panel-header">
+                <div>
+                  <p class="panel-kicker">Before the study</p>
+                  <h2>Researcher read-aloud script</h2>
+                </div>
+              </div>
+              <ol id="subject-instruction-script" class="instruction-list"></ol>
+              <p class="panel-note">This operational script supplements—not replaces—the approved participant information sheet and ethics materials.</p>
+            </section>
+
             <section class="panel live-panel panel-wide">
               <div class="panel-header">
                 <div>
                   <p class="panel-kicker">Readiness</p>
-                  <h2>Begin sitting</h2>
+                  <h2>Begin participant study</h2>
                 </div>
               </div>
               <div id="readiness-list" class="readiness-list"></div>
-              <p id="screen-links" class="panel-note">Start the C270 in the camera panel, then return here to begin. Pupil Capture must use the glasses camera, not the Logitech.</p>
+              <p id="screen-links" class="panel-note">Start the C270 in the camera panel, then open and arm the participant and robot screens.</p>
               <div class="button-row">
-                <button id="session-start" class="button button-primary" type="button">Begin sitting</button>
+                <button id="session-start" class="button button-primary" type="button">Begin study</button>
                 <button id="reset-session-setup" class="button button-ghost" type="button">Reset session</button>
               </div>
             </section>
@@ -208,15 +238,17 @@
                     <span class="callout-label">Last sample</span>
                     <strong id="hrv-updated">No HRV sample yet.</strong>
                   </article>
-                  <article class="metric-card">
-                    <span class="callout-label">Gaze confidence</span>
-                    <strong id="gaze-attention">--</strong>
-                  </article>
-                  <article class="metric-card">
-                    <span class="callout-label">Last gaze frame</span>
-                    <strong id="gaze-updated">No Pupil frame yet.</strong>
-                  </article>
                 </div>
+                <div id="hrv-spike-alert" class="callout hrv-spike-alert" hidden>
+                  <span class="callout-label">Adaptive intervention signal</span>
+                  <strong>HRV stress spike detected</strong>
+                  <p id="hrv-spike-detail">Review the signal and decide whether to intervene.</p>
+                </div>
+                <div class="button-row">
+                  <button id="watch-calibrate" class="button button-ghost" type="button">Recalibrate watch</button>
+                  <button id="operator-sound" class="button button-ghost" type="button">Enable operator alerts</button>
+                </div>
+                <p id="watch-calibration-status" class="panel-note">Calibration status will appear here.</p>
                 <div hidden>
                   <strong id="hrv-sdnn">--</strong>
                   <strong id="hrv-pnn50">--</strong>
@@ -305,14 +337,26 @@
                   <div class="callout">
                     <span class="callout-label">Status</span>
                     <p id="session-status-summary">SETUP</p>
-                    <p id="session-status-detail">Queue puzzles, then begin the sitting.</p>
+                    <p id="session-status-detail">Complete setup, then begin the participant study.</p>
+                  </div>
+                  <div id="constant-reminder" class="callout" hidden>
+                    <span class="callout-label">Constant intervention</span>
+                    <p id="constant-reminder-text">Next researcher reminder in 30 seconds.</p>
+                  </div>
+                  <div id="round-survey-status" class="callout" hidden>
+                    <span class="callout-label">Participant questionnaire</span>
+                    <p id="round-survey-status-text">Waiting for the participant.</p>
+                    <button id="skip-round-survey" class="button button-ghost" type="button">Skip with reason</button>
                   </div>
                   <div class="button-row">
                     <button id="round-start" class="button button-primary" type="button">Start round</button>
+                    <button id="round-pause" class="button button-ghost" type="button">Pause timer</button>
+                    <button id="round-resume" class="button button-ghost" type="button">Resume timer</button>
                     <button id="round-complete" class="button button-ghost" type="button">Complete round</button>
                   </div>
                   <div class="button-row">
-                    <button id="session-complete" class="button button-ghost" type="button">End sitting</button>
+                    <button id="resume-sitting" class="button button-primary" type="button" hidden>Begin next sitting</button>
+                    <button id="session-complete" class="button button-ghost" type="button">End study</button>
                     <button id="reset-session" class="button button-ghost" type="button">Reset session</button>
                   </div>
                 </section>
@@ -336,7 +380,7 @@
             <div class="panel-header">
               <div>
                 <p class="panel-kicker">Review</p>
-                <h2>Sitting complete</h2>
+                <h2>Study complete</h2>
               </div>
             </div>
             <p id="review-summary" class="workspace-note">Download the export, then reset for the next participant.</p>

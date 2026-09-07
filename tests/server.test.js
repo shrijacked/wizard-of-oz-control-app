@@ -81,22 +81,6 @@ async function markSensorsLive(baseUrl) {
   });
   assert.equal(hrv.status, 200);
 
-  const heartbeat = await postJson(baseUrl, '/api/bridge/gaze/heartbeat', {
-    bridgeId: 'pupil-core',
-    deviceLabel: 'Pupil Core',
-  });
-  assert.equal(heartbeat.status, 200);
-
-  const frame = await postJson(baseUrl, '/api/bridge/gaze/frame', {
-    bridgeId: 'pupil-core',
-    deviceLabel: 'Pupil Core',
-    frame: {
-      attentionScore: 0.82,
-      fixationLoss: 0.18,
-      pupilDilation: 0.44,
-    },
-  });
-  assert.equal(frame.status, 200);
 }
 
 async function connectDisplayScreens(baseUrl) {
@@ -171,7 +155,7 @@ test('server serves the simplified three-screen routes and aliases /audit to /ro
     assert.match(adminHtml, /Operator Dashboard/i);
     assert.match(adminHtml, /Start camera/i);
     assert.match(adminHtml, /Robot cue controls/i);
-    assert.match(adminHtml, /Begin sitting/i);
+    assert.match(adminHtml, /Begin study/i);
     assert.match(adminHtml, /id="round-start"/);
     assert.match(subjectHtml, /Participant Display/i);
     assert.match(subjectHtml, />Hint</i);
@@ -598,7 +582,7 @@ test('camera controller assets remain reachable from the single admin page build
   }
 });
 
-test('starting a sitting is rejected until camera, watch, and Pupil frames are live', async () => {
+test('starting a sitting is rejected until camera and watch data are live', async () => {
   const { app, baseUrl } = await startApp();
 
   try {
@@ -622,22 +606,6 @@ test('starting a sitting is rejected until camera, watch, and Pupil frames are l
     await postJson(baseUrl, '/api/telemetry/hrv', {
       metrics: { hr: 72, rmssd: 30 },
       stressLevel: 'Not Stressed',
-    });
-    await postJson(baseUrl, '/api/bridge/gaze/heartbeat', {
-      bridgeId: 'pupil-core',
-      deviceLabel: 'Pupil Core',
-    });
-    const heartbeatOnly = await postJson(baseUrl, '/api/session/start', { operator: 'Shrijacked' });
-    assert.equal(heartbeatOnly.status, 409);
-
-    await postJson(baseUrl, '/api/bridge/gaze/frame', {
-      bridgeId: 'pupil-core',
-      deviceLabel: 'Pupil Core',
-      frame: {
-        attentionScore: 0.82,
-        fixationLoss: 0.18,
-        pupilDilation: 0.44,
-      },
     });
     await startSitting(baseUrl);
     screens.subject.socket.close();

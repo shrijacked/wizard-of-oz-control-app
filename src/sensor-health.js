@@ -20,6 +20,18 @@ function summarizeWatchHealth(status = {}, now = new Date(), options = {}) {
   const telemetryAgeSeconds = ageSeconds(options.telemetryUpdatedAt, now);
   const liveAgeSeconds = processedAgeSeconds ?? telemetryAgeSeconds;
 
+  if (options.calibration?.active) {
+    return {
+      name: 'watch',
+      level: 'info',
+      state: 'calibrating',
+      stale: false,
+      ageSeconds: liveAgeSeconds,
+      summary: `Watch baseline calibration is ${Math.round(Number(options.calibration.progress) || 0)}% complete.`,
+      detail: 'Keep the participant still and relaxed until calibration finishes.',
+    };
+  }
+
   if (status.lastError) {
     return {
       name: 'watch',
@@ -81,61 +93,6 @@ function summarizeWatchHealth(status = {}, now = new Date(), options = {}) {
   };
 }
 
-function summarizeGazeHealth(status = {}, now = new Date()) {
-  const staleAfterMs = Number(status.staleAfterMs || 15000);
-  const frameAgeSeconds = ageSeconds(status.lastFrameAt, now);
-
-  if (status.lastError) {
-    return {
-      name: 'gaze',
-      level: 'error',
-      state: 'error',
-      stale: false,
-      ageSeconds: frameAgeSeconds,
-      summary: 'Pupil Core reported an error.',
-      detail: status.lastError,
-    };
-  }
-
-  if (!status.lastFrameAt) {
-    return {
-      name: 'gaze',
-      level: 'info',
-      state: 'waiting',
-      stale: false,
-      ageSeconds: null,
-      summary: 'Pupil Core has not sent a gaze frame yet.',
-      detail: status.bridgeId
-        ? `Bridge ${status.deviceLabel || status.bridgeId} is connected, but no gaze frame has arrived. Heartbeats are not enough.`
-        : 'Start Pupil Capture and the Pupil Core bridge so gaze frames reach this app.',
-    };
-  }
-
-  if (frameAgeSeconds != null && (frameAgeSeconds * 1000) > staleAfterMs) {
-    return {
-      name: 'gaze',
-      level: 'warning',
-      state: 'stale',
-      stale: true,
-      ageSeconds: frameAgeSeconds,
-      summary: 'Pupil Core gaze is stale.',
-      detail: `The last gaze frame was received ${frameAgeSeconds}s ago.`,
-    };
-  }
-
-  return {
-    name: 'gaze',
-    level: 'healthy',
-    state: 'healthy',
-    stale: false,
-    ageSeconds: frameAgeSeconds,
-    summary: 'Pupil Core gaze looks healthy.',
-    detail: frameAgeSeconds == null
-      ? `Bridge ${status.deviceLabel || status.bridgeId} is sending gaze frames.`
-      : `The last gaze frame was received ${frameAgeSeconds}s ago.`,
-  };
-}
-
 function severityRank(level) {
   if (level === 'error') {
     return 3;
@@ -156,18 +113,14 @@ function summarizeSensorHealth(input = {}, now = new Date(), options = {}) {
   const watch = summarizeWatchHealth(input.watchBridge || {}, now, {
     ...(options.watch || {}),
     telemetryUpdatedAt: input.telemetry?.hrv?.updatedAt,
+    calibration: input.telemetry?.hrv?.calibration,
   });
-  const gaze = summarizeGazeHealth(input.gazeBridge || {}, now);
   const sessionStatus = input.sessionStatus || 'setup';
 
   const issues = [];
   if (watch.level !== 'healthy') {
     issues.push(watch);
   }
-  if (gaze.level !== 'healthy') {
-    issues.push(gaze);
-  }
-
   let overallLevel = issues.length === 0 ? 'healthy' : 'info';
   if (issues.some((issue) => issue.level === 'error')) {
     overallLevel = 'error';
@@ -177,7 +130,7 @@ function summarizeSensorHealth(input = {}, now = new Date(), options = {}) {
     overallLevel = 'warning';
   }
 
-  let summary = 'All sensor streams look healthy.';
+  let summary = 'Watch telemetry looks healthy.';
   if (issues.length > 0) {
     summary = issues.map((issue) => issue.summary).join(' ');
   }
@@ -196,13 +149,11 @@ function summarizeSensorHealth(input = {}, now = new Date(), options = {}) {
       sessionStatus,
     },
     watch,
-    gaze,
   };
 }
 
 module.exports = {
   ageSeconds,
-  summarizeGazeHealth,
   summarizeSensorHealth,
   summarizeWatchHealth,
 };

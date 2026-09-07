@@ -4,7 +4,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const DEFAULT_STUDY_CONFIG = Object.freeze({
-  plannedRounds: 3,
+  plannedRounds: 9,
+  roundsPerSitting: 3,
+  roundDurationSeconds: 300,
+  constantIntervalSeconds: 30,
   slotCount: 7,
   tangramPuzzlesDir: 'tangram puzzles',
   pieces: [
@@ -39,6 +42,16 @@ function normalizeStudyConfig(raw = {}) {
     ? Math.floor(raw.slotCount)
     : DEFAULT_STUDY_CONFIG.slotCount;
 
+  const roundsPerSitting = Number.isFinite(raw.roundsPerSitting) && raw.roundsPerSitting > 0
+    ? Math.floor(raw.roundsPerSitting)
+    : DEFAULT_STUDY_CONFIG.roundsPerSitting;
+  const roundDurationSeconds = Number.isFinite(raw.roundDurationSeconds) && raw.roundDurationSeconds >= 30
+    ? Math.floor(raw.roundDurationSeconds)
+    : DEFAULT_STUDY_CONFIG.roundDurationSeconds;
+  const constantIntervalSeconds = Number.isFinite(raw.constantIntervalSeconds) && raw.constantIntervalSeconds >= 5
+    ? Math.floor(raw.constantIntervalSeconds)
+    : DEFAULT_STUDY_CONFIG.constantIntervalSeconds;
+
   const pieces = Array.isArray(raw.pieces)
     ? raw.pieces.map((piece, index) => normalizePiece(piece, index)).filter(Boolean)
     : [];
@@ -52,6 +65,9 @@ function normalizeStudyConfig(raw = {}) {
 
   return {
     plannedRounds,
+    roundsPerSitting,
+    roundDurationSeconds,
+    constantIntervalSeconds,
     slotCount,
     tangramPuzzlesDir,
     pieces: pieces.length ? pieces : DEFAULT_STUDY_CONFIG.pieces.map((piece) => ({ ...piece })),
@@ -80,6 +96,9 @@ function saveStudyConfig(config, configPath = path.join(process.cwd(), 'config',
   const normalized = normalizeStudyConfig(config);
   const payload = {
     plannedRounds: normalized.plannedRounds,
+    roundsPerSitting: normalized.roundsPerSitting,
+    roundDurationSeconds: normalized.roundDurationSeconds,
+    constantIntervalSeconds: normalized.constantIntervalSeconds,
     slotCount: normalized.slotCount,
     tangramPuzzlesDir: normalized.tangramPuzzlesDir,
     pieces: normalized.pieces,

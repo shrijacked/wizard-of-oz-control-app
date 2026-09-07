@@ -10,13 +10,13 @@ const { AdminGuard } = require('./admin-guard');
 const { ExperimentStore } = require('./store');
 const { WebSocketHub } = require('./websocket-hub');
 const { WatchBridge } = require('./watch-bridge');
-const { GazeBridge } = require('./gaze-bridge');
 const { getLocalNetworkAddresses } = require('./network');
 const { LlmAdvisor } = require('./llm-advisor');
 const { summarizeSensorHealth } = require('./sensor-health');
 const { summarizePreflight } = require('./preflight');
 const { assertPolicy, buildPolicy } = require('./session-policy');
 const { loadStudyConfig, normalizeStudyConfig, saveStudyConfig } = require('./study-config');
+const { CONSENT_STATEMENT, SUBJECT_INSTRUCTIONS } = require('./surveys');
 
 // Requests carry base64-encoded puzzle uploads (up to ~8 MB raw), so the JSON
 // body cap sits above that with headroom but still bounds memory per request.
@@ -134,14 +134,44 @@ function roleState(store, role, systemStatus) {
   const state = store.getState();
 
   if (role === 'subject') {
+    const pendingRound = state.session.awaitingRoundSurvey
+      ? state.session.rounds.find((round) => round.index === state.session.awaitingRoundSurvey)
+      : null;
     return {
       session: {
+        id: state.session.id,
         status: state.session.status,
+        participantId: state.session.metadata.participantId,
+        plannedRounds: state.session.plannedRounds,
+        roundsPerSitting: state.session.roundsPerSitting,
+        completedRounds: state.session.rounds.length,
+        betweenSittings: state.session.betweenSittings,
+        awaitingRoundSurvey: state.session.awaitingRoundSurvey,
+        finalSurveyRequired: state.session.finalSurveyRequired,
+        finalSurveySubmitted: Boolean(state.session.finalSurvey),
+        participantProfile: state.session.participantProfiles?.subject || null,
+        roundDurationSeconds: state.session.metadata.roundDurationSeconds,
         activeRound: state.session.activeRound
-          ? { index: state.session.activeRound.index }
+          ? {
+            index: state.session.activeRound.index,
+            sittingNumber: state.session.activeRound.sittingNumber,
+            startedAt: state.session.activeRound.startedAt,
+            pauseStartedAt: state.session.activeRound.pauseStartedAt,
+            pausedDurationSeconds: state.session.activeRound.pausedDurationSeconds,
+          }
           : null,
+        pendingSurvey: pendingRound ? {
+          roundIndex: pendingRound.index,
+          sittingNumber: pendingRound.sittingNumber,
+          condition: pendingRound.condition,
+        } : null,
       },
       hint: state.hint,
+      robotCueUpdatedAt: state.robotAction.updatedAt,
+      study: {
+        consentStatement: CONSENT_STATEMENT,
+        instructions: SUBJECT_INSTRUCTIONS,
+      },
     };
   }
 
@@ -217,6 +247,9 @@ async function createApp(options = {}) {
     adaptiveEngine: options.adaptiveEngine,
     llmAdvisor: options.llmAdvisor || new LlmAdvisor(),
     plannedRounds: studyConfig.plannedRounds,
+    roundsPerSitting: studyConfig.roundsPerSitting,
+    roundDurationSeconds: studyConfig.roundDurationSeconds,
+    constantIntervalSeconds: studyConfig.constantIntervalSeconds,
     tangramPuzzlesDir,
   });
 
@@ -239,10 +272,6 @@ async function createApp(options = {}) {
     store,
     watchFilePath: options.watchFilePath || path.join(process.cwd(), 'watch', 'watch_data.json'),
   });
-  const gazeBridge = options.gazeBridge || new GazeBridge({
-    store,
-  });
-
   await store.initialize();
   await watchBridge.start();
 
@@ -251,27 +280,29 @@ async function createApp(options = {}) {
   const getBaseSystemStatus = () => {
     const state = store.getState();
     const watchStatus = watchBridge.getStatus();
-    const gazeStatus = gazeBridge.getStatus();
     const connections = hub.getConnectionStats();
     const sensorHealth = summarizeSensorHealth({
       sessionStatus: state.session.status,
       watchBridge: watchStatus,
-      gazeBridge: gazeStatus,
       telemetry: state.telemetry,
     });
 
     return {
       watchBridge: watchStatus,
-      gazeBridge: gazeStatus,
       sensorHealth,
       camera: { ...cameraStatus },
       safeguards: adminGuard.getPublicStatus(),
       connections,
       study: {
         plannedRounds: studyConfig.plannedRounds,
+        roundsPerSitting: studyConfig.roundsPerSitting,
+        roundDurationSeconds: studyConfig.roundDurationSeconds,
+        constantIntervalSeconds: studyConfig.constantIntervalSeconds,
         slotCount: studyConfig.slotCount,
         pieces: studyConfig.pieces,
         hintPresets: studyConfig.hintPresets,
+        consentStatement: CONSENT_STATEMENT,
+        instructions: SUBJECT_INSTRUCTIONS,
       },
       screens: {
         subject: {
@@ -412,11 +443,6 @@ async function createApp(options = {}) {
 
       if (request.method === 'GET' && pathname === '/api/network') {
         json(response, 200, getSystemStatus().network);
-        return;
-      }
-
-      if (request.method === 'GET' && pathname === '/api/bridge/gaze') {
-        json(response, 200, gazeBridge.getStatus());
         return;
       }
 
@@ -607,13 +633,6 @@ async function createApp(options = {}) {
         return;
       }
 
-      if (request.method === 'POST' && pathname === '/api/telemetry/gaze') {
-        const body = await readJsonBody(request);
-        const state = await store.ingestGazeTelemetry(body, { source: body.source || 'api' });
-        json(response, 200, state);
-        return;
-      }
-
       if (request.method === 'POST' && pathname === '/api/telemetry/simulate') {
         adminGuard.assertAuthorized(getAdminToken(request));
         assertPolicy(store.getState(), 'simulateTelemetry');
@@ -682,6 +701,28 @@ async function createApp(options = {}) {
           source: 'admin',
         });
         json(response, 200, state);
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/rounds/pause') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        assertPolicy(store.getState(), 'pauseRound');
+        const body = await readJsonBody(request);
+        json(response, 200, await store.pauseRound({
+          operator: body.operator || 'researcher',
+          source: 'admin',
+        }));
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/rounds/resume') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        assertPolicy(store.getState(), 'resumeRound');
+        const body = await readJsonBody(request);
+        json(response, 200, await store.resumeRound({
+          operator: body.operator || 'researcher',
+          source: 'admin',
+        }));
         return;
       }
 
@@ -766,15 +807,55 @@ async function createApp(options = {}) {
         return;
       }
 
-      if (request.method === 'POST' && pathname === '/api/bridge/gaze/heartbeat') {
+      if (request.method === 'POST' && pathname === '/api/watch/calibrate') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        const state = store.getState();
+        if (state.session.activeRound) {
+          const error = new Error('Pause or complete the active round before recalibrating the watch.');
+          error.statusCode = 409;
+          throw error;
+        }
         const body = await readJsonBody(request);
-        json(response, 200, await gazeBridge.heartbeat(body));
+        const result = await watchBridge.requestCalibration({ requestedBy: body.requestedBy || 'researcher' });
+        await store.logSystemEvent({
+          type: 'watch.calibration.requested',
+          source: 'admin',
+          summary: `Watch recalibration requested by ${body.requestedBy || 'researcher'}.`,
+          payload: result,
+        });
+        json(response, 200, result);
         return;
       }
 
-      if (request.method === 'POST' && pathname === '/api/bridge/gaze/frame') {
+      if (request.method === 'POST' && pathname === '/api/participant/profile') {
         const body = await readJsonBody(request);
-        json(response, 200, await gazeBridge.ingestFrame(body));
+        await store.submitParticipantProfile(body);
+        json(response, 200, roleState(store, 'subject', getSystemStatus()));
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/surveys/round') {
+        const body = await readJsonBody(request);
+        await store.submitRoundSurvey(body);
+        json(response, 200, roleState(store, 'subject', getSystemStatus()));
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/surveys/round/skip') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        const body = await readJsonBody(request);
+        json(response, 200, await store.skipRoundSurvey({
+          ...body,
+          operator: body.operator || 'researcher',
+          source: 'admin',
+        }));
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/surveys/final') {
+        const body = await readJsonBody(request);
+        await store.submitFinalSurvey(body);
+        json(response, 200, roleState(store, 'subject', getSystemStatus()));
         return;
       }
 
@@ -805,6 +886,10 @@ async function createApp(options = {}) {
           condition: body.condition,
           researcher: body.researcher,
           notes: body.notes,
+          roundDurationSeconds: body.roundDurationSeconds,
+          constantIntervalSeconds: body.constantIntervalSeconds,
+          adminProfile: body.adminProfile,
+          actor: body.actor || body.researcher || 'researcher',
           source: 'admin',
         });
         json(response, 200, state);
@@ -820,6 +905,17 @@ async function createApp(options = {}) {
           source: 'admin',
         });
         json(response, 200, state);
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/session/resume-sitting') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        assertPolicy(store.getState(), 'resumeSitting');
+        const body = await readJsonBody(request);
+        json(response, 200, await store.resumeNextSitting({
+          operator: body.operator || 'researcher',
+          source: 'admin',
+        }));
         return;
       }
 
@@ -899,7 +995,6 @@ async function createApp(options = {}) {
     server,
     store,
     watchBridge,
-    gazeBridge,
     hub,
     studyConfig,
     close() {

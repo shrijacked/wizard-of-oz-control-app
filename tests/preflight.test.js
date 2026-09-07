@@ -14,7 +14,6 @@ function readySystem() {
     camera: { live: true, deviceLabel: 'HD Pro Webcam C270' },
     sensorHealth: {
       watch: { state: 'healthy', detail: 'HRV sample 1s ago.' },
-      gaze: { state: 'healthy', detail: 'Gaze frame 1s ago.' },
     },
   };
 }
@@ -41,7 +40,6 @@ test('preflight blocks setup when screens, camera, or sensors are missing', () =
       camera: { live: false },
       sensorHealth: {
         watch: { state: 'waiting', summary: 'Watch telemetry is waiting for its first sample.' },
-        gaze: { state: 'waiting', summary: 'Pupil Core has not sent a gaze frame yet.' },
       },
     },
   });
@@ -51,7 +49,7 @@ test('preflight blocks setup when screens, camera, or sensors are missing', () =
   assert.ok(summary.blockers.some((item) => item.id === 'metadata'));
   assert.ok(summary.blockers.some((item) => item.id === 'camera'));
   assert.ok(summary.blockers.some((item) => item.id === 'robot-display'));
-  assert.ok(summary.blockers.some((item) => item.id === 'gaze-telemetry'));
+  assert.equal(summary.blockers.some((item) => item.id === 'gaze-telemetry'), false);
 });
 
 test('preflight marks setup ready once sitting queue, screens, camera, and sensors are live', () => {
@@ -74,4 +72,31 @@ test('preflight marks setup ready once sitting queue, screens, camera, and senso
   assert.equal(summary.requiredReady, true);
   assert.equal(summary.blockingCount, 0);
   assert.match(summary.summary, /ready for participant/i);
+});
+
+test('nine-round preflight requires matching participant and researcher profile copies', () => {
+  const schedule = Array.from({ length: 9 }, (_, index) => ({ roundIndex: index + 1 }));
+  const profile = { age: 29, gender: 'woman', genderSelfDescribe: '', consented: true };
+  const state = {
+    session: {
+      status: 'setup',
+      plannedRounds: 9,
+      metadata: { participantId: 'P01', researcher: 'Researcher', sittingNumber: 1 },
+      queue: schedule,
+      schedule,
+      conditionOrder: ['control', 'constant', 'adaptive'],
+      randomizationSeed: 'hti:P01',
+      participantProfiles: {
+        admin: profile,
+        subject: { ...profile, instructionsAcknowledged: true, expectedEfficacy: 4 },
+      },
+    },
+  };
+  const ready = summarizePreflight({ state, system: readySystem() });
+  assert.equal(ready.requiredReady, true);
+
+  state.session.participantProfiles.admin.age = 30;
+  const mismatch = summarizePreflight({ state, system: readySystem() });
+  assert.equal(mismatch.requiredReady, false);
+  assert.ok(mismatch.blockers.some((item) => item.id === 'profile-crosscheck'));
 });

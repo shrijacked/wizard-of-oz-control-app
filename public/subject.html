@@ -3,24 +3,81 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Participant Hint Display</title>
+    <title>Participant Display — Study Screen</title>
     <link rel="stylesheet" href="/styles.css">
   </head>
   <body class="display-page subject-display">
     <div id="connection-badge" class="connection-badge" hidden>Reconnecting…</div>
-    <main class="display-shell hint-only-layout">
-      <section class="display-card subject-hint-card">
-        <p class="display-kicker">Participant Display</p>
-        <h1>Hint</h1>
+    <main class="display-shell participant-shell">
+      <header class="participant-header">
+        <div><p class="display-kicker">Tangram study</p><strong id="participant-id-label">Participant</strong></div>
         <div class="display-alert-controls">
-          <button id="subject-sound-toggle" class="button button-primary" type="button">Enable alert sound</button>
-          <small id="subject-sound-status" class="display-meta">Tap once on this screen so new hints play a beep.</small>
+          <button id="subject-sound-toggle" class="button button-primary" type="button">Enable study sounds</button>
+          <small id="subject-sound-status" class="display-meta">Tap once so timer and hint alerts can play.</small>
         </div>
+      </header>
+
+      <section id="subject-onboarding" class="display-card participant-card" hidden>
+        <p class="display-kicker">Before the study</p><h1>Welcome</h1>
+        <ol id="subject-instructions" class="instruction-list"></ol>
+        <form id="participant-profile-form" class="stack-form participant-form">
+          <div class="field-grid">
+            <label class="field"><span>Participant ID</span><input id="subject-participant-id" readonly></label>
+            <label class="field"><span>Age</span><input id="subject-age" type="number" min="18" max="120" required></label>
+            <label class="field"><span>Gender</span><select id="subject-gender" required>
+              <option value="">Select one</option><option value="woman">Woman</option><option value="man">Man</option>
+              <option value="non-binary">Non-binary</option><option value="self-describe">Prefer to self-describe</option>
+              <option value="prefer-not-to-say">Prefer not to say</option>
+            </select></label>
+            <label id="subject-gender-self-field" class="field" hidden><span>Self-describe</span><input id="subject-gender-self" type="text"></label>
+          </div>
+          <fieldset class="survey-question">
+            <legend>Before starting, how effective do you expect the robot assistance to be?</legend>
+            <div class="scale-row" data-scale-name="expectedEfficacy" data-low="Not effective at all" data-high="Extremely effective"></div>
+          </fieldset>
+          <label class="checkbox-field"><input id="subject-instructions-check" type="checkbox" required><span>I have read or heard the study instructions and had an opportunity to ask questions.</span></label>
+          <label class="checkbox-field"><input id="subject-consent" type="checkbox" required><span id="subject-consent-copy"></span></label>
+          <button class="button button-primary" type="submit">Save and continue</button>
+          <p id="participant-profile-status" class="inline-status"></p>
+        </form>
+      </section>
+
+      <section id="subject-waiting" class="display-card participant-card" hidden>
+        <p class="display-kicker">Ready</p><h1>Waiting for the researcher</h1>
+        <p>Your details are saved. The researcher will begin when all equipment is ready.</p>
+      </section>
+
+      <section id="subject-round" class="display-card subject-hint-card" hidden>
+        <div class="participant-round-head"><div><p class="display-kicker" id="subject-round-label">Puzzle</p><h1>Hint</h1></div><strong id="subject-timer" class="subject-timer">05:00</strong></div>
+        <p id="subject-timer-status" class="display-meta">Waiting for the timer.</p>
         <p id="subject-hint" class="display-message" aria-live="assertive">Waiting for a hint from the researcher.</p>
         <small id="subject-updated" class="display-meta">No broadcast received yet.</small>
       </section>
-    </main>
 
+      <section id="subject-round-survey" class="display-card participant-card" hidden>
+        <p class="display-kicker" id="round-survey-label">After puzzle</p><h1>Short questionnaire</h1>
+        <form id="round-survey-form" class="stack-form participant-form"><div id="round-survey-questions"></div>
+          <button class="button button-primary" type="submit">Submit questionnaire</button><p id="round-survey-status" class="inline-status"></p>
+        </form>
+      </section>
+
+      <section id="subject-break" class="display-card participant-card" hidden>
+        <p class="display-kicker">Sitting complete</p><h1>Take a short break</h1>
+        <p>The researcher will tell you when the next group of three puzzles is ready.</p>
+      </section>
+
+      <section id="subject-final-survey" class="display-card participant-card" hidden>
+        <p class="display-kicker">After all nine puzzles</p><h1>Final questionnaire</h1>
+        <form id="final-survey-form" class="stack-form participant-form"><div id="final-survey-questions"></div>
+          <label class="field"><span>Is there anything else you would like us to know?</span><textarea id="final-comment" rows="5" maxlength="4000"></textarea></label>
+          <button class="button button-primary" type="submit">Finish questionnaire</button><p id="final-survey-status" class="inline-status"></p>
+        </form>
+      </section>
+
+      <section id="subject-complete" class="display-card participant-card" hidden>
+        <p class="display-kicker">Complete</p><h1>Thank you</h1><p>Your responses have been saved.</p>
+      </section>
+    </main>
     <script type="module" src="/subject.js"></script>
   </body>
 </html>

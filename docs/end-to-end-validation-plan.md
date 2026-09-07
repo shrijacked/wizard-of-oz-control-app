@@ -1,102 +1,36 @@
 # End-to-End Validation Plan
 
-This plan validates the three-screen study flow from setup to export.
+This pass validates the complete three-screen, nine-round participant study.
 
-## Goal
+## Setup and onboarding
 
-Prove that:
+1. Start `npm run launch:study`.
+2. Open `/admin`, `/subject`, and `/robot`; arm sound on both secondary screens.
+3. Start the C270 and confirm live watch data.
+4. Confirm `/admin` shows a unique P##, all nine puzzle pairs exactly once, and a three-condition order.
+5. Enter matching researcher and participant demographic/consent copies. On `/subject`, also submit instruction acknowledgement and baseline expected efficacy.
 
-- the operator dashboard works from a single page
-- `/subject` shows only the written hint plus a beep
-- `/robot` shows only the piece-and-slot cue plus a beep
-- the operator keeps the C270 and the current solution
-- **Begin sitting** stays blocked until camera, watch, Pupil frames, both screens, and the sitting queue are live
-- saving sitting 2 auto-queues puzzles 4, 5, and 6
-- the session export captures sitting metadata, per-round filenames, durations, and piece+slot interventions
+Expected: **Begin study** stays blocked until the copies match, displays and hardware are ready, watch calibration is finished, and all nine puzzles are scheduled.
 
-## Validation checklist
+## Round and intervention flow
 
-### 1. Route contract
+For each of nine rounds:
 
-Open these pages and confirm they load:
+1. Start the round and confirm the participant countdown and start sound.
+2. Pause/resume at least one round; confirm time freezes and the saved duration excludes the pause.
+3. Confirm midpoint and end patterns in a shortened rehearsal configuration.
+4. Confirm interventions are disabled in control, the configured reminder appears in constant, and a new in-round HRV spike is highlighted in adaptive.
+5. Send a hint and robot cue in an intervention round; confirm screen updates, sound patterns, and logs.
+6. Complete the round and confirm the next round stays locked until the participant questionnaire is submitted.
+7. Confirm six workload questions always appear and four intervention questions appear only outside control.
 
-- `/admin`
-- `/subject`
-- `/robot`
+After rounds 3 and 6, confirm the break screen, optionally recalibrate the watch, wait for it to finish, and click **Begin next sitting**.
 
-Optional:
+## Final flow and export
 
-- `/audit` should redirect or behave as a compatibility alias to `/robot`
+1. After round 9, confirm the final helpfulness, efficacy, trust, automation-bias, and comment fields.
+2. Confirm **End study** stays disabled until the final survey is submitted.
+3. Download JSON and CSV; verify both profiles, baseline rating, condition order, shuffle seed, nine unique puzzle IDs, conditions, pauses, surveys, interventions, and recording metadata.
+4. Reset, confirm the P## increments, and confirm the previous ID is rejected if re-entered.
 
-### 2. Puzzle pairing
-
-On a fresh data directory, start the server so `tangram puzzles/` seeds sets `1`–`9`.
-
-Save sitting 2.
-
-Expected:
-
-- queue is `4`, `5`, `6` in that order
-- `/subject` still has no puzzle image
-- `/admin` solution pane stays empty until a round starts, then shows `4s.pdf`
-
-Upload fallback:
-
-- `1.pdf`
-- `1s.pdf`
-- one unmatched file such as `2.pdf`
-
-Expected:
-
-- set `1` appears as a complete pair
-- `2.pdf` appears in the incomplete uploads list
-
-### 3. Multi-screen propagation
-
-Arm `/subject` and `/robot`, start the C270, wait for watch and Pupil frames, begin sitting 1, and start round 1.
-
-Expected:
-
-- `/subject` shows the hint area only, not `1.pdf`
-- `/robot` shows the cue area only, not `1s.pdf`
-- `/admin` shows `1s.pdf` after the round starts
-- after tapping once on each display, both screens report that alert sound is ready
-
-### 4. Sitting start gate
-
-Expected:
-
-1. camera can start from setup, before **Begin sitting**
-2. **Begin sitting** stays disabled without C270 / watch / Pupil frames / armed screens
-3. a gaze heartbeat without a frame is not enough
-4. sending a hint updates `/subject` and triggers one subject-screen beep
-5. logging a robot cue updates `/robot` and triggers one robot-screen beep
-6. if the watch feed is connected, `/admin` shows fresh HRV values and updated time
-7. **End sitting** locks further interventions
-
-### 5. Export validation
-
-Download `/api/export/current.json`.
-
-Expected:
-
-- `sessionId` is present
-- `metadata.sittingNumber` matches the sitting
-- `roundsCompleted` matches finished rounds
-- each round has `puzzle.subjectFile` and `puzzle.solutionFile`
-- `interventions` are in timestamp order
-- the hint intervention includes `type=hint` and `text`
-- the robot intervention includes `type=robot`, `piece`, and `slot`
-
-## Suggested dry run
-
-1. Start Pupil Capture, then `npm run launch:study`.
-2. Open `/admin`, `/subject`, and `/robot`.
-3. Start the C270. Confirm Capture is not using it.
-4. Tap once on `/subject` and `/robot`.
-5. Save sitting 1 (or 2, or 3) and confirm the three puzzles queued.
-6. Click **Begin sitting** only after every readiness row is green.
-7. Start round 1, send one hint, send one robot cue.
-8. Complete three rounds, end the sitting, download JSON.
-
-A hardware pass cannot be claimed from unit tests alone. After code lands, rehearse once with C270 + Pupil Capture + the Maxim H Band on the study laptop.
+Automated tests cannot validate actual speaker volume, camera framing, or BLE quality. Complete one full hardware rehearsal on the study laptop before collection.

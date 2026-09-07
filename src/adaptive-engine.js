@@ -6,8 +6,7 @@ const DEFAULT_ADAPTIVE_CONFIGURATION = Object.freeze({
     intervene: 0.75,
   }),
   weights: Object.freeze({
-    hrv: 0.55,
-    gaze: 0.45,
+    hrv: 1,
   }),
   distractionBoost: 0.12,
   freshness: Object.freeze({
@@ -95,7 +94,7 @@ function normalizeStressLevel(level) {
   return 0.15;
 }
 
-function buildReason({ compositeScore, hrvScore, gazeScore, distractionDetected, hrvFreshness, gazeFreshness }) {
+function buildReason({ compositeScore, hrvScore, distractionDetected, hrvFreshness }) {
   if (compositeScore < 0.2) {
     return 'Telemetry is currently within the expected baseline range.';
   }
@@ -104,10 +103,6 @@ function buildReason({ compositeScore, hrvScore, gazeScore, distractionDetected,
 
   if (hrvFreshness > 0 && hrvScore >= 0.45) {
     reasons.push('HRV stress indicators are elevated');
-  }
-
-  if (gazeFreshness > 0 && gazeScore >= 0.4) {
-    reasons.push('visual attention appears unstable');
   }
 
   if (distractionDetected) {
@@ -149,16 +144,6 @@ function normalizeAdaptiveConfiguration(input = {}) {
     1,
   );
 
-  const rawHrvWeight = clamp(finiteNumber(merged.weights.hrv, DEFAULT_ADAPTIVE_CONFIGURATION.weights.hrv), 0, 1);
-  const rawGazeWeight = clamp(finiteNumber(merged.weights.gaze, DEFAULT_ADAPTIVE_CONFIGURATION.weights.gaze), 0, 1);
-  const weightTotal = rawHrvWeight + rawGazeWeight;
-  const weights = weightTotal === 0
-    ? DEFAULT_ADAPTIVE_CONFIGURATION.weights
-    : {
-      hrv: rawHrvWeight / weightTotal,
-      gaze: rawGazeWeight / weightTotal,
-    };
-
   const fullStrengthSeconds = Math.round(clamp(
     finiteNumber(merged.freshness.fullStrengthSeconds, DEFAULT_ADAPTIVE_CONFIGURATION.freshness.fullStrengthSeconds),
     15,
@@ -179,8 +164,7 @@ function normalizeAdaptiveConfiguration(input = {}) {
       intervene: round(intervene),
     },
     weights: {
-      hrv: round(weights.hrv),
-      gaze: round(weights.gaze),
+      hrv: 1,
     },
     distractionBoost: round(clamp(
       finiteNumber(merged.distractionBoost, DEFAULT_ADAPTIVE_CONFIGURATION.distractionBoost),
@@ -204,31 +188,20 @@ class AdaptiveEngine {
 
   evaluate(state, now = new Date()) {
     const hrv = state?.telemetry?.hrv || {};
-    const gaze = state?.telemetry?.gaze || {};
     const configuration = normalizeAdaptiveConfiguration(mergeAdaptiveConfiguration(
       this.defaultConfiguration,
       state?.adaptive?.configuration || {},
     ));
 
     const hrvFreshness = freshnessWeight(hrv.updatedAt, now, configuration.freshness);
-    const gazeFreshness = freshnessWeight(gaze.updatedAt, now, configuration.freshness);
 
     const hrvStressScore = clamp(
       Number.isFinite(hrv.stressScore) ? hrv.stressScore : normalizeStressLevel(hrv.stressLevel),
     );
-    const gazeAttentionLoss = clamp(1 - (Number.isFinite(gaze.attentionScore) ? gaze.attentionScore : 1));
-    const gazeFixationLoss = clamp(Number.isFinite(gaze.fixationLoss) ? gaze.fixationLoss : 0);
-    const pupilActivation = clamp(Number.isFinite(gaze.pupilDilation) ? gaze.pupilDilation : 0);
     const distractionDetected = Boolean(hrv.distractionDetected);
 
     const weightedHrvScore = clamp(hrvStressScore + (distractionDetected ? configuration.distractionBoost : 0)) * hrvFreshness;
-    const weightedGazeScore = clamp(
-      (gazeAttentionLoss * 0.5) + (gazeFixationLoss * 0.4) + (pupilActivation * 0.1),
-    ) * gazeFreshness;
-
-    const compositeScore = clamp(
-      (weightedHrvScore * configuration.weights.hrv) + (weightedGazeScore * configuration.weights.gaze),
-    );
+    const compositeScore = clamp(weightedHrvScore);
 
     let status = 'normal';
     if (compositeScore >= configuration.thresholds.intervene) {
@@ -237,7 +210,7 @@ class AdaptiveEngine {
       status = 'observe';
     }
 
-    if (hrvFreshness === 0 && gazeFreshness === 0) {
+    if (hrvFreshness === 0) {
       status = 'normal';
     }
 
@@ -247,19 +220,15 @@ class AdaptiveEngine {
       reason: buildReason({
         compositeScore,
         hrvScore: weightedHrvScore,
-        gazeScore: weightedGazeScore,
         distractionDetected,
         hrvFreshness,
-        gazeFreshness,
       }),
       updatedAt: toIsoDate(now),
       configuration,
       contributingSignals: {
         hrvScore: Number(weightedHrvScore.toFixed(2)),
-        gazeScore: Number(weightedGazeScore.toFixed(2)),
         distractionDetected,
         hrvFreshness: Number(hrvFreshness.toFixed(2)),
-        gazeFreshness: Number(gazeFreshness.toFixed(2)),
       },
     };
   }

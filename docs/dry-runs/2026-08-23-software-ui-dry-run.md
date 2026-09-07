@@ -8,7 +8,7 @@
 ## What passed
 
 - `npm test`: 57 passing
-- `npm run test:python`: watch and gaze scripts compile
+- `npm run test:python`: watch script compiles
 - Scripted sitting: 3 queued puzzles, 3 rounds, hint + piece/slot cue per round, export had `roundsCompleted: 3` and `Move ORANGE TRIANGLE to slot 1`
 - `/admin` loads setup mode with a real readiness list; Begin sitting stays disabled until checks pass
 - `/subject` arms sound and reports ready; operator pill changes to `Subject: ready`

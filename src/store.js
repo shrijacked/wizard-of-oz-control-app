@@ -15,6 +15,12 @@ const {
 const { LlmAdvisor } = require('./llm-advisor');
 const { createInitialPreflightAcknowledgements, normalizePreflightAcknowledgements } = require('./preflight');
 const { setIdsForSitting } = require('./sitting-queue');
+const { buildStudySchedule } = require('./study-design');
+const {
+  normalizeFinalSurvey,
+  normalizeProfile,
+  normalizeRoundSurvey,
+} = require('./surveys');
 const {
   normalizeRecordings,
   publicRecording,
@@ -56,10 +62,8 @@ function createInitialAdaptiveState(now = new Date()) {
     defaults: clone(DEFAULT_ADAPTIVE_CONFIGURATION),
     contributingSignals: {
       hrvScore: 0,
-      gazeScore: 0,
       distractionDetected: false,
       hrvFreshness: 0,
-      gazeFreshness: 0,
     },
   };
 }
@@ -249,10 +253,15 @@ function hydrateRound(round = {}) {
 
   return {
     index: Number(round.index) || 0,
+    sittingNumber: Number(round.sittingNumber) || Math.floor(((Number(round.index) || 1) - 1) / 3) + 1,
+    condition: String(round.condition || 'control'),
     puzzle,
     startedAt: round.startedAt || null,
+    pauseStartedAt: round.pauseStartedAt || null,
+    pausedDurationSeconds: Number(round.pausedDurationSeconds) || 0,
     completedAt: round.completedAt || null,
     durationSeconds: Number.isFinite(round.durationSeconds) ? round.durationSeconds : null,
+    survey: round.survey && typeof round.survey === 'object' ? clone(round.survey) : null,
   };
 }
 
@@ -284,16 +293,30 @@ function createInitialState(now = new Date(), options = {}) {
       completedSummary: null,
       metadata: {
         studyId: '',
-        participantId: '',
+        participantId: String(options.participantId || ''),
         sittingNumber: 1,
-        condition: 'adaptive',
+        condition: 'counterbalanced',
         researcher: '',
         notes: '',
+        roundDurationSeconds: Number(options.roundDurationSeconds) || 300,
+        constantIntervalSeconds: Number(options.constantIntervalSeconds) || 30,
       },
       plannedRounds,
+      roundsPerSitting: Number(options.roundsPerSitting) || 3,
+      conditionOrder: [],
+      randomizationSeed: null,
+      schedule: [],
       queue: [],
       rounds: [],
       activeRound: null,
+      awaitingRoundSurvey: null,
+      betweenSittings: false,
+      finalSurveyRequired: false,
+      finalSurvey: null,
+      participantProfiles: {
+        admin: null,
+        subject: null,
+      },
       puzzleSet: null,
       resetCount: 0,
       recordings: [],
@@ -322,17 +345,16 @@ function createInitialState(now = new Date(), options = {}) {
         distractionDetected: false,
         interpretation: 'Awaiting HRV data.',
         feedback: 'Start the watch monitor or post HRV telemetry.',
-      },
-      gaze: {
-        source: null,
-        updatedAt: null,
-        attentionScore: null,
-        fixationLoss: null,
-        pupilDilation: null,
+        calibration: {
+          active: false,
+          progress: 0,
+          startedAt: null,
+          completedAt: null,
+        },
+        spike: null,
       },
       history: {
         hrv: [],
-        gaze: [],
       },
     },
     adaptive: createInitialAdaptiveState(now),
@@ -367,6 +389,24 @@ function hydrateState(parsed, now = new Date()) {
       metadata: {
         ...initial.session.metadata,
         ...(parsed.session?.metadata || {}),
+      },
+      roundsPerSitting: Number(parsed.session?.roundsPerSitting) || initial.session.roundsPerSitting,
+      conditionOrder: Array.isArray(parsed.session?.conditionOrder) ? parsed.session.conditionOrder : [],
+      randomizationSeed: parsed.session?.randomizationSeed || null,
+      schedule: Array.isArray(parsed.session?.schedule)
+        ? parsed.session.schedule.map((entry) => ({
+          roundIndex: Number(entry.roundIndex) || 0,
+          sittingNumber: Number(entry.sittingNumber) || 1,
+          condition: String(entry.condition || 'control'),
+          puzzle: createPuzzleSetSnapshot(entry.puzzle, {
+            selectedAt: entry.puzzle?.selectedAt || null,
+            selectedBy: entry.puzzle?.selectedBy || null,
+          }),
+        })).filter((entry) => entry.puzzle)
+        : [],
+      participantProfiles: {
+        admin: parsed.session?.participantProfiles?.admin || null,
+        subject: parsed.session?.participantProfiles?.subject || null,
       },
       plannedRounds: Number.isFinite(parsed.session?.plannedRounds) && parsed.session.plannedRounds > 0
         ? Math.floor(parsed.session.plannedRounds)
@@ -407,22 +447,14 @@ function hydrateState(parsed, now = new Date()) {
     },
     telemetry: {
       ...initial.telemetry,
-      ...(parsed.telemetry || {}),
       hrv: {
         ...initial.telemetry.hrv,
         ...(parsed.telemetry?.hrv || {}),
-      },
-      gaze: {
-        ...initial.telemetry.gaze,
-        ...(parsed.telemetry?.gaze || {}),
       },
       history: {
         hrv: Array.isArray(parsed.telemetry?.history?.hrv)
           ? parsed.telemetry.history.hrv
           : initial.telemetry.history.hrv,
-        gaze: Array.isArray(parsed.telemetry?.history?.gaze)
-          ? parsed.telemetry.history.gaze
-          : initial.telemetry.history.gaze,
       },
     },
     adaptive: {
@@ -487,6 +519,8 @@ class ExperimentStore extends EventEmitter {
     this.puzzleDir = path.join(this.dataDir, 'puzzles');
     this.recordingsDir = path.join(this.dataDir, 'recordings');
     this.recordingTokens = new Map();
+    this.participantRegistryPath = path.join(this.dataDir, 'participant-registry.json');
+    this.participantRegistry = { nextNumber: 1, assigned: [] };
     this.statePath = path.join(this.dataDir, 'state.json');
     this.eventsPath = path.join(this.dataDir, 'events.jsonl');
     this.adaptiveEngine = options.adaptiveEngine || new AdaptiveEngine();
@@ -495,10 +529,18 @@ class ExperimentStore extends EventEmitter {
     this.plannedRounds = Number.isFinite(options.plannedRounds) && options.plannedRounds > 0
       ? Math.floor(options.plannedRounds)
       : (Number.isFinite(options.studyConfig?.plannedRounds) ? Math.floor(options.studyConfig.plannedRounds) : 3);
+    this.roundsPerSitting = Number(options.roundsPerSitting || options.studyConfig?.roundsPerSitting || 3);
+    this.roundDurationSeconds = Number(options.roundDurationSeconds || options.studyConfig?.roundDurationSeconds || 300);
+    this.constantIntervalSeconds = Number(options.constantIntervalSeconds || options.studyConfig?.constantIntervalSeconds || 30);
     this.tangramPuzzlesDir = options.tangramPuzzlesDir
       ? path.resolve(String(options.tangramPuzzlesDir))
       : null;
-    this.state = createInitialState(this.now(), { plannedRounds: this.plannedRounds });
+    this.state = createInitialState(this.now(), {
+      plannedRounds: this.plannedRounds,
+      roundsPerSitting: this.roundsPerSitting,
+      roundDurationSeconds: this.roundDurationSeconds,
+      constantIntervalSeconds: this.constantIntervalSeconds,
+    });
     this.timeline = [];
     this.writeQueue = Promise.resolve();
     this.lastAdvisorySignature = null;
@@ -534,10 +576,83 @@ class ExperimentStore extends EventEmitter {
       await this.#writeState();
     }
 
+    // A setup-only state from an older app version is safe to migrate to the
+    // configured study design. Never rewrite a participant once collection has
+    // begun.
+    if (this.state.session.status === 'setup'
+      && this.state.session.rounds.length === 0
+      && !this.state.session.activeRound) {
+      const designChanged = this.state.session.plannedRounds !== this.plannedRounds
+        || this.state.session.roundsPerSitting !== this.roundsPerSitting;
+      this.state.session.plannedRounds = this.plannedRounds;
+      this.state.session.roundsPerSitting = this.roundsPerSitting;
+      this.state.session.metadata.roundDurationSeconds = this.state.session.metadata.roundDurationSeconds || this.roundDurationSeconds;
+      this.state.session.metadata.constantIntervalSeconds = this.state.session.metadata.constantIntervalSeconds || this.constantIntervalSeconds;
+      if (designChanged) {
+        this.state.session.conditionOrder = [];
+        this.state.session.randomizationSeed = null;
+        this.state.session.schedule = [];
+        this.state.session.queue = [];
+      }
+      await this.#writeState();
+    }
+
     await this.#ensureCsvFile();
+    await this.#loadParticipantRegistry();
+    await this.#ensureParticipantId();
     await this.#loadRecordingTokens();
     await this.promoteStaleCameraRecordings();
     await this.seedPuzzleLibraryFromDir();
+  }
+
+  async #loadParticipantRegistry() {
+    try {
+      const parsed = JSON.parse(await fs.readFile(this.participantRegistryPath, 'utf8'));
+      this.participantRegistry = {
+        nextNumber: Math.max(1, Number(parsed.nextNumber) || 1),
+        assigned: Array.isArray(parsed.assigned) ? parsed.assigned.map(String) : [],
+      };
+    } catch (error) {
+      if (error.code !== 'ENOENT') {
+        this.participantRegistry = { nextNumber: 1, assigned: [] };
+      }
+    }
+  }
+
+  async #saveParticipantRegistry() {
+    await fs.writeFile(this.participantRegistryPath, `${JSON.stringify(this.participantRegistry, null, 2)}\n`, 'utf8');
+  }
+
+  async #reserveParticipantId(preferred = '', options = {}) {
+    let participantId = String(preferred || '').trim();
+    if (!participantId) {
+      do {
+        participantId = `P${String(this.participantRegistry.nextNumber).padStart(2, '0')}`;
+        this.participantRegistry.nextNumber += 1;
+      } while (this.participantRegistry.assigned.includes(participantId));
+    }
+
+    if (this.participantRegistry.assigned.includes(participantId)
+      && participantId !== String(options.currentParticipantId || '').trim()) {
+      const error = new Error(`Participant ID ${participantId} has already been assigned. Use the auto-assigned ID or enter a new one.`);
+      error.statusCode = 409;
+      throw error;
+    }
+    if (!this.participantRegistry.assigned.includes(participantId)) {
+      this.participantRegistry.assigned.push(participantId);
+    }
+    const numeric = Number(participantId.match(/(\d+)$/)?.[1]);
+    if (Number.isFinite(numeric)) {
+      this.participantRegistry.nextNumber = Math.max(this.participantRegistry.nextNumber, numeric + 1);
+    }
+    await this.#saveParticipantRegistry();
+    return participantId;
+  }
+
+  async #ensureParticipantId() {
+    const current = String(this.state.session.metadata.participantId || '').trim();
+    this.state.session.metadata.participantId = await this.#reserveParticipantId(current, { currentParticipantId: current });
+    await this.#writeState();
   }
 
   getState() {
@@ -738,11 +853,16 @@ class ExperimentStore extends EventEmitter {
     await this.finalizeOpenCameraRecordings({ reason: 'reset' });
     this.recordingTokens.clear();
     const previousResetCount = Number(this.state?.session?.resetCount || 0);
-    const preservedBaseline = clone(this.state?.telemetry?.hrv?.baseline || null);
     const preservedAssets = clone(this.state?.assets || createInitialAssetState());
-    this.state = createInitialState(this.now(), { plannedRounds: this.plannedRounds });
+    const participantId = await this.#reserveParticipantId();
+    this.state = createInitialState(this.now(), {
+      plannedRounds: this.plannedRounds,
+      roundsPerSitting: this.roundsPerSitting,
+      roundDurationSeconds: this.roundDurationSeconds,
+      constantIntervalSeconds: this.constantIntervalSeconds,
+      participantId,
+    });
     this.state.session.resetCount = previousResetCount + 1;
-    this.state.telemetry.hrv.baseline = preservedBaseline;
     this.state.assets = preservedAssets;
 
     const event = this.#createEvent('session.reset', {
@@ -754,7 +874,7 @@ class ExperimentStore extends EventEmitter {
     });
 
     await this.#persistAndBroadcast([event]);
-    await this.#syncSittingQueue({
+    await this.#syncStudySchedule({
       actor: meta.requestedBy || 'researcher',
       source: meta.source || 'admin',
     });
@@ -762,22 +882,47 @@ class ExperimentStore extends EventEmitter {
   }
 
   async configureSession(payload = {}) {
+    const previousParticipantId = this.state.session.metadata.participantId;
+    const requestedParticipantId = String(payload.participantId || previousParticipantId || '').trim();
+    const participantId = await this.#reserveParticipantId(requestedParticipantId, { currentParticipantId: previousParticipantId });
     const sittingNumber = Number.isFinite(Number(payload.sittingNumber)) && Number(payload.sittingNumber) > 0
       ? Math.floor(Number(payload.sittingNumber))
       : (this.state.session.metadata.sittingNumber || 1);
     const nextMetadata = {
       ...this.state.session.metadata,
       studyId: String(payload.studyId || '').trim(),
-      participantId: String(payload.participantId || '').trim(),
+      participantId,
       sittingNumber,
       condition: String(payload.condition || this.state.session.metadata.condition || 'adaptive').trim() || 'adaptive',
       researcher: String(payload.researcher || '').trim(),
       notes: String(payload.notes || '').trim(),
+      roundDurationSeconds: Math.max(30, Math.floor(Number(payload.roundDurationSeconds) || this.state.session.metadata.roundDurationSeconds || this.roundDurationSeconds)),
+      constantIntervalSeconds: Math.max(5, Math.floor(Number(payload.constantIntervalSeconds) || this.state.session.metadata.constantIntervalSeconds || this.constantIntervalSeconds)),
     };
+
+    let adminProfile = this.state.session.participantProfiles?.admin || null;
+    if (payload.adminProfile) {
+      adminProfile = {
+        ...normalizeProfile(payload.adminProfile, { requireInstructions: false }),
+        submittedAt: toIsoDate(this.now()),
+        submittedBy: payload.actor || nextMetadata.researcher || 'researcher',
+      };
+    }
+
+    const participantChanged = previousParticipantId !== participantId;
 
     this.state.session = {
       ...this.state.session,
       metadata: nextMetadata,
+      participantProfiles: {
+        ...this.state.session.participantProfiles,
+        admin: adminProfile,
+        subject: participantChanged ? null : this.state.session.participantProfiles?.subject || null,
+      },
+      conditionOrder: participantChanged ? [] : this.state.session.conditionOrder,
+      randomizationSeed: participantChanged ? null : this.state.session.randomizationSeed,
+      schedule: participantChanged ? [] : this.state.session.schedule,
+      queue: participantChanged ? [] : this.state.session.queue,
     };
 
     const event = this.#createEvent('session.configured', {
@@ -785,11 +930,12 @@ class ExperimentStore extends EventEmitter {
       summary: `Session configured for participant ${nextMetadata.participantId || 'unassigned'}.`,
       payload: {
         metadata: clone(nextMetadata),
+        adminProfile: clone(adminProfile),
       },
     });
 
     await this.#persistAndBroadcast([event]);
-    await this.#syncSittingQueue({
+    await this.#syncStudySchedule({
       actor: payload.actor || nextMetadata.researcher || 'researcher',
       source: payload.source || 'admin',
     });
@@ -828,7 +974,7 @@ class ExperimentStore extends EventEmitter {
 
     await this.#persistAndBroadcast([event]);
     const catalog = buildPuzzleCatalog(this.state.assets.puzzles);
-    await this.#syncSittingQueue({
+    await this.#syncStudySchedule({
       actor: uploadedBy,
       source: meta.source || 'admin',
     });
@@ -889,7 +1035,7 @@ class ExperimentStore extends EventEmitter {
     }
 
     if (preparedAssets.length === 0) {
-      await this.#syncSittingQueue({
+      await this.#syncStudySchedule({
         actor: uploadedBy,
         source: meta.source || 'system',
       });
@@ -919,7 +1065,7 @@ class ExperimentStore extends EventEmitter {
     });
 
     await this.#persistAndBroadcast([event]);
-    await this.#syncSittingQueue({
+    await this.#syncStudySchedule({
       actor: uploadedBy,
       source: meta.source || 'system',
     });
@@ -966,8 +1112,51 @@ class ExperimentStore extends EventEmitter {
     return this.getState();
   }
 
-  async #syncSittingQueue(meta = {}) {
+  async #syncStudySchedule(meta = {}) {
     if (this.state.session.status !== 'setup') {
+      return this.getState();
+    }
+
+    const participantId = this.state.session.metadata.participantId;
+    if (this.plannedRounds >= 9 && this.state.assets.puzzleSets.length >= this.plannedRounds) {
+      if (this.state.session.schedule.length === this.plannedRounds) {
+        return this.getState();
+      }
+
+      const design = buildStudySchedule(this.state.assets.puzzleSets, participantId, {
+        studyId: this.state.session.metadata.studyId,
+        roundsPerSitting: this.roundsPerSitting,
+        totalRounds: this.plannedRounds,
+      });
+      const selectedAt = toIsoDate(this.now());
+      const selectedBy = meta.actor || 'randomizer';
+      const schedule = design.schedule.map((entry) => ({
+        ...entry,
+        puzzle: createPuzzleSetSnapshot(entry.puzzle, { selectedAt, selectedBy }),
+      }));
+      this.state.session = {
+        ...this.state.session,
+        conditionOrder: design.conditionOrder,
+        randomizationSeed: design.seed,
+        schedule,
+        queue: schedule.map((entry) => clone(entry.puzzle)),
+      };
+      const event = this.#createEvent('study.schedule.generated', {
+        source: meta.source || 'system',
+        summary: `Generated a nine-round counterbalanced schedule for ${participantId}.`,
+        payload: {
+          participantId,
+          seed: design.seed,
+          conditionOrder: design.conditionOrder,
+          rounds: schedule.map((entry) => ({
+            roundIndex: entry.roundIndex,
+            sittingNumber: entry.sittingNumber,
+            condition: entry.condition,
+            puzzleSetId: entry.puzzle.setId,
+          })),
+        },
+      });
+      await this.#persistAndBroadcast([event]);
       return this.getState();
     }
 
@@ -1019,7 +1208,8 @@ class ExperimentStore extends EventEmitter {
   async startRound(payload = {}) {
     const session = this.state.session;
     const nextIndex = session.rounds.length;
-    const puzzle = session.queue[nextIndex];
+    const scheduled = session.schedule?.[nextIndex] || null;
+    const puzzle = scheduled?.puzzle || session.queue[nextIndex];
     if (!puzzle) {
       throw new Error('No queued puzzle is available for the next round.');
     }
@@ -1027,8 +1217,12 @@ class ExperimentStore extends EventEmitter {
     const startedAt = toIsoDate(this.now());
     const activeRound = {
       index: nextIndex + 1,
+      sittingNumber: scheduled?.sittingNumber || Math.floor(nextIndex / this.roundsPerSitting) + 1,
+      condition: scheduled?.condition || session.metadata.condition || 'control',
       puzzle: clone(puzzle),
       startedAt,
+      pauseStartedAt: null,
+      pausedDurationSeconds: 0,
       completedAt: null,
       durationSeconds: null,
     };
@@ -1044,6 +1238,8 @@ class ExperimentStore extends EventEmitter {
       summary: `Round ${activeRound.index} started on puzzle ${puzzle.setId}.`,
       payload: {
         index: activeRound.index,
+        sittingNumber: activeRound.sittingNumber,
+        condition: activeRound.condition,
         puzzle: clone(puzzle),
         startedAt,
         operator: payload.operator || 'researcher',
@@ -1062,10 +1258,16 @@ class ExperimentStore extends EventEmitter {
     }
 
     const completedAt = toIsoDate(this.now());
+    const activePauseSeconds = activeRound.pauseStartedAt
+      ? secondsBetween(activeRound.pauseStartedAt, completedAt) || 0
+      : 0;
+    const pausedDurationSeconds = (activeRound.pausedDurationSeconds || 0) + activePauseSeconds;
     const completedRound = {
       ...activeRound,
+      pauseStartedAt: null,
+      pausedDurationSeconds,
       completedAt,
-      durationSeconds: secondsBetween(activeRound.startedAt, completedAt),
+      durationSeconds: Math.max(0, (secondsBetween(activeRound.startedAt, completedAt) || 0) - pausedDurationSeconds),
     };
 
     this.state.session = {
@@ -1073,6 +1275,7 @@ class ExperimentStore extends EventEmitter {
       rounds: [...session.rounds, completedRound],
       activeRound: null,
       puzzleSet: null,
+      awaitingRoundSurvey: completedRound.index,
     };
 
     const event = this.#createEvent('round.completed', {
@@ -1080,6 +1283,8 @@ class ExperimentStore extends EventEmitter {
       summary: `Round ${completedRound.index} completed on puzzle ${completedRound.puzzle.setId}.`,
       payload: {
         index: completedRound.index,
+        sittingNumber: completedRound.sittingNumber,
+        condition: completedRound.condition,
         puzzle: clone(completedRound.puzzle),
         startedAt: completedRound.startedAt,
         completedAt,
@@ -1088,6 +1293,192 @@ class ExperimentStore extends EventEmitter {
       },
     });
 
+    await this.#persistAndBroadcast([event]);
+    return this.getState();
+  }
+
+  async pauseRound(payload = {}) {
+    const activeRound = this.state.session.activeRound;
+    if (!activeRound) {
+      const error = new Error('No round is currently active.');
+      error.statusCode = 409;
+      throw error;
+    }
+    if (activeRound.pauseStartedAt) {
+      return this.getState();
+    }
+    activeRound.pauseStartedAt = toIsoDate(this.now());
+    const event = this.#createEvent('round.paused', {
+      source: payload.source || 'admin',
+      summary: `Round ${activeRound.index} timer paused.`,
+      payload: { index: activeRound.index, pausedAt: activeRound.pauseStartedAt, operator: payload.operator || 'researcher' },
+    });
+    await this.#persistAndBroadcast([event]);
+    return this.getState();
+  }
+
+  async resumeRound(payload = {}) {
+    const activeRound = this.state.session.activeRound;
+    if (!activeRound) {
+      const error = new Error('No round is currently active.');
+      error.statusCode = 409;
+      throw error;
+    }
+    if (!activeRound.pauseStartedAt) {
+      return this.getState();
+    }
+    const resumedAt = toIsoDate(this.now());
+    activeRound.pausedDurationSeconds = (activeRound.pausedDurationSeconds || 0)
+      + (secondsBetween(activeRound.pauseStartedAt, resumedAt) || 0);
+    activeRound.pauseStartedAt = null;
+    const event = this.#createEvent('round.resumed', {
+      source: payload.source || 'admin',
+      summary: `Round ${activeRound.index} timer resumed.`,
+      payload: { index: activeRound.index, resumedAt, pausedDurationSeconds: activeRound.pausedDurationSeconds, operator: payload.operator || 'researcher' },
+    });
+    await this.#persistAndBroadcast([event]);
+    return this.getState();
+  }
+
+  async resumeNextSitting(payload = {}) {
+    if (!this.state.session.betweenSittings) {
+      const error = new Error('The study is not currently between sittings.');
+      error.statusCode = 409;
+      throw error;
+    }
+    this.state.session.betweenSittings = false;
+    const nextSitting = Math.floor(this.state.session.rounds.length / this.roundsPerSitting) + 1;
+    const event = this.#createEvent('sitting.resumed', {
+      source: payload.source || 'admin',
+      summary: `Sitting ${nextSitting} is ready to begin.`,
+      payload: { sittingNumber: nextSitting, operator: payload.operator || 'researcher' },
+    });
+    await this.#persistAndBroadcast([event]);
+    return this.getState();
+  }
+
+  async submitParticipantProfile(payload = {}) {
+    if (this.state.session.status !== 'setup') {
+      const error = new Error('Participant details are locked after the study begins.');
+      error.statusCode = 409;
+      throw error;
+    }
+    const profile = {
+      ...normalizeProfile(payload, { requireInstructions: true, requireExpected: true }),
+      submittedAt: toIsoDate(this.now()),
+      submittedBy: 'participant',
+    };
+    this.state.session.participantProfiles = {
+      ...this.state.session.participantProfiles,
+      subject: profile,
+    };
+    const event = this.#createEvent('participant.profile.submitted', {
+      source: 'subject',
+      summary: `Participant profile and consent submitted for ${this.state.session.metadata.participantId}.`,
+      payload: clone(profile),
+    });
+    await this.#persistAndBroadcast([event]);
+    return this.getState();
+  }
+
+  async submitRoundSurvey(payload = {}) {
+    const roundIndex = Number(payload.roundIndex || this.state.session.awaitingRoundSurvey);
+    if (roundIndex !== this.state.session.awaitingRoundSurvey) {
+      const error = new Error('That round is not awaiting a questionnaire.');
+      error.statusCode = 409;
+      throw error;
+    }
+    const round = this.state.session.rounds.find((entry) => entry.index === roundIndex);
+    if (!round) {
+      const error = new Error('Completed round not found.');
+      error.statusCode = 404;
+      throw error;
+    }
+    const submittedAt = toIsoDate(this.now());
+    round.survey = {
+      ...normalizeRoundSurvey(payload.responses || payload, round.condition),
+      submittedAt,
+    };
+    this.state.session.awaitingRoundSurvey = null;
+    const totalRounds = this.state.session.schedule.length || this.state.session.queue.length;
+    if (roundIndex === totalRounds) {
+      this.state.session.finalSurveyRequired = true;
+    } else if (roundIndex % this.roundsPerSitting === 0) {
+      this.state.session.betweenSittings = true;
+    }
+    const event = this.#createEvent('round.survey.submitted', {
+      source: 'subject',
+      summary: `Participant submitted the questionnaire for round ${roundIndex}.`,
+      payload: { roundIndex, sittingNumber: round.sittingNumber, condition: round.condition, responses: clone(round.survey) },
+    });
+    await this.#persistAndBroadcast([event]);
+    return this.getState();
+  }
+
+  async skipRoundSurvey(payload = {}) {
+    const roundIndex = Number(payload.roundIndex || this.state.session.awaitingRoundSurvey);
+    const reason = String(payload.reason || '').trim();
+    if (roundIndex !== this.state.session.awaitingRoundSurvey) {
+      const error = new Error('That round is not awaiting a questionnaire.');
+      error.statusCode = 409;
+      throw error;
+    }
+    if (!reason) {
+      const error = new Error('Enter a reason before skipping the questionnaire.');
+      error.statusCode = 400;
+      throw error;
+    }
+    const round = this.state.session.rounds.find((entry) => entry.index === roundIndex);
+    if (!round) {
+      const error = new Error('Completed round not found.');
+      error.statusCode = 404;
+      throw error;
+    }
+
+    round.survey = {
+      skipped: true,
+      reason: reason.slice(0, 1000),
+      submittedAt: toIsoDate(this.now()),
+      submittedBy: payload.operator || 'researcher',
+    };
+    this.state.session.awaitingRoundSurvey = null;
+    const totalRounds = this.state.session.schedule.length || this.state.session.queue.length;
+    if (roundIndex === totalRounds) {
+      this.state.session.finalSurveyRequired = true;
+    } else if (roundIndex % this.roundsPerSitting === 0) {
+      this.state.session.betweenSittings = true;
+    }
+    const event = this.#createEvent('round.survey.skipped', {
+      source: payload.source || 'admin',
+      summary: `Researcher skipped the questionnaire for round ${roundIndex}.`,
+      payload: {
+        roundIndex,
+        sittingNumber: round.sittingNumber,
+        condition: round.condition,
+        survey: clone(round.survey),
+      },
+    });
+    await this.#persistAndBroadcast([event]);
+    return this.getState();
+  }
+
+  async submitFinalSurvey(payload = {}) {
+    if (!this.state.session.finalSurveyRequired) {
+      const error = new Error('The end-of-study questionnaire is not available yet.');
+      error.statusCode = 409;
+      throw error;
+    }
+    const finalSurvey = {
+      ...normalizeFinalSurvey(payload.responses || payload),
+      submittedAt: toIsoDate(this.now()),
+    };
+    this.state.session.finalSurvey = finalSurvey;
+    this.state.session.finalSurveyRequired = false;
+    const event = this.#createEvent('study.final-survey.submitted', {
+      source: 'subject',
+      summary: 'Participant submitted the end-of-study questionnaire.',
+      payload: clone(finalSurvey),
+    });
     await this.#persistAndBroadcast([event]);
     return this.getState();
   }
@@ -1115,7 +1506,8 @@ class ExperimentStore extends EventEmitter {
     await this.copyDownloadableRecordingsToExport();
     const events = [];
 
-    // Auto-close a round that is still open so the sitting always ends cleanly.
+    // Legacy direct callers may still complete with an active round. The full
+    // study HTTP policy blocks this until the round and questionnaires finish.
     if (this.state.session.activeRound) {
       const activeRound = this.state.session.activeRound;
       const roundCompletedAt = toIsoDate(this.now());
@@ -1253,6 +1645,12 @@ class ExperimentStore extends EventEmitter {
     const stressLevel = payload.stressLevel || 'Not Stressed';
     const distractionDetected = Boolean(payload.distractionDetected);
 
+    const previousScore = Number(this.state.telemetry.hrv.stressScore) || 0;
+    const spikeDelta = stressScore - previousScore;
+    const spikeDetected = stressScore >= 0.45 && spikeDelta >= 0.15;
+    const calibration = payload.calibration
+      ? { ...this.state.telemetry.hrv.calibration, ...clone(payload.calibration) }
+      : this.state.telemetry.hrv.calibration;
     this.state.telemetry.hrv = {
       source: meta.source || payload.source || 'api',
       updatedAt: timestamp,
@@ -1264,6 +1662,14 @@ class ExperimentStore extends EventEmitter {
       distractionDetected,
       interpretation: payload.interpretation || 'HRV telemetry received.',
       feedback: payload.feedback || 'Continue monitoring the participant.',
+      calibration,
+      spike: spikeDetected ? {
+        detected: true,
+        detectedAt: timestamp,
+        stressScore,
+        delta: Number(spikeDelta.toFixed(2)),
+        message: `HRV stress score rose by ${spikeDelta.toFixed(2)}.`,
+      } : this.state.telemetry.hrv.spike,
     };
 
     pushCapped(this.state.telemetry.history.hrv, {
@@ -1280,35 +1686,12 @@ class ExperimentStore extends EventEmitter {
     });
 
     const adaptiveEvents = await this.#refreshAdaptiveState(meta.source || payload.source || 'api');
-    const events = [telemetryEvent, ...adaptiveEvents];
-    await this.#persistAndBroadcast(events);
-    return this.getState();
-  }
-
-  async ingestGazeTelemetry(payload = {}, meta = {}) {
-    const timestamp = toIsoDate(payload.timestamp || this.now());
-    this.state.telemetry.gaze = {
+    const spikeEvent = spikeDetected ? [this.#createEvent('telemetry.hrv.spike.detected', {
       source: meta.source || payload.source || 'api',
-      updatedAt: timestamp,
-      attentionScore: Number.isFinite(payload.attentionScore) ? payload.attentionScore : null,
-      fixationLoss: Number.isFinite(payload.fixationLoss) ? payload.fixationLoss : null,
-      pupilDilation: Number.isFinite(payload.pupilDilation) ? payload.pupilDilation : null,
-    };
-
-    pushCapped(this.state.telemetry.history.gaze, {
-      timestamp,
-      attentionScore: this.state.telemetry.gaze.attentionScore,
-      fixationLoss: this.state.telemetry.gaze.fixationLoss,
-    });
-
-    const telemetryEvent = this.#createEvent('telemetry.gaze.updated', {
-      source: meta.source || payload.source || 'api',
-      summary: 'Gaze telemetry updated.',
-      payload: clone(this.state.telemetry.gaze),
-    });
-
-    const adaptiveEvents = await this.#refreshAdaptiveState(meta.source || payload.source || 'api');
-    const events = [telemetryEvent, ...adaptiveEvents];
+      summary: `HRV spike detected (stress ${stressScore.toFixed(2)}, +${spikeDelta.toFixed(2)}).`,
+      payload: clone(this.state.telemetry.hrv.spike),
+    })] : [];
+    const events = [telemetryEvent, ...spikeEvent, ...adaptiveEvents];
     await this.#persistAndBroadcast(events);
     return this.getState();
   }
@@ -1316,10 +1699,6 @@ class ExperimentStore extends EventEmitter {
   async ingestSimulatedTelemetry(payload = {}, meta = {}) {
     if (payload.hrv) {
       await this.ingestHrvTelemetry(payload.hrv, { source: meta.source || 'simulator' });
-    }
-
-    if (payload.gaze) {
-      await this.ingestGazeTelemetry(payload.gaze, { source: meta.source || 'simulator' });
     }
 
     return this.getState();
@@ -1330,6 +1709,12 @@ class ExperimentStore extends EventEmitter {
 
     if (watchData.is_baseline) {
       this.state.telemetry.hrv.baseline = clone(watchData.baseline_metrics || {});
+      this.state.telemetry.hrv.calibration = {
+        active: false,
+        progress: 100,
+        startedAt: watchData.calibration?.started_at || null,
+        completedAt: entry.timestamp || toIsoDate(this.now()),
+      };
 
       const event = this.#createEvent('telemetry.hrv.baseline.loaded', {
         source: 'watch-bridge',
@@ -1355,6 +1740,7 @@ class ExperimentStore extends EventEmitter {
       distractionDetected: Boolean(watchData.distraction_detected),
       interpretation: watchData.interpretation,
       feedback: watchData.feedback,
+      calibration: watchData.calibration,
       source: 'watch-bridge',
     }, { source: 'watch-bridge' });
   }
@@ -1518,6 +1904,15 @@ class ExperimentStore extends EventEmitter {
       : this.#reconstructStateFromEvents(sessionId, sessionEvents);
     const session = state.session || {};
     const rounds = this.#buildRoundExports(sessionEvents);
+    for (const round of rounds) {
+      const saved = session.rounds?.find((entry) => entry.index === round.index);
+      if (saved) {
+        round.sittingNumber = saved.sittingNumber;
+        round.condition = saved.condition;
+        round.pausedDurationSeconds = saved.pausedDurationSeconds || 0;
+        round.survey = saved.survey ? clone(saved.survey) : null;
+      }
+    }
     const totalDurationSeconds = rounds.reduce(
       (total, round) => total + (Number.isFinite(round.durationSeconds) ? round.durationSeconds : 0),
       0,
@@ -1529,10 +1924,20 @@ class ExperimentStore extends EventEmitter {
       trialStartedAt: session.trialStartedAt || null,
       completedAt: session.completedAt || null,
       metadata: clone(session.metadata || {}),
+      participantProfiles: clone(session.participantProfiles || {}),
+      conditionOrder: clone(session.conditionOrder || []),
+      randomizationSeed: session.randomizationSeed || null,
+      schedule: (session.schedule || []).map((entry) => ({
+        roundIndex: entry.roundIndex,
+        sittingNumber: entry.sittingNumber,
+        condition: entry.condition,
+        puzzleSetId: entry.puzzle?.setId || '',
+      })),
       plannedRounds: session.plannedRounds || rounds.length,
       roundsCompleted: rounds.length,
       totalDurationSeconds,
       rounds,
+      finalSurvey: session.finalSurvey ? clone(session.finalSurvey) : null,
       recordings: (session.recordings || []).map((entry) => publicRecording(entry)),
     };
   }
@@ -1570,6 +1975,8 @@ class ExperimentStore extends EventEmitter {
       if (event.type === 'round.started') {
         current = {
           index: event.payload?.index || rounds.length + 1,
+          sittingNumber: event.payload?.sittingNumber || 1,
+          condition: event.payload?.condition || 'control',
           puzzle: {
             setId: event.payload?.puzzle?.setId || '',
             label: event.payload?.puzzle?.label || '',
@@ -1580,6 +1987,7 @@ class ExperimentStore extends EventEmitter {
           completedAt: null,
           durationSeconds: null,
           interventions: [],
+          survey: null,
         };
         continue;
       }
@@ -1694,8 +2102,6 @@ class ExperimentStore extends EventEmitter {
       score: nextAdaptiveState.score,
       configuration: nextAdaptiveState.configuration,
       hrv: this.state.telemetry.hrv.stressScore,
-      gazeAttention: this.state.telemetry.gaze.attentionScore,
-      fixationLoss: this.state.telemetry.gaze.fixationLoss,
       distractionDetected: this.state.telemetry.hrv.distractionDetected,
     });
 
@@ -1892,6 +2298,13 @@ class ExperimentStore extends EventEmitter {
           ...reconstructed.session.metadata,
           ...event.payload.metadata,
         };
+        if (event.payload.adminProfile) {
+          reconstructed.session.participantProfiles.admin = clone(event.payload.adminProfile);
+        }
+      }
+
+      if (event.type === 'participant.profile.submitted' && event.payload) {
+        reconstructed.session.participantProfiles.subject = clone(event.payload);
       }
 
       if (event.type === 'puzzle.library.uploaded' && Array.isArray(event.payload?.assets)) {
@@ -1909,6 +2322,21 @@ class ExperimentStore extends EventEmitter {
       if (event.type === 'session.started') {
         reconstructed.session.status = 'running';
         reconstructed.session.trialStartedAt = event.payload?.trialStartedAt || event.timestamp;
+      }
+
+      if (event.type === 'study.schedule.generated' && Array.isArray(event.payload?.rounds)) {
+        reconstructed.session.conditionOrder = clone(event.payload.conditionOrder || []);
+        reconstructed.session.randomizationSeed = event.payload.seed || null;
+        reconstructed.session.schedule = event.payload.rounds.map((entry) => {
+          const puzzle = reconstructed.assets.puzzleSets.find((item) => item.setId === entry.puzzleSetId);
+          return puzzle ? {
+            roundIndex: entry.roundIndex,
+            sittingNumber: entry.sittingNumber,
+            condition: entry.condition,
+            puzzle: createPuzzleSetSnapshot(puzzle),
+          } : null;
+        }).filter(Boolean);
+        reconstructed.session.queue = reconstructed.session.schedule.map((entry) => clone(entry.puzzle));
       }
 
       if (event.type === 'session.completed') {
@@ -1933,12 +2361,25 @@ class ExperimentStore extends EventEmitter {
         });
         reconstructed.session.activeRound = {
           index: event.payload.index || reconstructed.session.rounds.length + 1,
+          sittingNumber: event.payload.sittingNumber || 1,
+          condition: event.payload.condition || 'control',
           puzzle,
           startedAt: event.payload.startedAt || event.timestamp,
+          pauseStartedAt: null,
+          pausedDurationSeconds: 0,
           completedAt: null,
           durationSeconds: null,
         };
         reconstructed.session.puzzleSet = puzzle;
+      }
+
+      if (event.type === 'round.paused' && reconstructed.session.activeRound) {
+        reconstructed.session.activeRound.pauseStartedAt = event.payload?.pausedAt || event.timestamp;
+      }
+
+      if (event.type === 'round.resumed' && reconstructed.session.activeRound) {
+        reconstructed.session.activeRound.pauseStartedAt = null;
+        reconstructed.session.activeRound.pausedDurationSeconds = event.payload?.pausedDurationSeconds || 0;
       }
 
       if (event.type === 'round.completed' && event.payload?.puzzle) {
@@ -1948,13 +2389,35 @@ class ExperimentStore extends EventEmitter {
         });
         reconstructed.session.rounds.push({
           index: event.payload.index || reconstructed.session.rounds.length + 1,
+          sittingNumber: event.payload.sittingNumber || 1,
+          condition: event.payload.condition || 'control',
           puzzle,
           startedAt: event.payload.startedAt || null,
           completedAt: event.payload.completedAt || event.timestamp,
           durationSeconds: Number.isFinite(event.payload.durationSeconds) ? event.payload.durationSeconds : null,
+          survey: null,
         });
         reconstructed.session.activeRound = null;
         reconstructed.session.puzzleSet = null;
+      }
+
+      if (event.type === 'round.survey.submitted') {
+        const round = reconstructed.session.rounds.find((entry) => entry.index === event.payload?.roundIndex);
+        if (round) {
+          round.survey = clone(event.payload.responses || null);
+        }
+      }
+
+      if (event.type === 'round.survey.skipped') {
+        const round = reconstructed.session.rounds.find((entry) => entry.index === event.payload?.roundIndex);
+        if (round) {
+          round.survey = clone(event.payload.survey || null);
+        }
+      }
+
+      if (event.type === 'study.final-survey.submitted') {
+        reconstructed.session.finalSurvey = clone(event.payload || null);
+        reconstructed.session.finalSurveyRequired = false;
       }
 
       if (event.type === 'hint.updated' && event.payload) {
@@ -1981,13 +2444,6 @@ class ExperimentStore extends EventEmitter {
       if (event.type === 'telemetry.hrv.updated' && event.payload) {
         reconstructed.telemetry.hrv = {
           ...reconstructed.telemetry.hrv,
-          ...event.payload,
-        };
-      }
-
-      if (event.type === 'telemetry.gaze.updated' && event.payload) {
-        reconstructed.telemetry.gaze = {
-          ...reconstructed.telemetry.gaze,
           ...event.payload,
         };
       }
@@ -2049,7 +2505,6 @@ class ExperimentStore extends EventEmitter {
       referencePuzzleLabel: state.session?.puzzleSet?.subjectAsset?.originalName || '',
       adaptiveTransitions: counts['adaptive.status.changed'] || 0,
       hrvFrames: counts['telemetry.hrv.updated'] || 0,
-      gazeFrames: counts['telemetry.gaze.updated'] || 0,
       participantId: session.metadata?.participantId || '',
       condition: session.metadata?.condition || '',
       adaptiveConfiguration: clone(state.adaptive?.configuration || DEFAULT_ADAPTIVE_CONFIGURATION),

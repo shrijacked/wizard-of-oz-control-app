@@ -1,20 +1,49 @@
 {
-  "plannedRounds": 3,
+  "plannedRounds": 9,
+  "roundsPerSitting": 3,
+  "roundDurationSeconds": 300,
+  "constantIntervalSeconds": 30,
   "slotCount": 7,
   "tangramPuzzlesDir": "tangram puzzles",
   "pieces": [
-    { "id": "orange-triangle", "label": "Orange Triangle", "color": "#e07a3f" },
-    { "id": "green-square", "label": "Green Square", "color": "#3f8f5c" },
-    { "id": "purple-triangle", "label": "Purple Triangle", "color": "#7a4fa0" },
-    { "id": "pink-triangle", "label": "Pink Triangle", "color": "#d6699e" },
-    { "id": "yellow-parallelogram", "label": "Yellow Parallelogram", "color": "#d3a53a" },
-    { "id": "blue-triangle", "label": "Blue Triangle", "color": "#2f6f9f" },
-    { "id": "red-triangle", "label": "Red Triangle", "color": "#c0433a" }
+    {
+      "id": "orange-triangle",
+      "label": "Orange Triangle",
+      "color": "#e07a3f"
+    },
+    {
+      "id": "green-square",
+      "label": "Green Square",
+      "color": "#3f8f5c"
+    },
+    {
+      "id": "purple-triangle",
+      "label": "Purple Triangle",
+      "color": "#7a4fa0"
+    },
+    {
+      "id": "pink-triangle",
+      "label": "Pink Triangle",
+      "color": "#d6699e"
+    },
+    {
+      "id": "yellow-parallelogram",
+      "label": "Yellow Parallelogram",
+      "color": "#d3a53a"
+    },
+    {
+      "id": "blue-triangle",
+      "label": "Blue Triangle",
+      "color": "#2f6f9f"
+    },
+    {
+      "id": "red-triangle",
+      "label": "Red Triangle",
+      "color": "#c0433a"
+    }
   ],
   "hintPresets": [
-    "Look closely at the shape you just placed.",
     "Try rotating that piece.",
-    "Check the corner of the outline.",
     "One piece is in the wrong spot.",
     "You are very close — keep going."
   ]

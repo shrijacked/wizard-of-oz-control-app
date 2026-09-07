@@ -11,7 +11,6 @@ function buildPrompt(state, adaptiveState) {
       reason: adaptiveState.reason,
     },
     hrv: state.telemetry.hrv,
-    gaze: state.telemetry.gaze,
     latestHint: state.hint,
     latestRobotAction: state.robotAction,
   };

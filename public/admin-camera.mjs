@@ -47,7 +47,7 @@ export function createCameraController({
     }
 
     if (error?.name === 'NotReadableError') {
-      return 'Unable to start camera: the camera is already in use by another tab or app. If Pupil Capture is using the C270, switch Capture back to the glasses camera.';
+      return 'Unable to start camera: the camera is already in use by another tab or app.';
     }
 
     return `Unable to start camera: ${error.message}`;

@@ -15,6 +15,7 @@ import {
   shouldShowCameraControls,
 } from './admin-controls.mjs';
 import { renderHrvTelemetry } from './admin-telemetry.mjs';
+import { createAudioCueController } from './audio-cue.mjs';
 
 const ADMIN_TOKEN_KEY = 'woz.admin.token';
 
@@ -28,7 +29,6 @@ const elements = {
   robotHealth: document.querySelector('#robot-health'),
   cameraHealth: document.querySelector('#camera-health'),
   watchHealth: document.querySelector('#watch-health'),
-  gazeHealth: document.querySelector('#gaze-health'),
   guardShell: document.querySelector('#guard-shell'),
   guardForm: document.querySelector('#guard-form'),
   guardPin: document.querySelector('#guard-pin'),
@@ -39,8 +39,16 @@ const elements = {
   sessionStudyId: document.querySelector('#session-study-id'),
   sessionParticipantId: document.querySelector('#session-participant-id'),
   sessionResearcher: document.querySelector('#session-researcher'),
-  sessionSittingNumber: document.querySelector('#session-sitting-number'),
-  sessionCondition: document.querySelector('#session-condition'),
+  sessionRoundDuration: document.querySelector('#session-round-duration'),
+  sessionConstantInterval: document.querySelector('#session-constant-interval'),
+  adminParticipantAge: document.querySelector('#admin-participant-age'),
+  adminParticipantGender: document.querySelector('#admin-participant-gender'),
+  adminParticipantGenderSelf: document.querySelector('#admin-participant-gender-self'),
+  adminGenderSelfField: document.querySelector('#admin-gender-self-field'),
+  adminParticipantConsent: document.querySelector('#admin-participant-consent'),
+  adminConsentStatement: document.querySelector('#admin-consent-statement'),
+  conditionOrderSummary: document.querySelector('#condition-order-summary'),
+  subjectInstructionScript: document.querySelector('#subject-instruction-script'),
   sessionNotes: document.querySelector('#session-notes'),
   sessionSave: document.querySelector('#session-save'),
   puzzleUploadForm: document.querySelector('#puzzle-upload-form'),
@@ -74,7 +82,13 @@ const elements = {
   sessionStart: document.querySelector('#session-start'),
   sessionComplete: document.querySelector('#session-complete'),
   roundStart: document.querySelector('#round-start'),
+  roundPause: document.querySelector('#round-pause'),
+  roundResume: document.querySelector('#round-resume'),
   roundComplete: document.querySelector('#round-complete'),
+  resumeSitting: document.querySelector('#resume-sitting'),
+  roundSurveyStatus: document.querySelector('#round-survey-status'),
+  roundSurveyStatusText: document.querySelector('#round-survey-status-text'),
+  skipRoundSurvey: document.querySelector('#skip-round-survey'),
   resetSession: document.querySelector('#reset-session'),
   resetSessionSetup: document.querySelector('#reset-session-setup'),
   resetSessionReview: document.querySelector('#reset-session-review'),
@@ -104,8 +118,13 @@ const elements = {
   cameraStatus: document.querySelector('#camera-status'),
   recordingStatus: document.querySelector('#recording-status'),
   reviewRecordings: document.querySelector('#review-recordings'),
-  gazeAttention: document.querySelector('#gaze-attention'),
-  gazeUpdated: document.querySelector('#gaze-updated'),
+  watchCalibrate: document.querySelector('#watch-calibrate'),
+  watchCalibrationStatus: document.querySelector('#watch-calibration-status'),
+  operatorSound: document.querySelector('#operator-sound'),
+  hrvSpikeAlert: document.querySelector('#hrv-spike-alert'),
+  hrvSpikeDetail: document.querySelector('#hrv-spike-detail'),
+  constantReminder: document.querySelector('#constant-reminder'),
+  constantReminderText: document.querySelector('#constant-reminder-text'),
 };
 
 let currentState = null;
@@ -116,7 +135,16 @@ let selectedPieceId = null;
 let selectedSlot = null;
 let lastHintToken = null;
 let lastRobotToken = null;
+let lastHrvSpikeToken = null;
+let lastConstantReminderKey = null;
 const liveLog = [];
+
+const operatorSound = createAudioCueController({
+  frequency: 1040,
+  durationMs: 240,
+  gainValue: 0.14,
+  waveform: 'square',
+});
 
 const cameraController = createCameraController({
   videoElement: elements.cameraFeed,
@@ -353,6 +381,15 @@ function localPolicy(action) {
     if (activeRound) {
       return { allowed: false, reason: 'Finish the current round before starting the next one.' };
     }
+    if (session.awaitingRoundSurvey) {
+      return { allowed: false, reason: `Wait for the round ${session.awaitingRoundSurvey} questionnaire.` };
+    }
+    if (session.betweenSittings) {
+      return { allowed: false, reason: 'Begin the next sitting before starting its first round.' };
+    }
+    if (session.finalSurveyRequired || session.finalSurvey) {
+      return { allowed: false, reason: 'The nine puzzle rounds are complete.' };
+    }
     if (rounds.length >= queue.length) {
       return { allowed: false, reason: 'All queued puzzles for this sitting have been played.' };
     }
@@ -366,9 +403,13 @@ function localPolicy(action) {
   }
 
   if (action === 'completeSession') {
-    return status === 'running'
-      ? { allowed: true, reason: '' }
-      : { allowed: false, reason: 'Only running sittings can be completed.' };
+    if (status !== 'running') {
+      return { allowed: false, reason: 'Only a running study can be completed.' };
+    }
+    if (activeRound || rounds.length < queue.length || session.awaitingRoundSurvey || session.finalSurveyRequired || !session.finalSurvey) {
+      return { allowed: false, reason: 'Finish all nine rounds and participant questionnaires before ending the study.' };
+    }
+    return { allowed: true, reason: '' };
   }
 
   if (action === 'setHint' || action === 'logRobotAction') {
@@ -378,7 +419,31 @@ function localPolicy(action) {
     if (!activeRound) {
       return { allowed: false, reason: 'Start a round before sending hints or robot cues.' };
     }
+    if (activeRound.condition === 'control') {
+      return { allowed: false, reason: 'Interventions are disabled during control rounds.' };
+    }
     return { allowed: true, reason: '' };
+  }
+
+  if (action === 'pauseRound') {
+    if (status !== 'running' || !activeRound) {
+      return { allowed: false, reason: 'Start a round before pausing.' };
+    }
+    return activeRound.pauseStartedAt
+      ? { allowed: false, reason: 'The timer is already paused.' }
+      : { allowed: true, reason: '' };
+  }
+
+  if (action === 'resumeRound') {
+    return status === 'running' && activeRound?.pauseStartedAt
+      ? { allowed: true, reason: '' }
+      : { allowed: false, reason: 'Pause the active round before resuming it.' };
+  }
+
+  if (action === 'resumeSitting') {
+    return status === 'running' && session.betweenSittings
+      ? { allowed: true, reason: '' }
+      : { allowed: false, reason: 'The study is not between sittings.' };
   }
 
   return { allowed: true, reason: '' };
@@ -437,7 +502,9 @@ function renderHealth() {
   }
 
   const watchState = sensorHealth.watch?.state;
-  if (watchState === 'healthy') {
+  if (watchState === 'calibrating') {
+    setPill(elements.watchHealth, 'connected', 'Watch: calibrating');
+  } else if (watchState === 'healthy') {
     setPill(elements.watchHealth, 'ready', 'Watch: live');
   } else if (watchState === 'stale' || watchState === 'error') {
     setPill(elements.watchHealth, 'connected', 'Watch: check band');
@@ -445,14 +512,6 @@ function renderHealth() {
     setPill(elements.watchHealth, 'offline', 'Watch: waiting');
   }
 
-  const gazeState = sensorHealth.gaze?.state;
-  if (gazeState === 'healthy') {
-    setPill(elements.gazeHealth, 'ready', 'Pupil: live');
-  } else if (gazeState === 'stale' || gazeState === 'error') {
-    setPill(elements.gazeHealth, 'connected', 'Pupil: check Capture');
-  } else {
-    setPill(elements.gazeHealth, 'offline', 'Pupil: waiting');
-  }
 }
 
 function renderGuard() {
@@ -492,11 +551,11 @@ function renderModes() {
   document.body.dataset.sessionPhase = status;
 
   if (status === 'running') {
-    setText(elements.modeNote, 'Live sitting. Camera, solution, hints, and robot cues stay on this deck.');
+    setText(elements.modeNote, 'Live participant study. Camera, solution, timer, sensors, and intervention controls stay on this deck.');
   } else if (status === 'completed') {
     setText(elements.modeNote, 'Sitting complete. Download the export, then reset for the next participant.');
   } else {
-    setText(elements.modeNote, 'Start the C270, arm both screens, and wait for Watch and Pupil before beginning.');
+    setText(elements.modeNote, 'Start the C270, arm both screens, and wait for the watch before beginning.');
   }
 }
 
@@ -519,7 +578,7 @@ function renderQueueAndLibrary() {
     if (!queue.length) {
       const empty = document.createElement('p');
       empty.className = 'panel-note';
-      empty.textContent = 'Save the sitting profile to auto-queue that sitting\'s three puzzles.';
+      empty.textContent = 'Nine complete puzzle pairs are required to generate the participant schedule.';
       elements.queueList.append(empty);
     }
 
@@ -527,7 +586,9 @@ function renderQueueAndLibrary() {
       const row = document.createElement('div');
       row.className = 'queue-item';
       const title = document.createElement('strong');
-      title.textContent = `${index + 1}. Set ${entry.setId}`;
+      const scheduled = currentState?.session?.schedule?.[index];
+      const names = { control: 'Control', constant: 'Constant', adaptive: 'Adaptive' };
+      title.textContent = `${index + 1}. Set ${entry.setId}${scheduled ? ` • Sitting ${scheduled.sittingNumber} • ${names[scheduled.condition] || scheduled.condition}` : ''}`;
       const meta = document.createElement('small');
       meta.textContent = `${entry.subjectAsset.originalName} / ${entry.solutionAsset.originalName}`;
       row.append(title, meta);
@@ -802,44 +863,79 @@ function renderSession() {
   const completedRounds = session.rounds || [];
   const queue = session.queue || [];
   const planned = session.plannedRounds || studyConfig().plannedRounds;
-  const timerStart = activeRound?.startedAt || session.trialStartedAt;
-  const timerEnd = activeRound?.completedAt || session.completedAt;
-  const durationSeconds = timerStart
-    ? Math.max(0, Math.round(((timerEnd ? new Date(timerEnd) : new Date()).getTime() - new Date(timerStart).getTime()) / 1000))
+  const adminProfile = session.participantProfiles?.admin || {};
+  const timerNow = activeRound?.pauseStartedAt ? new Date(activeRound.pauseStartedAt) : new Date();
+  const durationSeconds = activeRound?.startedAt
+    ? Math.max(0, Math.round((timerNow.getTime() - new Date(activeRound.startedAt).getTime()) / 1000) - Number(activeRound.pausedDurationSeconds || 0))
     : null;
 
   setValueSafely(elements.sessionStudyId, metadata.studyId);
   setValueSafely(elements.sessionParticipantId, metadata.participantId);
   setValueSafely(elements.sessionResearcher, metadata.researcher);
-  setValueSafely(elements.sessionSittingNumber, String(metadata.sittingNumber || 1));
-  setValueSafely(elements.sessionCondition, metadata.condition || 'adaptive');
+  setValueSafely(elements.sessionRoundDuration, metadata.roundDurationSeconds || 300);
+  setValueSafely(elements.sessionConstantInterval, metadata.constantIntervalSeconds || 30);
+  setValueSafely(elements.adminParticipantAge, adminProfile.age);
+  setValueSafely(elements.adminParticipantGender, adminProfile.gender);
+  setValueSafely(elements.adminParticipantGenderSelf, adminProfile.genderSelfDescribe);
+  if (elements.adminParticipantConsent && document.activeElement !== elements.adminParticipantConsent) {
+    elements.adminParticipantConsent.checked = Boolean(adminProfile.consented);
+  }
+  if (elements.adminGenderSelfField) {
+    elements.adminGenderSelfField.hidden = (elements.adminParticipantGender?.value || adminProfile.gender) !== 'self-describe';
+  }
   setValueSafely(elements.sessionNotes, metadata.notes);
 
+  const conditionNames = { control: 'Control', constant: 'Constant intervention', adaptive: 'Adaptive intervention' };
+  setText(
+    elements.conditionOrderSummary,
+    session.conditionOrder?.length
+      ? session.conditionOrder.map((condition, index) => `Sitting ${index + 1}: ${conditionNames[condition] || condition}`).join(' • ')
+      : 'Saved after the participant ID and nine puzzle pairs are available.',
+  );
+  if (elements.subjectInstructionScript && !elements.subjectInstructionScript.childElementCount) {
+    for (const instruction of studyConfig().instructions || []) {
+      const item = document.createElement('li');
+      item.textContent = instruction;
+      elements.subjectInstructionScript.append(item);
+    }
+  }
+  setText(elements.adminConsentStatement, studyConfig().consentStatement
+    ? `Researcher cross-check: ${studyConfig().consentStatement}`
+    : 'I confirm that the participant consented using the statement on their screen.');
+
   const label = status.toUpperCase();
-  setText(elements.sessionStatusSummary, `${label}${metadata.participantId ? ` • ${metadata.participantId}` : ''}${metadata.sittingNumber ? ` • sitting ${metadata.sittingNumber}` : ''}`);
+  const currentSitting = activeRound?.sittingNumber || Math.min(3, Math.floor(completedRounds.length / 3) + 1);
+  setText(elements.sessionStatusSummary, `${label}${metadata.participantId ? ` • ${metadata.participantId}` : ''} • sitting ${currentSitting}`);
 
   if (status === 'running' && activeRound) {
-    setText(elements.sessionStatusDetail, `Round ${activeRound.index} of ${queue.length || planned} is live.`);
-    setText(elements.roundSummary, `Round ${activeRound.index} of ${queue.length || planned} • Set ${activeRound.puzzle?.setId || ''}`);
-    setText(elements.sessionDurationSummary, `Elapsed: ${formatDurationSeconds(durationSeconds)}`);
-    setText(elements.sessionDurationDetail, `Started ${formatTimestamp(activeRound.startedAt)}.`);
+    const condition = conditionNames[activeRound.condition] || activeRound.condition;
+    setText(elements.sessionStatusDetail, `Round ${activeRound.index} of ${queue.length || planned} is ${activeRound.pauseStartedAt ? 'paused' : 'live'} • ${condition}.`);
+    setText(elements.roundSummary, `Round ${activeRound.index} of ${queue.length || planned} • Sitting ${activeRound.sittingNumber} • ${condition} • Set ${activeRound.puzzle?.setId || ''}`);
+    setText(elements.sessionDurationSummary, `${activeRound.pauseStartedAt ? 'Paused' : 'Elapsed'}: ${formatDurationSeconds(durationSeconds)}`);
+    setText(elements.sessionDurationDetail, `Planned time ${formatDurationSeconds(metadata.roundDurationSeconds || 300)} • started ${formatTimestamp(activeRound.startedAt)}.`);
   } else if (status === 'running') {
     const nextIndex = completedRounds.length + 1;
-    setText(elements.sessionStatusDetail, completedRounds.length
-      ? `Round ${completedRounds.length} finished. Start the next one when ready.`
-      : 'Sitting is open. Start round 1 when the participant begins.');
+    setText(elements.sessionStatusDetail, session.awaitingRoundSurvey
+      ? `Round ${session.awaitingRoundSurvey} finished. Waiting for the participant questionnaire.`
+      : session.betweenSittings
+        ? `Sitting ${Math.floor(completedRounds.length / 3)} is complete. Take a break, recalibrate if needed, then begin the next sitting.`
+        : session.finalSurveyRequired
+          ? 'All nine rounds are complete. Waiting for the end-of-study questionnaire.'
+          : completedRounds.length
+            ? `Round ${completedRounds.length} finished. Start the next one when ready.`
+            : 'Study is open. Start round 1 when the participant begins.');
     setText(elements.roundSummary, nextIndex <= queue.length
-      ? `Next: round ${nextIndex} • Set ${queue[nextIndex - 1]?.setId || ''}`
-      : 'All queued rounds are finished. End the sitting.');
+      ? `Next: round ${nextIndex} • ${conditionNames[session.schedule?.[nextIndex - 1]?.condition] || ''} • Set ${queue[nextIndex - 1]?.setId || ''}`
+      : 'All nine rounds are finished. Complete the final questionnaire.');
     setText(elements.sessionDurationSummary, 'Round timer is waiting.');
-    setText(elements.sessionDurationDetail, 'The timer starts when you open a round.');
+    setText(elements.sessionDurationDetail, 'The participant timer starts when you open a round.');
   } else if (status === 'completed') {
-    setText(elements.sessionStatusDetail, `Sitting completed ${formatTimestamp(session.completedAt)}.`);
+    setText(elements.sessionStatusDetail, `Study completed ${formatTimestamp(session.completedAt)}.`);
     setText(elements.roundSummary, `${completedRounds.length} round${completedRounds.length === 1 ? '' : 's'} recorded.`);
-    setText(elements.sessionDurationSummary, `Sitting time ${formatDurationSeconds(durationSeconds)}`);
+    setText(elements.sessionDurationSummary, 'Study record is complete.');
     setText(elements.sessionDurationDetail, 'Download the JSON export or reset for the next participant.');
   } else {
-    setText(elements.sessionStatusDetail, 'Save the profile, queue puzzles, then begin the sitting.');
+    setText(elements.sessionStatusDetail, 'Save both profile copies, verify the equipment, then begin the study.');
     setText(elements.roundSummary, 'Waiting to start round 1.');
     setText(elements.sessionDurationSummary, 'Timer waiting.');
     setText(elements.sessionDurationDetail, 'Start the round when the participant begins this puzzle.');
@@ -876,14 +972,21 @@ function renderSession() {
   const startRoundPolicy = resolvePolicy('startRound');
   const completeRoundPolicy = resolvePolicy('completeRound');
   const completePolicy = resolvePolicy('completeSession');
+  const pausePolicy = resolvePolicy('pauseRound');
+  const resumePolicy = resolvePolicy('resumeRound');
+  const resumeSittingPolicy = resolvePolicy('resumeSitting');
   const resetPolicy = resolvePolicy('resetSession');
 
   [
     elements.sessionStudyId,
     elements.sessionParticipantId,
     elements.sessionResearcher,
-    elements.sessionSittingNumber,
-    elements.sessionCondition,
+    elements.sessionRoundDuration,
+    elements.sessionConstantInterval,
+    elements.adminParticipantAge,
+    elements.adminParticipantGender,
+    elements.adminParticipantGenderSelf,
+    elements.adminParticipantConsent,
     elements.sessionNotes,
     elements.sessionSave,
     elements.puzzleUploadInput,
@@ -894,7 +997,13 @@ function renderSession() {
   });
 
   setElementDisabled(elements.roundStart, !startRoundPolicy.allowed, startRoundPolicy.reason);
+  setElementDisabled(elements.roundPause, !pausePolicy.allowed, pausePolicy.reason);
+  setElementDisabled(elements.roundResume, !resumePolicy.allowed, resumePolicy.reason);
   setElementDisabled(elements.roundComplete, !completeRoundPolicy.allowed, completeRoundPolicy.reason);
+  if (elements.resumeSitting) {
+    elements.resumeSitting.hidden = !session.betweenSittings;
+    setElementDisabled(elements.resumeSitting, !resumeSittingPolicy.allowed, resumeSittingPolicy.reason);
+  }
   setElementDisabled(elements.sessionComplete, !completePolicy.allowed, completePolicy.reason);
   setElementDisabled(elements.hintText, !hintPolicy.allowed, hintPolicy.reason);
   setElementDisabled(elements.hintSend, !hintPolicy.allowed, hintPolicy.reason);
@@ -902,6 +1011,57 @@ function renderSession() {
   [elements.resetSession, elements.resetSessionSetup, elements.resetSessionReview].forEach((element) => {
     setElementDisabled(element, !resetPolicy.allowed, resetPolicy.reason);
   });
+
+  if (elements.roundSurveyStatus) {
+    elements.roundSurveyStatus.hidden = !session.awaitingRoundSurvey && !session.finalSurveyRequired;
+    setText(elements.roundSurveyStatusText, session.awaitingRoundSurvey
+      ? `Round ${session.awaitingRoundSurvey} is locked until the participant submits the questionnaire.`
+      : 'Waiting for the participant to submit the end-of-study questionnaire.');
+    setElementDisabled(elements.skipRoundSurvey, !session.awaitingRoundSurvey, 'Only per-round questionnaires may be skipped.');
+  }
+
+  const watchCalibration = currentState?.telemetry?.hrv?.calibration || {};
+  const rawCalibrationProgress = Number(watchCalibration.progress || 0);
+  const calibrationPercent = Math.round(rawCalibrationProgress <= 1 ? rawCalibrationProgress * 100 : rawCalibrationProgress);
+  setText(elements.watchCalibrationStatus, watchCalibration.active
+    ? `Calibration in progress: ${calibrationPercent}%`
+    : watchCalibration.completedAt
+      ? `Last calibration completed ${formatTimestamp(watchCalibration.completedAt)}.`
+      : 'Watch has not completed a calibration in this participant record.');
+  setElementDisabled(elements.watchCalibrate, Boolean(activeRound), 'Pause and complete the round before recalibrating.');
+
+  const spike = currentState?.telemetry?.hrv?.spike;
+  const spikeAt = spike?.detectedAt || spike?.at;
+  const showSpike = Boolean(activeRound?.condition === 'adaptive'
+    && spikeAt
+    && Date.parse(spikeAt) >= Date.parse(activeRound.startedAt));
+  if (elements.hrvSpikeAlert) {
+    elements.hrvSpikeAlert.hidden = !showSpike;
+    setText(elements.hrvSpikeDetail, showSpike
+      ? `Detected ${formatTimestamp(spikeAt)} • stress ${Number(spike.stressScore || 0).toFixed(2)}. Use researcher judgment before intervening.`
+      : 'Review the signal and decide whether to intervene.');
+  }
+  if (showSpike && spikeAt !== lastHrvSpikeToken) {
+    lastHrvSpikeToken = spikeAt;
+    operatorSound.pattern(3, 120);
+  }
+
+  const constantActive = activeRound?.condition === 'constant';
+  if (elements.constantReminder) {
+    elements.constantReminder.hidden = !constantActive;
+  }
+  if (constantActive && Number.isFinite(durationSeconds)) {
+    const interval = Math.max(5, Number(metadata.constantIntervalSeconds) || 30);
+    const remainder = durationSeconds % interval;
+    const remaining = remainder === 0 && durationSeconds > 0 ? interval : interval - remainder;
+    setText(elements.constantReminderText, `Next researcher reminder in ${remaining} second${remaining === 1 ? '' : 's'} (every ${interval}s).`);
+    const reminderNumber = Math.floor(durationSeconds / interval);
+    const reminderKey = `${activeRound.index}:${reminderNumber}`;
+    if (!activeRound.pauseStartedAt && reminderNumber > 0 && reminderKey !== lastConstantReminderKey) {
+      lastConstantReminderKey = reminderKey;
+      operatorSound.pattern(2, 160);
+    }
+  }
 
   renderHintPresets(hintPolicy);
   renderRobotComposer(actionPolicy);
@@ -956,7 +1116,7 @@ function renderReviewRecordings() {
   if (!recordings.length) {
     const empty = document.createElement('p');
     empty.className = 'panel-note';
-    empty.textContent = 'No camera takes were saved in this sitting.';
+    empty.textContent = 'No camera takes were saved in this study.';
     elements.reviewRecordings.append(empty);
     return;
   }
@@ -989,7 +1149,7 @@ function renderReview() {
   const rounds = session.rounds || [];
   setText(
     elements.reviewSummary,
-    `${metadata.participantId || 'Unnamed participant'} • sitting ${metadata.sittingNumber || 1} • ${rounds.length} round${rounds.length === 1 ? '' : 's'}.`,
+    `${metadata.participantId || 'Unnamed participant'} • ${rounds.length} of ${session.plannedRounds || 9} rounds recorded.`,
   );
   renderReviewRecordings();
 
@@ -1001,7 +1161,7 @@ function renderReview() {
   if (!rounds.length) {
     const empty = document.createElement('p');
     empty.className = 'panel-note';
-    empty.textContent = 'No rounds were recorded in this sitting.';
+    empty.textContent = 'No rounds were recorded in this study.';
     elements.reviewRounds.append(empty);
     return;
   }
@@ -1048,17 +1208,6 @@ function renderState() {
     interpretation: elements.hrvInterpretation,
   }, currentState);
 
-  const gaze = currentState?.telemetry?.gaze || {};
-  if (elements.gazeAttention) {
-    elements.gazeAttention.textContent = Number.isFinite(gaze.attentionScore)
-      ? Number(gaze.attentionScore).toFixed(2)
-      : '--';
-  }
-  if (elements.gazeUpdated) {
-    elements.gazeUpdated.textContent = gaze.updatedAt
-      ? formatTimestamp(gaze.updatedAt)
-      : 'No Pupil frame yet.';
-  }
 }
 
 async function refreshState() {
@@ -1131,7 +1280,7 @@ async function resetSession() {
   const isRunning = (currentState?.session?.status || 'setup') === 'running';
   const confirmed = window.confirm(
     isRunning
-      ? 'Reset the live sitting and start fresh?'
+      ? 'Reset the live participant study and start fresh?'
       : 'Reset the current session and clear the selected run state?',
   );
   if (!confirmed) {
@@ -1330,12 +1479,44 @@ async function init() {
         studyId: elements.sessionStudyId.value,
         participantId: elements.sessionParticipantId.value,
         researcher: elements.sessionResearcher.value,
-        sittingNumber: Number(elements.sessionSittingNumber.value || 1),
-        condition: elements.sessionCondition.value,
+        roundDurationSeconds: Number(elements.sessionRoundDuration.value || 300),
+        constantIntervalSeconds: Number(elements.sessionConstantInterval.value || 30),
+        adminProfile: {
+          age: Number(elements.adminParticipantAge.value),
+          gender: elements.adminParticipantGender.value,
+          genderSelfDescribe: elements.adminParticipantGenderSelf.value,
+          consented: elements.adminParticipantConsent.checked,
+          instructionsAcknowledged: true,
+        },
+        actor: actorName(),
         notes: elements.sessionNotes.value,
       }, {
         headers: buildHeaders(),
       });
+      await refreshState();
+    } catch (error) {
+      await handleError(error);
+    }
+  });
+
+  elements.adminParticipantGender?.addEventListener('change', () => {
+    if (elements.adminGenderSelfField) {
+      elements.adminGenderSelfField.hidden = elements.adminParticipantGender.value !== 'self-describe';
+    }
+  });
+
+  elements.operatorSound?.addEventListener('click', async () => {
+    const armed = await operatorSound.arm();
+    setText(elements.operatorSound, armed ? 'Operator alerts enabled' : 'Sound unavailable');
+    if (armed) {
+      await operatorSound.pattern(2, 120);
+    }
+  });
+
+  elements.watchCalibrate?.addEventListener('click', async () => {
+    try {
+      await postJson('/api/watch/calibrate', { requestedBy: actorName() }, { headers: buildHeaders() });
+      setText(elements.watchCalibrationStatus, 'Calibration requested. Keep the participant still while the watch collects a fresh baseline.');
       await refreshState();
     } catch (error) {
       await handleError(error);
@@ -1413,6 +1594,54 @@ async function init() {
       });
       selectedPieceId = null;
       selectedSlot = null;
+      await refreshState();
+    } catch (error) {
+      await handleError(error);
+    }
+  });
+
+  elements.roundPause?.addEventListener('click', async () => {
+    try {
+      await postJson('/api/rounds/pause', { operator: actorName() }, { headers: buildHeaders() });
+      await refreshState();
+    } catch (error) {
+      await handleError(error);
+    }
+  });
+
+  elements.roundResume?.addEventListener('click', async () => {
+    try {
+      await postJson('/api/rounds/resume', { operator: actorName() }, { headers: buildHeaders() });
+      await refreshState();
+    } catch (error) {
+      await handleError(error);
+    }
+  });
+
+  elements.resumeSitting?.addEventListener('click', async () => {
+    try {
+      await postJson('/api/session/resume-sitting', { operator: actorName() }, { headers: buildHeaders() });
+      await refreshState();
+    } catch (error) {
+      await handleError(error);
+    }
+  });
+
+  elements.skipRoundSurvey?.addEventListener('click', async () => {
+    const roundIndex = currentState?.session?.awaitingRoundSurvey;
+    if (!roundIndex) {
+      return;
+    }
+    const reason = window.prompt(`Why is the round ${roundIndex} questionnaire being skipped?`);
+    if (!reason?.trim()) {
+      return;
+    }
+    try {
+      await postJson('/api/surveys/round/skip', {
+        roundIndex,
+        reason,
+        operator: actorName(),
+      }, { headers: buildHeaders() });
       await refreshState();
     } catch (error) {
       await handleError(error);

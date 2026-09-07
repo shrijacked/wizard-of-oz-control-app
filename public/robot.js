@@ -19,19 +19,20 @@ const cueHistory = [];
 
 const soundController = createAudioCueController({
   frequency: 560,
-  durationMs: 200,
-  gainValue: 0.05,
+  durationMs: 240,
+  gainValue: 0.14,
+  waveform: 'square',
 });
 const ROBOT_MOVE_WARNING_MS = 10_000;
 const moveAlertScheduler = createDelayedCueScheduler({
   delayMs: ROBOT_MOVE_WARNING_MS,
   onCue: async () => {
-    await soundController.beep();
+    await soundController.pattern(2, 120);
   },
 });
 const robotAlertTracker = createUpdateCueTracker({
   onCue: async (token) => {
-    await soundController.beep();
+    await soundController.pattern(3, 100);
     const remaining = remainingDelayMs(token, ROBOT_MOVE_WARNING_MS);
     if (remaining <= -2000) {
       return;

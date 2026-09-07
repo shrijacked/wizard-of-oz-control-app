@@ -43,6 +43,7 @@ LOG_FILE = os.path.join(OUTPUT_DIR, "hrv_processor.log")
 # Path for storing the JSON data file
 WATCH_DATA_FILE = os.path.join(OUTPUT_DIR, "watch_data.json")
 BASELINE_FILE = os.path.join(OUTPUT_DIR, "baseline_calibration.json")
+CONTROL_FILE = os.path.join(OUTPUT_DIR, "control.json")
 
 HEART_RATE_UUID = "00002a37-0000-1000-8000-00805f9b34fb"
 TARGET_DEVICE_NAME = "hBand"
@@ -115,6 +116,49 @@ class HRVProcessor:
         self.data_points_collected = 0
         # Remove the limit on data points
         self.continuous_monitoring = True
+        self.last_control_request_id = None
+
+    def begin_calibration(self):
+        """Start a fresh participant baseline while the collector remains connected."""
+        now = time.time()
+        self.heart_rate_values.clear()
+        self.rr_intervals_values.clear()
+        self.baseline_metrics = {}
+        self.baseline_complete = False
+        self.baseline_start_time = now
+        self.current_window_start = now
+        self.monitoring_mode = False
+        self.stress_count = 0
+        self.save_to_json({
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "watch_data": {
+                "is_baseline": False,
+                "current_metrics": {},
+                "stress_score": 0,
+                "stress_level": "Calibrating",
+                "distraction_detected": False,
+                "interpretation": "Fresh participant baseline calibration started.",
+                "feedback": "Keep the participant still and relaxed.",
+                "calibration": {
+                    "active": True,
+                    "progress": 0,
+                    "started_at": datetime.now().isoformat(),
+                    "duration_seconds": BASELINE_DURATION,
+                },
+            },
+        })
+        logger.info("Fresh watch baseline calibration started from the running app.")
+
+    def check_control_file(self):
+        try:
+            with open(CONTROL_FILE, "r", encoding="utf-8") as handle:
+                command = json.load(handle)
+        except (FileNotFoundError, json.JSONDecodeError, OSError):
+            return
+        request_id = command.get("requestId")
+        if request_id and request_id != self.last_control_request_id and command.get("action") == "calibrate":
+            self.last_control_request_id = request_id
+            self.begin_calibration()
 
     def reset_json_file(self):
         """Reset the JSON file with an empty structure for a new session"""
@@ -284,8 +328,8 @@ class HRVProcessor:
             self.baseline_complete = True
             self.current_window_start = timestamp
             logger.info("Baseline calibration complete.")
-
-            # After baseline is complete, we don't automatically start monitoring
+            self.save_baseline_to_json()
+            self.start_monitoring()
 
         # Monitoring mode - collect data continuously
         elif (
@@ -374,6 +418,9 @@ class HRVProcessor:
 
         self.last_live_write_time = timestamp
         calibrating = not self.baseline_complete
+        progress = 0
+        if calibrating and self.baseline_start_time:
+            progress = min(100, int((timestamp - self.baseline_start_time) / BASELINE_DURATION * 100))
         self.save_to_json({
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "watch_data": {
@@ -389,6 +436,12 @@ class HRVProcessor:
                 "distraction_detected": False,
                 "interpretation": "Watch live — calibrating baseline." if calibrating else "Heart rate sample received from the band.",
                 "feedback": "Keep the band on." if calibrating else "HRV monitoring is running.",
+                "calibration": {
+                    "active": calibrating,
+                    "progress": progress,
+                    "started_at": datetime.fromtimestamp(self.baseline_start_time).isoformat() if self.baseline_start_time else None,
+                    "duration_seconds": BASELINE_DURATION,
+                },
             },
         })
 
@@ -689,6 +742,7 @@ async def main():
         logger.info("Starting baseline calibration...")
         calibration_start = time.time()
         while not proc.baseline_complete:
+            proc.check_control_file()
             if time.time() - calibration_start > 120:  # Safety timeout of 2 minutes
                 print("Calibration timeout - please try again.")
                 await proc.stop()
@@ -699,9 +753,6 @@ async def main():
             progress = min(100, int((time.time() - calibration_start) / BASELINE_DURATION * 100))
             if progress % 10 == 0:
                 print(f"Calibration: {progress}% complete...", end="\r", flush=True)
-
-        # Save the baseline metrics to JSON after calibration
-        proc.save_baseline_to_json()
 
         print("\nCalibration complete!")
         print("Baseline metrics established and saved for future sessions.")
@@ -717,7 +768,14 @@ async def main():
     # Wait for monitoring to continue indefinitely
     monitoring_start = time.time()
     while proc.monitoring_mode:
+        proc.check_control_file()
         await asyncio.sleep(1)
+
+        # A runtime calibration temporarily disables monitoring and restores it
+        # automatically from the notification handler when the baseline ends.
+        while not proc.baseline_complete:
+            proc.check_control_file()
+            await asyncio.sleep(1)
 
     print("\nMonitoring stopped.")
     print("Data saved to watch_data.json")

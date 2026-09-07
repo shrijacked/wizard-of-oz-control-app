@@ -25,7 +25,7 @@ test('study config keeps valid pieces, slots, and hint presets', () => {
 test('study config falls back to defaults when the file is missing', () => {
   const missingPath = path.join(os.tmpdir(), `woz-missing-study-${Date.now()}.json`);
   const config = loadStudyConfig(missingPath);
-  assert.equal(config.plannedRounds, 3);
+  assert.equal(config.plannedRounds, 9);
   assert.equal(config.tangramPuzzlesDir, 'tangram puzzles');
   assert.ok(config.pieces.length >= 1);
 });
@@ -46,6 +46,6 @@ test('study config falls back when the file is malformed', () => {
   const filePath = path.join(os.tmpdir(), `woz-bad-study-${Date.now()}.json`);
   fs.writeFileSync(filePath, '{not-json');
   const config = loadStudyConfig(filePath);
-  assert.equal(config.plannedRounds, 3);
+  assert.equal(config.plannedRounds, 9);
   fs.unlinkSync(filePath);
 });

@@ -2,11 +2,13 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { randomUUID } = require('node:crypto');
 
 class WatchBridge {
   constructor(options) {
     this.store = options.store;
     this.watchFilePath = options.watchFilePath || path.join(process.cwd(), 'watch', 'watch_data.json');
+    this.controlFilePath = options.controlFilePath || path.join(path.dirname(this.watchFilePath), 'control.json');
     this.lastSequenceNumber = 0;
     this.status = {
       filePath: this.watchFilePath,
@@ -15,6 +17,7 @@ class WatchBridge {
       lastProcessedAt: null,
       lastError: null,
       lastSequenceNumber: 0,
+      calibrationRequestedAt: null,
     };
     this.listener = null;
   }
@@ -41,6 +44,24 @@ class WatchBridge {
 
   getStatus() {
     return { ...this.status };
+  }
+
+  async requestCalibration(meta = {}) {
+    if (!this.status.active) {
+      const error = new Error('The watch bridge is not running.');
+      error.statusCode = 409;
+      throw error;
+    }
+    const requestedAt = new Date().toISOString();
+    await fs.promises.mkdir(path.dirname(this.controlFilePath), { recursive: true });
+    await fs.promises.writeFile(this.controlFilePath, JSON.stringify({
+      requestId: randomUUID(),
+      action: 'calibrate',
+      requestedAt,
+      requestedBy: meta.requestedBy || 'researcher',
+    }, null, 2));
+    this.status.calibrationRequestedAt = requestedAt;
+    return { accepted: true, requestedAt };
   }
 
   async processFile() {

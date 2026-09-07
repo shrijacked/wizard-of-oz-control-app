@@ -74,5 +74,19 @@ export function createAudioCueController(options = {}) {
       oscillator.stop(endAt);
       return true;
     },
+
+    async pattern(count = 2, gapMs = 140) {
+      if (!armed) {
+        return false;
+      }
+      const total = Math.max(1, Math.min(6, Math.floor(Number(count) || 1)));
+      for (let index = 0; index < total; index += 1) {
+        await this.beep();
+        if (index < total - 1) {
+          await new Promise((resolve) => setTimeout(resolve, gapMs));
+        }
+      }
+      return true;
+    },
   };
 }

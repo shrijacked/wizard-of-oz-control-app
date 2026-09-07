@@ -2,10 +2,10 @@
 
 Local-first control software for a three-screen Wizard of Oz puzzle study.
 
-One sitting is one session with three queued puzzles. Each participant does three sittings.
+One participant record contains nine randomized puzzles in three consecutive sittings of three. Each sitting uses one condition: control, constant intervention, or adaptive intervention.
 
 - `/admin` for the dashboard operator
-- `/subject` for the participant (written hint + beep only)
+- `/subject` for participant onboarding, timer, written hints, breaks, and questionnaires
 - `/robot` for the robot operator (piece + slot cue + beep only)
 
 The host machine serves all three screens over the local network and keeps them synchronized with WebSockets and file-backed logging.
@@ -14,15 +14,21 @@ The host machine serves all three screens over the local network and keeps them 
 
 - shows a live Logitech C270 preview on the operator dashboard, with a camera picker
 - seeds puzzle pairs from `tangram puzzles/` (`1.pdf`+`1s.pdf` through `9.pdf`+`9s.pdf`)
-- auto-queues sitting 1 as puzzles 1–3, sitting 2 as 4–6, and sitting 3 as 7–9 when the operator saves the sitting number
+- reserves the next participant ID (`P01`, `P02`, …) without reusing saved IDs
+- cycles participants through all six possible condition orders and saves the assigned order
+- globally shuffles all nine puzzles with a persisted participant-specific seed, then assigns three to each sitting
+- records separate participant-entered and researcher-entered demographic/consent copies for cross-checking
+- collects baseline expected efficacy, a questionnaire after every round, and an end-of-study questionnaire in the app
 - sends text hints from the dashboard to the subject screen
 - sends robot cues as **piece + numbered slot** to the robot screen
 - plays a short alert beep on the subject screen when a new hint arrives
 - plays a short alert beep on the robot screen when a new robot cue arrives
-- blocks **Begin sitting** until the C270, Maxim H Band, Pupil Core gaze frames, both display screens, and the sitting queue are live
-- tracks sitting and round lifecycle with start, complete, reset, and elapsed time
-- shows live HRV and Pupil gaze metrics on the operator dashboard
-- exports a concise session JSON with sitting metadata, per-round durations, and ordered interventions
+- blocks **Begin study** until the C270, Maxim H Band, both displays, matching profile copies, and nine-round schedule are ready
+- tracks study, sitting, and round lifecycle with start, pause, resume, complete, breaks, and elapsed active time
+- provides configurable constant-condition reminders and highlights detected HRV stress spikes in adaptive rounds
+- allows watch recalibration between rounds and sittings without restarting the app
+- shows live HRV metrics and stress-spike guidance on the operator dashboard
+- exports a concise participant-session JSON with counterbalancing, puzzle order, both profile copies, per-round surveys, final survey, durations, and ordered interventions
 - keeps CSV timeline output available as a secondary export
 
 ## Puzzle file pairing
@@ -30,9 +36,8 @@ The host machine serves all three screens over the local network and keeps them 
 The study folder is the source of truth. Pairing uses the `s` suffix convention:
 
 - `1.pdf` pairs with `1s.pdf`
-- sitting 1 queues `1`, `2`, `3`
-- sitting 2 queues `4`, `5`, `6`
-- sitting 3 queues `7`, `8`, `9`
+- all nine complete pairs are shuffled across the full participant schedule
+- the resulting order and randomization seed are saved and remain stable for that participant
 
 Manual upload remains a fallback for a missing or replaced file. Only complete pairs become selectable sets.
 
@@ -45,7 +50,7 @@ The robot screen shows a sentence such as `Move ORANGE TRIANGLE to slot 4`.
 ## Routes
 
 - `GET /admin`: operator dashboard (camera, solution, hints, robot cues)
-- `GET /subject`: participant hint display
+- `GET /subject`: participant study screen
 - `GET /robot`: robot-operator cue display
 - `GET /audit`: compatibility redirect to `/robot`
 - `GET /api/export/current.json`: concise primary session export
@@ -58,7 +63,7 @@ npm install
 npm run launch:study
 ```
 
-`npm run launch:study` starts the Node server, `watch.py` for the Maxim H Band, and the Pupil Core gaze bridge. Use `npm start` if you only want the web app.
+`npm run launch:study` starts the Node server and `watch.py` for the Maxim H Band. Use `npm start` if you only want the web app.
 
 Then open:
 
@@ -76,17 +81,18 @@ That archives `data/state.json`, the event log, exports, and uploaded puzzles in
 
 ## Operator runbook
 
-1. Start **Pupil Capture** with the Core headset. Capture must use the **glasses** world camera, not the C270. If Capture grabs the Logitech, the operator preview will fail with “camera already in use”.
-2. Put the Maxim H Band on and start the app with `npm run launch:study`. Heart rate should appear as soon as BLE is connected; stress/RMSSD still wait for the 60s baseline.
-3. Open `/admin` on the host machine. Choose the C270 in the camera list and click **Start camera**.
-4. Open `/subject` and `/robot` on the other two devices. Tap once on each so the alert sound is armed.
-5. Fill in participant ID, researcher, and sitting number (1/2/3). Save the profile. The three puzzles for that sitting queue automatically.
-6. When the readiness list is green, click **Begin sitting**. The button stays disabled until camera, watch, Pupil frames, both screens, and the sitting queue are live.
-7. Click **Start round** when the participant begins a puzzle. The physical tangram is on the table; `/subject` does not show the puzzle PDF.
-8. Send hints and robot cues (piece, then slot) only while a round is open.
-9. Click **Complete round**, then start the next one.
-10. After the third puzzle, click **End sitting** and download the session JSON.
-11. Click **Reset for next participant**, or run `npm run study:reset` if you also want a clean archive.
+1. Put the Maxim H Band on and start the app with `npm run launch:study`. Heart rate should appear as soon as BLE is connected; stress/RMSSD still wait for the 60s baseline.
+2. Open `/admin` on the host machine. Choose the C270 in the camera list and click **Start camera**.
+3. Open `/subject` and `/robot` on the other two devices. Tap once on each so the alert sound is armed.
+4. Use the auto-assigned participant ID. Enter the researcher’s demographic/consent cross-check, timer length, and constant reminder interval, then save. The nine-round condition and puzzle schedule is generated once and shown in the dashboard.
+5. Read the on-screen participant script. On `/subject`, have the participant enter their own age/gender copy, baseline expected-efficacy rating, instruction acknowledgement, and consent.
+6. When the readiness list is green, click **Begin study**. The button stays disabled until both profile copies match and the camera, watch, both screens, and nine-puzzle schedule are ready.
+7. Click **Start round** when the participant begins. Use **Pause timer** and **Resume timer** when needed. The participant sees the countdown and hears start, midpoint, and end cues.
+8. Control rounds disable hints and robot movements. In constant rounds, use the configured researcher reminder. In adaptive rounds, use the HRV spike highlight as decision support rather than an automatic intervention.
+9. Click **Complete round**. The next round remains locked until the participant submits the in-app questionnaire. A researcher can skip it only by recording a reason.
+10. After rounds 3 and 6, take a break. Recalibrate the watch if needed, click **Begin next sitting**, and continue the same participant record.
+11. After round 9, wait for the participant’s end-of-study questionnaire, click **End study**, and download the exports.
+12. Click **Reset for next participant**, or run `npm run study:reset` if you also want a clean archive.
 
 ## Runtime options
 
@@ -94,16 +100,15 @@ That archives `data/state.json`, the event log, exports, and uploaded puzzles in
 - `HOST`: listening host, default `0.0.0.0`
 - `ADMIN_PIN`: optional browser unlock PIN for operator actions
 - `OPENAI_API_KEY` or `ADAPTIVE_LLM_API_KEY`: optional LLM advisory support for adaptive analysis
-- `PUPIL_HOST` / `PUPIL_PORT`: Pupil Capture Network API, default `127.0.0.1:50020`
-- `GAZE_MODE`: default `pupil-core`; set `heartbeat-only` or `file-tail` only for rehearsal without Capture
 
 ## Sensor integration
 
 - Maxim H Band: [`integrations/watch/watch.py`](integrations/watch/watch.py) writes `watch/watch_data.json`. `pylsl` is optional; `bleak` and `numpy` are required for BLE.
-- Pupil Core: [`integrations/gaze/pupil_core_bridge.py`](integrations/gaze/pupil_core_bridge.py) reads Capture’s ZMQ Network API and posts gaze frames. Heartbeats alone do not clear the start gate.
 - C270: selected in the operator camera list and reported to `POST /api/camera/status`.
 
-These feeds **do** block a sitting from starting.
+The watch still establishes a baseline when its bridge starts. **Recalibrate watch** writes a runtime control request for `watch.py`; use it between rounds or sittings while the participant is still.
+
+The camera and watch feeds **do** block a sitting from starting.
 
 ## Verification
 
@@ -111,10 +116,11 @@ These feeds **do** block a sitting from starting.
 npm run verify
 ```
 
-That runs the Node test suite plus Python syntax validation for the watch and gaze scripts. A hardware rehearsal with C270 + Pupil Capture + the band is still required on the study laptop.
+That runs the Node test suite plus Python syntax validation for the watch script. A hardware rehearsal with the C270 and band is still required on the study laptop.
 
 ## Documentation
 
 - [Architecture](docs/architecture.md)
 - [Internal Study Readiness](docs/internal-study-readiness.md)
 - [End-to-End Validation Plan](docs/end-to-end-validation-plan.md)
+- [Participant Read-Aloud Script](docs/participant-script.md)

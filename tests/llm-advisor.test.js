@@ -15,7 +15,7 @@ test('LLM advisor parses an OpenAI-compatible JSON response', async () => {
           {
             message: {
               content: JSON.stringify({
-                summary: 'Stress is rising and attention is unstable.',
+                summary: 'HRV stress is rising.',
                 recommendedHint: 'Try the outer edge for alignment.',
                 urgency: 'observe',
               }),
@@ -29,7 +29,6 @@ test('LLM advisor parses an OpenAI-compatible JSON response', async () => {
   const result = await advisor.analyze({
     telemetry: {
       hrv: { stressScore: 0.6 },
-      gaze: { attentionScore: 0.4, fixationLoss: 0.7 },
     },
     hint: {},
     robotAction: {},
@@ -39,7 +38,7 @@ test('LLM advisor parses an OpenAI-compatible JSON response', async () => {
     reason: 'Observe the participant.',
   });
 
-  assert.equal(result.summary, 'Stress is rising and attention is unstable.');
+  assert.equal(result.summary, 'HRV stress is rising.');
   assert.equal(result.recommendedHint, 'Try the outer edge for alignment.');
   assert.equal(result.urgency, 'observe');
   assert.equal(result.error, null);

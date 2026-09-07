@@ -53,7 +53,7 @@ test('store creates, appends, and finalizes a camera recording on disk', async (
   const { store, dataDir } = await createStore();
 
   const created = await store.createCameraRecording();
-  assert.match(created.filename, /table-unknown-sitting1-1\.webm/);
+  assert.match(created.filename, /table-P01-sitting1-1\.webm/);
   assert.ok(created.recordingId);
   assert.ok(created.finalizeToken);
 

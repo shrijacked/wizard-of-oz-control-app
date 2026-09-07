@@ -19,15 +19,14 @@ function tinyPdfBase64() {
   return Buffer.from('%PDF-1.4\n1 0 obj\n<< /Type /Catalog >>\nendobj\ntrailer\n<<>>\n%%EOF').toString('base64');
 }
 
-test('store persists hints, actions, and telemetry to disk-backed state', async () => {
+test('store persists hints, actions, and HRV telemetry to disk-backed state', async () => {
   const { store, dataDir } = await createStore();
 
   await store.setHint({ text: 'Try the outer edge first.' });
   await store.logRobotAction({ pieceId: 'purple-triangle', pieceLabel: 'Purple Triangle', slot: 4 });
-  await store.ingestGazeTelemetry({
-    attentionScore: 0.3,
-    fixationLoss: 0.7,
-    pupilDilation: 0.5,
+  await store.ingestHrvTelemetry({
+    metrics: { hr: 74, rmssd: 31 },
+    stressLevel: 'Not Stressed',
   });
 
   const state = store.getState();
@@ -35,7 +34,8 @@ test('store persists hints, actions, and telemetry to disk-backed state', async 
   assert.equal(state.robotAction.pieceLabel, 'Purple Triangle');
   assert.equal(state.robotAction.slot, 4);
   assert.equal(state.robotAction.label, 'Move PURPLE TRIANGLE to slot 4');
-  assert.equal(state.telemetry.gaze.fixationLoss, 0.7);
+  assert.equal(state.telemetry.hrv.metrics.hr, 74);
+  assert.equal('gaze' in state.telemetry, false);
   assert.ok(['normal', 'observe', 'intervene'].includes(state.adaptive.status));
 
   const savedState = JSON.parse(await fs.readFile(path.join(dataDir, 'state.json'), 'utf8'));
@@ -181,7 +181,25 @@ test('store backs up a corrupt state.json instead of crashing on startup', async
   assert.ok(entries.some((name) => name.startsWith('state.json.corrupt-')));
 });
 
-test('store preserves the loaded watch baseline across session resets', async () => {
+test('store migrates an untouched setup state to the configured nine-round design', async () => {
+  const dataDir = await fs.mkdtemp(path.join(os.tmpdir(), 'woz-migrate-'));
+  const legacy = new ExperimentStore({ dataDir, plannedRounds: 3 });
+  await legacy.initialize();
+  const legacyStatePath = path.join(dataDir, 'state.json');
+  const legacyState = JSON.parse(await fs.readFile(legacyStatePath, 'utf8'));
+  legacyState.telemetry.gaze = { attentionScore: 0.8, updatedAt: '2026-04-01T00:00:00.000Z' };
+  legacyState.telemetry.history.gaze = [{ attentionScore: 0.8 }];
+  await fs.writeFile(legacyStatePath, JSON.stringify(legacyState), 'utf8');
+
+  const upgraded = new ExperimentStore({ dataDir, plannedRounds: 9, roundsPerSitting: 3 });
+  await upgraded.initialize();
+  assert.equal(upgraded.getState().session.plannedRounds, 9);
+  assert.equal(upgraded.getState().session.metadata.participantId, 'P01');
+  assert.equal('gaze' in upgraded.getState().telemetry, false);
+  assert.equal('gaze' in upgraded.getState().telemetry.history, false);
+});
+
+test('store starts a fresh watch baseline and participant ID after reset', async () => {
   const { store } = await createStore();
 
   await store.ingestWatchEntry({
@@ -203,12 +221,19 @@ test('store preserves the loaded watch baseline across session resets', async ()
   });
 
   const state = store.getState();
-  assert.deepEqual(state.telemetry.hrv.baseline, {
-    hr: 70,
-    sdnn: 40,
-    rmssd: 30,
-    pnn50: 20,
-  });
+  assert.equal(state.telemetry.hrv.baseline, null);
+  assert.equal(state.session.metadata.participantId, 'P02');
+});
+
+test('store refuses to reuse a previously assigned participant ID', async () => {
+  const { store } = await createStore();
+  assert.equal(store.getState().session.metadata.participantId, 'P01');
+  await store.resetSession({ requestedBy: 'Researcher' });
+  assert.equal(store.getState().session.metadata.participantId, 'P02');
+  await assert.rejects(
+    () => store.configureSession({ participantId: 'P01', researcher: 'Researcher' }),
+    /already been assigned/i,
+  );
 });
 
 test('store seeds tangram pairs and auto-queues sitting 2 as puzzles 4, 5, 6', async () => {
@@ -239,4 +264,96 @@ test('store seeds tangram pairs and auto-queues sitting 2 as puzzles 4, 5, 6', a
 
   const sittingTwo = store.getState();
   assert.deepEqual(sittingTwo.session.queue.map((entry) => entry.setId), ['4', '5', '6']);
+});
+
+test('store runs one persisted nine-round participant study with surveys and sitting breaks', async () => {
+  const dataDir = await fs.mkdtemp(path.join(os.tmpdir(), 'woz-study-'));
+  let now = new Date('2026-09-07T10:00:00.000Z');
+  const store = new ExperimentStore({
+    dataDir,
+    plannedRounds: 9,
+    roundsPerSitting: 3,
+    now: () => now,
+  });
+  await store.initialize();
+  const files = [];
+  for (let index = 1; index <= 9; index += 1) {
+    files.push(
+      { name: `${index}.pdf`, mimeType: 'application/pdf', contentBase64: tinyPdfBase64() },
+      { name: `${index}s.pdf`, mimeType: 'application/pdf', contentBase64: tinyPdfBase64() },
+    );
+  }
+  await store.uploadPuzzleAssets(files, { actor: 'researcher' });
+  await store.configureSession({
+    studyId: 'hti-20260907',
+    participantId: 'P01',
+    researcher: 'Researcher',
+    adminProfile: { age: 24, gender: 'non-binary', consented: true, instructionsAcknowledged: true },
+  });
+  await store.submitParticipantProfile({
+    age: 24,
+    gender: 'non-binary',
+    consented: true,
+    instructionsAcknowledged: true,
+    expectedEfficacy: 5,
+  });
+  await store.startSession({ operator: 'Researcher' });
+
+  const baseSurvey = {
+    mentalDemand: 3,
+    physicalDemand: 2,
+    temporalDemand: 4,
+    performance: 5,
+    effort: 4,
+    frustration: 2,
+  };
+  for (let roundIndex = 1; roundIndex <= 9; roundIndex += 1) {
+    await store.startRound({ operator: 'Researcher' });
+    now = new Date(now.getTime() + 30_000);
+    if (roundIndex === 1) {
+      await store.pauseRound({ operator: 'Researcher' });
+      now = new Date(now.getTime() + 10_000);
+      await store.resumeRound({ operator: 'Researcher' });
+    }
+    now = new Date(now.getTime() + 30_000);
+    await store.completeRound({ operator: 'Researcher' });
+    const condition = store.getState().session.rounds.at(-1).condition;
+    await store.submitRoundSurvey({
+      roundIndex,
+      responses: condition === 'control' ? baseSurvey : {
+        ...baseSurvey,
+        helpfulness: 5,
+        timingEffectiveness: 5,
+        clarityAndDistraction: 5,
+        stressReduction: 5,
+      },
+    });
+    if (roundIndex === 3 || roundIndex === 6) {
+      assert.equal(store.getState().session.betweenSittings, true);
+      await store.resumeNextSitting({ operator: 'Researcher' });
+    }
+  }
+
+  assert.equal(store.getState().session.finalSurveyRequired, true);
+  await store.submitFinalSurvey({ responses: {
+    overallHelpfulness: 5,
+    overallEfficacy: 5,
+    trust: 5,
+    automationBias: 3,
+    comment: 'Completed.',
+  } });
+  await store.completeSession({ operator: 'Researcher' });
+
+  const state = store.getState();
+  assert.equal(state.session.status, 'completed');
+  assert.equal(state.session.rounds.length, 9);
+  assert.equal(state.session.rounds[0].durationSeconds, 60);
+  assert.equal(new Set(state.session.queue.map((puzzle) => puzzle.setId)).size, 9);
+  assert.deepEqual(state.session.rounds.map((round) => round.condition), [
+    'control', 'control', 'control',
+    'constant', 'constant', 'constant',
+    'adaptive', 'adaptive', 'adaptive',
+  ]);
+  assert.ok(state.session.rounds.every((round) => round.survey));
+  assert.equal(state.session.finalSurvey.comment, 'Completed.');
 });

@@ -5,7 +5,6 @@ const assert = require('node:assert/strict');
 
 const {
   summarizeWatchHealth,
-  summarizeGazeHealth,
   summarizeSensorHealth,
 } = require('../src/sensor-health');
 
@@ -24,41 +23,7 @@ test('sensor health marks the watch bridge stale after its threshold elapses', (
   assert.equal(watch.stale, true);
 });
 
-test('sensor health treats heartbeat-only gaze as waiting for a frame', () => {
-  const now = new Date('2026-04-09T12:00:00.000Z');
-  const gaze = summarizeGazeHealth({
-    bridgeId: 'pupil-core',
-    deviceLabel: 'Pupil Core',
-    transport: 'pupil-zmq',
-    lastHeartbeatAt: '2026-04-09T11:59:57.000Z',
-    lastFrameAt: null,
-    active: true,
-    staleAfterMs: 15000,
-    lastError: null,
-  }, now);
-
-  assert.equal(gaze.state, 'waiting');
-  assert.match(gaze.detail, /heartbeat/i);
-});
-
-test('sensor health treats a recent gaze frame as healthy', () => {
-  const now = new Date('2026-04-09T12:00:00.000Z');
-  const gaze = summarizeGazeHealth({
-    bridgeId: 'pupil-core',
-    deviceLabel: 'Pupil Core',
-    transport: 'pupil-zmq',
-    lastHeartbeatAt: '2026-04-09T11:59:57.000Z',
-    lastFrameAt: '2026-04-09T11:59:58.000Z',
-    active: true,
-    staleAfterMs: 15000,
-    lastError: null,
-  }, now);
-
-  assert.equal(gaze.level, 'healthy');
-  assert.equal(gaze.state, 'healthy');
-});
-
-test('sensor health summarizes running-session warnings across bridges', () => {
+test('sensor health summarizes running-session watch warnings', () => {
   const now = new Date('2026-04-09T12:00:00.000Z');
   const health = summarizeSensorHealth({
     sessionStatus: 'running',
@@ -69,19 +34,10 @@ test('sensor health summarizes running-session warnings across bridges', () => {
       lastProcessedAt: '2026-04-09T11:58:10.000Z',
       lastError: null,
     },
-    gazeBridge: {
-      bridgeId: null,
-      active: false,
-      lastHeartbeatAt: null,
-      lastFrameAt: null,
-      staleAfterMs: 15000,
-      lastError: null,
-    },
   }, now);
 
   assert.equal(health.overall.level, 'warning');
   assert.match(health.overall.summary, /stale/i);
-  assert.match(health.overall.summary, /gaze frame/i);
   assert.equal(health.watch.state, 'stale');
-  assert.equal(health.gaze.state, 'waiting');
+  assert.equal('gaze' in health, false);
 });
