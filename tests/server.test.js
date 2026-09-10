@@ -161,6 +161,8 @@ test('server serves the simplified three-screen routes and aliases /audit to /ro
     assert.match(subjectHtml, /Participant Display/i);
     assert.match(subjectHtml, /id="subject-puzzle"/);
     assert.match(subjectHtml, /Your puzzle/i);
+    assert.match(subjectHtml, /id="subject-script-audio"[^>]*autoplay/);
+    assert.match(subjectHtml, /I have read and understood the study instructions/);
     assert.match(robotHtml, /Robot Operator Screen/i);
     assert.match(robotHtml, /Move this piece/i);
     assert.ok([200, 302, 307, 308].includes(auditResponse.status));
@@ -619,6 +621,53 @@ test('starting a sitting permits hardware and display warnings and records the o
     assert.equal(started.status, 200);
     const events = await fetch(`${baseUrl}/api/events?limit=10`).then((response) => response.json());
     assert.ok(events.events.some((event) => event.type === 'preflight.warnings.accepted'));
+  } finally {
+    await app.close();
+  }
+});
+
+test('watch recalibration is allowed during a paused round and remains visibly pending', async () => {
+  const watchBridge = {
+    async start() {},
+    stop() {},
+    getStatus() {
+      return {
+        active: true,
+        filePath: './watch/watch_data.json',
+        lastProcessedAt: null,
+        lastError: null,
+      };
+    },
+    async requestCalibration() {
+      return {
+        accepted: true,
+        awaitingWatch: true,
+        requestId: 'request-paused-round',
+        requestedAt: '2026-04-09T12:00:00.000Z',
+        warning: 'The watch has not sent a live sample yet.',
+      };
+    },
+  };
+  const { app, baseUrl } = await startApp({ watchBridge });
+
+  try {
+    await postJson(baseUrl, '/api/session/configure', {
+      participantId: 'P-WATCH',
+      researcher: 'Researcher',
+    });
+    await uploadPuzzlePair(baseUrl, '1');
+    await postJson(baseUrl, '/api/session/start', { operator: 'Researcher' });
+    await postJson(baseUrl, '/api/rounds/start', { operator: 'Researcher' });
+
+    const liveAttempt = await postJson(baseUrl, '/api/watch/calibrate', { requestedBy: 'Researcher' });
+    assert.equal(liveAttempt.status, 409);
+    await postJson(baseUrl, '/api/rounds/pause', { operator: 'Researcher' });
+    const pausedAttempt = await postJson(baseUrl, '/api/watch/calibrate', { requestedBy: 'Researcher' });
+    assert.equal(pausedAttempt.status, 200, await pausedAttempt.text());
+
+    const state = await fetch(`${baseUrl}/api/state`).then((response) => response.json());
+    assert.equal(state.telemetry.hrv.calibration.pending, true);
+    assert.equal(state.telemetry.hrv.calibration.requestId, 'request-paused-round');
   } finally {
     await app.close();
   }

@@ -119,6 +119,8 @@ That archives `data/state.json`, the event log, exports, and uploaded puzzles in
 
 The watch still establishes a baseline when its bridge starts. **Recalibrate watch** writes a runtime control request for `watch.py`; use it between rounds or sittings while the participant is still.
 
+If macOS discovers the band without its `hBand` name, launch with its saved Bluetooth identifier: `WATCH_DEVICE_ID=<identifier> npm run launch:study`. A recalibration request made while the collector is disconnected remains pending and is processed after the collector reconnects.
+
 Camera and watch issues are shown as warnings and **do not** block a sitting from starting.
 
 Open the Admin page at `http://localhost:3000/admin` on the Mac connected to the camera. Browsers block camera access from ordinary non-secure LAN addresses. Other laptops should use the `.local` Subject/Robot links shown on the dashboard; the pages reconnect automatically after a network interruption.

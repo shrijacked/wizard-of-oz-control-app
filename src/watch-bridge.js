@@ -54,14 +54,23 @@ class WatchBridge {
     }
     const requestedAt = new Date().toISOString();
     await fs.promises.mkdir(path.dirname(this.controlFilePath), { recursive: true });
+    const requestId = randomUUID();
     await fs.promises.writeFile(this.controlFilePath, JSON.stringify({
-      requestId: randomUUID(),
+      requestId,
       action: 'calibrate',
       requestedAt,
       requestedBy: meta.requestedBy || 'researcher',
     }, null, 2));
     this.status.calibrationRequestedAt = requestedAt;
-    return { accepted: true, requestedAt };
+    return {
+      accepted: true,
+      requestId,
+      requestedAt,
+      awaitingWatch: true,
+      warning: this.status.lastProcessedAt
+        ? null
+        : 'The request was saved, but the watch has not sent a live sample yet.',
+    };
   }
 
   async processFile() {
@@ -71,6 +80,16 @@ class WatchBridge {
       const raw = await fs.promises.readFile(this.watchFilePath, 'utf8');
       const parsed = JSON.parse(raw);
       const entries = Array.isArray(parsed.entries) ? parsed.entries : [];
+      const fileSequenceNumber = Number.isFinite(Number(parsed.current_sequence))
+        ? Number(parsed.current_sequence)
+        : entries.reduce((maximum, entry) => Math.max(maximum, Number(entry.sequence_number || 0)), 0);
+      if (fileSequenceNumber < this.lastSequenceNumber) {
+        // watch.py starts a new file generation at sequence 0 whenever its
+        // process launches. Reset the bridge cursor as well or every fresh
+        // entry would be mistaken for an already-processed old entry.
+        this.lastSequenceNumber = 0;
+        this.status.lastSequenceNumber = 0;
+      }
       const orderedEntries = [...entries].sort((left, right) => {
         return Number(left.sequence_number || 0) - Number(right.sequence_number || 0);
       });

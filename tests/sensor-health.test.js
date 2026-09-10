@@ -40,6 +40,20 @@ test('sensor health reports stale samples instead of frozen calibration progress
   assert.match(watch.detail, /42%/);
 });
 
+test('sensor health distinguishes a saved recalibration request from active collection', () => {
+  const watch = summarizeWatchHealth({
+    active: true,
+    lastProcessedAt: null,
+    lastError: null,
+  }, new Date('2026-04-09T12:00:00.000Z'), {
+    calibration: { pending: true, active: false, progress: 0 },
+  });
+
+  assert.equal(watch.state, 'pending');
+  assert.equal(watch.level, 'warning');
+  assert.match(watch.detail, /No live hBand sample/i);
+});
+
 test('sensor health summarizes running-session watch warnings', () => {
   const now = new Date('2026-04-09T12:00:00.000Z');
   const health = summarizeSensorHealth({

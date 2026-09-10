@@ -4,6 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 
 const {
+  CONSENT_STATEMENT,
   SUBJECT_INSTRUCTIONS,
   normalizeFinalSurvey,
   normalizeProfile,
@@ -32,6 +33,7 @@ test('control questionnaires save workload only while intervention rounds requir
 });
 
 test('participant profile and final survey enforce required scales and consent', () => {
+  assert.equal(CONSENT_STATEMENT, 'I consent to participate in this study.');
   assert.throws(() => normalizeProfile({ age: 25, gender: 'woman', consented: false }), /consent/i);
   const profile = normalizeProfile({
     age: 25,
@@ -57,6 +59,7 @@ test('participant instructions explain piece centers, sound cues, and form confi
   const instructions = SUBJECT_INSTRUCTIONS.join(' ');
   assert.match(instructions, /dot marking the center/i);
   assert.match(instructions, /robot can only pick pieces up from their marked starting spots/i);
-  assert.match(instructions, /high beep.*midpoint.*low three-tone sound/i);
+  assert.match(instructions, /high beep.*midpoint.*different low sound/i);
+  assert.match(instructions, /bright two-beep alert.*questionnaire is ready/i);
   assert.match(instructions, /researcher will see when it has been filled/i);
 });

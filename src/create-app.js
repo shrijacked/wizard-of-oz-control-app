@@ -998,18 +998,17 @@ async function createApp(options = {}) {
       if (request.method === 'POST' && pathname === '/api/watch/calibrate') {
         adminGuard.assertAuthorized(getAdminToken(request));
         const state = store.getState();
-        if (state.session.activeRound) {
-          const error = new Error('Pause or complete the active round before recalibrating the watch.');
+        if (state.session.activeRound && !state.session.activeRound.pauseStartedAt) {
+          const error = new Error('Pause the active round before recalibrating the watch.');
           error.statusCode = 409;
           throw error;
         }
         const body = await readJsonBody(request);
         const result = await watchBridge.requestCalibration({ requestedBy: body.requestedBy || 'researcher' });
-        await store.logSystemEvent({
-          type: 'watch.calibration.requested',
+        await store.requestWatchCalibration({
+          ...result,
           source: 'admin',
-          summary: `Watch recalibration requested by ${body.requestedBy || 'researcher'}.`,
-          payload: result,
+          requestedBy: body.requestedBy || 'researcher',
         });
         json(response, 200, result);
         return;

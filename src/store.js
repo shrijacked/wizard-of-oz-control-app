@@ -1248,6 +1248,12 @@ class ExperimentStore extends EventEmitter {
     }
 
     const startedAt = toIsoDate(this.now());
+    const previousHint = String(this.state.hint?.text || '').trim();
+    this.state.hint = {
+      text: '',
+      updatedAt: startedAt,
+      author: 'system',
+    };
     const activeRound = {
       index: nextIndex + 1,
       sittingNumber: scheduled?.sittingNumber || Math.floor(nextIndex / this.roundsPerSitting) + 1,
@@ -1266,7 +1272,15 @@ class ExperimentStore extends EventEmitter {
       puzzleSet: clone(puzzle),
     };
 
-    const event = this.#createEvent('round.started', {
+    const events = [];
+    if (previousHint) {
+      events.push(this.#createEvent('hint.cleared', {
+        source: 'system',
+        summary: `Previous hint cleared before round ${activeRound.index}.`,
+        payload: clone(this.state.hint),
+      }));
+    }
+    events.push(this.#createEvent('round.started', {
       source: payload.source || 'admin',
       summary: `Round ${activeRound.index} started on puzzle ${puzzle.setId}.`,
       payload: {
@@ -1277,9 +1291,9 @@ class ExperimentStore extends EventEmitter {
         startedAt,
         operator: payload.operator || 'researcher',
       },
-    });
+    }));
 
-    await this.#persistAndBroadcast([event]);
+    await this.#persistAndBroadcast(events);
     return this.getState();
   }
 
@@ -1823,6 +1837,43 @@ class ExperimentStore extends EventEmitter {
     return this.getState();
   }
 
+  async requestWatchCalibration(payload = {}) {
+    const requestedAt = toIsoDate(payload.requestedAt || this.now());
+    this.state.telemetry.hrv = {
+      ...this.state.telemetry.hrv,
+      baseline: null,
+      changesFromBaseline: {},
+      stressScore: 0,
+      stressLevel: 'Calibrating',
+      distractionDetected: false,
+      interpretation: 'Recalibration requested; waiting for the watch collector to acknowledge it.',
+      feedback: 'Keep the participant still and make sure the hBand is on and advertising.',
+      calibration: {
+        ...this.state.telemetry.hrv.calibration,
+        active: false,
+        pending: true,
+        progress: 0,
+        requestId: payload.requestId || null,
+        requestedAt,
+        startedAt: null,
+        completedAt: null,
+      },
+    };
+
+    const event = this.#createEvent('watch.calibration.requested', {
+      source: payload.source || 'admin',
+      summary: `Watch recalibration requested by ${payload.requestedBy || 'researcher'}.`,
+      payload: {
+        requestId: payload.requestId || null,
+        requestedAt,
+        requestedBy: payload.requestedBy || 'researcher',
+        warning: payload.warning || null,
+      },
+    });
+    await this.#persistAndBroadcast([event]);
+    return this.getState();
+  }
+
   async ingestHrvTelemetry(payload = {}, meta = {}) {
     const timestamp = toIsoDate(payload.timestamp || this.now());
     const metrics = clone(payload.metrics || {});
@@ -1833,9 +1884,27 @@ class ExperimentStore extends EventEmitter {
     const previousScore = Number(this.state.telemetry.hrv.stressScore) || 0;
     const spikeDelta = stressScore - previousScore;
     const spikeDetected = stressScore >= 0.45 && spikeDelta >= 0.15;
-    const calibration = payload.calibration
-      ? { ...this.state.telemetry.hrv.calibration, ...clone(payload.calibration) }
-      : this.state.telemetry.hrv.calibration;
+    const currentCalibration = this.state.telemetry.hrv.calibration || {};
+    const incomingCalibration = payload.calibration ? clone(payload.calibration) : null;
+    let calibration = currentCalibration;
+    if (incomingCalibration) {
+      const incomingActive = Boolean(incomingCalibration.active);
+      // Between the HTTP request and the Python collector acknowledging the
+      // control file, an old monitoring sample may arrive. Do not let that
+      // stale sample erase the visible pending request.
+      if (!(currentCalibration.pending && !incomingActive)) {
+        calibration = {
+          ...currentCalibration,
+          ...incomingCalibration,
+          pending: false,
+          startedAt: incomingCalibration.startedAt || incomingCalibration.started_at || null,
+          requestId: incomingCalibration.requestId
+            || incomingCalibration.request_id
+            || currentCalibration.requestId
+            || null,
+        };
+      }
+    }
     this.state.telemetry.hrv = {
       source: meta.source || payload.source || 'api',
       updatedAt: timestamp,
@@ -1896,7 +1965,12 @@ class ExperimentStore extends EventEmitter {
       this.state.telemetry.hrv.baseline = clone(watchData.baseline_metrics || {});
       this.state.telemetry.hrv.calibration = {
         active: false,
+        pending: false,
         progress: 100,
+        requestId: watchData.calibration?.request_id
+          || this.state.telemetry.hrv.calibration?.requestId
+          || null,
+        requestedAt: this.state.telemetry.hrv.calibration?.requestedAt || null,
         startedAt: watchData.calibration?.started_at || null,
         completedAt: entry.timestamp || toIsoDate(this.now()),
       };

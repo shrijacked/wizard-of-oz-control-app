@@ -50,7 +50,8 @@ BASELINE_FILE = os.path.join(OUTPUT_DIR, "baseline_calibration.json")
 CONTROL_FILE = os.path.join(OUTPUT_DIR, "control.json")
 
 HEART_RATE_UUID = "00002a37-0000-1000-8000-00805f9b34fb"
-TARGET_DEVICE_NAME = "hBand"
+TARGET_DEVICE_NAME = os.environ.get("WATCH_DEVICE_NAME", "hBand").strip() or "hBand"
+TARGET_DEVICE_ID = os.environ.get("WATCH_DEVICE_ID", "").strip()
 
 # --- LOGGING SETUP --------------------------------------------
 # Create directories first
@@ -125,18 +126,20 @@ class HRVProcessor:
         self.last_notification_time = None
         self.disconnected = False
         self.last_insufficient_baseline_log = None
+        self.active_calibration_request_id = None
 
     def load_existing_control_request_id(self):
-        """Ignore a calibration command already present before this process starts."""
+        """Ignore only calibration commands that the collector acknowledged."""
         try:
             with open(CONTROL_FILE, "r", encoding="utf-8") as handle:
                 command = json.load(handle)
-            return command.get("requestId")
+            return command.get("requestId") if command.get("acknowledgedAt") else None
         except (FileNotFoundError, json.JSONDecodeError, OSError):
             return None
 
-    def begin_calibration(self):
+    def begin_calibration(self, request_id=None):
         """Start a fresh participant baseline while the collector remains connected."""
+        self.active_calibration_request_id = request_id
         self.heart_rate_values.clear()
         self.rr_intervals_values.clear()
         self.baseline_metrics = {}
@@ -162,6 +165,7 @@ class HRVProcessor:
                     "progress": 0,
                     "started_at": None,
                     "duration_seconds": BASELINE_DURATION,
+                    "request_id": request_id,
                 },
             },
         })
@@ -186,7 +190,15 @@ class HRVProcessor:
         request_id = command.get("requestId")
         if request_id and request_id != self.last_control_request_id and command.get("action") == "calibrate":
             self.last_control_request_id = request_id
-            self.begin_calibration()
+            self.begin_calibration(request_id=request_id)
+            command["acknowledgedAt"] = datetime.now().isoformat()
+            temporary_path = f"{CONTROL_FILE}.tmp"
+            try:
+                with open(temporary_path, "w", encoding="utf-8") as handle:
+                    json.dump(command, handle, indent=2)
+                os.replace(temporary_path, CONTROL_FILE)
+            except OSError as error:
+                logger.warning(f"Could not acknowledge calibration request {request_id}: {error}")
 
     def reset_json_file(self):
         """Reset the JSON file with an empty structure for a new session"""
@@ -229,10 +241,12 @@ class HRVProcessor:
             return False
 
     async def initialize_device(self):
-        logger.info(f"Scanning for BLE devices matching '{TARGET_DEVICE_NAME}'...")
+        target_description = TARGET_DEVICE_ID or TARGET_DEVICE_NAME
+        logger.info(f"Scanning for BLE devices matching '{target_description}'...")
 
         # Add retries for device scanning
         max_scan_attempts = 3
+        target = None
         for attempt in range(1, max_scan_attempts + 1):
             try:
                 logger.info(f"Scan attempt {attempt}/{max_scan_attempts}...")
@@ -245,10 +259,10 @@ class HRVProcessor:
                     logger.info(f"  {i+1}. {dev_name} ({d.address})")
 
                 # Look for our target device
-                target = None
                 for d in devices:
-                    # Compare device name case-insensitively
-                    if d.name and TARGET_DEVICE_NAME.lower() in d.name.lower():
+                    matches_saved_id = TARGET_DEVICE_ID and str(d.address).lower() == TARGET_DEVICE_ID.lower()
+                    matches_name = d.name and TARGET_DEVICE_NAME.lower() in d.name.lower()
+                    if matches_saved_id or matches_name:
                         target = d
                         break
 
@@ -266,7 +280,10 @@ class HRVProcessor:
                     await asyncio.sleep(2)
 
         if target is None:
-            logger.error(f"Device '{TARGET_DEVICE_NAME}' not found after {max_scan_attempts} attempts. Make sure it's on and advertising.")
+            logger.error(
+                f"Device '{target_description}' not found after {max_scan_attempts} attempts. "
+                "Make sure it is on, advertising, and disconnected from other phones or computers."
+            )
             return False
 
         logger.info(f"Found target device: {target.name} ({target.address})")
@@ -500,6 +517,7 @@ class HRVProcessor:
                     "rr_intervals": len(self.rr_intervals_values),
                     "minimum_heart_rate_samples": MIN_BASELINE_HR_SAMPLES,
                     "minimum_rr_intervals": MIN_BASELINE_RR_INTERVALS,
+                    "request_id": self.active_calibration_request_id,
                 },
             },
         })
@@ -588,7 +606,11 @@ class HRVProcessor:
                 "is_baseline": True,
                 "baseline_metrics": self.baseline_metrics,
                 "interpretation": "Baseline measurements established as reference point for stress detection",
-                "feedback": "Baseline calibration complete. Reference HRV metrics set."
+                "feedback": "Baseline calibration complete. Reference HRV metrics set.",
+                "calibration": {
+                    "request_id": self.active_calibration_request_id,
+                    "started_at": datetime.fromtimestamp(self.baseline_start_time).isoformat() if self.baseline_start_time else None,
+                },
             }
         }
         self.save_to_json(baseline_entry)

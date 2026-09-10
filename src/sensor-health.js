@@ -32,6 +32,20 @@ function summarizeWatchHealth(status = {}, now = new Date(), options = {}) {
     };
   }
 
+  if (options.calibration?.pending) {
+    return {
+      name: 'watch',
+      level: liveAgeSeconds == null || (liveAgeSeconds * 1000) > staleAfterMs ? 'warning' : 'info',
+      state: 'pending',
+      stale: liveAgeSeconds != null && (liveAgeSeconds * 1000) > staleAfterMs,
+      ageSeconds: liveAgeSeconds,
+      summary: 'Watch recalibration is waiting for the collector.',
+      detail: liveAgeSeconds == null
+        ? 'No live hBand sample has arrived. Wake the band and make sure it is not connected to another device.'
+        : `The request is saved; the last watch sample was ${liveAgeSeconds}s ago.`,
+    };
+  }
+
   if (
     options.calibration?.active
     && liveAgeSeconds != null

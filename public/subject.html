@@ -22,7 +22,8 @@
         <ol id="subject-instructions" class="instruction-list"></ol>
         <div id="subject-script-audio-block" class="callout" hidden>
           <span class="callout-label">Recorded instructions</span>
-          <audio id="subject-script-audio" controls preload="metadata"></audio>
+          <audio id="subject-script-audio" controls autoplay playsinline preload="auto"></audio>
+          <small id="subject-script-audio-status" class="display-meta">The recording will start automatically. If your browser blocks it, tap Play once.</small>
         </div>
         <form id="participant-profile-form" class="stack-form participant-form">
           <div class="field-grid">
@@ -39,7 +40,7 @@
             <legend>Before starting, how effective do you expect the robot assistance to be?</legend>
             <div class="scale-row" data-scale-name="expectedEfficacy" data-low="Not effective at all" data-high="Extremely effective"></div>
           </fieldset>
-          <label class="checkbox-field"><input id="subject-instructions-check" type="checkbox" required><span>I have read or heard the study instructions and had an opportunity to ask questions.</span></label>
+          <label class="checkbox-field"><input id="subject-instructions-check" type="checkbox" required><span>I have read and understood the study instructions.</span></label>
           <label class="checkbox-field"><input id="subject-consent" type="checkbox" required><span id="subject-consent-copy"></span></label>
           <button class="button button-primary" type="submit">Save and continue</button>
           <p id="participant-profile-status" class="inline-status"></p>

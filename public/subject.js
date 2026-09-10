@@ -9,6 +9,8 @@ const sound = createAudioCueController({ frequency: 920, durationMs: 230, gainVa
 let state = null;
 let surveyRound = null;
 let timerRoundToken = null;
+let instructionAudioUrl = null;
+let instructionAudioStarted = false;
 const timerMilestones = new Set();
 
 const WORKLOAD = [
@@ -65,6 +67,51 @@ function elapsedSeconds(round) {
 function formatClock(seconds) {
   const value = Math.max(0, Math.floor(seconds));
   return `${String(Math.floor(value / 60)).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}`;
+}
+
+const wait = (milliseconds) => new Promise((resolve) => window.setTimeout(resolve, milliseconds));
+
+async function playFinishCue() {
+  await sound.beep({ frequency: 650, durationMs: 240, gainValue: 0.16, waveform: 'triangle' });
+  await wait(100);
+  await sound.beep({ frequency: 520, durationMs: 300, gainValue: 0.16, waveform: 'triangle' });
+}
+
+async function playFormReadyCue({ includeFinish = false } = {}) {
+  if (includeFinish) {
+    await playFinishCue();
+    await wait(300);
+  }
+  await sound.beep({ frequency: 1040, durationMs: 170, gainValue: 0.15, waveform: 'sine' });
+  await wait(110);
+  await sound.beep({ frequency: 1320, durationMs: 220, gainValue: 0.15, waveform: 'sine' });
+}
+
+function formCueToken(session = {}) {
+  if (session.awaitingRoundSurvey) {
+    return `${session.id}:${String(session.awaitingRoundSurvey).padStart(3, '0')}`;
+  }
+  if (session.finalSurveyRequired) {
+    return `${session.id}:999`;
+  }
+  return null;
+}
+
+async function attemptInstructionAutoplay() {
+  const audio = byId('subject-script-audio');
+  const status = byId('subject-script-audio-status');
+  if (!audio?.getAttribute('src') || instructionAudioStarted) {
+    return false;
+  }
+  try {
+    await audio.play();
+    instructionAudioStarted = true;
+    if (status) status.textContent = 'Recorded instructions are playing.';
+    return true;
+  } catch (error) {
+    if (status) status.textContent = 'Your browser blocked automatic audio. Tap Play once to hear the instructions.';
+    return false;
+  }
 }
 
 function renderPuzzle(asset) {
@@ -129,12 +176,17 @@ function renderTimer() {
   }
   if (elapsed >= duration && !timerMilestones.has('end')) {
     timerMilestones.add('end');
-    sound.pattern(3, 180, { frequency: 480, durationMs: 360, gainValue: 0.16, waveform: 'triangle' });
+    playFinishCue().catch(() => {});
   }
 }
 
 const hintTracker = createUpdateCueTracker({ onCue: () => sound.pattern(2, 90) });
 const robotTracker = createUpdateCueTracker({ onCue: () => sound.pattern(3, 90) });
+const formTracker = createUpdateCueTracker({
+  onCue: (token) => playFormReadyCue({
+    includeFinish: !token.endsWith(':999') && !timerMilestones.has('end'),
+  }),
+});
 
 function render(current) {
   state = current;
@@ -156,8 +208,15 @@ function render(current) {
   const scriptAudio = byId('subject-script-audio');
   const audioBlock = byId('subject-script-audio-block');
   const audioUrl = current?.study?.scriptAudioUrl || '';
-  if (scriptAudio && scriptAudio.getAttribute('src') !== audioUrl) {
-    scriptAudio.src = audioUrl;
+  if (scriptAudio && instructionAudioUrl !== audioUrl) {
+    instructionAudioUrl = audioUrl;
+    instructionAudioStarted = false;
+    if (audioUrl) {
+      scriptAudio.src = audioUrl;
+    } else {
+      scriptAudio.removeAttribute('src');
+    }
+    scriptAudio.load();
   }
   if (audioBlock) {
     audioBlock.hidden = !audioUrl;
@@ -167,6 +226,7 @@ function render(current) {
   byId('subject-participant-id').value = session.participantId || '';
   if (!session.participantProfile && session.status === 'setup') {
     showPanel('subject-onboarding');
+    attemptInstructionAutoplay().catch(() => {});
   } else if (session.awaitingRoundSurvey) {
     showPanel('subject-round-survey');
     if (surveyRound !== session.awaitingRoundSurvey) {
@@ -213,12 +273,20 @@ async function init() {
   byId('subject-consent-copy').textContent = state.study?.consentStatement || '';
   hintTracker.prime(state?.hint?.updatedAt || null);
   robotTracker.prime(state?.robotCueUpdatedAt || null);
+  formTracker.prime(formCueToken(state?.session));
   render(state);
 
-  const tryArm = () => { if (!sound.isArmed()) armSound().catch(() => {}); };
+  const tryArm = () => {
+    if (!sound.isArmed()) armSound().catch(() => {});
+    attemptInstructionAutoplay().catch(() => {});
+  };
   window.addEventListener('pointerdown', tryArm, { once: true });
   window.addEventListener('keydown', tryArm, { once: true });
-  byId('subject-sound-toggle').addEventListener('click', () => armSound().catch(() => { byId('subject-sound-status').textContent = 'Sound could not be enabled. Check browser permissions.'; }));
+  byId('subject-sound-toggle').addEventListener('click', () => {
+    armSound().then(() => attemptInstructionAutoplay()).catch(() => {
+      byId('subject-sound-status').textContent = 'Sound could not be enabled. Check browser permissions.';
+    });
+  });
   byId('subject-gender').addEventListener('change', () => { byId('subject-gender-self-field').hidden = byId('subject-gender').value !== 'self-describe'; });
 
   byId('participant-profile-form').addEventListener('submit', async (event) => {
@@ -257,6 +325,7 @@ async function init() {
       const hint = String(snapshot?.hint?.text || '').trim();
       if (hint) hintTracker.push(snapshot?.hint?.updatedAt || null); else hintTracker.prime(snapshot?.hint?.updatedAt || null);
       robotTracker.push(snapshot?.robotCueUpdatedAt || null);
+      formTracker.push(formCueToken(snapshot?.session)).catch(() => {});
       render(snapshot);
     },
   });

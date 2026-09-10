@@ -47,6 +47,53 @@ test('store persists hints, actions, and HRV telemetry to disk-backed state', as
   assert.match(eventsLog, /robot\.action\.logged/);
 });
 
+test('watch recalibration stays pending until fresh collector telemetry acknowledges it', async () => {
+  const { store } = await createStore();
+  await store.requestWatchCalibration({
+    requestId: 'calibration-1',
+    requestedAt: '2026-04-01T06:31:30.000Z',
+    requestedBy: 'Researcher',
+  });
+  assert.equal(store.getState().telemetry.hrv.calibration.pending, true);
+
+  await store.ingestHrvTelemetry({
+    metrics: { hr: 72 },
+    calibration: { active: false, progress: 100 },
+  }, { source: 'watch-bridge' });
+  assert.equal(store.getState().telemetry.hrv.calibration.pending, true);
+
+  await store.ingestHrvTelemetry({
+    metrics: { hr: 73 },
+    calibration: { active: true, progress: 8, request_id: 'calibration-1' },
+  }, { source: 'watch-bridge' });
+  const acknowledged = store.getState().telemetry.hrv.calibration;
+  assert.equal(acknowledged.pending, false);
+  assert.equal(acknowledged.active, true);
+  assert.equal(acknowledged.progress, 8);
+  assert.equal(acknowledged.requestId, 'calibration-1');
+});
+
+test('starting a new round clears the previous round hint', async () => {
+  const { store, dataDir } = await createStore();
+  await store.uploadPuzzleAssets([
+    { name: '1.pdf', mimeType: 'application/pdf', contentBase64: tinyPdfBase64() },
+    { name: '1s.pdf', mimeType: 'application/pdf', contentBase64: tinyPdfBase64() },
+    { name: '2.pdf', mimeType: 'application/pdf', contentBase64: tinyPdfBase64() },
+    { name: '2s.pdf', mimeType: 'application/pdf', contentBase64: tinyPdfBase64() },
+  ]);
+  await store.queuePuzzleSets({ setIds: ['1', '2'] });
+  await store.startSession({ operator: 'Researcher' });
+  await store.startRound({ operator: 'Researcher' });
+  await store.setHint({ text: 'This must not carry into the next puzzle.' });
+  await store.completeRound({ operator: 'Researcher' });
+  await store.skipRoundSurvey({ roundIndex: 1, reason: 'Test transition' });
+  await store.startRound({ operator: 'Researcher' });
+
+  assert.equal(store.getState().hint.text, '');
+  const events = await fs.readFile(path.join(dataDir, 'events.jsonl'), 'utf8');
+  assert.match(events, /Previous hint cleared before round 2/);
+});
+
 test('store groups uploaded subject and solution files into selectable puzzle sets', async () => {
   const { store } = await createStore();
 

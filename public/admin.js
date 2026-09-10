@@ -566,7 +566,9 @@ function renderHealth() {
   }
 
   const watchState = sensorHealth.watch?.state;
-  if (watchState === 'calibrating') {
+  if (watchState === 'pending') {
+    setPill(elements.watchHealth, 'connected', 'Watch: recalibration pending');
+  } else if (watchState === 'calibrating') {
     setPill(elements.watchHealth, 'connected', 'Watch: calibrating');
   } else if (watchState === 'healthy') {
     setPill(elements.watchHealth, 'ready', 'Watch: live');
@@ -1128,13 +1130,19 @@ function renderSession() {
 
   const watchCalibration = currentState?.telemetry?.hrv?.calibration || {};
   const rawCalibrationProgress = Number(watchCalibration.progress || 0);
-  const calibrationPercent = Math.round(rawCalibrationProgress <= 1 ? rawCalibrationProgress * 100 : rawCalibrationProgress);
-  setText(elements.watchCalibrationStatus, watchCalibration.active
+  const calibrationPercent = Math.round(rawCalibrationProgress);
+  setText(elements.watchCalibrationStatus, watchCalibration.pending
+    ? `Recalibration request saved ${formatTimestamp(watchCalibration.requestedAt)}. Waiting for a live hBand sample.`
+    : watchCalibration.active
     ? `Calibration in progress: ${calibrationPercent}%`
     : watchCalibration.completedAt
       ? `Last calibration completed ${formatTimestamp(watchCalibration.completedAt)}.`
       : 'Watch has not completed a calibration in this participant record.');
-  setElementDisabled(elements.watchCalibrate, Boolean(activeRound), 'Pause and complete the round before recalibrating.');
+  setElementDisabled(
+    elements.watchCalibrate,
+    Boolean(activeRound && !activeRound.pauseStartedAt),
+    'Pause the active round before recalibrating.',
+  );
 
   const spike = currentState?.telemetry?.hrv?.spike;
   const spikeAt = spike?.detectedAt || spike?.at;
