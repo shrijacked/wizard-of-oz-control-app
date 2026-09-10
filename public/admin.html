@@ -84,6 +84,19 @@
                     <input id="session-constant-interval" type="number" min="5" step="1" value="30">
                   </label>
                   <label class="field">
+                    <span>Condition order</span>
+                    <select id="session-condition-order">
+                      <option value="">Auto-balanced from participant ID</option>
+                      <option value="control|constant|adaptive">Control → Constant → Adaptive</option>
+                      <option value="control|adaptive|constant">Control → Adaptive → Constant</option>
+                      <option value="constant|control|adaptive">Constant → Control → Adaptive</option>
+                      <option value="constant|adaptive|control">Constant → Adaptive → Control</option>
+                      <option value="adaptive|control|constant">Adaptive → Control → Constant</option>
+                      <option value="adaptive|constant|control">Adaptive → Constant → Control</option>
+                    </select>
+                    <small>There are six unique orders when all three conditions appear exactly once.</small>
+                  </label>
+                  <label class="field">
                     <span>Age (researcher copy)</span>
                     <input id="admin-participant-age" type="number" min="18" max="120" step="1">
                   </label>
@@ -164,6 +177,23 @@
                 </div>
               </div>
               <ol id="subject-instruction-script" class="instruction-list"></ol>
+              <form id="study-script-form" class="stack-form">
+                <div class="field-grid">
+                  <label class="field">
+                    <span>Replacement script text (.txt)</span>
+                    <input id="study-script-text" type="file" accept=".txt,text/plain">
+                  </label>
+                  <label class="field">
+                    <span>Recorded script (MP3, M4A, WAV, or OGG)</span>
+                    <input id="study-script-audio" type="file" accept=".mp3,.m4a,.wav,.ogg,audio/mpeg,audio/mp4,audio/wav,audio/ogg">
+                  </label>
+                </div>
+                <audio id="study-script-audio-preview" controls hidden></audio>
+                <div class="button-row">
+                  <button id="study-script-upload" class="button button-primary" type="submit">Save script files</button>
+                </div>
+                <p id="study-script-status" class="panel-note">The default script is currently displayed.</p>
+              </form>
               <p class="panel-note">This operational script supplements—not replaces—the approved participant information sheet and ethics materials.</p>
             </section>
 
@@ -175,7 +205,7 @@
                 </div>
               </div>
               <div id="readiness-list" class="readiness-list"></div>
-              <p id="screen-links" class="panel-note">Start the C270 in the camera panel, then open and arm the participant and robot screens.</p>
+              <p id="screen-links" class="panel-note">Start the C270, then open and arm the participant and robot screens. Hardware and display warnings stay visible but do not block Begin study.</p>
               <div class="button-row">
                 <button id="session-start" class="button button-primary" type="button">Begin study</button>
                 <button id="reset-session-setup" class="button button-ghost" type="button">Reset session</button>
@@ -246,7 +276,6 @@
                 </div>
                 <div class="button-row">
                   <button id="watch-calibrate" class="button button-ghost" type="button">Recalibrate watch</button>
-                  <button id="operator-sound" class="button button-ghost" type="button">Enable operator alerts</button>
                 </div>
                 <p id="watch-calibration-status" class="panel-note">Calibration status will appear here.</p>
                 <div hidden>
@@ -312,14 +341,10 @@
                     <p class="panel-kicker">Robot cue controls</p>
                     <h2>Robot Cue Controls</h2>
                   </div>
-                  <span class="panel-note">Piece, then slot</span>
+                  <span class="panel-note">One-click programs</span>
                 </div>
-                <p class="panel-note">1. Choose the piece. 2. Choose the numbered slot.</p>
+                <p class="panel-note">Click a shape once to broadcast its fixed robot program.</p>
                 <div id="piece-grid" class="action-grid"></div>
-                <div id="slot-grid" class="slot-grid"></div>
-                <div class="button-row">
-                  <button id="send-robot-cue" class="button button-primary" type="button">Send robot cue</button>
-                </div>
                 <div class="callout">
                   <span class="callout-label">Latest robot cue</span>
                   <p id="latest-action">No robotic action logged yet.</p>
@@ -339,6 +364,20 @@
                     <p id="session-status-summary">SETUP</p>
                     <p id="session-status-detail">Complete setup, then begin the participant study.</p>
                   </div>
+                  <div class="round-progress-strip" aria-live="polite">
+                    <div class="round-progress-item">
+                      <span>Progress</span>
+                      <strong id="admin-round-counter">Round 0 of 9</strong>
+                    </div>
+                    <div id="admin-round-form-card" class="round-progress-item" data-status="pending">
+                      <span>Questionnaire</span>
+                      <strong id="admin-round-form-status">No form yet • 0/9 filled</strong>
+                    </div>
+                  </div>
+                  <div class="admin-timer" aria-live="off">
+                    <span>Round time remaining</span>
+                    <strong id="admin-round-timer">--:--</strong>
+                  </div>
                   <div id="constant-reminder" class="callout" hidden>
                     <span class="callout-label">Constant intervention</span>
                     <p id="constant-reminder-text">Next researcher reminder in 30 seconds.</p>
@@ -353,10 +392,12 @@
                     <button id="round-pause" class="button button-ghost" type="button">Pause timer</button>
                     <button id="round-resume" class="button button-ghost" type="button">Resume timer</button>
                     <button id="round-complete" class="button button-ghost" type="button">Complete round</button>
+                    <button id="round-skip" class="button button-ghost" type="button">Skip next round</button>
                   </div>
                   <div class="button-row">
                     <button id="resume-sitting" class="button button-primary" type="button" hidden>Begin next sitting</button>
                     <button id="session-complete" class="button button-ghost" type="button">End study</button>
+                    <button id="session-end-early" class="button button-danger" type="button">End early + save</button>
                     <button id="reset-session" class="button button-ghost" type="button">Reset session</button>
                   </div>
                 </section>
@@ -388,6 +429,7 @@
             <div id="review-rounds" class="review-rounds"></div>
             <div class="button-row">
               <button id="export-json-link" class="button button-primary" type="button">Download session JSON</button>
+              <button id="export-forms-link" class="button button-ghost" type="button">Download form responses</button>
               <button id="export-csv-link" class="button button-ghost" type="button">Download CSV</button>
               <button id="reset-session-review" class="button button-ghost" type="button">Reset for next participant</button>
             </div>

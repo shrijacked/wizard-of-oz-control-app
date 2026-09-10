@@ -15,7 +15,7 @@ Practical runbook for one participant's complete visit: nine puzzles in three co
 2. Enter study ID, researcher, researcher demographic/consent copy, round duration, and constant reminder interval; save.
 3. Read the dashboard script and provide the approved participant information.
 4. On `/subject`, have the participant submit their own demographics, baseline rating, acknowledgement, and consent.
-5. Resolve any profile mismatch and begin only when every required readiness row is green.
+5. Resolve every required profile or schedule row. Hardware and display warnings may be accepted when necessary; the session log records them when the study starts.
 
 ## During and after
 

@@ -116,6 +116,50 @@ test('camera controller falls back to default video constraints when no specific
   assert.match(statusElement.textContent, /live webcam preview active/i);
 });
 
+test('an empty pre-permission device list does not become a fake camera id', async () => {
+  const { createCameraController } = await loadAdminCameraModule();
+  const originalDocument = global.document;
+  global.document = {
+    createElement() {
+      return { value: '', textContent: '' };
+    },
+  };
+  const options = [];
+  const selectElement = {
+    value: '',
+    set innerHTML(value) {
+      if (value === '') options.splice(0);
+    },
+    append(option) {
+      options.push(option);
+      this.value = option.value;
+    },
+    addEventListener() {},
+  };
+  const requested = [];
+  const stream = { getTracks() { return []; } };
+  try {
+    const controller = createCameraController({
+      videoElement: createVideoElement(),
+      statusElement: createStatusElement(),
+      selectElement,
+      mediaDevices: {
+        async enumerateDevices() { return []; },
+        async getUserMedia(constraints) { requested.push(constraints); return stream; },
+      },
+    });
+    await controller.start();
+    assert.equal(options[0].value, '');
+    assert.equal(controller.getStatus().deviceId, null);
+    assert.deepEqual(requested[0], {
+      video: { width: { ideal: 1280 }, height: { ideal: 720 } },
+      audio: false,
+    });
+  } finally {
+    global.document = originalDocument;
+  }
+});
+
 test('camera controller does not report live when the selected camera fails and another device would be substituted', async () => {
   const { createCameraController } = await loadAdminCameraModule();
   const videoElement = createVideoElement();

@@ -36,6 +36,24 @@ function getLocalNetworkAddresses(port) {
   return addresses;
 }
 
+function getLocalHostnameUrls(port) {
+  const raw = String(os.hostname() || '').trim().replace(/\.local$/i, '');
+  if (!raw) {
+    return null;
+  }
+  const hostname = `${raw}.local`;
+  return {
+    hostname,
+    urls: {
+      admin: `http://${hostname}:${port}/admin`,
+      subject: `http://${hostname}:${port}/subject`,
+      robot: `http://${hostname}:${port}/robot`,
+      audit: `http://${hostname}:${port}/audit`,
+    },
+  };
+}
+
 module.exports = {
   getLocalNetworkAddresses,
+  getLocalHostnameUrls,
 };

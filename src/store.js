@@ -15,7 +15,7 @@ const {
 const { LlmAdvisor } = require('./llm-advisor');
 const { createInitialPreflightAcknowledgements, normalizePreflightAcknowledgements } = require('./preflight');
 const { setIdsForSitting } = require('./sitting-queue');
-const { buildStudySchedule } = require('./study-design');
+const { buildStudySchedule, normalizeConditionOrder } = require('./study-design');
 const {
   normalizeFinalSurvey,
   normalizeProfile,
@@ -262,6 +262,9 @@ function hydrateRound(round = {}) {
     completedAt: round.completedAt || null,
     durationSeconds: Number.isFinite(round.durationSeconds) ? round.durationSeconds : null,
     survey: round.survey && typeof round.survey === 'object' ? clone(round.survey) : null,
+    skipped: Boolean(round.skipped),
+    skipReason: round.skipReason ? String(round.skipReason) : null,
+    endedEarly: Boolean(round.endedEarly),
   };
 }
 
@@ -291,6 +294,8 @@ function createInitialState(now = new Date(), options = {}) {
       trialStartedAt: null,
       completedAt: null,
       completedSummary: null,
+      completedEarly: false,
+      earlyEndReason: null,
       metadata: {
         studyId: '',
         participantId: String(options.participantId || ''),
@@ -300,6 +305,7 @@ function createInitialState(now = new Date(), options = {}) {
         notes: '',
         roundDurationSeconds: Number(options.roundDurationSeconds) || 300,
         constantIntervalSeconds: Number(options.constantIntervalSeconds) || 30,
+        conditionOrderSelection: null,
       },
       plannedRounds,
       roundsPerSitting: Number(options.roundsPerSitting) || 3,
@@ -603,6 +609,7 @@ class ExperimentStore extends EventEmitter {
     await this.#loadRecordingTokens();
     await this.promoteStaleCameraRecordings();
     await this.seedPuzzleLibraryFromDir();
+    await this.#writeAutomaticJson(this.getState());
   }
 
   async #loadParticipantRegistry() {
@@ -888,6 +895,7 @@ class ExperimentStore extends EventEmitter {
     const sittingNumber = Number.isFinite(Number(payload.sittingNumber)) && Number(payload.sittingNumber) > 0
       ? Math.floor(Number(payload.sittingNumber))
       : (this.state.session.metadata.sittingNumber || 1);
+    const requestedOrder = normalizeConditionOrder(payload.conditionOrder);
     const nextMetadata = {
       ...this.state.session.metadata,
       studyId: String(payload.studyId || '').trim(),
@@ -898,6 +906,7 @@ class ExperimentStore extends EventEmitter {
       notes: String(payload.notes || '').trim(),
       roundDurationSeconds: Math.max(30, Math.floor(Number(payload.roundDurationSeconds) || this.state.session.metadata.roundDurationSeconds || this.roundDurationSeconds)),
       constantIntervalSeconds: Math.max(5, Math.floor(Number(payload.constantIntervalSeconds) || this.state.session.metadata.constantIntervalSeconds || this.constantIntervalSeconds)),
+      conditionOrderSelection: requestedOrder,
     };
 
     let adminProfile = this.state.session.participantProfiles?.admin || null;
@@ -910,6 +919,9 @@ class ExperimentStore extends EventEmitter {
     }
 
     const participantChanged = previousParticipantId !== participantId;
+    const orderChanged = JSON.stringify(this.state.session.metadata.conditionOrderSelection || null)
+      !== JSON.stringify(requestedOrder);
+    const regenerateSchedule = participantChanged || orderChanged;
 
     this.state.session = {
       ...this.state.session,
@@ -919,10 +931,10 @@ class ExperimentStore extends EventEmitter {
         admin: adminProfile,
         subject: participantChanged ? null : this.state.session.participantProfiles?.subject || null,
       },
-      conditionOrder: participantChanged ? [] : this.state.session.conditionOrder,
-      randomizationSeed: participantChanged ? null : this.state.session.randomizationSeed,
-      schedule: participantChanged ? [] : this.state.session.schedule,
-      queue: participantChanged ? [] : this.state.session.queue,
+      conditionOrder: regenerateSchedule ? [] : this.state.session.conditionOrder,
+      randomizationSeed: regenerateSchedule ? null : this.state.session.randomizationSeed,
+      schedule: regenerateSchedule ? [] : this.state.session.schedule,
+      queue: regenerateSchedule ? [] : this.state.session.queue,
     };
 
     const event = this.#createEvent('session.configured', {
@@ -1127,6 +1139,7 @@ class ExperimentStore extends EventEmitter {
         studyId: this.state.session.metadata.studyId,
         roundsPerSitting: this.roundsPerSitting,
         totalRounds: this.plannedRounds,
+        conditionOrder: this.state.session.metadata.conditionOrderSelection,
       });
       const selectedAt = toIsoDate(this.now());
       const selectedBy = meta.actor || 'randomizer';
@@ -1183,6 +1196,13 @@ class ExperimentStore extends EventEmitter {
 
   async startSession(payload = {}) {
     const timestamp = toIsoDate(this.now());
+    const readinessWarnings = Array.isArray(payload.readinessWarnings)
+      ? payload.readinessWarnings.map((warning) => ({
+        id: warning.id || null,
+        label: warning.label || null,
+        summary: warning.summary || null,
+      }))
+      : [];
     this.state.session = {
       ...this.state.session,
       status: 'running',
@@ -1198,10 +1218,23 @@ class ExperimentStore extends EventEmitter {
         operator: payload.operator || 'researcher',
         trialStartedAt: timestamp,
         queuedSetIds: this.state.session.queue.map((entry) => entry.setId),
+        readinessWarnings,
       },
     });
 
-    await this.#persistAndBroadcast([event]);
+    const events = [event];
+    if (readinessWarnings.length > 0) {
+      events.push(this.#createEvent('preflight.warnings.accepted', {
+        source: payload.source || 'admin',
+        summary: `Study started with ${readinessWarnings.length} readiness warning${readinessWarnings.length === 1 ? '' : 's'}.`,
+        payload: {
+          operator: payload.operator || 'researcher',
+          warnings: readinessWarnings,
+        },
+      }));
+    }
+
+    await this.#persistAndBroadcast(events);
     return this.getState();
   }
 
@@ -1294,6 +1327,84 @@ class ExperimentStore extends EventEmitter {
     });
 
     await this.#persistAndBroadcast([event]);
+    return this.getState();
+  }
+
+  async skipNextRound(payload = {}) {
+    const reason = String(payload.reason || '').trim();
+    if (!reason) {
+      const error = new Error('Enter a reason before skipping a round.');
+      error.statusCode = 400;
+      throw error;
+    }
+    const session = this.state.session;
+    const nextIndex = session.rounds.length;
+    const scheduled = session.schedule?.[nextIndex] || null;
+    const puzzle = scheduled?.puzzle || session.queue[nextIndex];
+    if (!puzzle) {
+      const error = new Error('No queued puzzle is available to skip.');
+      error.statusCode = 409;
+      throw error;
+    }
+    const timestamp = toIsoDate(this.now());
+    const round = {
+      index: nextIndex + 1,
+      sittingNumber: scheduled?.sittingNumber || Math.floor(nextIndex / this.roundsPerSitting) + 1,
+      condition: scheduled?.condition || session.metadata.condition || 'control',
+      puzzle: clone(puzzle),
+      startedAt: timestamp,
+      pauseStartedAt: null,
+      pausedDurationSeconds: 0,
+      completedAt: timestamp,
+      durationSeconds: 0,
+      skipped: true,
+      skipReason: reason.slice(0, 1000),
+      survey: {
+        skipped: true,
+        reason: `Round skipped: ${reason.slice(0, 1000)}`,
+        submittedAt: timestamp,
+        submittedBy: payload.operator || 'researcher',
+      },
+    };
+    const totalRounds = session.schedule.length || session.queue.length;
+    this.state.session = {
+      ...session,
+      rounds: [...session.rounds, round],
+      activeRound: null,
+      puzzleSet: null,
+      awaitingRoundSurvey: null,
+      finalSurveyRequired: round.index === totalRounds,
+      betweenSittings: round.index < totalRounds && round.index % this.roundsPerSitting === 0,
+    };
+    const eventPayload = {
+      index: round.index,
+      sittingNumber: round.sittingNumber,
+      condition: round.condition,
+      puzzle: clone(round.puzzle),
+      startedAt: timestamp,
+      completedAt: timestamp,
+      durationSeconds: 0,
+      skipped: true,
+      skipReason: round.skipReason,
+      operator: payload.operator || 'researcher',
+    };
+    await this.#persistAndBroadcast([
+      this.#createEvent('round.started', {
+        source: payload.source || 'admin',
+        summary: `Round ${round.index} opened for an administrative skip.`,
+        payload: eventPayload,
+      }),
+      this.#createEvent('round.completed', {
+        source: payload.source || 'admin',
+        summary: `Round ${round.index} was skipped by the researcher.`,
+        payload: eventPayload,
+      }),
+      this.#createEvent('round.skipped', {
+        source: payload.source || 'admin',
+        summary: `Researcher skipped round ${round.index}: ${round.skipReason}`,
+        payload: eventPayload,
+      }),
+    ]);
     return this.getState();
   }
 
@@ -1544,6 +1655,8 @@ class ExperimentStore extends EventEmitter {
       status: 'completed',
       completedAt: timestamp,
       completedSummary,
+      completedEarly: false,
+      earlyEndReason: null,
     };
 
     events.push(this.#createEvent('session.completed', {
@@ -1557,6 +1670,77 @@ class ExperimentStore extends EventEmitter {
       },
     }));
 
+    await this.#persistAndBroadcast(events);
+    return this.getState();
+  }
+
+  async endSessionEarly(payload = {}) {
+    const reason = String(payload.reason || '').trim();
+    if (!reason) {
+      const error = new Error('Enter a reason before ending the study early.');
+      error.statusCode = 400;
+      throw error;
+    }
+    await this.finalizeOpenCameraRecordings({ reason: 'early-end' });
+    await this.copyDownloadableRecordingsToExport();
+    const events = [];
+    if (this.state.session.activeRound) {
+      const activeRound = this.state.session.activeRound;
+      const completedAt = toIsoDate(this.now());
+      const activePauseSeconds = activeRound.pauseStartedAt
+        ? secondsBetween(activeRound.pauseStartedAt, completedAt) || 0
+        : 0;
+      const pausedDurationSeconds = (activeRound.pausedDurationSeconds || 0) + activePauseSeconds;
+      const completedRound = {
+        ...activeRound,
+        pauseStartedAt: null,
+        pausedDurationSeconds,
+        completedAt,
+        durationSeconds: Math.max(0, (secondsBetween(activeRound.startedAt, completedAt) || 0) - pausedDurationSeconds),
+        endedEarly: true,
+      };
+      this.state.session.rounds.push(completedRound);
+      this.state.session.activeRound = null;
+      this.state.session.puzzleSet = null;
+      events.push(this.#createEvent('round.completed', {
+        source: payload.source || 'admin',
+        summary: `Round ${completedRound.index} was closed when the study ended early.`,
+        payload: {
+          index: completedRound.index,
+          sittingNumber: completedRound.sittingNumber,
+          condition: completedRound.condition,
+          puzzle: clone(completedRound.puzzle),
+          startedAt: completedRound.startedAt,
+          completedAt,
+          durationSeconds: completedRound.durationSeconds,
+          pausedDurationSeconds,
+          endedEarly: true,
+          operator: payload.operator || 'researcher',
+        },
+      }));
+    }
+    const timestamp = toIsoDate(this.now());
+    this.state.session = {
+      ...this.state.session,
+      status: 'completed',
+      completedAt: timestamp,
+      completedSummary: `Ended early: ${reason.slice(0, 1000)}`,
+      completedEarly: true,
+      earlyEndReason: reason.slice(0, 1000),
+      awaitingRoundSurvey: null,
+      betweenSittings: false,
+      finalSurveyRequired: false,
+    };
+    events.push(this.#createEvent('session.ended-early', {
+      source: payload.source || 'admin',
+      summary: `Study ended early by ${payload.operator || 'researcher'}.`,
+      payload: {
+        operator: payload.operator || 'researcher',
+        completedAt: timestamp,
+        reason: this.state.session.earlyEndReason,
+        roundsRecorded: this.state.session.rounds.length,
+      },
+    }));
     await this.#persistAndBroadcast(events);
     return this.getState();
   }
@@ -1587,23 +1771,24 @@ class ExperimentStore extends EventEmitter {
   async logRobotAction(payload = {}) {
     const pieceId = String(payload.pieceId || payload.actionId || '').trim();
     const pieceLabel = String(payload.pieceLabel || '').trim();
-    const slot = Number(payload.slot);
+    const programNumber = Number(payload.programNumber ?? payload.slot);
 
     if (!pieceLabel) {
       throw new Error('A piece is required for a robot cue.');
     }
 
-    if (!Number.isFinite(slot) || slot <= 0) {
-      throw new Error('A destination slot is required for a robot cue.');
+    if (!Number.isInteger(programNumber) || programNumber <= 0) {
+      throw new Error('A program number is required for a robot cue.');
     }
 
-    const label = String(payload.label || '').trim() || `Move ${pieceLabel.toUpperCase()} to slot ${slot}`;
+    const label = String(payload.label || '').trim() || `Run program ${programNumber} — ${pieceLabel.toUpperCase()}`;
     const timestamp = toIsoDate(this.now());
     this.state.robotAction = {
       actionId: pieceId || null,
       pieceId: pieceId || null,
       pieceLabel,
-      slot,
+      programNumber,
+      slot: programNumber,
       label,
       payload: payload.payload || null,
       actor: payload.actor || 'researcher',
@@ -1860,6 +2045,8 @@ class ExperimentStore extends EventEmitter {
           : session.startedAt,
         isCurrent: session.sessionId === currentSessionId,
         downloads: {
+          json: `/api/exports/${session.sessionId}.json`,
+          formsJson: `/api/exports/${session.sessionId}.forms.json`,
           bundleJson: `/api/exports/${session.sessionId}.bundle.json`,
           csv: `/api/exports/${session.sessionId}.csv`,
         },
@@ -1911,6 +2098,9 @@ class ExperimentStore extends EventEmitter {
         round.condition = saved.condition;
         round.pausedDurationSeconds = saved.pausedDurationSeconds || 0;
         round.survey = saved.survey ? clone(saved.survey) : null;
+        round.skipped = Boolean(saved.skipped);
+        round.skipReason = saved.skipReason || null;
+        round.endedEarly = Boolean(saved.endedEarly);
       }
     }
     const totalDurationSeconds = rounds.reduce(
@@ -1920,9 +2110,12 @@ class ExperimentStore extends EventEmitter {
 
     return {
       sessionId,
+      status: session.status || null,
       startedAt: session.startedAt || null,
       trialStartedAt: session.trialStartedAt || null,
       completedAt: session.completedAt || null,
+      completedEarly: Boolean(session.completedEarly),
+      earlyEndReason: session.earlyEndReason || null,
       metadata: clone(session.metadata || {}),
       participantProfiles: clone(session.participantProfiles || {}),
       conditionOrder: clone(session.conditionOrder || []),
@@ -1939,6 +2132,58 @@ class ExperimentStore extends EventEmitter {
       rounds,
       finalSurvey: session.finalSurvey ? clone(session.finalSurvey) : null,
       recordings: (session.recordings || []).map((entry) => publicRecording(entry)),
+    };
+  }
+
+  async buildFormResponsesExport(sessionIdInput) {
+    const sessionId = this.#resolveSessionId(sessionIdInput);
+    const events = await this.#readPersistedEvents();
+    const sessionEvents = events.filter((event) => event.sessionId === sessionId);
+    const state = sessionId === this.getCurrentSessionId()
+      ? this.getState()
+      : this.#reconstructStateFromEvents(sessionId, sessionEvents);
+
+    return this.#formResponsesPayload(state, sessionId);
+  }
+
+  #formResponsesPayload(state, sessionId) {
+    const session = state?.session || {};
+    const savedRounds = session.rounds || [];
+    const scheduledRounds = session.schedule?.length
+      ? session.schedule
+      : savedRounds.map((round) => ({
+        roundIndex: round.index,
+        sittingNumber: round.sittingNumber,
+        condition: round.condition,
+        puzzle: round.puzzle,
+      }));
+
+    const roundForms = scheduledRounds.map((scheduled, position) => {
+      const roundIndex = Number(scheduled.roundIndex || position + 1);
+      const round = savedRounds.find((entry) => entry.index === roundIndex);
+      const responses = round?.survey ? clone(round.survey) : null;
+      return {
+        roundIndex,
+        sittingNumber: scheduled.sittingNumber || round?.sittingNumber || null,
+        condition: scheduled.condition || round?.condition || null,
+        puzzleSetId: scheduled.puzzle?.setId || round?.puzzle?.setId || '',
+        formStatus: responses ? (responses.skipped ? 'skipped' : 'submitted') : 'missing',
+        responses,
+      };
+    });
+
+    return {
+      sessionId,
+      participantId: session.metadata?.participantId || '',
+      studyId: session.metadata?.studyId || '',
+      status: session.status || null,
+      exportedAt: toIsoDate(this.now()),
+      preStudyForms: clone(session.participantProfiles || { admin: null, subject: null }),
+      roundForms,
+      finalStudyForm: {
+        formStatus: session.finalSurvey ? 'submitted' : 'missing',
+        responses: session.finalSurvey ? clone(session.finalSurvey) : null,
+      },
     };
   }
 
@@ -1965,6 +2210,9 @@ class ExperimentStore extends EventEmitter {
           offsetSeconds: secondsBetween(current.startedAt, event.timestamp) || 0,
           pieceId: event.payload?.pieceId || event.payload?.actionId || '',
           piece: event.payload?.pieceLabel || '',
+          programNumber: Number.isFinite(event.payload?.programNumber)
+            ? event.payload.programNumber
+            : (Number.isFinite(event.payload?.slot) ? event.payload.slot : null),
           slot: Number.isFinite(event.payload?.slot) ? event.payload.slot : null,
           label: event.payload?.label || '',
         });
@@ -2137,6 +2385,10 @@ class ExperimentStore extends EventEmitter {
         this.#appendCsv(events),
         this.#writeState(),
       ]);
+      // Keep a human-readable JSON result beside the continuously appended CSV.
+      // A fresh file is written after every state-changing event, so an early
+      // stop or browser failure still leaves both formats on disk.
+      await this.#writeAutomaticJson(stateSnapshot);
     });
 
     const fullSnapshot = clone(stateSnapshot);
@@ -2144,6 +2396,30 @@ class ExperimentStore extends EventEmitter {
     for (const event of events) {
       this.emit('event', { event: clone(event), state: clone(fullSnapshot) });
     }
+  }
+
+  async #writeAutomaticJson(stateSnapshot) {
+    const sessionId = stateSnapshot?.session?.id || this.state.session.id;
+    const jsonExport = await this.buildOperatorExport(sessionId);
+    const persistedEvents = await this.#readPersistedEvents();
+    const sessionEvents = persistedEvents.filter((event) => event.sessionId === sessionId);
+    jsonExport.eventCounts = eventCounts(sessionEvents);
+    jsonExport.events = sessionEvents;
+    // buildOperatorExport uses live state for the current session. Pin the key
+    // termination fields to the snapshot associated with this queued write.
+    jsonExport.completedAt = stateSnapshot?.session?.completedAt || jsonExport.completedAt;
+    jsonExport.completedEarly = Boolean(stateSnapshot?.session?.completedEarly);
+    jsonExport.earlyEndReason = stateSnapshot?.session?.earlyEndReason || null;
+    const jsonPath = path.join(this.exportDir, `${sessionId}.json`);
+    const temporaryPath = `${jsonPath}.tmp`;
+    await fs.writeFile(temporaryPath, `${JSON.stringify(jsonExport, null, 2)}\n`, 'utf8');
+    await fs.rename(temporaryPath, jsonPath);
+
+    const formsPath = path.join(this.exportDir, `${sessionId}-forms.json`);
+    const temporaryFormsPath = `${formsPath}.tmp`;
+    const formResponses = this.#formResponsesPayload(stateSnapshot, sessionId);
+    await fs.writeFile(temporaryFormsPath, `${JSON.stringify(formResponses, null, 2)}\n`, 'utf8');
+    await fs.rename(temporaryFormsPath, formsPath);
   }
 
   async #ensureCsvFile() {
@@ -2345,6 +2621,18 @@ class ExperimentStore extends EventEmitter {
         reconstructed.session.completedSummary = event.payload?.summary || null;
       }
 
+      if (event.type === 'session.ended-early') {
+        reconstructed.session.status = 'completed';
+        reconstructed.session.completedAt = event.payload?.completedAt || event.timestamp;
+        reconstructed.session.completedSummary = `Ended early: ${event.payload?.reason || 'No reason recorded'}`;
+        reconstructed.session.completedEarly = true;
+        reconstructed.session.earlyEndReason = event.payload?.reason || null;
+        reconstructed.session.activeRound = null;
+        reconstructed.session.awaitingRoundSurvey = null;
+        reconstructed.session.betweenSittings = false;
+        reconstructed.session.finalSurveyRequired = false;
+      }
+
       if (event.type === 'session.queue.updated' && Array.isArray(event.payload?.queue)) {
         reconstructed.session.queue = event.payload.queue
           .map((entry) => createPuzzleSetSnapshot(entry, {
@@ -2395,6 +2683,10 @@ class ExperimentStore extends EventEmitter {
           startedAt: event.payload.startedAt || null,
           completedAt: event.payload.completedAt || event.timestamp,
           durationSeconds: Number.isFinite(event.payload.durationSeconds) ? event.payload.durationSeconds : null,
+          pausedDurationSeconds: Number(event.payload.pausedDurationSeconds || 0),
+          skipped: Boolean(event.payload.skipped),
+          skipReason: event.payload.skipReason || null,
+          endedEarly: Boolean(event.payload.endedEarly),
           survey: null,
         });
         reconstructed.session.activeRound = null;
@@ -2412,6 +2704,21 @@ class ExperimentStore extends EventEmitter {
         const round = reconstructed.session.rounds.find((entry) => entry.index === event.payload?.roundIndex);
         if (round) {
           round.survey = clone(event.payload.survey || null);
+        }
+      }
+
+
+      if (event.type === 'round.skipped') {
+        const round = reconstructed.session.rounds.find((entry) => entry.index === event.payload?.index);
+        if (round) {
+          round.skipped = true;
+          round.skipReason = event.payload?.skipReason || null;
+          round.survey = {
+            skipped: true,
+            reason: `Round skipped: ${round.skipReason || 'No reason recorded'}`,
+            submittedAt: event.timestamp,
+            submittedBy: event.payload?.operator || 'researcher',
+          };
         }
       }
 

@@ -57,11 +57,11 @@ function buildLaunchPlan(rawOptions = {}) {
       label: 'watch',
       command: options.pythonCommand,
       args: ['integrations/watch/watch.py'],
-      env: {},
+      env: {
+        WATCH_CALIBRATE_ON_START: options.watchAutoCalibrate ? '1' : '0',
+      },
       optional: true,
-      autoInput: options.watchAutoCalibrate
-        ? [{ match: 'Press Enter to start calibration:', send: '\n', once: true }]
-        : [],
+      autoInput: [],
     };
   }
 

@@ -20,6 +20,10 @@
       <section id="subject-onboarding" class="display-card participant-card" hidden>
         <p class="display-kicker">Before the study</p><h1>Welcome</h1>
         <ol id="subject-instructions" class="instruction-list"></ol>
+        <div id="subject-script-audio-block" class="callout" hidden>
+          <span class="callout-label">Recorded instructions</span>
+          <audio id="subject-script-audio" controls preload="metadata"></audio>
+        </div>
         <form id="participant-profile-form" class="stack-form participant-form">
           <div class="field-grid">
             <label class="field"><span>Participant ID</span><input id="subject-participant-id" readonly></label>
@@ -48,10 +52,18 @@
       </section>
 
       <section id="subject-round" class="display-card subject-hint-card" hidden>
-        <div class="participant-round-head"><div><p class="display-kicker" id="subject-round-label">Puzzle</p><h1>Hint</h1></div><strong id="subject-timer" class="subject-timer">05:00</strong></div>
+        <div class="participant-round-head"><div><p class="display-kicker" id="subject-round-label">Puzzle</p><h1>Your puzzle</h1></div><strong id="subject-timer" class="subject-timer">05:00</strong></div>
         <p id="subject-timer-status" class="display-meta">Waiting for the timer.</p>
-        <p id="subject-hint" class="display-message" aria-live="assertive">Waiting for a hint from the researcher.</p>
-        <small id="subject-updated" class="display-meta">No broadcast received yet.</small>
+        <div class="subject-round-stage">
+          <div id="subject-puzzle" class="subject-reference-shell empty" aria-live="polite">
+            <p class="subject-reference-empty">The puzzle diagram will appear when the round starts.</p>
+          </div>
+          <aside class="subject-hint-panel">
+            <p class="display-kicker">Hint</p>
+            <p id="subject-hint" class="display-message" aria-live="assertive">Waiting for a hint from the researcher.</p>
+            <small id="subject-updated" class="display-meta">No broadcast received yet.</small>
+          </aside>
+        </div>
       </section>
 
       <section id="subject-round-survey" class="display-card participant-card" hidden>

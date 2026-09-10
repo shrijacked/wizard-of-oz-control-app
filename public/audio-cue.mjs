@@ -45,7 +45,7 @@ export function createAudioCueController(options = {}) {
       return armed;
     },
 
-    async beep() {
+    async beep(cueOptions = {}) {
       if (!armed) {
         return false;
       }
@@ -56,16 +56,20 @@ export function createAudioCueController(options = {}) {
       }
 
       const startAt = Number.isFinite(audioContext.currentTime) ? audioContext.currentTime : 0;
+      const cueFrequency = Number.isFinite(cueOptions.frequency) ? cueOptions.frequency : frequency;
+      const cueDurationMs = Number.isFinite(cueOptions.durationMs) ? cueOptions.durationMs : durationMs;
+      const cueGainValue = Number.isFinite(cueOptions.gainValue) ? cueOptions.gainValue : gainValue;
+      const cueWaveform = String(cueOptions.waveform || waveform);
       const attackAt = startAt + 0.01;
-      const endAt = startAt + (durationMs / 1000);
+      const endAt = startAt + (cueDurationMs / 1000);
       const oscillator = audioContext.createOscillator();
       const gain = audioContext.createGain();
 
-      oscillator.type = waveform;
-      oscillator.frequency.value = frequency;
+      oscillator.type = cueWaveform;
+      oscillator.frequency.value = cueFrequency;
 
       gain.gain.setValueAtTime(0.0001, startAt);
-      gain.gain.linearRampToValueAtTime(gainValue, attackAt);
+      gain.gain.linearRampToValueAtTime(cueGainValue, attackAt);
       gain.gain.exponentialRampToValueAtTime(0.0001, endAt);
 
       oscillator.connect(gain);
@@ -75,13 +79,13 @@ export function createAudioCueController(options = {}) {
       return true;
     },
 
-    async pattern(count = 2, gapMs = 140) {
+    async pattern(count = 2, gapMs = 140, cueOptions = {}) {
       if (!armed) {
         return false;
       }
       const total = Math.max(1, Math.min(6, Math.floor(Number(count) || 1)));
       for (let index = 0; index < total; index += 1) {
-        await this.beep();
+        await this.beep(cueOptions);
         if (index < total - 1) {
           await new Promise((resolve) => setTimeout(resolve, gapMs));
         }

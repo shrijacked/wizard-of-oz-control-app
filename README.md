@@ -6,7 +6,7 @@ One participant record contains nine randomized puzzles in three consecutive sit
 
 - `/admin` for the dashboard operator
 - `/subject` for participant onboarding, timer, written hints, breaks, and questionnaires
-- `/robot` for the robot operator (piece + slot cue + beep only)
+- `/robot` for the robot operator (fixed program cue + beep only)
 
 The host machine serves all three screens over the local network and keeps them synchronized with WebSockets and file-backed logging.
 
@@ -15,21 +15,21 @@ The host machine serves all three screens over the local network and keeps them 
 - shows a live Logitech C270 preview on the operator dashboard, with a camera picker
 - seeds puzzle pairs from `tangram puzzles/` (`1.pdf`+`1s.pdf` through `9.pdf`+`9s.pdf`)
 - reserves the next participant ID (`P01`, `P02`, …) without reusing saved IDs
-- cycles participants through all six possible condition orders and saves the assigned order
+- cycles participants through all six possible condition orders, with a manual-order override during setup
 - globally shuffles all nine puzzles with a persisted participant-specific seed, then assigns three to each sitting
 - records separate participant-entered and researcher-entered demographic/consent copies for cross-checking
 - collects baseline expected efficacy, a questionnaire after every round, and an end-of-study questionnaire in the app
 - sends text hints from the dashboard to the subject screen
-- sends robot cues as **piece + numbered slot** to the robot screen
+- sends each robot cue with one click using the shape's fixed robot program
 - plays a short alert beep on the subject screen when a new hint arrives
 - plays a short alert beep on the robot screen when a new robot cue arrives
-- blocks **Begin study** until the C270, Maxim H Band, both displays, matching profile copies, and nine-round schedule are ready
-- tracks study, sitting, and round lifecycle with start, pause, resume, complete, breaks, and elapsed active time
+- keeps consent/profile and puzzle scheduling as hard requirements while showing camera, watch, and display issues as non-blocking warnings
+- tracks study, sitting, and round lifecycle with start, pause, resume, skip, early end, breaks, and timers on both participant and admin screens
 - provides configurable constant-condition reminders and highlights detected HRV stress spikes in adaptive rounds
 - allows watch recalibration between rounds and sittings without restarting the app
 - shows live HRV metrics and stress-spike guidance on the operator dashboard
-- exports a concise participant-session JSON with counterbalancing, puzzle order, both profile copies, per-round surveys, final survey, durations, and ordered interventions
-- keeps CSV timeline output available as a secondary export
+- accepts an optional replacement `.txt` script and an MP3/M4A/WAV/OGG recording for participant playback
+- continuously writes a full session JSON, a separate form-responses JSON, and a raw event CSV for every session
 
 ## Puzzle file pairing
 
@@ -43,9 +43,19 @@ Manual upload remains a fallback for a missing or replaced file. Only complete p
 
 ## Robot cues
 
-Edit [`config/study.json`](config/study.json) to change piece names, slot count, planned rounds, and hint presets. No code change is required.
+Edit [`config/study.json`](config/study.json) to change piece names, fixed program numbers, planned rounds, and hint presets. No code change is required.
 
-The robot screen shows a sentence such as `Move ORANGE TRIANGLE to slot 4`.
+The dashboard has one button per shape. The configured robot programs are:
+
+- Orange Triangle — program 1
+- Green Square — program 2
+- Red Triangle — program 3
+- Pink Triangle — program 4
+- Yellow Parallelogram — program 5
+- Blue Triangle — program 6
+- Purple Triangle — program 7
+
+The robot screen shows a sentence such as `Run program 1 — ORANGE TRIANGLE`.
 
 ## Routes
 
@@ -54,6 +64,7 @@ The robot screen shows a sentence such as `Move ORANGE TRIANGLE to slot 4`.
 - `GET /robot`: robot-operator cue display
 - `GET /audit`: compatibility redirect to `/robot`
 - `GET /api/export/current.json`: concise primary session export
+- `GET /api/export/current.forms.json`: profiles and questionnaire responses only
 - `GET /api/export/current.csv`: raw timeline CSV
 
 ## Quick start
@@ -68,8 +79,8 @@ npm run launch:study
 Then open:
 
 - `http://localhost:3000/admin`
-- `http://<host-ip>:3000/subject`
-- `http://<host-ip>:3000/robot`
+- `http://<Mac-hostname>.local:3000/subject` (preferred because it survives IP changes)
+- `http://<Mac-hostname>.local:3000/robot`
 
 Reset between participants with:
 
@@ -84,14 +95,14 @@ That archives `data/state.json`, the event log, exports, and uploaded puzzles in
 1. Put the Maxim H Band on and start the app with `npm run launch:study`. Heart rate should appear as soon as BLE is connected; stress/RMSSD still wait for the 60s baseline.
 2. Open `/admin` on the host machine. Choose the C270 in the camera list and click **Start camera**.
 3. Open `/subject` and `/robot` on the other two devices. Tap once on each so the alert sound is armed.
-4. Use the auto-assigned participant ID. Enter the researcher’s demographic/consent cross-check, timer length, and constant reminder interval, then save. The nine-round condition and puzzle schedule is generated once and shown in the dashboard.
-5. Read the on-screen participant script. On `/subject`, have the participant enter their own age/gender copy, baseline expected-efficacy rating, instruction acknowledgement, and consent.
-6. When the readiness list is green, click **Begin study**. The button stays disabled until both profile copies match and the camera, watch, both screens, and nine-puzzle schedule are ready.
+4. Use the auto-assigned participant ID. Enter the researcher’s demographic/consent cross-check, timer length, constant reminder interval, and either the automatic or manual condition order, then save. The nine-round condition and puzzle schedule is generated once and shown in the dashboard.
+5. Read the on-screen participant script. You may upload replacement `.txt` copy and a prerecorded audio version during setup. On `/subject`, have the participant enter their own age/gender copy, baseline expected-efficacy rating, instruction acknowledgement, and consent.
+6. Click **Begin study** after the profile copies match and the nine-puzzle schedule is ready. Camera, watch, or display warnings remain visible but do not prevent starting, and accepting them is recorded in the session log.
 7. Click **Start round** when the participant begins. Use **Pause timer** and **Resume timer** when needed. The participant sees the countdown and hears start, midpoint, and end cues.
 8. Control rounds disable hints and robot movements. In constant rounds, use the configured researcher reminder. In adaptive rounds, use the HRV spike highlight as decision support rather than an automatic intervention.
-9. Click **Complete round**. The next round remains locked until the participant submits the in-app questionnaire. A researcher can skip it only by recording a reason.
+9. Click **Complete round**. The next round remains locked until the participant submits the in-app questionnaire. A researcher can skip a waiting round or questionnaire only by recording a reason.
 10. After rounds 3 and 6, take a break. Recalibrate the watch if needed, click **Begin next sitting**, and continue the same participant record.
-11. After round 9, wait for the participant’s end-of-study questionnaire, click **End study**, and download the exports.
+11. After round 9, wait for the participant’s end-of-study questionnaire, click **End study**, and download the exports. **End early + save** closes a partial study safely when required.
 12. Click **Reset for next participant**, or run `npm run study:reset` if you also want a clean archive.
 
 ## Runtime options
@@ -108,7 +119,9 @@ That archives `data/state.json`, the event log, exports, and uploaded puzzles in
 
 The watch still establishes a baseline when its bridge starts. **Recalibrate watch** writes a runtime control request for `watch.py`; use it between rounds or sittings while the participant is still.
 
-The camera and watch feeds **do** block a sitting from starting.
+Camera and watch issues are shown as warnings and **do not** block a sitting from starting.
+
+Open the Admin page at `http://localhost:3000/admin` on the Mac connected to the camera. Browsers block camera access from ordinary non-secure LAN addresses. Other laptops should use the `.local` Subject/Robot links shown on the dashboard; the pages reconnect automatically after a network interruption.
 
 ## Verification
 

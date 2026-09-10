@@ -15,7 +15,8 @@ import {
   shouldShowCameraControls,
 } from './admin-controls.mjs';
 import { renderHrvTelemetry } from './admin-telemetry.mjs';
-import { createAudioCueController } from './audio-cue.mjs';
+import { createSessionDraftController } from './admin-session-draft.mjs';
+import { describeRoundProgress } from './admin-round-progress.mjs';
 
 const ADMIN_TOKEN_KEY = 'woz.admin.token';
 
@@ -41,6 +42,7 @@ const elements = {
   sessionResearcher: document.querySelector('#session-researcher'),
   sessionRoundDuration: document.querySelector('#session-round-duration'),
   sessionConstantInterval: document.querySelector('#session-constant-interval'),
+  sessionConditionOrder: document.querySelector('#session-condition-order'),
   adminParticipantAge: document.querySelector('#admin-participant-age'),
   adminParticipantGender: document.querySelector('#admin-participant-gender'),
   adminParticipantGenderSelf: document.querySelector('#admin-participant-gender-self'),
@@ -49,6 +51,12 @@ const elements = {
   adminConsentStatement: document.querySelector('#admin-consent-statement'),
   conditionOrderSummary: document.querySelector('#condition-order-summary'),
   subjectInstructionScript: document.querySelector('#subject-instruction-script'),
+  studyScriptForm: document.querySelector('#study-script-form'),
+  studyScriptText: document.querySelector('#study-script-text'),
+  studyScriptAudio: document.querySelector('#study-script-audio'),
+  studyScriptAudioPreview: document.querySelector('#study-script-audio-preview'),
+  studyScriptUpload: document.querySelector('#study-script-upload'),
+  studyScriptStatus: document.querySelector('#study-script-status'),
   sessionNotes: document.querySelector('#session-notes'),
   sessionSave: document.querySelector('#session-save'),
   puzzleUploadForm: document.querySelector('#puzzle-upload-form'),
@@ -78,13 +86,19 @@ const elements = {
   sessionStatusDetail: document.querySelector('#session-status-detail'),
   sessionDurationSummary: document.querySelector('#session-duration-summary'),
   sessionDurationDetail: document.querySelector('#session-duration-detail'),
+  adminRoundTimer: document.querySelector('#admin-round-timer'),
+  adminRoundCounter: document.querySelector('#admin-round-counter'),
+  adminRoundFormStatus: document.querySelector('#admin-round-form-status'),
+  adminRoundFormCard: document.querySelector('#admin-round-form-card'),
   screenLinks: document.querySelector('#screen-links'),
   sessionStart: document.querySelector('#session-start'),
   sessionComplete: document.querySelector('#session-complete'),
+  sessionEndEarly: document.querySelector('#session-end-early'),
   roundStart: document.querySelector('#round-start'),
   roundPause: document.querySelector('#round-pause'),
   roundResume: document.querySelector('#round-resume'),
   roundComplete: document.querySelector('#round-complete'),
+  roundSkip: document.querySelector('#round-skip'),
   resumeSitting: document.querySelector('#resume-sitting'),
   roundSurveyStatus: document.querySelector('#round-survey-status'),
   roundSurveyStatusText: document.querySelector('#round-survey-status-text'),
@@ -93,6 +107,7 @@ const elements = {
   resetSessionSetup: document.querySelector('#reset-session-setup'),
   resetSessionReview: document.querySelector('#reset-session-review'),
   exportJsonLink: document.querySelector('#export-json-link'),
+  exportFormsLink: document.querySelector('#export-forms-link'),
   exportCsvLink: document.querySelector('#export-csv-link'),
   reviewSummary: document.querySelector('#review-summary'),
   reviewRounds: document.querySelector('#review-rounds'),
@@ -104,8 +119,6 @@ const elements = {
   hintPreview: document.querySelector('#hint-preview'),
   hintPresets: document.querySelector('#hint-presets'),
   pieceGrid: document.querySelector('#piece-grid'),
-  slotGrid: document.querySelector('#slot-grid'),
-  sendRobotCue: document.querySelector('#send-robot-cue'),
   latestAction: document.querySelector('#latest-action'),
   interventionLog: document.querySelector('#intervention-log'),
   startCamera: document.querySelector('#start-camera'),
@@ -120,7 +133,6 @@ const elements = {
   reviewRecordings: document.querySelector('#review-recordings'),
   watchCalibrate: document.querySelector('#watch-calibrate'),
   watchCalibrationStatus: document.querySelector('#watch-calibration-status'),
-  operatorSound: document.querySelector('#operator-sound'),
   hrvSpikeAlert: document.querySelector('#hrv-spike-alert'),
   hrvSpikeDetail: document.querySelector('#hrv-spike-detail'),
   constantReminder: document.querySelector('#constant-reminder'),
@@ -131,19 +143,47 @@ let currentState = null;
 let guardStatus = null;
 let adminToken = window.localStorage.getItem(ADMIN_TOKEN_KEY) || '';
 let durationTicker = null;
-let selectedPieceId = null;
-let selectedSlot = null;
 let lastHintToken = null;
 let lastRobotToken = null;
-let lastHrvSpikeToken = null;
-let lastConstantReminderKey = null;
 const liveLog = [];
+const sessionDraft = createSessionDraftController([
+  'studyId',
+  'participantId',
+  'researcher',
+  'roundDurationSeconds',
+  'constantIntervalSeconds',
+  'conditionOrder',
+  'age',
+  'gender',
+  'genderSelfDescribe',
+  'consented',
+  'notes',
+]);
 
-const operatorSound = createAudioCueController({
-  frequency: 1040,
-  durationMs: 240,
-  gainValue: 0.14,
-  waveform: 'square',
+const sessionDraftInputs = [
+  ['studyId', elements.sessionStudyId],
+  ['participantId', elements.sessionParticipantId],
+  ['researcher', elements.sessionResearcher],
+  ['roundDurationSeconds', elements.sessionRoundDuration],
+  ['constantIntervalSeconds', elements.sessionConstantInterval],
+  ['conditionOrder', elements.sessionConditionOrder],
+  ['age', elements.adminParticipantAge],
+  ['gender', elements.adminParticipantGender],
+  ['genderSelfDescribe', elements.adminParticipantGenderSelf],
+  ['notes', elements.sessionNotes],
+];
+
+for (const [field, element] of sessionDraftInputs) {
+  element?.addEventListener('input', () => {
+    sessionDraft.noteChange(field, element.value);
+  });
+  element?.addEventListener('change', () => {
+    sessionDraft.noteChange(field, element.value);
+  });
+}
+
+elements.adminParticipantConsent?.addEventListener('change', () => {
+  sessionDraft.noteChange('consented', elements.adminParticipantConsent.checked);
 });
 
 const cameraController = createCameraController({
@@ -151,6 +191,8 @@ const cameraController = createCameraController({
   statusElement: elements.cameraStatus,
   selectElement: elements.cameraDevice,
   mediaDevices: window.navigator?.mediaDevices || null,
+  secureContext: window.isSecureContext,
+  hostname: window.location.hostname,
   async onStatusChange(status) {
     try {
       await postJson('/api/camera/status', {
@@ -310,6 +352,14 @@ function renderAssetPreview(container, asset, emptyMessage) {
     return;
   }
 
+  const previewKey = asset
+    ? `${asset.assetId || asset.urlPath || asset.originalName}:${asset.displayKind || ''}`
+    : 'empty';
+  if (container.dataset.previewKey === previewKey) {
+    return;
+  }
+  container.dataset.previewKey = previewKey;
+
   container.innerHTML = '';
   container.classList.toggle('empty', !asset);
 
@@ -400,6 +450,20 @@ function localPolicy(action) {
     return status === 'running' && activeRound
       ? { allowed: true, reason: '' }
       : { allowed: false, reason: 'There is no active round to complete.' };
+  }
+
+  if (action === 'skipRound') {
+    const allowed = status === 'running' && !activeRound && !session.awaitingRoundSurvey
+      && !session.betweenSittings && !session.finalSurveyRequired && rounds.length < queue.length;
+    return allowed
+      ? { allowed: true, reason: '' }
+      : { allowed: false, reason: 'The next round can only be skipped while it is waiting to start.' };
+  }
+
+  if (action === 'endSessionEarly') {
+    return status === 'running'
+      ? { allowed: true, reason: '' }
+      : { allowed: false, reason: 'Only a running study can be ended early.' };
   }
 
   if (action === 'completeSession') {
@@ -660,6 +724,7 @@ function readinessChecks() {
   if (items.length) {
     return items.map((item) => ({
       ok: item.status === 'ready',
+      status: item.status,
       label: item.summary || item.label,
     }));
   }
@@ -673,20 +738,21 @@ function renderReadiness() {
     elements.readinessList.innerHTML = '';
     checks.forEach((check) => {
       const item = document.createElement('p');
-      item.className = check.ok ? 'readiness-ok' : 'readiness-wait';
-      item.textContent = `${check.ok ? 'Ready' : 'Waiting'} — ${check.label}`;
+      item.className = check.ok
+        ? 'readiness-ok'
+        : (check.status === 'warning' ? 'readiness-warning' : 'readiness-wait');
+      const prefix = check.ok ? 'Ready' : (check.status === 'warning' ? 'Warning' : 'Required');
+      item.textContent = `${prefix} — ${check.label}`;
       elements.readinessList.append(item);
     });
   }
 
   const startPolicy = resolvePolicy('startSession');
-  const blocked = checks.find((check) => !check.ok);
-  const preflightBlocked = currentState?.system?.preflight?.requiredReady === false;
-  const canStart = startPolicy.allowed && !blocked && !preflightBlocked;
+  const canStart = startPolicy.allowed;
   setElementDisabled(
     elements.sessionStart,
     !canStart,
-    blocked ? blocked.label : (preflightBlocked ? currentState.system.preflight.summary : startPolicy.reason),
+    startPolicy.reason,
   );
 }
 
@@ -805,7 +871,6 @@ function renderHintPresets(hintPolicy) {
 
 function renderRobotComposer(actionPolicy) {
   const pieces = studyConfig().pieces || [];
-  const slotCount = studyConfig().slotCount || 7;
 
   if (elements.pieceGrid) {
     elements.pieceGrid.innerHTML = '';
@@ -813,46 +878,31 @@ function renderRobotComposer(actionPolicy) {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'action-button';
-      if (selectedPieceId === piece.id) {
-        button.classList.add('selected');
-      }
-      button.textContent = piece.label;
+      button.textContent = `${piece.programNumber}. ${piece.label}`;
       button.style.setProperty('--piece-color', piece.color);
       button.disabled = !actionPolicy.allowed;
-      button.title = actionPolicy.allowed ? '' : actionPolicy.reason;
-      button.addEventListener('click', () => {
-        selectedPieceId = piece.id;
-        renderRobotComposer(actionPolicy);
+      button.title = actionPolicy.allowed
+        ? `Broadcast robot program ${piece.programNumber}`
+        : actionPolicy.reason;
+      button.addEventListener('click', async () => {
+        button.disabled = true;
+        try {
+          await postJson('/api/actions', {
+            pieceId: piece.id,
+            payload: { origin: 'admin-dashboard' },
+            actor: actorName(),
+          }, {
+            headers: buildHeaders(),
+          });
+          await refreshState();
+        } catch (error) {
+          button.disabled = !actionPolicy.allowed;
+          await handleError(error);
+        }
       });
       elements.pieceGrid.append(button);
     });
   }
-
-  if (elements.slotGrid) {
-    elements.slotGrid.innerHTML = '';
-    for (let slot = 1; slot <= slotCount; slot += 1) {
-      const button = document.createElement('button');
-      button.type = 'button';
-      button.className = 'slot-button';
-      if (selectedSlot === slot) {
-        button.classList.add('selected');
-      }
-      button.textContent = String(slot);
-      button.disabled = !actionPolicy.allowed;
-      button.addEventListener('click', () => {
-        selectedSlot = slot;
-        renderRobotComposer(actionPolicy);
-      });
-      elements.slotGrid.append(button);
-    }
-  }
-
-  const canSend = actionPolicy.allowed && selectedPieceId && selectedSlot;
-  setElementDisabled(
-    elements.sendRobotCue,
-    !canSend,
-    actionPolicy.allowed ? 'Choose a piece and a slot first.' : actionPolicy.reason,
-  );
 }
 
 function renderSession() {
@@ -864,26 +914,55 @@ function renderSession() {
   const queue = session.queue || [];
   const planned = session.plannedRounds || studyConfig().plannedRounds;
   const adminProfile = session.participantProfiles?.admin || {};
+  const draft = sessionDraft.resolve(session.id, {
+    studyId: String(metadata.studyId || ''),
+    participantId: String(metadata.participantId || ''),
+    researcher: String(metadata.researcher || ''),
+    roundDurationSeconds: String(metadata.roundDurationSeconds || 300),
+    constantIntervalSeconds: String(metadata.constantIntervalSeconds || 30),
+    conditionOrder: (metadata.conditionOrderSelection || []).join('|'),
+    age: adminProfile.age == null ? '' : String(adminProfile.age),
+    gender: String(adminProfile.gender || ''),
+    genderSelfDescribe: String(adminProfile.genderSelfDescribe || ''),
+    consented: Boolean(adminProfile.consented),
+    notes: String(metadata.notes || ''),
+  });
   const timerNow = activeRound?.pauseStartedAt ? new Date(activeRound.pauseStartedAt) : new Date();
   const durationSeconds = activeRound?.startedAt
     ? Math.max(0, Math.round((timerNow.getTime() - new Date(activeRound.startedAt).getTime()) / 1000) - Number(activeRound.pausedDurationSeconds || 0))
     : null;
+  const plannedDurationSeconds = Number(metadata.roundDurationSeconds || 300);
+  const roundProgress = describeRoundProgress(session);
+  setText(elements.adminRoundCounter, roundProgress.roundText);
+  setText(elements.adminRoundFormStatus, roundProgress.formText);
+  if (elements.adminRoundFormCard) {
+    elements.adminRoundFormCard.dataset.status = roundProgress.formStatus;
+  }
+  if (elements.adminRoundTimer) {
+    const remaining = durationSeconds == null ? null : plannedDurationSeconds - durationSeconds;
+    const displaySeconds = remaining == null ? null : Math.abs(remaining);
+    const minutes = displaySeconds == null ? '--' : String(Math.floor(displaySeconds / 60)).padStart(2, '0');
+    const seconds = displaySeconds == null ? '--' : String(displaySeconds % 60).padStart(2, '0');
+    elements.adminRoundTimer.textContent = `${remaining != null && remaining < 0 ? '+' : ''}${minutes}:${seconds}`;
+    elements.adminRoundTimer.dataset.overtime = remaining != null && remaining < 0 ? 'true' : 'false';
+  }
 
-  setValueSafely(elements.sessionStudyId, metadata.studyId);
-  setValueSafely(elements.sessionParticipantId, metadata.participantId);
-  setValueSafely(elements.sessionResearcher, metadata.researcher);
-  setValueSafely(elements.sessionRoundDuration, metadata.roundDurationSeconds || 300);
-  setValueSafely(elements.sessionConstantInterval, metadata.constantIntervalSeconds || 30);
-  setValueSafely(elements.adminParticipantAge, adminProfile.age);
-  setValueSafely(elements.adminParticipantGender, adminProfile.gender);
-  setValueSafely(elements.adminParticipantGenderSelf, adminProfile.genderSelfDescribe);
+  setValueSafely(elements.sessionStudyId, draft.studyId);
+  setValueSafely(elements.sessionParticipantId, draft.participantId);
+  setValueSafely(elements.sessionResearcher, draft.researcher);
+  setValueSafely(elements.sessionRoundDuration, draft.roundDurationSeconds);
+  setValueSafely(elements.sessionConstantInterval, draft.constantIntervalSeconds);
+  setValueSafely(elements.sessionConditionOrder, draft.conditionOrder);
+  setValueSafely(elements.adminParticipantAge, draft.age);
+  setValueSafely(elements.adminParticipantGender, draft.gender);
+  setValueSafely(elements.adminParticipantGenderSelf, draft.genderSelfDescribe);
   if (elements.adminParticipantConsent && document.activeElement !== elements.adminParticipantConsent) {
-    elements.adminParticipantConsent.checked = Boolean(adminProfile.consented);
+    elements.adminParticipantConsent.checked = Boolean(draft.consented);
   }
   if (elements.adminGenderSelfField) {
-    elements.adminGenderSelfField.hidden = (elements.adminParticipantGender?.value || adminProfile.gender) !== 'self-describe';
+    elements.adminGenderSelfField.hidden = draft.gender !== 'self-describe';
   }
-  setValueSafely(elements.sessionNotes, metadata.notes);
+  setValueSafely(elements.sessionNotes, draft.notes);
 
   const conditionNames = { control: 'Control', constant: 'Constant intervention', adaptive: 'Adaptive intervention' };
   setText(
@@ -892,12 +971,30 @@ function renderSession() {
       ? session.conditionOrder.map((condition, index) => `Sitting ${index + 1}: ${conditionNames[condition] || condition}`).join(' • ')
       : 'Saved after the participant ID and nine puzzle pairs are available.',
   );
-  if (elements.subjectInstructionScript && !elements.subjectInstructionScript.childElementCount) {
-    for (const instruction of studyConfig().instructions || []) {
-      const item = document.createElement('li');
-      item.textContent = instruction;
-      elements.subjectInstructionScript.append(item);
+  if (elements.subjectInstructionScript) {
+    const instructions = studyConfig().instructions || [];
+    const scriptKey = JSON.stringify(instructions);
+    if (elements.subjectInstructionScript.dataset.scriptKey !== scriptKey) {
+      elements.subjectInstructionScript.dataset.scriptKey = scriptKey;
+      elements.subjectInstructionScript.innerHTML = '';
+      for (const instruction of instructions) {
+        const item = document.createElement('li');
+        item.textContent = instruction;
+        elements.subjectInstructionScript.append(item);
+      }
     }
+  }
+  if (elements.studyScriptAudioPreview) {
+    const audioUrl = studyConfig().scriptAudioUrl || '';
+    if (elements.studyScriptAudioPreview.getAttribute('src') !== audioUrl) {
+      elements.studyScriptAudioPreview.src = audioUrl;
+    }
+    elements.studyScriptAudioPreview.hidden = !audioUrl;
+    setText(elements.studyScriptStatus, audioUrl
+      ? `Displayed script plus recording: ${studyConfig().scriptAudioName || 'uploaded audio'}.`
+      : (studyConfig().customTextName
+        ? `Displayed script loaded from ${studyConfig().customTextName}.`
+        : 'The default script is currently displayed.'));
   }
   setText(elements.adminConsentStatement, studyConfig().consentStatement
     ? `Researcher cross-check: ${studyConfig().consentStatement}`
@@ -942,10 +1039,11 @@ function renderSession() {
   }
 
   const localhost = currentState?.system?.network?.localhost || {};
+  const stableUrls = currentState?.system?.network?.stableHost?.urls || {};
   const lanUrls = (currentState?.system?.network?.lan || [])[0]?.urls || {};
   setText(
     elements.screenLinks,
-    `Subject ${lanUrls.subject || localhost.subject || `${window.location.origin}/subject`} • Robot ${lanUrls.robot || localhost.robot || `${window.location.origin}/robot`}`,
+    `Subject ${stableUrls.subject || lanUrls.subject || localhost.subject || `${window.location.origin}/subject`} • Robot ${stableUrls.robot || lanUrls.robot || localhost.robot || `${window.location.origin}/robot`}`,
   );
   setText(elements.hintPreview, currentState?.hint?.text || 'No hint has been sent yet.');
   setText(
@@ -971,7 +1069,9 @@ function renderSession() {
   const actionPolicy = resolvePolicy('logRobotAction');
   const startRoundPolicy = resolvePolicy('startRound');
   const completeRoundPolicy = resolvePolicy('completeRound');
+  const skipRoundPolicy = resolvePolicy('skipRound');
   const completePolicy = resolvePolicy('completeSession');
+  const earlyEndPolicy = resolvePolicy('endSessionEarly');
   const pausePolicy = resolvePolicy('pauseRound');
   const resumePolicy = resolvePolicy('resumeRound');
   const resumeSittingPolicy = resolvePolicy('resumeSitting');
@@ -983,6 +1083,7 @@ function renderSession() {
     elements.sessionResearcher,
     elements.sessionRoundDuration,
     elements.sessionConstantInterval,
+    elements.sessionConditionOrder,
     elements.adminParticipantAge,
     elements.adminParticipantGender,
     elements.adminParticipantGenderSelf,
@@ -992,6 +1093,9 @@ function renderSession() {
     elements.puzzleUploadInput,
     elements.puzzleUploadSubmit,
     elements.puzzleClearSelection,
+    elements.studyScriptText,
+    elements.studyScriptAudio,
+    elements.studyScriptUpload,
   ].forEach((element) => {
     setElementDisabled(element, !configurePolicy.allowed, configurePolicy.reason);
   });
@@ -1000,11 +1104,13 @@ function renderSession() {
   setElementDisabled(elements.roundPause, !pausePolicy.allowed, pausePolicy.reason);
   setElementDisabled(elements.roundResume, !resumePolicy.allowed, resumePolicy.reason);
   setElementDisabled(elements.roundComplete, !completeRoundPolicy.allowed, completeRoundPolicy.reason);
+  setElementDisabled(elements.roundSkip, !skipRoundPolicy.allowed, skipRoundPolicy.reason);
   if (elements.resumeSitting) {
     elements.resumeSitting.hidden = !session.betweenSittings;
     setElementDisabled(elements.resumeSitting, !resumeSittingPolicy.allowed, resumeSittingPolicy.reason);
   }
   setElementDisabled(elements.sessionComplete, !completePolicy.allowed, completePolicy.reason);
+  setElementDisabled(elements.sessionEndEarly, !earlyEndPolicy.allowed, earlyEndPolicy.reason);
   setElementDisabled(elements.hintText, !hintPolicy.allowed, hintPolicy.reason);
   setElementDisabled(elements.hintSend, !hintPolicy.allowed, hintPolicy.reason);
   setElementDisabled(elements.clearHint, !hintPolicy.allowed, hintPolicy.reason);
@@ -1041,11 +1147,6 @@ function renderSession() {
       ? `Detected ${formatTimestamp(spikeAt)} • stress ${Number(spike.stressScore || 0).toFixed(2)}. Use researcher judgment before intervening.`
       : 'Review the signal and decide whether to intervene.');
   }
-  if (showSpike && spikeAt !== lastHrvSpikeToken) {
-    lastHrvSpikeToken = spikeAt;
-    operatorSound.pattern(3, 120);
-  }
-
   const constantActive = activeRound?.condition === 'constant';
   if (elements.constantReminder) {
     elements.constantReminder.hidden = !constantActive;
@@ -1055,12 +1156,6 @@ function renderSession() {
     const remainder = durationSeconds % interval;
     const remaining = remainder === 0 && durationSeconds > 0 ? interval : interval - remainder;
     setText(elements.constantReminderText, `Next researcher reminder in ${remaining} second${remaining === 1 ? '' : 's'} (every ${interval}s).`);
-    const reminderNumber = Math.floor(durationSeconds / interval);
-    const reminderKey = `${activeRound.index}:${reminderNumber}`;
-    if (!activeRound.pauseStartedAt && reminderNumber > 0 && reminderKey !== lastConstantReminderKey) {
-      lastConstantReminderKey = reminderKey;
-      operatorSound.pattern(2, 160);
-    }
   }
 
   renderHintPresets(hintPolicy);
@@ -1294,8 +1389,6 @@ async function resetSession() {
   }, {
     headers: buildHeaders(),
   });
-  selectedPieceId = null;
-  selectedSlot = null;
   liveLog.splice(0, liveLog.length);
   lastHintToken = null;
   lastRobotToken = null;
@@ -1481,6 +1574,9 @@ async function init() {
         researcher: elements.sessionResearcher.value,
         roundDurationSeconds: Number(elements.sessionRoundDuration.value || 300),
         constantIntervalSeconds: Number(elements.sessionConstantInterval.value || 30),
+        conditionOrder: elements.sessionConditionOrder.value
+          ? elements.sessionConditionOrder.value.split('|')
+          : null,
         adminProfile: {
           age: Number(elements.adminParticipantAge.value),
           gender: elements.adminParticipantGender.value,
@@ -1493,6 +1589,7 @@ async function init() {
       }, {
         headers: buildHeaders(),
       });
+      sessionDraft.discard(currentState?.session?.id);
       await refreshState();
     } catch (error) {
       await handleError(error);
@@ -1502,14 +1599,6 @@ async function init() {
   elements.adminParticipantGender?.addEventListener('change', () => {
     if (elements.adminGenderSelfField) {
       elements.adminGenderSelfField.hidden = elements.adminParticipantGender.value !== 'self-describe';
-    }
-  });
-
-  elements.operatorSound?.addEventListener('click', async () => {
-    const armed = await operatorSound.arm();
-    setText(elements.operatorSound, armed ? 'Operator alerts enabled' : 'Sound unavailable');
-    if (armed) {
-      await operatorSound.pattern(2, 120);
     }
   });
 
@@ -1545,6 +1634,30 @@ async function init() {
       await refreshState();
     } catch (error) {
       setText(elements.puzzleUploadStatus, error.message || 'Upload failed.');
+      await handleError(error);
+    }
+  });
+
+  elements.studyScriptForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const textFile = elements.studyScriptText?.files?.[0] || null;
+    const audioFile = elements.studyScriptAudio?.files?.[0] || null;
+    if (!textFile && !audioFile) {
+      setText(elements.studyScriptStatus, 'Choose a text file, an audio recording, or both.');
+      return;
+    }
+    try {
+      setText(elements.studyScriptStatus, 'Uploading script files...');
+      await postJson('/api/study-script', {
+        textFile: textFile ? await readUploadFileAsBase64(textFile) : null,
+        audioFile: audioFile ? await readUploadFileAsBase64(audioFile) : null,
+        actor: actorName(),
+      }, { headers: buildHeaders() });
+      elements.studyScriptText.value = '';
+      elements.studyScriptAudio.value = '';
+      await refreshState();
+    } catch (error) {
+      setText(elements.studyScriptStatus, error.message || 'Script upload failed.');
       await handleError(error);
     }
   });
@@ -1592,8 +1705,20 @@ async function init() {
       }, {
         headers: buildHeaders(),
       });
-      selectedPieceId = null;
-      selectedSlot = null;
+      await refreshState();
+    } catch (error) {
+      await handleError(error);
+    }
+  });
+
+  elements.roundSkip?.addEventListener('click', async () => {
+    const nextRound = (currentState?.session?.rounds?.length || 0) + 1;
+    const reason = window.prompt(`Why are you skipping round ${nextRound}? This will be recorded in both exports.`);
+    if (!reason?.trim()) {
+      return;
+    }
+    try {
+      await postJson('/api/rounds/skip', { reason, operator: actorName() }, { headers: buildHeaders() });
       await refreshState();
     } catch (error) {
       await handleError(error);
@@ -1663,6 +1788,24 @@ async function init() {
     }
   });
 
+  elements.sessionEndEarly?.addEventListener('click', async () => {
+    const reason = window.prompt('Why is this study being ended early? All data collected so far will be saved.');
+    if (!reason?.trim()) {
+      return;
+    }
+    if (!window.confirm('End the study now and save the partial results?')) {
+      return;
+    }
+    try {
+      await cameraRecorder.stop();
+      await postJson('/api/session/end-early', { reason, operator: actorName() }, { headers: buildHeaders() });
+      await refreshState();
+      await downloadSittingFootage();
+    } catch (error) {
+      await handleError(error);
+    }
+  });
+
   const resetHandler = async () => {
     try {
       await resetSession();
@@ -1678,6 +1821,15 @@ async function init() {
     try {
       const sessionId = currentState?.session?.id || 'session';
       await downloadExport('/api/export/current.json', `${sessionId}.json`);
+    } catch (error) {
+      await handleError(error);
+    }
+  });
+
+  elements.exportFormsLink?.addEventListener('click', async () => {
+    try {
+      const sessionId = currentState?.session?.id || 'session';
+      await downloadExport('/api/export/current.forms.json', `${sessionId}-forms.json`);
     } catch (error) {
       await handleError(error);
     }
@@ -1742,25 +1894,6 @@ async function init() {
     }
   });
 
-  elements.sendRobotCue?.addEventListener('click', async () => {
-    if (!selectedPieceId || !selectedSlot) {
-      return;
-    }
-
-    try {
-      await postJson('/api/actions', {
-        pieceId: selectedPieceId,
-        slot: selectedSlot,
-        payload: { origin: 'admin-dashboard' },
-        actor: actorName(),
-      }, {
-        headers: buildHeaders(),
-      });
-      await refreshState();
-    } catch (error) {
-      await handleError(error);
-    }
-  });
 }
 
 init().catch((error) => {

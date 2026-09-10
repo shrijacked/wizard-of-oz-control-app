@@ -34,6 +34,7 @@ const FINAL = [
 
 function showPanel(id) {
   panelIds.forEach((name) => { panels[name].hidden = name !== id; });
+  document.body.dataset.subjectPhase = id.replace('subject-', '');
 }
 
 function scaleMarkup(name, low, high) {
@@ -66,6 +67,46 @@ function formatClock(seconds) {
   return `${String(Math.floor(value / 60)).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}`;
 }
 
+function renderPuzzle(asset) {
+  const container = byId('subject-puzzle');
+  if (!container) return;
+
+  const previewKey = asset
+    ? `${asset.assetId || asset.urlPath || asset.originalName}:${asset.displayKind || ''}`
+    : 'empty';
+  if (container.dataset.previewKey === previewKey) return;
+  container.dataset.previewKey = previewKey;
+  container.innerHTML = '';
+  container.classList.toggle('empty', !asset);
+
+  if (!asset) {
+    const empty = document.createElement('p');
+    empty.className = 'subject-reference-empty';
+    empty.textContent = 'The puzzle diagram will appear when the round starts.';
+    container.append(empty);
+    return;
+  }
+
+  const preview = document.createElement(asset.displayKind === 'pdf' ? 'iframe' : 'img');
+  preview.className = asset.displayKind === 'pdf' ? 'subject-reference-pdf' : 'subject-reference-image';
+  preview.title = `Puzzle ${asset.originalName || ''}`.trim();
+  if (asset.displayKind === 'pdf') {
+    preview.src = `${asset.urlPath}#toolbar=0&navpanes=0&scrollbar=0&view=Fit`;
+  } else {
+    preview.src = asset.urlPath;
+    preview.alt = `Puzzle diagram ${asset.originalName || ''}`.trim();
+  }
+  preview.addEventListener('error', () => {
+    container.innerHTML = '';
+    container.classList.add('empty');
+    const failed = document.createElement('p');
+    failed.className = 'subject-reference-empty';
+    failed.textContent = 'The puzzle diagram could not be loaded. Please tell the researcher.';
+    container.append(failed);
+  });
+  container.append(preview);
+}
+
 function renderTimer() {
   const round = state?.session?.activeRound;
   if (!round || panels['subject-round'].hidden) return;
@@ -80,15 +121,15 @@ function renderTimer() {
     timerRoundToken = token;
     timerMilestones.clear();
     timerMilestones.add('start');
-    sound.pattern(2, 120);
+    sound.beep({ frequency: 1100, durationMs: 300, gainValue: 0.16, waveform: 'square' });
   }
   if (elapsed >= Math.floor(duration / 2) && !timerMilestones.has('mid')) {
     timerMilestones.add('mid');
-    sound.pattern(2, 260);
+    sound.pattern(2, 260, { frequency: 760, durationMs: 210, gainValue: 0.13, waveform: 'sine' });
   }
   if (elapsed >= duration && !timerMilestones.has('end')) {
     timerMilestones.add('end');
-    sound.pattern(4, 130);
+    sound.pattern(3, 180, { frequency: 480, durationMs: 360, gainValue: 0.16, waveform: 'triangle' });
   }
 }
 
@@ -98,6 +139,30 @@ const robotTracker = createUpdateCueTracker({ onCue: () => sound.pattern(3, 90) 
 function render(current) {
   state = current;
   const session = current?.session || {};
+  const instructionList = byId('subject-instructions');
+  if (instructionList) {
+    const instructions = current?.study?.instructions || [];
+    const key = JSON.stringify(instructions);
+    if (instructionList.dataset.scriptKey !== key) {
+      instructionList.dataset.scriptKey = key;
+      instructionList.innerHTML = '';
+      for (const line of instructions) {
+        const item = document.createElement('li');
+        item.textContent = line;
+        instructionList.append(item);
+      }
+    }
+  }
+  const scriptAudio = byId('subject-script-audio');
+  const audioBlock = byId('subject-script-audio-block');
+  const audioUrl = current?.study?.scriptAudioUrl || '';
+  if (scriptAudio && scriptAudio.getAttribute('src') !== audioUrl) {
+    scriptAudio.src = audioUrl;
+  }
+  if (audioBlock) {
+    audioBlock.hidden = !audioUrl;
+  }
+  renderPuzzle(session.activeRound?.puzzle?.subjectAsset || null);
   byId('participant-id-label').textContent = session.participantId || 'Participant';
   byId('subject-participant-id').value = session.participantId || '';
   if (!session.participantProfile && session.status === 'setup') {
@@ -145,7 +210,6 @@ async function init() {
   byId('final-survey-questions').innerHTML = FINAL.map(questionMarkup).join('');
   fillScaleRows(byId('final-survey-questions'));
   state = await fetchJson('/api/state?role=subject');
-  byId('subject-instructions').innerHTML = (state.study?.instructions || []).map((line) => `<li>${line}</li>`).join('');
   byId('subject-consent-copy').textContent = state.study?.consentStatement || '';
   hintTracker.prime(state?.hint?.updatedAt || null);
   robotTracker.prime(state?.robotCueUpdatedAt || null);

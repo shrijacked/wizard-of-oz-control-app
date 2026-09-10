@@ -72,8 +72,19 @@ export function formatDurationSeconds(value) {
 export function connectSocket(role, handlers = {}) {
   let socket;
   let shouldReconnect = true;
+  let retryTimer = null;
+  let generation = 0;
+
+  const scheduleReconnect = () => {
+    window.clearTimeout(retryTimer);
+    if (shouldReconnect) {
+      retryTimer = window.setTimeout(connect, RETRY_DELAY_MS);
+    }
+  };
 
   const connect = () => {
+    window.clearTimeout(retryTimer);
+    const connectionGeneration = ++generation;
     const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
     socket = new WebSocket(`${protocol}://${window.location.host}/ws?role=${encodeURIComponent(role)}`);
 
@@ -99,18 +110,43 @@ export function connectSocket(role, handlers = {}) {
     });
 
     socket.addEventListener('close', () => {
-      handlers.onClose?.();
-      if (shouldReconnect) {
-        window.setTimeout(connect, RETRY_DELAY_MS);
+      if (connectionGeneration !== generation) {
+        return;
       }
+      handlers.onClose?.();
+      scheduleReconnect();
     });
   };
+
+  const reconnectNow = () => {
+    if (!shouldReconnect) {
+      return;
+    }
+    generation += 1;
+    window.clearTimeout(retryTimer);
+    if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
+      socket.close();
+    }
+    connect();
+  };
+
+  const reconnectWhenVisible = () => {
+    if (document.visibilityState === 'visible') {
+      reconnectNow();
+    }
+  };
+
+  window.addEventListener('online', reconnectNow);
+  document.addEventListener('visibilitychange', reconnectWhenVisible);
 
   connect();
 
   return {
     close() {
       shouldReconnect = false;
+      window.clearTimeout(retryTimer);
+      window.removeEventListener('online', reconnectNow);
+      document.removeEventListener('visibilitychange', reconnectWhenVisible);
       socket?.close();
     },
   };

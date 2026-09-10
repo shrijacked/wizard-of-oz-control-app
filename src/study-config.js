@@ -11,13 +11,13 @@ const DEFAULT_STUDY_CONFIG = Object.freeze({
   slotCount: 7,
   tangramPuzzlesDir: 'tangram puzzles',
   pieces: [
-    { id: 'orange-triangle', label: 'Orange Triangle', color: '#e07a3f' },
-    { id: 'green-square', label: 'Green Square', color: '#3f8f5c' },
-    { id: 'purple-triangle', label: 'Purple Triangle', color: '#7a4fa0' },
-    { id: 'pink-triangle', label: 'Pink Triangle', color: '#d6699e' },
-    { id: 'yellow-parallelogram', label: 'Yellow Parallelogram', color: '#d3a53a' },
-    { id: 'blue-triangle', label: 'Blue Triangle', color: '#2f6f9f' },
-    { id: 'red-triangle', label: 'Red Triangle', color: '#c0433a' },
+    { id: 'orange-triangle', label: 'Orange Triangle', color: '#e07a3f', programNumber: 1 },
+    { id: 'green-square', label: 'Green Square', color: '#3f8f5c', programNumber: 2 },
+    { id: 'red-triangle', label: 'Red Triangle', color: '#c0433a', programNumber: 3 },
+    { id: 'pink-triangle', label: 'Pink Triangle', color: '#d6699e', programNumber: 4 },
+    { id: 'yellow-parallelogram', label: 'Yellow Parallelogram', color: '#d3a53a', programNumber: 5 },
+    { id: 'blue-triangle', label: 'Blue Triangle', color: '#2f6f9f', programNumber: 6 },
+    { id: 'purple-triangle', label: 'Purple Triangle', color: '#7a4fa0', programNumber: 7 },
   ],
   hintPresets: [],
 });
@@ -30,7 +30,11 @@ function normalizePiece(piece, index) {
 
   const id = String(piece?.id || '').trim() || `piece-${index + 1}`;
   const color = String(piece?.color || '').trim() || '#5a5148';
-  return { id, label, color };
+  const requestedProgram = Number(piece?.programNumber);
+  const programNumber = Number.isInteger(requestedProgram) && requestedProgram > 0
+    ? requestedProgram
+    : index + 1;
+  return { id, label, color, programNumber };
 }
 
 function normalizeStudyConfig(raw = {}) {

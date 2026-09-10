@@ -9,7 +9,7 @@
 
 - `npm test`: 57 passing
 - `npm run test:python`: watch script compiles
-- Scripted sitting: 3 queued puzzles, 3 rounds, hint + piece/slot cue per round, export had `roundsCompleted: 3` and `Move ORANGE TRIANGLE to slot 1`
+- Scripted sitting (historical, before fixed program controls): 3 queued puzzles, 3 rounds, hint + robot cue per round, and `roundsCompleted: 3` in the export
 - `/admin` loads setup mode with a real readiness list; Begin sitting stays disabled until checks pass
 - `/subject` arms sound and reports ready; operator pill changes to `Subject: ready`
 - `/robot` loads and appears as connected on the operator dashboard

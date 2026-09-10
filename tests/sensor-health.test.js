@@ -23,6 +23,23 @@ test('sensor health marks the watch bridge stale after its threshold elapses', (
   assert.equal(watch.stale, true);
 });
 
+test('sensor health reports stale samples instead of frozen calibration progress', () => {
+  const now = new Date('2026-04-09T12:00:00.000Z');
+  const watch = summarizeWatchHealth({
+    active: true,
+    lastProcessedAt: '2026-04-09T11:58:00.000Z',
+    lastError: null,
+  }, now, {
+    staleAfterMs: 60000,
+    calibration: { active: true, progress: 42 },
+  });
+
+  assert.equal(watch.level, 'warning');
+  assert.equal(watch.state, 'stale');
+  assert.match(watch.summary, /stopped during baseline/i);
+  assert.match(watch.detail, /42%/);
+});
+
 test('sensor health summarizes running-session watch warnings', () => {
   const now = new Date('2026-04-09T12:00:00.000Z');
   const health = summarizeSensorHealth({

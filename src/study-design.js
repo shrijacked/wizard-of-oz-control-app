@@ -21,6 +21,23 @@ function conditionOrderForParticipant(participantId) {
   return [...CONDITION_ORDERS[(participantNumber(participantId) - 1) % CONDITION_ORDERS.length]];
 }
 
+function normalizeConditionOrder(value) {
+  if (value == null || value === '' || (Array.isArray(value) && value.length === 0)) {
+    return null;
+  }
+  const order = Array.isArray(value)
+    ? value.map((entry) => String(entry || '').trim().toLowerCase())
+    : String(value).split(/[|,>]/).map((entry) => entry.trim().toLowerCase()).filter(Boolean);
+  if (order.length !== CONDITIONS.length
+    || new Set(order).size !== CONDITIONS.length
+    || order.some((condition) => !CONDITIONS.includes(condition))) {
+    const error = new Error('Condition order must contain control, constant, and adaptive exactly once.');
+    error.statusCode = 400;
+    throw error;
+  }
+  return order;
+}
+
 function seededRandom(seed) {
   let state = createHash('sha256').update(String(seed || 'wizard-of-oz')).digest().readUInt32LE(0);
   return () => {
@@ -46,7 +63,7 @@ function buildStudySchedule(puzzleSets, participantId, options = {}) {
   const roundsPerSitting = Number(options.roundsPerSitting || 3);
   const totalRounds = Number(options.totalRounds || 9);
   const seed = String(options.seed || `${options.studyId || 'hti'}:${participantId || 'P01'}`);
-  const order = conditionOrderForParticipant(participantId);
+  const order = normalizeConditionOrder(options.conditionOrder) || conditionOrderForParticipant(participantId);
   const selected = shuffled(puzzleSets, seed).slice(0, totalRounds);
 
   if (selected.length < totalRounds) {
@@ -73,6 +90,7 @@ module.exports = {
   CONDITION_ORDERS,
   buildStudySchedule,
   conditionOrderForParticipant,
+  normalizeConditionOrder,
   participantNumber,
   shuffled,
 };

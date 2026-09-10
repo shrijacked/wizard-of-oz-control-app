@@ -21,6 +21,7 @@ async function startApp(options = {}) {
   return {
     app,
     baseUrl: `http://127.0.0.1:${address.port}`,
+    dataDir,
   };
 }
 
@@ -158,7 +159,8 @@ test('server serves the simplified three-screen routes and aliases /audit to /ro
     assert.match(adminHtml, /Begin study/i);
     assert.match(adminHtml, /id="round-start"/);
     assert.match(subjectHtml, /Participant Display/i);
-    assert.match(subjectHtml, />Hint</i);
+    assert.match(subjectHtml, /id="subject-puzzle"/);
+    assert.match(subjectHtml, /Your puzzle/i);
     assert.match(robotHtml, /Robot Operator Screen/i);
     assert.match(robotHtml, /Move this piece/i);
     assert.ok([200, 302, 307, 308].includes(auditResponse.status));
@@ -242,7 +244,6 @@ test('subject and robot sockets receive role-specific snapshots for live interve
 
     const cueResponse = await postJson(baseUrl, '/api/actions', {
       pieceId: 'purple-triangle',
-      slot: 4,
     });
     assert.equal(cueResponse.status, 200);
 
@@ -254,10 +255,14 @@ test('subject and robot sockets receive role-specific snapshots for live interve
     assert.equal(subjectState.hint.text, 'Try the blue piece next.');
     assert.equal('puzzleSet' in subjectState, false);
     assert.equal('robotAction' in subjectState, false);
+    assert.equal(subjectState.session.activeRound.puzzle.setId, '1');
+    assert.equal(subjectState.session.activeRound.puzzle.subjectAsset.originalName, '1.pdf');
+    assert.equal('solutionAsset' in subjectState.session.activeRound.puzzle, false);
 
     assert.equal(robotState.robotAction.pieceLabel, 'Purple Triangle');
-    assert.equal(robotState.robotAction.slot, 4);
-    assert.equal(robotState.robotAction.label, 'Move PURPLE TRIANGLE to slot 4');
+    assert.equal(robotState.robotAction.programNumber, 7);
+    assert.equal(robotState.robotAction.slot, 7);
+    assert.equal(robotState.robotAction.label, 'Run program 7 — PURPLE TRIANGLE');
     assert.equal('puzzleSet' in robotState, false);
     assert.equal('hint' in robotState, false);
 
@@ -290,7 +295,7 @@ test('interventions require an active round and are blocked between rounds and a
     const hintResponse = await postJson(baseUrl, '/api/hints', { text: 'Allowed during round.' });
     assert.equal(hintResponse.status, 200);
 
-    const actionResponse = await postJson(baseUrl, '/api/actions', { pieceId: 'orange-triangle', slot: 2 });
+    const actionResponse = await postJson(baseUrl, '/api/actions', { pieceId: 'orange-triangle' });
     assert.equal(actionResponse.status, 200);
 
     const completeRound = await postJson(baseUrl, '/api/rounds/complete', { operator: 'Shrijacked' });
@@ -303,7 +308,7 @@ test('interventions require an active round and are blocked between rounds and a
     const completeResponse = await postJson(baseUrl, '/api/session/complete', { operator: 'Shrijacked' });
     assert.equal(completeResponse.status, 200);
 
-    const afterCompleteAction = await postJson(baseUrl, '/api/actions', { pieceId: 'green-square', slot: 1 });
+    const afterCompleteAction = await postJson(baseUrl, '/api/actions', { pieceId: 'green-square' });
     assert.equal(afterCompleteAction.status, 409);
     screens.subject.socket.close();
     screens.robot.socket.close();
@@ -326,7 +331,7 @@ test('a full sitting records three rounds with attributed interventions in the e
     for (let round = 1; round <= 3; round += 1) {
       await startRound(baseUrl);
       await postJson(baseUrl, '/api/hints', { text: `Round ${round} hint.` });
-      await postJson(baseUrl, '/api/actions', { pieceId: 'blue-triangle', slot: round });
+      await postJson(baseUrl, '/api/actions', { pieceId: 'blue-triangle' });
       const complete = await postJson(baseUrl, '/api/rounds/complete', { operator: 'Shrijacked' });
       assert.equal(complete.status, 200);
     }
@@ -345,7 +350,8 @@ test('a full sitting records three rounds with attributed interventions in the e
     assert.equal(exportPayload.rounds[2].puzzle.setId, '6');
     assert.deepEqual(exportPayload.rounds[1].interventions.map((entry) => entry.type), ['hint', 'robot']);
     assert.equal(exportPayload.rounds[1].interventions[1].piece, 'Blue Triangle');
-    assert.equal(exportPayload.rounds[1].interventions[1].slot, 2);
+    assert.equal(exportPayload.rounds[1].interventions[1].programNumber, 6);
+    assert.equal(exportPayload.rounds[1].interventions[1].slot, 6);
     screens.subject.socket.close();
     screens.robot.socket.close();
   } finally {
@@ -366,7 +372,7 @@ test('the round export carries metadata, per-round filenames, and ordered interv
     await startRound(baseUrl);
 
     await postJson(baseUrl, '/api/hints', { text: 'Try the outer edge first.' });
-    await postJson(baseUrl, '/api/actions', { pieceId: 'green-square', slot: 3 });
+    await postJson(baseUrl, '/api/actions', { pieceId: 'green-square' });
     await postJson(baseUrl, '/api/session/complete', { operator: 'Shrijacked' });
 
     const exportResponse = await fetch(`${baseUrl}/api/export/current.json`);
@@ -386,6 +392,12 @@ test('the round export carries metadata, per-round filenames, and ordered interv
     const csv = await fetch(`${baseUrl}/api/export/current.csv`).then((response) => response.text());
     assert.match(csv, /hint\.updated/);
     assert.match(csv, /robot\.action\.logged/);
+    const formsResponse = await fetch(`${baseUrl}/api/export/current.forms.json`);
+    assert.equal(formsResponse.status, 200);
+    assert.match(formsResponse.headers.get('content-disposition') || '', /-forms\.json/);
+    const forms = await formsResponse.json();
+    assert.equal(forms.participantId, 'P-001');
+    assert.equal(forms.roundForms[0].formStatus, 'missing');
     screens.subject.socket.close();
     screens.robot.socket.close();
   } finally {
@@ -550,6 +562,8 @@ test('camera controller assets remain reachable from the single admin page build
     assert.match(adminHtml, /run-panel-hints/);
     assert.match(adminHtml, /id="hint-save-preset"/);
     assert.match(adminHtml, /class="run-ops"/);
+    assert.match(adminHtml, /One-click programs/);
+    assert.doesNotMatch(adminHtml, /id="slot-grid"|id="send-robot-cue"|id="operator-sound"/);
     const styles = await fetch(`${baseUrl}/styles.css`).then((response) => response.text());
     assert.match(styles, /body\[data-session-phase="setup"\] \.run-column-sensors \{\s*display: contents;/);
     assert.doesNotMatch(
@@ -575,6 +589,8 @@ test('camera controller assets remain reachable from the single admin page build
     );
     assert.match(adminModule, /bindCameraControls/);
     assert.match(adminModule, /shouldShowCameraControls/);
+    assert.match(adminModule, /container\.dataset\.previewKey === previewKey/);
+    assert.doesNotMatch(adminModule, /createAudioCueController|operatorSound/);
     assert.match(cameraModuleResponse.headers.get('content-type') || '', /text\/javascript/);
     assert.match(cameraModule, /Requesting camera access/i);
   } finally {
@@ -582,7 +598,7 @@ test('camera controller assets remain reachable from the single admin page build
   }
 });
 
-test('starting a sitting is rejected until camera and watch data are live', async () => {
+test('starting a sitting permits hardware and display warnings and records the override', async () => {
   const { app, baseUrl } = await startApp();
 
   try {
@@ -592,24 +608,17 @@ test('starting a sitting is rejected until camera and watch data are live', asyn
       sittingNumber: 1,
     });
     await uploadSittingPairs(baseUrl, 1);
-    const blocked = await postJson(baseUrl, '/api/session/start', { operator: 'Shrijacked' });
-    assert.equal(blocked.status, 409);
+    const preflight = await fetch(`${baseUrl}/api/preflight`).then((response) => response.json());
+    assert.equal(preflight.requiredReady, true);
+    assert.ok(preflight.warningCount >= 3);
+    assert.ok(preflight.warnings.some((warning) => warning.id === 'camera'));
+    assert.ok(preflight.warnings.some((warning) => warning.id === 'subject-display'));
+    assert.ok(preflight.warnings.some((warning) => warning.id === 'robot-display'));
 
-    const screens = await connectDisplayScreens(baseUrl);
-    const stillBlocked = await postJson(baseUrl, '/api/session/start', { operator: 'Shrijacked' });
-    assert.equal(stillBlocked.status, 409);
-
-    await postJson(baseUrl, '/api/camera/status', {
-      live: true,
-      deviceLabel: 'HD Pro Webcam C270',
-    });
-    await postJson(baseUrl, '/api/telemetry/hrv', {
-      metrics: { hr: 72, rmssd: 30 },
-      stressLevel: 'Not Stressed',
-    });
-    await startSitting(baseUrl);
-    screens.subject.socket.close();
-    screens.robot.socket.close();
+    const started = await postJson(baseUrl, '/api/session/start', { operator: 'Shrijacked' });
+    assert.equal(started.status, 200);
+    const events = await fetch(`${baseUrl}/api/events?limit=10`).then((response) => response.json());
+    assert.ok(events.events.some((event) => event.type === 'preflight.warnings.accepted'));
   } finally {
     await app.close();
   }
@@ -642,5 +651,39 @@ test('hint presets can be updated and persist into the next admin state snapshot
   } finally {
     await app.close();
     await fs.unlink(configPath).catch(() => {});
+  }
+});
+
+test('admin can replace the displayed script and add a participant-playable recording', async () => {
+  const { app, baseUrl } = await startApp();
+  try {
+    const scriptText = 'Use all seven pieces.\nReturn unused pieces to their designated spots.';
+    const audioBytes = Buffer.from('test-audio-recording');
+    const saved = await postJson(baseUrl, '/api/study-script', {
+      textFile: {
+        name: 'updated-script.txt',
+        mimeType: 'text/plain',
+        contentBase64: Buffer.from(scriptText).toString('base64'),
+      },
+      audioFile: {
+        name: 'updated-script.mp3',
+        mimeType: 'audio/mpeg',
+        contentBase64: audioBytes.toString('base64'),
+      },
+      actor: 'Researcher',
+    });
+    assert.equal(saved.status, 200, await saved.text());
+
+    const subjectState = await fetch(`${baseUrl}/api/state?role=subject`).then((response) => response.json());
+    assert.deepEqual(subjectState.study.instructions, [
+      'Use all seven pieces.',
+      'Return unused pieces to their designated spots.',
+    ]);
+    assert.equal(subjectState.study.scriptAudioName, 'updated-script.mp3');
+    const audio = await fetch(`${baseUrl}${subjectState.study.scriptAudioUrl}`);
+    assert.equal(audio.status, 200);
+    assert.deepEqual(Buffer.from(await audio.arrayBuffer()), audioBytes);
+  } finally {
+    await app.close();
   }
 });

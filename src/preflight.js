@@ -48,6 +48,10 @@ function automaticIssueStatus(phase) {
   return phase === 'setup' ? 'blocked' : 'warning';
 }
 
+function operationalIssueStatus() {
+  return 'warning';
+}
+
 function sittingQueueChecklistItem(session = {}) {
   const schedule = Array.isArray(session.schedule) ? session.schedule : [];
   if (schedule.length >= 9) {
@@ -159,7 +163,7 @@ function screenChecklistItem({
     return {
       id,
       kind: 'automatic',
-      required: true,
+      required: false,
       status: 'ready',
       label,
       summary: `${noun} screen is connected and the alert sound is armed.`,
@@ -171,8 +175,8 @@ function screenChecklistItem({
     return {
       id,
       kind: 'automatic',
-      required: true,
-      status: automaticIssueStatus(phase),
+      required: false,
+      status: operationalIssueStatus(phase),
       label,
       summary: `${noun} screen is connected, but the alert sound is not armed yet.`,
       detail: `Tap once on ${path} so new messages play a beep.`,
@@ -182,8 +186,8 @@ function screenChecklistItem({
   return {
     id,
     kind: 'automatic',
-    required: true,
-    status: automaticIssueStatus(phase),
+    required: false,
+    status: operationalIssueStatus(phase),
     label,
     summary: `Open ${path} on the ${noun.toLowerCase()} device before starting.`,
     detail: `The ${noun.toLowerCase()} screen needs a live WebSocket connection.`,
@@ -196,7 +200,7 @@ function cameraChecklistItem(system = {}, phase = 'setup') {
     return {
       id: 'camera',
       kind: 'automatic',
-      required: true,
+      required: false,
       status: 'ready',
       label: 'C270 camera live',
       summary: camera.deviceLabel
@@ -209,8 +213,8 @@ function cameraChecklistItem(system = {}, phase = 'setup') {
   return {
     id: 'camera',
     kind: 'automatic',
-    required: true,
-    status: automaticIssueStatus(phase),
+    required: false,
+    status: operationalIssueStatus(phase),
     label: 'C270 camera live',
     summary: 'Start the Logitech C270 on the operator dashboard.',
     detail: 'Choose the C270 in the camera list, then click Start camera.',
@@ -228,7 +232,7 @@ function telemetryChecklistItem({
     return {
       id,
       kind: 'automatic',
-      required: true,
+      required: false,
       status: 'ready',
       label,
       summary: `${label} is live.`,
@@ -239,8 +243,8 @@ function telemetryChecklistItem({
   return {
     id,
     kind: 'automatic',
-    required: true,
-    status: automaticIssueStatus(phase),
+    required: false,
+    status: operationalIssueStatus(phase),
     label,
     summary: health.summary || `No ${label.toLowerCase()} sample has been received yet.`,
     detail: health.detail || waitingDetail,

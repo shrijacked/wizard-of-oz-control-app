@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 
 const { buildPolicy } = require('../src/session-policy');
 
-test('startSession is blocked when preflight is not requiredReady', () => {
+test('startSession permits acknowledged operator override when preflight has warnings', () => {
   const state = {
     session: {
       status: 'setup',
@@ -13,18 +13,17 @@ test('startSession is blocked when preflight is not requiredReady', () => {
     },
   };
 
-  const blocked = buildPolicy(state, 'startSession', {
+  const allowed = buildPolicy(state, 'startSession', {
     preflight: {
       requiredReady: false,
       summary: 'Watch telemetry is waiting for its first sample.',
     },
   });
 
-  assert.equal(blocked.allowed, false);
-  assert.match(blocked.reason, /watch telemetry/i);
+  assert.equal(allowed.allowed, true);
 });
 
-test('startSession is blocked when preflight is omitted', () => {
+test('startSession is allowed when preflight is omitted', () => {
   const state = {
     session: {
       status: 'setup',
@@ -32,9 +31,8 @@ test('startSession is blocked when preflight is omitted', () => {
     },
   };
 
-  const blocked = buildPolicy(state, 'startSession');
-  assert.equal(blocked.allowed, false);
-  assert.match(blocked.reason, /readiness is not complete/i);
+  const allowed = buildPolicy(state, 'startSession');
+  assert.equal(allowed.allowed, true);
 });
 
 test('startSession is allowed when preflight is ready', () => {
@@ -82,4 +80,23 @@ test('nine-round policy gates surveys, breaks, control interventions, and final 
   state.session.rounds = Array.from({ length: 9 }, (_, index) => ({ index: index + 1 }));
   state.session.finalSurvey = { overallEfficacy: 5 };
   assert.equal(buildPolicy(state, 'completeSession').allowed, true);
+});
+
+test('administrative fast-forward actions are only available in safe running states', () => {
+  const state = {
+    session: {
+      status: 'running',
+      queue: [{ setId: '1' }],
+      rounds: [],
+      activeRound: null,
+      awaitingRoundSurvey: null,
+      betweenSittings: false,
+      finalSurveyRequired: false,
+    },
+  };
+  assert.equal(buildPolicy(state, 'skipRound').allowed, true);
+  assert.equal(buildPolicy(state, 'endSessionEarly').allowed, true);
+  state.session.activeRound = { index: 1 };
+  assert.equal(buildPolicy(state, 'skipRound').allowed, false);
+  assert.equal(buildPolicy(state, 'endSessionEarly').allowed, true);
 });

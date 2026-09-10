@@ -18,7 +18,7 @@ function readySystem() {
   };
 }
 
-test('preflight blocks setup when screens, camera, or sensors are missing', () => {
+test('preflight keeps study data as blockers while hardware and displays are warnings', () => {
   const summary = summarizePreflight({
     state: {
       session: {
@@ -45,10 +45,13 @@ test('preflight blocks setup when screens, camera, or sensors are missing', () =
   });
 
   assert.equal(summary.requiredReady, false);
-  assert.ok(summary.blockingCount >= 6);
+  assert.equal(summary.blockingCount, 2);
+  assert.equal(summary.warningCount, 4);
   assert.ok(summary.blockers.some((item) => item.id === 'metadata'));
-  assert.ok(summary.blockers.some((item) => item.id === 'camera'));
-  assert.ok(summary.blockers.some((item) => item.id === 'robot-display'));
+  assert.ok(summary.blockers.some((item) => item.id === 'sitting-queue'));
+  assert.ok(summary.warnings.some((item) => item.id === 'camera'));
+  assert.ok(summary.warnings.some((item) => item.id === 'robot-display'));
+  assert.ok(summary.warnings.some((item) => item.id === 'watch-telemetry'));
   assert.equal(summary.blockers.some((item) => item.id === 'gaze-telemetry'), false);
 });
 
@@ -71,6 +74,7 @@ test('preflight marks setup ready once sitting queue, screens, camera, and senso
 
   assert.equal(summary.requiredReady, true);
   assert.equal(summary.blockingCount, 0);
+  assert.equal(summary.warningCount, 0);
   assert.match(summary.summary, /ready for participant/i);
 });
 

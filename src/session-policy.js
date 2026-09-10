@@ -34,11 +34,6 @@ function buildPolicy(state, action, options = {}) {
       return deny('Queue at least one puzzle before starting the sitting.');
     }
 
-    const preflight = options.preflight;
-    if (!preflight || preflight.requiredReady !== true) {
-      return deny((preflight && preflight.summary) || 'Sitting readiness is not complete.');
-    }
-
     return allow();
   }
 
@@ -74,6 +69,19 @@ function buildPolicy(state, action, options = {}) {
     return status === 'running' && activeRound
       ? allow()
       : deny('There is no active round to complete.');
+  }
+
+  if (action === 'skipRound') {
+    if (status !== 'running' || activeRound || session.awaitingRoundSurvey || session.betweenSittings || session.finalSurveyRequired) {
+      return deny('A round can only be skipped while the next round is waiting to start.');
+    }
+    return rounds.length < queue.length ? allow() : deny('There are no remaining rounds to skip.');
+  }
+
+  if (action === 'endSessionEarly') {
+    return status === 'running'
+      ? allow()
+      : deny('Only a running study can be ended early.');
   }
 
   if (action === 'completeSession') {

@@ -10,7 +10,7 @@ const { AdminGuard } = require('./admin-guard');
 const { ExperimentStore } = require('./store');
 const { WebSocketHub } = require('./websocket-hub');
 const { WatchBridge } = require('./watch-bridge');
-const { getLocalNetworkAddresses } = require('./network');
+const { getLocalHostnameUrls, getLocalNetworkAddresses } = require('./network');
 const { LlmAdvisor } = require('./llm-advisor');
 const { summarizeSensorHealth } = require('./sensor-health');
 const { summarizePreflight } = require('./preflight');
@@ -25,6 +25,8 @@ const MAX_REQUEST_BODY_BYTES = 16 * 1024 * 1024;
 const CONTENT_TYPES = {
   '.css': 'text/css; charset=utf-8',
   '.html': 'text/html; charset=utf-8',
+  '.m4a': 'audio/mp4',
+  '.mp3': 'audio/mpeg',
   '.jpeg': 'image/jpeg',
   '.jpg': 'image/jpeg',
   '.js': 'text/javascript; charset=utf-8',
@@ -33,9 +35,32 @@ const CONTENT_TYPES = {
   '.pdf': 'application/pdf',
   '.png': 'image/png',
   '.svg': 'image/svg+xml',
+  '.wav': 'audio/wav',
+  '.ogg': 'audio/ogg',
   '.webm': 'video/webm',
   '.webp': 'image/webp',
 };
+
+const SCRIPT_AUDIO_TYPES = Object.freeze({
+  '.m4a': 'audio/mp4',
+  '.mp3': 'audio/mpeg',
+  '.ogg': 'audio/ogg',
+  '.wav': 'audio/wav',
+  '.webm': 'audio/webm',
+});
+const MAX_SCRIPT_TEXT_BYTES = 256 * 1024;
+const MAX_SCRIPT_AUDIO_BYTES = 10 * 1024 * 1024;
+
+function scriptInstructions(textValue) {
+  return String(textValue || '')
+    .split(/\r?\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+}
+
+function uploadedBuffer(file = {}) {
+  return Buffer.from(String(file.contentBase64 || '').trim(), 'base64');
+}
 
 const OPERATOR_ROUTE_FILES = {
   '/admin': 'admin.html',
@@ -130,7 +155,7 @@ async function serveCameraRecording(response, filePath, filename) {
   }
 }
 
-function roleState(store, role, systemStatus) {
+function roleState(store, role, systemStatus, studyDefinition = {}) {
   const state = store.getState();
 
   if (role === 'subject') {
@@ -158,6 +183,13 @@ function roleState(store, role, systemStatus) {
             startedAt: state.session.activeRound.startedAt,
             pauseStartedAt: state.session.activeRound.pauseStartedAt,
             pausedDurationSeconds: state.session.activeRound.pausedDurationSeconds,
+            puzzle: state.session.activeRound.puzzle
+              ? {
+                setId: state.session.activeRound.puzzle.setId,
+                label: state.session.activeRound.puzzle.label,
+                subjectAsset: state.session.activeRound.puzzle.subjectAsset,
+              }
+              : null,
           }
           : null,
         pendingSurvey: pendingRound ? {
@@ -170,7 +202,9 @@ function roleState(store, role, systemStatus) {
       robotCueUpdatedAt: state.robotAction.updatedAt,
       study: {
         consentStatement: CONSENT_STATEMENT,
-        instructions: SUBJECT_INSTRUCTIONS,
+        instructions: studyDefinition.instructions || SUBJECT_INSTRUCTIONS,
+        scriptAudioUrl: studyDefinition.scriptAudioUrl || null,
+        scriptAudioName: studyDefinition.scriptAudioName || null,
       },
     };
   }
@@ -273,6 +307,36 @@ async function createApp(options = {}) {
     watchFilePath: options.watchFilePath || path.join(process.cwd(), 'watch', 'watch_data.json'),
   });
   await store.initialize();
+  const scriptDir = path.join(store.dataDir, 'study-script');
+  const scriptManifestPath = path.join(scriptDir, 'manifest.json');
+  await fs.mkdir(scriptDir, { recursive: true });
+  let studyScript = {
+    text: SUBJECT_INSTRUCTIONS.join('\n'),
+    customTextName: null,
+    audioFileName: null,
+    audioOriginalName: null,
+  };
+  try {
+    const persisted = JSON.parse(await fs.readFile(scriptManifestPath, 'utf8'));
+    if (typeof persisted.text === 'string' && persisted.text.trim()) {
+      studyScript = { ...studyScript, ...persisted };
+    }
+  } catch (error) {
+    if (error.code !== 'ENOENT') {
+      // A damaged optional script should not prevent the experiment from opening.
+      studyScript = { ...studyScript };
+    }
+  }
+  const getStudyDefinition = () => ({
+    instructions: scriptInstructions(studyScript.text).length
+      ? scriptInstructions(studyScript.text)
+      : SUBJECT_INSTRUCTIONS,
+    scriptAudioUrl: studyScript.audioFileName
+      ? `/media/study-script/${studyScript.audioFileName}`
+      : null,
+    scriptAudioName: studyScript.audioOriginalName || null,
+    customTextName: studyScript.customTextName || null,
+  });
   await watchBridge.start();
 
   const getAdminToken = (request) => request.headers['x-admin-token'];
@@ -302,7 +366,7 @@ async function createApp(options = {}) {
         pieces: studyConfig.pieces,
         hintPresets: studyConfig.hintPresets,
         consentStatement: CONSENT_STATEMENT,
-        instructions: SUBJECT_INSTRUCTIONS,
+        ...getStudyDefinition(),
       },
       screens: {
         subject: {
@@ -318,6 +382,7 @@ async function createApp(options = {}) {
       },
       network: {
         localhost: buildLocalhostUrls(port),
+        stableHost: getLocalHostnameUrls(port),
         lan: getLocalNetworkAddresses(port),
       },
     };
@@ -350,7 +415,7 @@ async function createApp(options = {}) {
   };
 
   const hub = new WebSocketHub({
-    getStateForRole: (role) => roleState(store, role, getSystemStatus()),
+    getStateForRole: (role) => roleState(store, role, getSystemStatus(), getStudyDefinition()),
     getSystemStatus,
     onConnectionStatsChanged(stats) {
       clearDisconnectedScreenReadiness(stats);
@@ -413,6 +478,16 @@ async function createApp(options = {}) {
         }
       }
 
+      if (request.method === 'GET' && pathname.startsWith('/media/study-script/')) {
+        const fileName = pathname.slice('/media/study-script/'.length);
+        const candidatePath = path.join(scriptDir, fileName);
+        const relative = path.relative(scriptDir, candidatePath);
+        if (!relative.startsWith('..') && !path.isAbsolute(relative)) {
+          await serveFile(response, candidatePath);
+          return;
+        }
+      }
+
       if (request.method === 'GET' && pathname === '/health') {
         const systemStatus = getSystemStatus();
         const healthLevel = systemStatus.sensorHealth?.overall?.level || 'healthy';
@@ -431,7 +506,7 @@ async function createApp(options = {}) {
         if (role === 'admin') {
           adminGuard.assertAuthorized(getAdminToken(request));
         }
-        json(response, 200, roleState(store, role, getSystemStatus()));
+        json(response, 200, roleState(store, role, getSystemStatus(), getStudyDefinition()));
         return;
       }
 
@@ -460,7 +535,9 @@ async function createApp(options = {}) {
             startSession: buildPolicy(state, 'startSession', { preflight }),
             startRound: buildPolicy(state, 'startRound'),
             completeRound: buildPolicy(state, 'completeRound'),
+            skipRound: buildPolicy(state, 'skipRound'),
             completeSession: buildPolicy(state, 'completeSession'),
+            endSessionEarly: buildPolicy(state, 'endSessionEarly'),
             updateAdaptiveConfig: buildPolicy(state, 'updateAdaptiveConfig'),
             setHint: buildPolicy(state, 'setHint'),
             logRobotAction: buildPolicy(state, 'logRobotAction'),
@@ -487,6 +564,14 @@ async function createApp(options = {}) {
         adminGuard.assertAuthorized(getAdminToken(request));
         json(response, 200, await store.buildOperatorExport('current'), {
           'content-disposition': `attachment; filename="${store.getCurrentSessionId()}.json"`,
+        });
+        return;
+      }
+
+      if (request.method === 'GET' && pathname === '/api/export/current.forms.json') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        json(response, 200, await store.buildFormResponsesExport('current'), {
+          'content-disposition': `attachment; filename="${store.getCurrentSessionId()}-forms.json"`,
         });
         return;
       }
@@ -525,6 +610,24 @@ async function createApp(options = {}) {
           const resolvedSessionId = sessionId === 'current' ? store.getCurrentSessionId() : sessionId;
           json(response, 200, await store.buildSessionExport(sessionId), {
             'content-disposition': `attachment; filename="${resolvedSessionId}.bundle.json"`,
+          });
+          return;
+        }
+
+        if (slug.endsWith('.forms.json')) {
+          const sessionId = slug.slice(0, -'.forms.json'.length);
+          const resolvedSessionId = sessionId === 'current' ? store.getCurrentSessionId() : sessionId;
+          json(response, 200, await store.buildFormResponsesExport(sessionId), {
+            'content-disposition': `attachment; filename="${resolvedSessionId}-forms.json"`,
+          });
+          return;
+        }
+
+        if (slug.endsWith('.json')) {
+          const sessionId = slug.slice(0, -'.json'.length);
+          const resolvedSessionId = sessionId === 'current' ? store.getCurrentSessionId() : sessionId;
+          json(response, 200, await store.buildOperatorExport(sessionId), {
+            'content-disposition': `attachment; filename="${resolvedSessionId}.json"`,
           });
           return;
         }
@@ -570,6 +673,79 @@ async function createApp(options = {}) {
         return;
       }
 
+      if (request.method === 'POST' && pathname === '/api/study-script') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        assertPolicy(store.getState(), 'configureSession');
+        const body = await readJsonBody(request);
+        if (!body.textFile && !body.audioFile) {
+          const error = new Error('Choose a text file, an audio recording, or both.');
+          error.statusCode = 400;
+          throw error;
+        }
+        const nextScript = { ...studyScript };
+        if (body.textFile) {
+          const textFile = body.textFile;
+          const textBuffer = uploadedBuffer(textFile);
+          const extension = path.extname(String(textFile.name || '')).toLowerCase();
+          if (extension !== '.txt' && String(textFile.mimeType || textFile.type || '') !== 'text/plain') {
+            const error = new Error('The displayed script must be a plain .txt file.');
+            error.statusCode = 400;
+            throw error;
+          }
+          if (!textBuffer.length || textBuffer.length > MAX_SCRIPT_TEXT_BYTES) {
+            const error = new Error('The script text file must be non-empty and no larger than 256 KB.');
+            error.statusCode = 400;
+            throw error;
+          }
+          const scriptText = textBuffer.toString('utf8').trim();
+          if (!scriptText) {
+            const error = new Error('The script text file did not contain any readable text.');
+            error.statusCode = 400;
+            throw error;
+          }
+          await fs.writeFile(path.join(scriptDir, 'script.txt'), `${scriptText}\n`, 'utf8');
+          nextScript.text = scriptText;
+          nextScript.customTextName = path.basename(String(textFile.name || 'script.txt'));
+        }
+        if (body.audioFile) {
+          const audioFile = body.audioFile;
+          const extension = path.extname(String(audioFile.name || '')).toLowerCase();
+          const mimeType = SCRIPT_AUDIO_TYPES[extension];
+          const audioBuffer = uploadedBuffer(audioFile);
+          if (!mimeType) {
+            const error = new Error('Use an MP3, M4A, WAV, or OGG script recording.');
+            error.statusCode = 400;
+            throw error;
+          }
+          if (!audioBuffer.length || audioBuffer.length > MAX_SCRIPT_AUDIO_BYTES) {
+            const error = new Error('The script recording must be non-empty and no larger than 10 MB.');
+            error.statusCode = 400;
+            throw error;
+          }
+          const storedName = `script-audio${extension}`;
+          await fs.writeFile(path.join(scriptDir, storedName), audioBuffer);
+          nextScript.audioFileName = storedName;
+          nextScript.audioOriginalName = path.basename(String(audioFile.name || storedName));
+        }
+        studyScript = nextScript;
+        const temporaryManifest = `${scriptManifestPath}.tmp`;
+        await fs.writeFile(temporaryManifest, `${JSON.stringify(studyScript, null, 2)}\n`, 'utf8');
+        await fs.rename(temporaryManifest, scriptManifestPath);
+        await store.logSystemEvent({
+          type: 'study.script.updated',
+          source: 'admin',
+          summary: 'The participant script text or recording was updated.',
+          payload: {
+            actor: body.actor || 'researcher',
+            customTextName: studyScript.customTextName,
+            audioOriginalName: studyScript.audioOriginalName,
+          },
+        });
+        hub.broadcastSnapshots();
+        json(response, 200, getStudyDefinition());
+        return;
+      }
+
       if (request.method === 'POST' && pathname === '/api/hints') {
         adminGuard.assertAuthorized(getAdminToken(request));
         assertPolicy(store.getState(), 'setHint');
@@ -596,17 +772,17 @@ async function createApp(options = {}) {
           return;
         }
 
-        const slot = Number(body.slot);
-        if (!Number.isInteger(slot) || slot < 1 || slot > studyConfig.slotCount) {
-          json(response, 400, { error: `Slot must be a whole number between 1 and ${studyConfig.slotCount}.` });
+        const programNumber = Number(piece.programNumber);
+        if (!Number.isInteger(programNumber) || programNumber < 1) {
+          json(response, 500, { error: `No robot program is configured for ${piece.label}.` });
           return;
         }
 
         const state = await store.logRobotAction({
           pieceId: piece.id,
           pieceLabel: piece.label,
-          slot,
-          payload: { ...(body.payload || {}), color: piece.color },
+          programNumber,
+          payload: { ...(body.payload || {}), color: piece.color, programNumber },
           actor: body.actor || 'researcher',
           source: 'admin',
         });
@@ -701,6 +877,18 @@ async function createApp(options = {}) {
           source: 'admin',
         });
         json(response, 200, state);
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/rounds/skip') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        assertPolicy(store.getState(), 'skipRound');
+        const body = await readJsonBody(request);
+        json(response, 200, await store.skipNextRound({
+          reason: body.reason,
+          operator: body.operator || 'researcher',
+          source: 'admin',
+        }));
         return;
       }
 
@@ -830,14 +1018,14 @@ async function createApp(options = {}) {
       if (request.method === 'POST' && pathname === '/api/participant/profile') {
         const body = await readJsonBody(request);
         await store.submitParticipantProfile(body);
-        json(response, 200, roleState(store, 'subject', getSystemStatus()));
+        json(response, 200, roleState(store, 'subject', getSystemStatus(), getStudyDefinition()));
         return;
       }
 
       if (request.method === 'POST' && pathname === '/api/surveys/round') {
         const body = await readJsonBody(request);
         await store.submitRoundSurvey(body);
-        json(response, 200, roleState(store, 'subject', getSystemStatus()));
+        json(response, 200, roleState(store, 'subject', getSystemStatus(), getStudyDefinition()));
         return;
       }
 
@@ -855,7 +1043,7 @@ async function createApp(options = {}) {
       if (request.method === 'POST' && pathname === '/api/surveys/final') {
         const body = await readJsonBody(request);
         await store.submitFinalSurvey(body);
-        json(response, 200, roleState(store, 'subject', getSystemStatus()));
+        json(response, 200, roleState(store, 'subject', getSystemStatus(), getStudyDefinition()));
         return;
       }
 
@@ -888,6 +1076,7 @@ async function createApp(options = {}) {
           notes: body.notes,
           roundDurationSeconds: body.roundDurationSeconds,
           constantIntervalSeconds: body.constantIntervalSeconds,
+          conditionOrder: body.conditionOrder,
           adminProfile: body.adminProfile,
           actor: body.actor || body.researcher || 'researcher',
           source: 'admin',
@@ -898,11 +1087,13 @@ async function createApp(options = {}) {
 
       if (request.method === 'POST' && pathname === '/api/session/start') {
         adminGuard.assertAuthorized(getAdminToken(request));
-        assertPolicy(store.getState(), 'startSession', { preflight: getSystemStatus().preflight });
+        const preflight = getSystemStatus().preflight;
+        assertPolicy(store.getState(), 'startSession', { preflight });
         const body = await readJsonBody(request);
         const state = await store.startSession({
           operator: body.operator || 'researcher',
           source: 'admin',
+          readinessWarnings: preflight.warnings,
         });
         json(response, 200, state);
         return;
@@ -939,6 +1130,19 @@ async function createApp(options = {}) {
         const state = await store.completeSession({
           operator: body.operator || 'researcher',
           summary: body.summary,
+          source: 'admin',
+        });
+        json(response, 200, state);
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/session/end-early') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        assertPolicy(store.getState(), 'endSessionEarly');
+        const body = await readJsonBody(request);
+        const state = await store.endSessionEarly({
+          operator: body.operator || 'researcher',
+          reason: body.reason,
           source: 'admin',
         });
         json(response, 200, state);

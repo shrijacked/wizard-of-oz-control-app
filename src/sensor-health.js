@@ -20,18 +20,6 @@ function summarizeWatchHealth(status = {}, now = new Date(), options = {}) {
   const telemetryAgeSeconds = ageSeconds(options.telemetryUpdatedAt, now);
   const liveAgeSeconds = processedAgeSeconds ?? telemetryAgeSeconds;
 
-  if (options.calibration?.active) {
-    return {
-      name: 'watch',
-      level: 'info',
-      state: 'calibrating',
-      stale: false,
-      ageSeconds: liveAgeSeconds,
-      summary: `Watch baseline calibration is ${Math.round(Number(options.calibration.progress) || 0)}% complete.`,
-      detail: 'Keep the participant still and relaxed until calibration finishes.',
-    };
-  }
-
   if (status.lastError) {
     return {
       name: 'watch',
@@ -41,6 +29,34 @@ function summarizeWatchHealth(status = {}, now = new Date(), options = {}) {
       ageSeconds: liveAgeSeconds,
       summary: 'Watch bridge reported an error.',
       detail: status.lastError,
+    };
+  }
+
+  if (
+    options.calibration?.active
+    && liveAgeSeconds != null
+    && (liveAgeSeconds * 1000) > staleAfterMs
+  ) {
+    return {
+      name: 'watch',
+      level: 'warning',
+      state: 'stale',
+      stale: true,
+      ageSeconds: liveAgeSeconds,
+      summary: 'Watch samples stopped during baseline calibration.',
+      detail: `Calibration paused at ${Math.round(Number(options.calibration.progress) || 0)}%; the collector will reconnect automatically.`,
+    };
+  }
+
+  if (options.calibration?.active) {
+    return {
+      name: 'watch',
+      level: 'info',
+      state: 'calibrating',
+      stale: false,
+      ageSeconds: liveAgeSeconds,
+      summary: `Watch baseline calibration is ${Math.round(Number(options.calibration.progress) || 0)}% complete.`,
+      detail: 'Keep the participant still and relaxed until calibration finishes.',
     };
   }
 

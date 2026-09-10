@@ -10,7 +10,7 @@ This pass validates the complete three-screen, nine-round participant study.
 4. Confirm `/admin` shows a unique P##, all nine puzzle pairs exactly once, and a three-condition order.
 5. Enter matching researcher and participant demographic/consent copies. On `/subject`, also submit instruction acknowledgement and baseline expected efficacy.
 
-Expected: **Begin study** stays blocked until the copies match, displays and hardware are ready, watch calibration is finished, and all nine puzzles are scheduled.
+Expected: **Begin study** stays blocked until the profile copies match and all nine puzzles are scheduled. Display, camera, and watch issues appear as warnings but starting remains available; starting with them creates a `preflight.warnings.accepted` event.
 
 ## Round and intervention flow
 

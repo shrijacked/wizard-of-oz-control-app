@@ -7,6 +7,7 @@ const {
   CONDITION_ORDERS,
   buildStudySchedule,
   conditionOrderForParticipant,
+  normalizeConditionOrder,
 } = require('../src/study-design');
 
 test('participant numbers cycle evenly through all six condition orders', () => {
@@ -14,6 +15,21 @@ test('participant numbers cycle evenly through all six condition orders', () => 
   assert.deepEqual(firstCycle, CONDITION_ORDERS.map((order) => [...order]));
   assert.deepEqual(conditionOrderForParticipant('P07'), CONDITION_ORDERS[0]);
   assert.deepEqual(conditionOrderForParticipant('participant-12'), CONDITION_ORDERS[5]);
+});
+
+test('a valid manual condition order overrides participant counterbalancing', () => {
+  const puzzles = Array.from({ length: 9 }, (_, index) => ({ setId: String(index + 1) }));
+  const result = buildStudySchedule(puzzles, 'P01', {
+    seed: 'manual-order',
+    conditionOrder: ['adaptive', 'constant', 'control'],
+  });
+  assert.deepEqual(result.conditionOrder, ['adaptive', 'constant', 'control']);
+  assert.deepEqual(result.schedule.map((round) => round.condition), [
+    'adaptive', 'adaptive', 'adaptive',
+    'constant', 'constant', 'constant',
+    'control', 'control', 'control',
+  ]);
+  assert.throws(() => normalizeConditionOrder(['control', 'control', 'adaptive']), /exactly once/i);
 });
 
 test('nine puzzles are deterministically shuffled before being assigned to condition blocks', () => {

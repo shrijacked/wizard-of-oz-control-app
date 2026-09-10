@@ -23,7 +23,7 @@ test('store persists hints, actions, and HRV telemetry to disk-backed state', as
   const { store, dataDir } = await createStore();
 
   await store.setHint({ text: 'Try the outer edge first.' });
-  await store.logRobotAction({ pieceId: 'purple-triangle', pieceLabel: 'Purple Triangle', slot: 4 });
+  await store.logRobotAction({ pieceId: 'purple-triangle', pieceLabel: 'Purple Triangle', programNumber: 7 });
   await store.ingestHrvTelemetry({
     metrics: { hr: 74, rmssd: 31 },
     stressLevel: 'Not Stressed',
@@ -32,8 +32,9 @@ test('store persists hints, actions, and HRV telemetry to disk-backed state', as
   const state = store.getState();
   assert.equal(state.hint.text, 'Try the outer edge first.');
   assert.equal(state.robotAction.pieceLabel, 'Purple Triangle');
-  assert.equal(state.robotAction.slot, 4);
-  assert.equal(state.robotAction.label, 'Move PURPLE TRIANGLE to slot 4');
+  assert.equal(state.robotAction.programNumber, 7);
+  assert.equal(state.robotAction.slot, 7);
+  assert.equal(state.robotAction.label, 'Run program 7 — PURPLE TRIANGLE');
   assert.equal(state.telemetry.hrv.metrics.hr, 74);
   assert.equal('gaze' in state.telemetry, false);
   assert.ok(['normal', 'observe', 'intervene'].includes(state.adaptive.status));
@@ -103,6 +104,117 @@ test('store groups uploaded subject and solution files into selectable puzzle se
   assert.equal(resetState.session.puzzleSet, null);
 });
 
+test('store continuously writes JSON beside CSV and preserves an early partial ending', async () => {
+  const { store, dataDir } = await createStore();
+  await store.uploadPuzzleAssets([
+    { name: '1.pdf', mimeType: 'application/pdf', contentBase64: tinyPdfBase64() },
+    { name: '1s.pdf', mimeType: 'application/pdf', contentBase64: tinyPdfBase64() },
+  ]);
+  await store.queuePuzzleSets({ setIds: ['1'] });
+  await store.startSession({ operator: 'Researcher' });
+  await store.startRound({ operator: 'Researcher' });
+  await store.endSessionEarly({ operator: 'Researcher', reason: 'Participant requested to stop' });
+
+  const state = store.getState();
+  assert.equal(state.session.status, 'completed');
+  assert.equal(state.session.completedEarly, true);
+  assert.equal(state.session.rounds.length, 1);
+  assert.equal(state.session.rounds[0].endedEarly, true);
+  const jsonPath = path.join(dataDir, 'export', `${state.session.id}.json`);
+  const formsPath = path.join(dataDir, 'export', `${state.session.id}-forms.json`);
+  const csvPath = path.join(dataDir, 'export', `${state.session.id}.csv`);
+  const automaticJson = JSON.parse(await fs.readFile(jsonPath, 'utf8'));
+  const automaticForms = JSON.parse(await fs.readFile(formsPath, 'utf8'));
+  assert.equal(automaticJson.completedEarly, true);
+  assert.equal(automaticJson.earlyEndReason, 'Participant requested to stop');
+  assert.equal(automaticJson.rounds[0].endedEarly, true);
+  assert.equal(automaticForms.sessionId, state.session.id);
+  assert.equal(automaticForms.roundForms[0].formStatus, 'missing');
+  assert.match(await fs.readFile(csvPath, 'utf8'), /session\.ended-early/);
+});
+
+test('dedicated form export contains profile, round, and final questionnaire responses', async () => {
+  const { store, dataDir } = await createStore();
+  await store.configureSession({
+    studyId: 'forms-study',
+    participantId: 'P-FORMS',
+    researcher: 'Researcher',
+    adminProfile: {
+      age: 28,
+      gender: 'non-binary',
+      consented: true,
+    },
+  });
+  await store.submitParticipantProfile({
+    age: 28,
+    gender: 'non-binary',
+    consented: true,
+    instructionsAcknowledged: true,
+    expectedEfficacy: 5,
+  });
+  await store.uploadPuzzleAssets([
+    { name: '1.pdf', mimeType: 'application/pdf', contentBase64: tinyPdfBase64() },
+    { name: '1s.pdf', mimeType: 'application/pdf', contentBase64: tinyPdfBase64() },
+  ]);
+  await store.queuePuzzleSets({ setIds: ['1'] });
+  await store.startSession({ operator: 'Researcher' });
+  await store.startRound({ operator: 'Researcher' });
+  await store.completeRound({ operator: 'Researcher' });
+  await store.submitRoundSurvey({
+    roundIndex: 1,
+    responses: {
+      mentalDemand: 4,
+      physicalDemand: 2,
+      temporalDemand: 3,
+      performance: 6,
+      effort: 4,
+      frustration: 2,
+      helpfulness: 5,
+      timingEffectiveness: 4,
+      clarityAndDistraction: 5,
+      stressReduction: 4,
+    },
+  });
+  await store.submitFinalSurvey({
+    responses: {
+      overallHelpfulness: 6,
+      overallEfficacy: 5,
+      trust: 6,
+      automationBias: 3,
+      comment: 'The timing was useful.',
+    },
+  });
+
+  const forms = await store.buildFormResponsesExport('current');
+  assert.equal(forms.participantId, 'P-FORMS');
+  assert.equal(forms.preStudyForms.admin.age, 28);
+  assert.equal(forms.preStudyForms.subject.expectedEfficacy, 5);
+  assert.equal(forms.roundForms[0].formStatus, 'submitted');
+  assert.equal(forms.roundForms[0].responses.mentalDemand, 4);
+  assert.equal(forms.finalStudyForm.formStatus, 'submitted');
+  assert.equal(forms.finalStudyForm.responses.comment, 'The timing was useful.');
+
+  const formsPath = path.join(dataDir, 'export', `${store.getCurrentSessionId()}-forms.json`);
+  const automaticForms = JSON.parse(await fs.readFile(formsPath, 'utf8'));
+  assert.equal(automaticForms.finalStudyForm.responses.overallHelpfulness, 6);
+});
+
+test('store can skip a waiting round while retaining its puzzle and reason', async () => {
+  const { store } = await createStore();
+  await store.uploadPuzzleAssets([
+    { name: '1.pdf', mimeType: 'application/pdf', contentBase64: tinyPdfBase64() },
+    { name: '1s.pdf', mimeType: 'application/pdf', contentBase64: tinyPdfBase64() },
+  ]);
+  await store.queuePuzzleSets({ setIds: ['1'] });
+  await store.startSession({ operator: 'Researcher' });
+  await store.skipNextRound({ operator: 'Researcher', reason: 'Practice fast-forward' });
+  const round = store.getState().session.rounds[0];
+  assert.equal(round.skipped, true);
+  assert.equal(round.skipReason, 'Practice fast-forward');
+  assert.equal(round.puzzle.setId, '1');
+  assert.equal(store.getState().session.finalSurveyRequired, true);
+});
+
 test('store can start without preflight data and build the concise operator export', async () => {
   const { store } = await createStore(new Date('2026-04-01T06:31:30.000Z'));
 
@@ -136,7 +248,7 @@ test('store can start without preflight data and build the concise operator expo
   await store.startSession({ operator: 'Shrijacked' });
   await store.startRound({ operator: 'Shrijacked' });
   await store.setHint({ text: 'Try the outer edge first.' });
-  await store.logRobotAction({ pieceId: 'green-square', pieceLabel: 'Green Square', slot: 2 });
+  await store.logRobotAction({ pieceId: 'green-square', pieceLabel: 'Green Square', programNumber: 2 });
   await store.completeRound({ operator: 'Shrijacked' });
   await store.completeSession({
     operator: 'Shrijacked',
@@ -153,6 +265,7 @@ test('store can start without preflight data and build the concise operator expo
   assert.equal(conciseExport.rounds[0].puzzle.solutionFile, '7s.pdf');
   assert.equal(conciseExport.rounds[0].interventions.length, 2);
   assert.deepEqual(conciseExport.rounds[0].interventions.map((entry) => entry.type), ['hint', 'robot']);
+  assert.equal(conciseExport.rounds[0].interventions[1].programNumber, 2);
   assert.equal(conciseExport.rounds[0].interventions[0].text, 'Try the outer edge first.');
   assert.equal(conciseExport.rounds[0].interventions[1].piece, 'Green Square');
   assert.equal(conciseExport.rounds[0].interventions[1].slot, 2);

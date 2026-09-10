@@ -3,7 +3,12 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
-const { normalizeFinalSurvey, normalizeProfile, normalizeRoundSurvey } = require('../src/surveys');
+const {
+  SUBJECT_INSTRUCTIONS,
+  normalizeFinalSurvey,
+  normalizeProfile,
+  normalizeRoundSurvey,
+} = require('../src/surveys');
 
 const workload = {
   mentalDemand: 1,
@@ -46,4 +51,12 @@ test('participant profile and final survey enforce required scales and consent',
     comment: 'Useful overall.',
   });
   assert.equal(final.comment, 'Useful overall.');
+});
+
+test('participant instructions explain piece centers, sound cues, and form confirmation', () => {
+  const instructions = SUBJECT_INSTRUCTIONS.join(' ');
+  assert.match(instructions, /dot marking the center/i);
+  assert.match(instructions, /robot can only pick pieces up from their marked starting spots/i);
+  assert.match(instructions, /high beep.*midpoint.*low three-tone sound/i);
+  assert.match(instructions, /researcher will see when it has been filled/i);
 });

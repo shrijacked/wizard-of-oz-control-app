@@ -21,19 +21,25 @@ function createFakeAudioContext() {
       this.state = 'running';
     },
     createOscillator() {
-      return {
+      const oscillator = {
         type: null,
         frequency: { value: 0 },
         connect(target) {
           events.push({ type: 'oscillator.connect', target });
         },
         start(time) {
-          events.push({ type: 'oscillator.start', time });
+          events.push({
+            type: 'oscillator.start',
+            time,
+            frequency: oscillator.frequency.value,
+            waveform: oscillator.type,
+          });
         },
         stop(time) {
           events.push({ type: 'oscillator.stop', time });
         },
       };
+      return oscillator;
     },
     createGain() {
       return {
@@ -90,4 +96,19 @@ test('audio cue controller resumes audio and schedules an oscillator beep after 
   assert.ok(fake.events.some((entry) => entry.type === 'oscillator.stop'));
   assert.ok(fake.events.some((entry) => entry.type === 'gain.linear'));
   assert.ok(fake.events.some((entry) => entry.type === 'gain.exponential'));
+});
+
+test('audio cue controller accepts a distinct per-cue finish sound', async () => {
+  const { createAudioCueController } = await loadAudioCueModule();
+  const fake = createFakeAudioContext();
+  const controller = createAudioCueController({ createContext: () => fake.context });
+
+  await controller.arm();
+  await controller.beep({ frequency: 480, durationMs: 360, waveform: 'triangle' });
+
+  const start = fake.events.find((entry) => entry.type === 'oscillator.start');
+  const stop = fake.events.find((entry) => entry.type === 'oscillator.stop');
+  assert.equal(start.frequency, 480);
+  assert.equal(start.waveform, 'triangle');
+  assert.equal(stop.time, 4.36);
 });

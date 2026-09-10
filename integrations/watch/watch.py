@@ -34,6 +34,10 @@ except ImportError:
 # --- PARAMETERS ------------------------------------------------
 BASELINE_DURATION = 60.0  # seconds
 WINDOW_DURATION = 30.0  # seconds
+SAMPLE_STALE_TIMEOUT = float(os.environ.get("WATCH_SAMPLE_STALE_SECONDS", "90"))
+RECONNECT_DELAY = float(os.environ.get("WATCH_RECONNECT_DELAY_SECONDS", "3"))
+MIN_BASELINE_HR_SAMPLES = int(os.environ.get("WATCH_MIN_BASELINE_HR_SAMPLES", "20"))
+MIN_BASELINE_RR_INTERVALS = int(os.environ.get("WATCH_MIN_BASELINE_RR_INTERVALS", "20"))
 
 OUTPUT_DIR = "./watch"
 RAW_DIR = os.path.join(OUTPUT_DIR, "raw")
@@ -116,19 +120,33 @@ class HRVProcessor:
         self.data_points_collected = 0
         # Remove the limit on data points
         self.continuous_monitoring = True
-        self.last_control_request_id = None
+        self.last_control_request_id = self.load_existing_control_request_id()
+        self.connected_at = None
+        self.last_notification_time = None
+        self.disconnected = False
+        self.last_insufficient_baseline_log = None
+
+    def load_existing_control_request_id(self):
+        """Ignore a calibration command already present before this process starts."""
+        try:
+            with open(CONTROL_FILE, "r", encoding="utf-8") as handle:
+                command = json.load(handle)
+            return command.get("requestId")
+        except (FileNotFoundError, json.JSONDecodeError, OSError):
+            return None
 
     def begin_calibration(self):
         """Start a fresh participant baseline while the collector remains connected."""
-        now = time.time()
         self.heart_rate_values.clear()
         self.rr_intervals_values.clear()
         self.baseline_metrics = {}
         self.baseline_complete = False
-        self.baseline_start_time = now
-        self.current_window_start = now
+        # Start timing on the first fresh notification, not on the request.
+        self.baseline_start_time = None
+        self.current_window_start = None
         self.monitoring_mode = False
         self.stress_count = 0
+        self.last_insufficient_baseline_log = None
         self.save_to_json({
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "watch_data": {
@@ -142,12 +160,22 @@ class HRVProcessor:
                 "calibration": {
                     "active": True,
                     "progress": 0,
-                    "started_at": datetime.now().isoformat(),
+                    "started_at": None,
                     "duration_seconds": BASELINE_DURATION,
                 },
             },
         })
-        logger.info("Fresh watch baseline calibration started from the running app.")
+        logger.info("Fresh watch baseline requested; waiting for the first live sample.")
+
+    def handle_disconnect(self, _client):
+        """Record an unexpected BLE disconnect for the reconnect supervisor."""
+        self.disconnected = True
+        logger.warning("Watch disconnected; automatic reconnection will begin.")
+
+    def samples_are_stale(self):
+        """Return True when a connected band has stopped sending HR samples."""
+        reference = self.last_notification_time or self.connected_at
+        return bool(reference and time.time() - reference > SAMPLE_STALE_TIMEOUT)
 
     def check_control_file(self):
         try:
@@ -249,7 +277,10 @@ class HRVProcessor:
             for attempt in range(1, max_connect_attempts + 1):
                 try:
                     logger.info(f"Connection attempt {attempt}/{max_connect_attempts}...")
-                    self.ble_client = BleakClient(target)
+                    self.ble_client = BleakClient(
+                        target,
+                        disconnected_callback=self.handle_disconnect,
+                    )
                     await self.ble_client.connect()
 
                     if not self.ble_client.is_connected:
@@ -268,6 +299,10 @@ class HRVProcessor:
                         HEART_RATE_UUID, self.hr_notification_handler
                     )
                     logger.info(f"Subscribed to HR notifications (UUID: {HEART_RATE_UUID}).")
+
+                    self.connected_at = time.time()
+                    self.last_notification_time = None
+                    self.disconnected = False
 
                     return True
 
@@ -296,13 +331,19 @@ class HRVProcessor:
         heart_rate = decoded["Heart Rate (BPM)"]
         rr_intervals = decoded.get("RR Intervals (ms)", [])
         timestamp = time.time()
+        self.last_notification_time = timestamp
 
-        # Mark session & baseline start on first sample
+        # Mark the overall session on its first sample.
         if self.session_start_time is None:
             self.session_start_time = timestamp
-            self.baseline_start_time = timestamp
             self.current_window_start = timestamp
             logger.info(f"Session start at {datetime.fromtimestamp(timestamp)}")
+
+        # A requested baseline begins with its first fresh HR notification.
+        if not self.baseline_complete and self.baseline_start_time is None:
+            self.baseline_start_time = timestamp
+            self.current_window_start = timestamp
+            logger.info("Baseline timer started with the first fresh watch sample.")
 
         # Buffer samples
         self.heart_rate_values.append((timestamp, heart_rate))
@@ -324,12 +365,25 @@ class HRVProcessor:
             not self.baseline_complete
             and timestamp - self.baseline_start_time >= BASELINE_DURATION
         ):
-            self.compute_baseline_metrics()
-            self.baseline_complete = True
-            self.current_window_start = timestamp
-            logger.info("Baseline calibration complete.")
-            self.save_baseline_to_json()
-            self.start_monitoring()
+            enough_hr = len(self.heart_rate_values) >= MIN_BASELINE_HR_SAMPLES
+            enough_rr = len(self.rr_intervals_values) >= MIN_BASELINE_RR_INTERVALS
+            if enough_hr and enough_rr:
+                self.compute_baseline_metrics()
+                self.baseline_complete = True
+                self.current_window_start = timestamp
+                logger.info("Baseline calibration complete.")
+                self.save_baseline_to_json()
+                self.start_monitoring()
+            elif (
+                self.last_insufficient_baseline_log is None
+                or timestamp - self.last_insufficient_baseline_log >= 10
+            ):
+                logger.warning(
+                    "Baseline is waiting for enough live data "
+                    f"(HR samples {len(self.heart_rate_values)}/{MIN_BASELINE_HR_SAMPLES}, "
+                    f"RR intervals {len(self.rr_intervals_values)}/{MIN_BASELINE_RR_INTERVALS})."
+                )
+                self.last_insufficient_baseline_log = timestamp
 
         # Monitoring mode - collect data continuously
         elif (
@@ -420,7 +474,8 @@ class HRVProcessor:
         calibrating = not self.baseline_complete
         progress = 0
         if calibrating and self.baseline_start_time:
-            progress = min(100, int((timestamp - self.baseline_start_time) / BASELINE_DURATION * 100))
+            # Reserve 100% for a baseline that passed the minimum-data checks.
+            progress = min(99, int((timestamp - self.baseline_start_time) / BASELINE_DURATION * 100))
         self.save_to_json({
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "watch_data": {
@@ -441,6 +496,10 @@ class HRVProcessor:
                     "progress": progress,
                     "started_at": datetime.fromtimestamp(self.baseline_start_time).isoformat() if self.baseline_start_time else None,
                     "duration_seconds": BASELINE_DURATION,
+                    "heart_rate_samples": len(self.heart_rate_values),
+                    "rr_intervals": len(self.rr_intervals_values),
+                    "minimum_heart_rate_samples": MIN_BASELINE_HR_SAMPLES,
+                    "minimum_rr_intervals": MIN_BASELINE_RR_INTERVALS,
                 },
             },
         })
@@ -700,88 +759,67 @@ class HRVProcessor:
 
     async def stop(self):
         logger.info("Stopping...")
-        if self.ble_client and self.ble_client.is_connected:
-            await self.ble_client.stop_notify(HEART_RATE_UUID)
-            await self.ble_client.disconnect()
+        client = self.ble_client
+        self.ble_client = None
+        if client and client.is_connected:
+            try:
+                await client.stop_notify(HEART_RATE_UUID)
+            except Exception as error:
+                logger.debug(f"Unable to stop HR notifications cleanly: {error}")
+            try:
+                await client.disconnect()
+            except Exception as error:
+                logger.debug(f"Unable to disconnect cleanly: {error}")
             logger.info("Disconnected.")
+        self.connected_at = None
+        self.last_notification_time = None
+        self.disconnected = False
 
 
 # --- ENTRY POINT ----------------------------------------------
 async def main():
     proc = HRVProcessor()
-    if not await proc.start():
-        print("Failed to connect to the watch. Please make sure your device is turned on and in range.")
-        sys.exit(1)
+    calibrate_on_start = os.environ.get("WATCH_CALIBRATE_ON_START", "1").strip().lower() not in {
+        "0", "false", "no", "off"
+    }
+    calibration_pending = calibrate_on_start or not proc.baseline_complete
 
-    logger.info("Watch connected successfully.")
+    while True:
+        if not await proc.start():
+            logger.warning(
+                f"Watch connection failed; retrying automatically in {RECONNECT_DELAY:.0f}s."
+            )
+            await asyncio.sleep(RECONNECT_DELAY)
+            continue
 
-    # Check if calibration is needed
-    if proc.baseline_complete:
-        print("\nExisting calibration found!")
-        print("==========================")
-        print("Using previously saved baseline calibration.")
-        b = proc.baseline_metrics
-        print(f"Baseline metrics: HR={b['hr']:.1f}, SDNN={b['sdnn']:.1f}, RMSSD={b['rmssd']:.1f}, pNN50={b['pnn50']:.1f}%")
-        print("Skipping calibration and proceeding to monitoring.")
+        logger.info("Watch connected successfully.")
+        if calibration_pending:
+            proc.begin_calibration()
+            calibration_pending = False
+        elif proc.baseline_complete:
+            proc.start_monitoring()
 
-        # Save the loaded baseline to the current session's JSON
-        proc.save_baseline_to_json()
-
-    else:
-        # Calibration phase
-        print("\nCalibration Phase:")
-        print("==================")
-        print("This will establish a baseline for your heart rate metrics.")
-        print("It will take about 60 seconds. Please remain still and relaxed.")
-
-        # Wait for user input or automated input from the parent process
-        print("Press Enter to start calibration: ", end="", flush=True)
-        input()  # This will receive input from either the user or the parent process
-
-        # Wait for baseline calibration to complete
-        logger.info("Starting baseline calibration...")
-        calibration_start = time.time()
-        while not proc.baseline_complete:
+        while True:
             proc.check_control_file()
-            if time.time() - calibration_start > 120:  # Safety timeout of 2 minutes
-                print("Calibration timeout - please try again.")
-                await proc.stop()
-                sys.exit(1)
+
+            if proc.disconnected:
+                logger.warning("Bluetooth disconnected; reconnecting automatically.")
+                break
+
+            if proc.samples_are_stale():
+                logger.warning(
+                    f"No heart-rate sample for {SAMPLE_STALE_TIMEOUT:.0f}s; "
+                    "reconnecting the watch automatically."
+                )
+                break
+
             await asyncio.sleep(1)
 
-            # Print progress indicators
-            progress = min(100, int((time.time() - calibration_start) / BASELINE_DURATION * 100))
-            if progress % 10 == 0:
-                print(f"Calibration: {progress}% complete...", end="\r", flush=True)
-
-        print("\nCalibration complete!")
-        print("Baseline metrics established and saved for future sessions.")
-
-    # Monitoring phase
-    print("\nMonitoring Phase:")
-    print("=================")
-    print("This will collect data continuously.")
-    print("Please continue with your normal activities.")
-
-    proc.start_monitoring()
-
-    # Wait for monitoring to continue indefinitely
-    monitoring_start = time.time()
-    while proc.monitoring_mode:
-        proc.check_control_file()
-        await asyncio.sleep(1)
-
-        # A runtime calibration temporarily disables monitoring and restores it
-        # automatically from the notification handler when the baseline ends.
-        while not proc.baseline_complete:
-            proc.check_control_file()
-            await asyncio.sleep(1)
-
-    print("\nMonitoring stopped.")
-    print("Data saved to watch_data.json")
-
-    # Allow a moment for the parent process to read the output
-    await asyncio.sleep(2)
+        # Restart an interrupted calibration after reconnection so a partial,
+        # discontinuous sample window can never be accepted as the baseline.
+        calibration_pending = not proc.baseline_complete
+        await proc.stop()
+        await asyncio.sleep(RECONNECT_DELAY)
 
 
 if __name__ == "__main__":

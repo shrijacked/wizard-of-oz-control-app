@@ -6,9 +6,12 @@ const CONSENT_STATEMENT = 'I confirm that I have read the participant informatio
 
 const SUBJECT_INSTRUCTIONS = [
   'You will solve nine tangram puzzles in three short sittings of three puzzles each.',
+  'Each puzzle uses all seven tangram pieces. Every piece must be used in the final shape.',
+  'Each designated starting spot has a dot marking the center of its piece. Whenever a piece is not in use—or you are unsure what to do—put it back with its center over that dot. This is essential because the robot can only pick pieces up from their marked starting spots.',
   'The amount and timing of assistance may vary. You may receive an on-screen hint, hear an alert, or see the robot move a piece.',
-  'A timer will remain visible while each puzzle is active. Sounds mark the start, midpoint, and end of the planned puzzle time.',
-  'After every puzzle, complete the short questionnaire on this screen. There will be a break after puzzles three and six.',
+  'A timer and round number will remain visible while each puzzle is active. One high beep marks the start, two slower beeps mark the midpoint, and a different low three-tone sound marks the end of the planned puzzle time. Additional alerts indicate a new hint or robot movement.',
+  'The researcher uses fixed numbered robot programs for the seven colored shapes: 1 Orange Triangle, 2 Green Square, 3 Red Triangle, 4 Pink Triangle, 5 Yellow Parallelogram, 6 Blue Triangle, and 7 Purple Triangle.',
+  'After every puzzle, complete the short questionnaire on this screen. The researcher will see when it has been filled. There will be a break after puzzles three and six.',
   'Work naturally and tell the researcher if you want to pause or stop. Your participation is voluntary and you may stop at any time without penalty.',
 ];
 

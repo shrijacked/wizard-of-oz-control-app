@@ -16,6 +16,8 @@ export function createCameraController({
   selectElement,
   mediaDevices,
   storage = (typeof window !== 'undefined' ? window.localStorage : null),
+  secureContext = (typeof window !== 'undefined' ? window.isSecureContext : true),
+  hostname = (typeof window !== 'undefined' ? window.location.hostname : ''),
   onStatusChange,
 } = {}) {
   let mediaStream = null;
@@ -62,8 +64,13 @@ export function createCameraController({
     selectElement.innerHTML = '';
     if (!cameras.length) {
       const option = document.createElement('option');
-      option.textContent = 'No camera found';
+      // An option without an explicit value inherits its label. That previously
+      // made "No camera found" look like a real device id and prevented the
+      // initial permission request that reveals camera labels on Safari/Chrome.
+      option.value = '';
+      option.textContent = 'Default camera (allow access first)';
       selectElement.append(option);
+      selectedDeviceId = null;
       return;
     }
 
@@ -133,7 +140,7 @@ export function createCameraController({
   async function requestCameraStream() {
     const devices = await listDevices();
     populateSelect(devices);
-    selectedDeviceId = selectElement?.value || preferredCameraDeviceId(devices, selectedDeviceId);
+    selectedDeviceId = selectElement?.value || preferredCameraDeviceId(devices, selectedDeviceId) || null;
     const requestedDeviceId = selectedDeviceId;
     const stream = await openCamera(requestedDeviceId);
     const actualDeviceId = openedDeviceId(stream);
@@ -158,7 +165,10 @@ export function createCameraController({
     }
 
     if (!mediaDevices?.getUserMedia) {
-      setStatus('Unable to start camera: camera API is not available in this browser.');
+      const localHost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1';
+      setStatus(!secureContext && !localHost
+        ? 'Unable to start camera: browsers block camera access on a non-secure network address. Open the Admin page on this Mac at http://localhost:3000/admin.'
+        : 'Unable to start camera: camera API is not available in this browser.');
       live = false;
       reportStatus();
       return;

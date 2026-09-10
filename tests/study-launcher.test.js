@@ -30,6 +30,8 @@ test('study launcher builds a server and watch plan without gaze by default', ()
   assert.equal(plan.watch.label, 'watch');
   assert.equal(plan.watch.command, 'python3');
   assert.deepEqual(plan.watch.args, ['integrations/watch/watch.py']);
+  assert.equal(plan.watch.env.WATCH_CALIBRATE_ON_START, '1');
+  assert.deepEqual(plan.watch.autoInput, []);
   assert.equal(plan.watch.optional, true);
 
   assert.equal(plan.gaze, undefined);
@@ -44,4 +46,13 @@ test('study launcher can disable the optional watch bridge', () => {
 
   assert.equal(plan.watch, null);
   assert.equal(plan.gaze, undefined);
+});
+
+test('study launcher can reuse a saved baseline when startup calibration is disabled', () => {
+  const plan = buildLaunchPlan({
+    watchAutoCalibrate: false,
+  });
+
+  assert.equal(plan.watch.env.WATCH_CALIBRATE_ON_START, '0');
+  assert.deepEqual(plan.watch.autoInput, []);
 });

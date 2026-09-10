@@ -8,7 +8,7 @@ The local Node.js server coordinates one researcher dashboard and two secondary 
 flowchart LR
     admin["/admin<br/>study control + camera + sensor signals"] --> server["local Node server<br/>HTTP + WebSocket + file store"]
     server --> subject["/subject<br/>onboarding + timer + hints + surveys"]
-    server --> robot["/robot<br/>piece + slot cue"]
+    server --> robot["/robot<br/>fixed program cue"]
     watch["Maxim H Band"] --> server
     camera["C270"] --> admin
     server --> export["participant JSON<br/>and event CSV"]
@@ -44,14 +44,14 @@ flowchart LR
 
 ### `/robot`
 
-- shows only the latest piece-and-slot cue
+- shows only the latest shape's fixed robot-program cue
 - plays a loud movement sound pattern and later reminder after browser audio is armed
 
 ## Puzzle pairing and start gate
 
 The filename convention pairs `1.pdf` with `1s.pdf`, through `9.pdf` with `9s.pdf`. Only complete pairs enter the schedule; unmatched files remain visible as incomplete uploads.
 
-`POST /api/session/start` requires saved researcher and participant IDs, nine scheduled pairs, matching participant/researcher profiles, armed subject and robot screens, live C270, and healthy calibrated watch telemetry.
+`POST /api/session/start` requires saved researcher and participant IDs, nine scheduled pairs, and matching participant/researcher profiles. Missing display readiness, C270 video, or watch telemetry remains visible as a non-blocking warning and is logged if the researcher starts anyway.
 
 ## Main APIs
 
@@ -61,10 +61,10 @@ The filename convention pairs `1.pdf` with `1s.pdf`, through `9.pdf` with `9s.pd
 - Researcher override: `POST /api/surveys/round/skip`
 - Interventions: `POST /api/hints`, `/api/hints/clear`, `/api/actions`
 - Watch: `POST /api/watch/calibrate`
-- Exports: `GET /api/export/current.json`, `/api/export/current.csv`
+- Exports: `GET /api/export/current.json`, `/api/export/current.forms.json`, `/api/export/current.csv`
 
 ## Persistence and export
 
-`data/state.json` stores resumable current state. `data/events.jsonl` and per-session CSV files retain the ordered audit trail. `data/participant-registry.json` prevents ID reuse across resets.
+`data/state.json` stores resumable current state. `data/events.jsonl` and per-session CSV files retain the ordered audit trail. `data/participant-registry.json` prevents ID reuse across resets. Each session also continuously updates `data/export/<session-id>.json` and the questionnaire-only `data/export/<session-id>-forms.json`.
 
 The main JSON export includes both profile copies, condition order, randomization seed, schedule, pause-aware round durations, interventions, every round survey or documented skip, the final survey, and recording metadata.
