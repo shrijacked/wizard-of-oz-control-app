@@ -315,6 +315,7 @@ async function createApp(options = {}) {
     customTextName: null,
     audioFileName: null,
     audioOriginalName: null,
+    audioRevision: null,
   };
   try {
     const persisted = JSON.parse(await fs.readFile(scriptManifestPath, 'utf8'));
@@ -332,7 +333,7 @@ async function createApp(options = {}) {
       ? scriptInstructions(studyScript.text)
       : SUBJECT_INSTRUCTIONS,
     scriptAudioUrl: studyScript.audioFileName
-      ? `/media/study-script/${studyScript.audioFileName}`
+      ? `/media/study-script/${studyScript.audioFileName}${studyScript.audioRevision ? `?v=${encodeURIComponent(studyScript.audioRevision)}` : ''}`
       : null,
     scriptAudioName: studyScript.audioOriginalName || null,
     customTextName: studyScript.customTextName || null,
@@ -726,6 +727,7 @@ async function createApp(options = {}) {
           await fs.writeFile(path.join(scriptDir, storedName), audioBuffer);
           nextScript.audioFileName = storedName;
           nextScript.audioOriginalName = path.basename(String(audioFile.name || storedName));
+          nextScript.audioRevision = String(Date.now());
         }
         studyScript = nextScript;
         const temporaryManifest = `${scriptManifestPath}.tmp`;
@@ -743,6 +745,36 @@ async function createApp(options = {}) {
         });
         hub.broadcastSnapshots();
         json(response, 200, getStudyDefinition());
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/study-script/play') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        const definition = getStudyDefinition();
+        if (!definition.scriptAudioUrl) {
+          const error = new Error('Upload a script recording before trying to play it.');
+          error.statusCode = 409;
+          throw error;
+        }
+        const body = await readJsonBody(request);
+        const event = await store.logSystemEvent({
+          type: 'study.script.play.requested',
+          source: 'admin',
+          summary: 'The researcher requested instruction recording playback on the Subject screen.',
+          payload: {
+            actor: body.actor || 'researcher',
+            audioOriginalName: studyScript.audioOriginalName,
+          },
+        });
+        const recipients = hub.broadcastCommand('subject', 'study.script.play', {
+          requestId: event.id,
+          audioUrl: definition.scriptAudioUrl,
+        });
+        json(response, 200, {
+          requested: true,
+          recipients,
+          requestId: event.id,
+        });
         return;
       }
 

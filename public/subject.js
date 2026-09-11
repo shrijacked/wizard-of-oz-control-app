@@ -10,7 +10,6 @@ let state = null;
 let surveyRound = null;
 let timerRoundToken = null;
 let instructionAudioUrl = null;
-let instructionAudioStarted = false;
 const timerMilestones = new Set();
 
 const WORKLOAD = [
@@ -97,19 +96,28 @@ function formCueToken(session = {}) {
   return null;
 }
 
-async function attemptInstructionAutoplay() {
+async function playInstructionRecording(request = {}) {
   const audio = byId('subject-script-audio');
   const status = byId('subject-script-audio-status');
-  if (!audio?.getAttribute('src') || instructionAudioStarted) {
+  const requestedUrl = request.audioUrl || state?.study?.scriptAudioUrl || '';
+  if (!audio || !requestedUrl) {
+    if (status) status.textContent = 'No instruction recording is available.';
     return false;
   }
+
+  if (instructionAudioUrl !== requestedUrl || audio.getAttribute('src') !== requestedUrl) {
+    instructionAudioUrl = requestedUrl;
+    audio.src = requestedUrl;
+    audio.load();
+  }
+
   try {
+    audio.currentTime = 0;
     await audio.play();
-    instructionAudioStarted = true;
-    if (status) status.textContent = 'Recorded instructions are playing.';
+    if (status) status.textContent = 'The researcher started the recorded instructions.';
     return true;
   } catch (error) {
-    if (status) status.textContent = 'Your browser blocked automatic audio. Tap Play once to hear the instructions.';
+    if (status) status.textContent = 'Playback was blocked. Tap Enable study sounds, then ask the researcher to try again.';
     return false;
   }
 }
@@ -210,7 +218,6 @@ function render(current) {
   const audioUrl = current?.study?.scriptAudioUrl || '';
   if (scriptAudio && instructionAudioUrl !== audioUrl) {
     instructionAudioUrl = audioUrl;
-    instructionAudioStarted = false;
     if (audioUrl) {
       scriptAudio.src = audioUrl;
     } else {
@@ -226,7 +233,6 @@ function render(current) {
   byId('subject-participant-id').value = session.participantId || '';
   if (!session.participantProfile && session.status === 'setup') {
     showPanel('subject-onboarding');
-    attemptInstructionAutoplay().catch(() => {});
   } else if (session.awaitingRoundSurvey) {
     showPanel('subject-round-survey');
     if (surveyRound !== session.awaitingRoundSurvey) {
@@ -278,12 +284,11 @@ async function init() {
 
   const tryArm = () => {
     if (!sound.isArmed()) armSound().catch(() => {});
-    attemptInstructionAutoplay().catch(() => {});
   };
   window.addEventListener('pointerdown', tryArm, { once: true });
   window.addEventListener('keydown', tryArm, { once: true });
   byId('subject-sound-toggle').addEventListener('click', () => {
-    armSound().then(() => attemptInstructionAutoplay()).catch(() => {
+    armSound().catch(() => {
       byId('subject-sound-status').textContent = 'Sound could not be enabled. Check browser permissions.';
     });
   });
@@ -327,6 +332,11 @@ async function init() {
       robotTracker.push(snapshot?.robotCueUpdatedAt || null);
       formTracker.push(formCueToken(snapshot?.session)).catch(() => {});
       render(snapshot);
+    },
+    onCommand(command, data) {
+      if (command === 'study.script.play') {
+        playInstructionRecording(data).catch(() => {});
+      }
     },
   });
   window.setInterval(renderTimer, 250);

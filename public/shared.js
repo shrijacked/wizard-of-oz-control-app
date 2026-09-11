@@ -107,6 +107,10 @@ export function connectSocket(role, handlers = {}) {
       if (payload.type === 'event.created') {
         handlers.onEvent?.(payload.data, payload.system);
       }
+
+      if (payload.type === 'command.received') {
+        handlers.onCommand?.(payload.command, payload.data);
+      }
     });
 
     socket.addEventListener('close', () => {

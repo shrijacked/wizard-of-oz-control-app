@@ -56,6 +56,7 @@ const elements = {
   studyScriptAudio: document.querySelector('#study-script-audio'),
   studyScriptAudioPreview: document.querySelector('#study-script-audio-preview'),
   studyScriptUpload: document.querySelector('#study-script-upload'),
+  studyScriptPlay: document.querySelector('#study-script-play'),
   studyScriptStatus: document.querySelector('#study-script-status'),
   sessionNotes: document.querySelector('#session-notes'),
   sessionSave: document.querySelector('#session-save'),
@@ -992,6 +993,9 @@ function renderSession() {
       elements.studyScriptAudioPreview.src = audioUrl;
     }
     elements.studyScriptAudioPreview.hidden = !audioUrl;
+    if (elements.studyScriptPlay) {
+      elements.studyScriptPlay.disabled = !audioUrl;
+    }
     setText(elements.studyScriptStatus, audioUrl
       ? `Displayed script plus recording: ${studyConfig().scriptAudioName || 'uploaded audio'}.`
       : (studyConfig().customTextName
@@ -1666,6 +1670,21 @@ async function init() {
       await refreshState();
     } catch (error) {
       setText(elements.studyScriptStatus, error.message || 'Script upload failed.');
+      await handleError(error);
+    }
+  });
+
+  elements.studyScriptPlay?.addEventListener('click', async () => {
+    try {
+      setText(elements.studyScriptStatus, 'Sending playback request to the Subject screen...');
+      const result = await postJson('/api/study-script/play', {
+        actor: actorName(),
+      }, { headers: buildHeaders() });
+      setText(elements.studyScriptStatus, result.recipients > 0
+        ? 'Playback request sent. The recording is starting on the Subject screen.'
+        : 'No Subject screen is connected. Open it, enable study sounds, and try again.');
+    } catch (error) {
+      setText(elements.studyScriptStatus, error.message || 'The recording could not be started.');
       await handleError(error);
     }
   });

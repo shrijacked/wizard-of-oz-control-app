@@ -161,7 +161,8 @@ test('server serves the simplified three-screen routes and aliases /audit to /ro
     assert.match(subjectHtml, /Participant Display/i);
     assert.match(subjectHtml, /id="subject-puzzle"/);
     assert.match(subjectHtml, /Your puzzle/i);
-    assert.match(subjectHtml, /id="subject-script-audio"[^>]*autoplay/);
+    assert.match(adminHtml, /id="study-script-play"/);
+    assert.doesNotMatch(subjectHtml, /id="subject-script-audio"[^>]*autoplay/);
     assert.match(subjectHtml, /I have read and understood the study instructions/);
     assert.match(robotHtml, /Robot Operator Screen/i);
     assert.match(robotHtml, /Move this piece/i);
@@ -729,10 +730,44 @@ test('admin can replace the displayed script and add a participant-playable reco
       'Return unused pieces to their designated spots.',
     ]);
     assert.equal(subjectState.study.scriptAudioName, 'updated-script.mp3');
+    assert.match(subjectState.study.scriptAudioUrl, /\?v=\d+$/);
     const audio = await fetch(`${baseUrl}${subjectState.study.scriptAudioUrl}`);
     assert.equal(audio.status, 200);
     assert.deepEqual(Buffer.from(await audio.arrayBuffer()), audioBytes);
   } finally {
+    await app.close();
+  }
+});
+
+test('admin can explicitly start the instruction recording on the Subject screen', async () => {
+  const { app, baseUrl } = await startApp();
+  const subject = await readSubjectSocket(baseUrl.replace('http://', 'ws://'));
+  try {
+    const unavailable = await postJson(baseUrl, '/api/study-script/play', { actor: 'Researcher' });
+    assert.equal(unavailable.status, 409);
+
+    const saved = await postJson(baseUrl, '/api/study-script', {
+      audioFile: {
+        name: 'instructions.mp3',
+        mimeType: 'audio/mpeg',
+        contentBase64: Buffer.from('test-audio-recording').toString('base64'),
+      },
+      actor: 'Researcher',
+    });
+    assert.equal(saved.status, 200, await saved.text());
+
+    const played = await postJson(baseUrl, '/api/study-script/play', { actor: 'Researcher' });
+    assert.equal(played.status, 200);
+    const result = await played.json();
+    assert.equal(result.requested, true);
+    assert.equal(result.recipients, 1);
+
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    const command = subject.messages.find((message) => message.type === 'command.received');
+    assert.equal(command.command, 'study.script.play');
+    assert.match(command.data.audioUrl, /\/media\/study-script\/script-audio\.mp3\?v=\d+$/);
+  } finally {
+    subject.socket.close();
     await app.close();
   }
 });

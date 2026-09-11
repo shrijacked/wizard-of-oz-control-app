@@ -255,6 +255,24 @@ class WebSocketHub {
     }
   }
 
+  broadcastCommand(role, command, data = {}) {
+    let recipients = 0;
+    for (const client of this.clients.values()) {
+      if (client.role !== role) {
+        continue;
+      }
+
+      this.sendToClient(client, {
+        type: 'command.received',
+        role: client.role,
+        command,
+        data,
+      });
+      recipients += 1;
+    }
+    return recipients;
+  }
+
   close() {
     if (this.heartbeatTimer) {
       clearInterval(this.heartbeatTimer);
