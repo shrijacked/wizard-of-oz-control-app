@@ -199,6 +199,34 @@
               <p class="panel-note">This operational script supplements—not replaces—the approved participant information sheet and ethics materials.</p>
             </section>
 
+            <section class="panel panel-wide">
+              <div class="panel-header">
+                <div>
+                  <p class="panel-kicker">Audio cues</p>
+                  <h2>Robot and puzzle-finished sounds</h2>
+                </div>
+              </div>
+              <form id="study-sounds-form" class="stack-form">
+                <div class="field-grid">
+                  <label class="field">
+                    <span>Robot movement sound</span>
+                    <input id="robot-cue-audio" type="file" accept=".mp3,.m4a,.wav,.ogg,audio/mpeg,audio/mp4,audio/wav,audio/ogg">
+                    <audio id="robot-cue-audio-preview" controls preload="metadata"></audio>
+                  </label>
+                  <label class="field">
+                    <span>Puzzle-finished sound</span>
+                    <input id="puzzle-finish-audio" type="file" accept=".mp3,.m4a,.wav,.ogg,audio/mpeg,audio/mp4,audio/wav,audio/ogg">
+                    <audio id="puzzle-finish-audio-preview" controls preload="metadata"></audio>
+                  </label>
+                </div>
+                <div class="button-row">
+                  <button class="button button-primary" type="submit">Save cue sounds</button>
+                  <button id="study-sounds-reset" class="button button-secondary" type="button">Restore built-in sounds</button>
+                </div>
+                <p id="study-sounds-status" class="panel-note">Built-in cue sounds are active.</p>
+              </form>
+            </section>
+
             <section class="panel live-panel panel-wide">
               <div class="panel-header">
                 <div>
@@ -241,7 +269,7 @@
                   <video id="camera-feed" autoplay muted playsinline></video>
                   <div class="video-overlay">
                     <span id="camera-status">Camera is off.</span>
-                    <span id="recording-status"></span>
+                    <span id="recording-status">Recording off (manual only)</span>
                   </div>
                 </div>
               </section>
@@ -263,8 +291,16 @@
                     <strong id="hrv-rmssd">--</strong>
                   </article>
                   <article class="metric-card">
-                    <span class="callout-label">Stress</span>
+                    <span class="callout-label">Arousal advisory</span>
                     <strong id="hrv-stress-level">Awaiting data</strong>
+                  </article>
+                  <article class="metric-card">
+                    <span class="callout-label">HR change</span>
+                    <strong id="hrv-heart-rate-delta">--</strong>
+                  </article>
+                  <article class="metric-card">
+                    <span class="callout-label">Signal quality</span>
+                    <strong id="hrv-signal-quality">Awaiting data</strong>
                   </article>
                   <article class="metric-card">
                     <span class="callout-label">Last sample</span>
@@ -272,8 +308,8 @@
                   </article>
                 </div>
                 <div id="hrv-spike-alert" class="callout hrv-spike-alert" hidden>
-                  <span class="callout-label">Adaptive intervention signal</span>
-                  <strong>HRV stress spike detected</strong>
+                  <span class="callout-label">Researcher advisory</span>
+                  <strong>Possible arousal — review participant</strong>
                   <p id="hrv-spike-detail">Review the signal and decide whether to intervene.</p>
                 </div>
                 <div class="button-row">
@@ -319,6 +355,7 @@
                     <h2>Digital Hint Terminal</h2>
                   </div>
                 </div>
+                <p id="hint-preset-summary" class="panel-note">Shared hints will appear until a puzzle starts.</p>
                 <div id="hint-presets" class="preset-row"></div>
                 <form id="hint-form" class="stack-form">
                   <label class="field">
@@ -375,6 +412,10 @@
                       <span>Questionnaire</span>
                       <strong id="admin-round-form-status">No form yet • 0/9 filled</strong>
                     </div>
+                    <div class="round-progress-item">
+                      <span>Puzzle outcomes</span>
+                      <strong id="admin-round-outcome-summary">Solved 0 • Not solved 0</strong>
+                    </div>
                   </div>
                   <div class="admin-timer" aria-live="off">
                     <span>Round time remaining</span>
@@ -393,7 +434,8 @@
                     <button id="round-start" class="button button-primary" type="button">Start round</button>
                     <button id="round-pause" class="button button-ghost" type="button">Pause timer</button>
                     <button id="round-resume" class="button button-ghost" type="button">Resume timer</button>
-                    <button id="round-complete" class="button button-ghost" type="button">Complete round</button>
+                    <button id="round-complete" class="button button-primary" type="button">Finish — solved</button>
+                    <button id="round-complete-unsolved" class="button button-ghost" type="button">Finish — not solved</button>
                     <button id="round-skip" class="button button-ghost" type="button">Skip next round</button>
                   </div>
                   <div class="button-row">
@@ -433,6 +475,7 @@
               <button id="export-json-link" class="button button-primary" type="button">Download session JSON</button>
               <button id="export-forms-link" class="button button-ghost" type="button">Download form responses</button>
               <button id="export-csv-link" class="button button-ghost" type="button">Download CSV</button>
+              <button id="export-watch-link" class="button button-ghost" type="button">Download raw watch readings</button>
               <button id="reset-session-review" class="button button-ghost" type="button">Reset for next participant</button>
             </div>
           </section>

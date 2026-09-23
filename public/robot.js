@@ -16,6 +16,7 @@ const connectionBadgeElement = document.querySelector('#connection-badge');
 const historyElement = document.querySelector('#robot-history');
 
 const cueHistory = [];
+let robotCueAudioUrl = '';
 
 const soundController = createAudioCueController({
   frequency: 560,
@@ -27,12 +28,16 @@ const ROBOT_MOVE_WARNING_MS = 10_000;
 const moveAlertScheduler = createDelayedCueScheduler({
   delayMs: ROBOT_MOVE_WARNING_MS,
   onCue: async () => {
-    await soundController.pattern(2, 120);
+    if (!await soundController.playRecording(robotCueAudioUrl, { volume: 0.9 })) {
+      await soundController.pattern(2, 120);
+    }
   },
 });
 const robotAlertTracker = createUpdateCueTracker({
   onCue: async (token) => {
-    await soundController.pattern(3, 100);
+    if (!await soundController.playRecording(robotCueAudioUrl, { volume: 0.9 })) {
+      await soundController.pattern(3, 100);
+    }
     const remaining = remainingDelayMs(token, ROBOT_MOVE_WARNING_MS);
     if (remaining <= -2000) {
       return;
@@ -120,6 +125,7 @@ function renderHistory() {
 
 function render(state) {
   const robotAction = state?.robotAction || {};
+  robotCueAudioUrl = state?.study?.sounds?.robotCue?.audioUrl || '';
   if (actionElement) {
     actionElement.textContent = robotAction.updatedAt
       ? (robotAction.label || 'No robot cue has been sent yet.')
@@ -160,10 +166,10 @@ async function init() {
       setConnectionBadge(connectionBadgeElement, 'reconnecting');
     },
     onSnapshot(snapshot) {
+      render(snapshot);
       robotAlertTracker.push(snapshot?.robotAction?.updatedAt || null).catch(() => {
         setSoundStatus('Alert sound failed while trying to play the latest robot cue.');
       });
-      render(snapshot);
     },
   });
 }

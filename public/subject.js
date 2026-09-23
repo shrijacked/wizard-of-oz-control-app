@@ -10,6 +10,8 @@ let state = null;
 let surveyRound = null;
 let timerRoundToken = null;
 let instructionAudioUrl = null;
+let robotCueAudioUrl = '';
+let puzzleFinishAudioUrl = '';
 const timerMilestones = new Set();
 
 const WORKLOAD = [
@@ -71,9 +73,14 @@ function formatClock(seconds) {
 const wait = (milliseconds) => new Promise((resolve) => window.setTimeout(resolve, milliseconds));
 
 async function playFinishCue() {
-  await sound.beep({ frequency: 650, durationMs: 240, gainValue: 0.16, waveform: 'triangle' });
+  if (await sound.playRecording(puzzleFinishAudioUrl, { volume: 0.95, waitForEnd: true })) {
+    return;
+  }
+  await sound.beep({ frequency: 880, durationMs: 150, gainValue: 0.19, waveform: 'square' });
+  await wait(90);
+  await sound.beep({ frequency: 660, durationMs: 210, gainValue: 0.2, waveform: 'square' });
   await wait(100);
-  await sound.beep({ frequency: 520, durationMs: 300, gainValue: 0.16, waveform: 'triangle' });
+  await sound.beep({ frequency: 440, durationMs: 700, gainValue: 0.22, waveform: 'triangle' });
 }
 
 async function playFormReadyCue({ includeFinish = false } = {}) {
@@ -162,6 +169,48 @@ function renderPuzzle(asset) {
   container.append(preview);
 }
 
+function renderHintHistory(hintState = {}, activeRound = null) {
+  const block = byId('subject-hint-history-block');
+  const list = byId('subject-hint-history');
+  if (!block || !list) return;
+
+  const roundIndex = Number(activeRound?.index) || null;
+  const currentText = String(hintState.text || '').trim();
+  const currentUpdatedAt = hintState.updatedAt || null;
+  const entries = (Array.isArray(hintState.history) ? hintState.history : [])
+    .filter((entry) => String(entry?.text || '').trim())
+    .filter((entry) => !roundIndex || !entry.roundIndex || Number(entry.roundIndex) === roundIndex);
+  const previous = [...entries];
+  const latest = previous[previous.length - 1];
+  if (
+    currentText
+    && latest
+    && String(latest.text || '').trim() === currentText
+    && latest.updatedAt === currentUpdatedAt
+  ) {
+    previous.pop();
+  }
+
+  list.innerHTML = '';
+  previous.forEach((entry) => {
+    const item = document.createElement('li');
+    const text = document.createElement('span');
+    text.textContent = String(entry.text || '').trim();
+    item.append(text);
+    if (entry.updatedAt) {
+      const time = document.createElement('small');
+      time.className = 'display-meta';
+      time.textContent = formatTimestamp(entry.updatedAt);
+      item.append(time);
+    }
+    list.append(item);
+  });
+  block.hidden = previous.length === 0;
+  if (previous.length) {
+    list.scrollTop = list.scrollHeight;
+  }
+}
+
 function renderTimer() {
   const round = state?.session?.activeRound;
   if (!round || panels['subject-round'].hidden) return;
@@ -180,7 +229,7 @@ function renderTimer() {
   }
   if (elapsed >= Math.floor(duration / 2) && !timerMilestones.has('mid')) {
     timerMilestones.add('mid');
-    sound.pattern(2, 260, { frequency: 760, durationMs: 210, gainValue: 0.13, waveform: 'sine' });
+    sound.pattern(2, 280, { frequency: 760, durationMs: 240, gainValue: 0.2, waveform: 'square' });
   }
   if (elapsed >= duration && !timerMilestones.has('end')) {
     timerMilestones.add('end');
@@ -189,7 +238,13 @@ function renderTimer() {
 }
 
 const hintTracker = createUpdateCueTracker({ onCue: () => sound.pattern(2, 90) });
-const robotTracker = createUpdateCueTracker({ onCue: () => sound.pattern(3, 90) });
+const robotTracker = createUpdateCueTracker({
+  onCue: async () => {
+    if (!await sound.playRecording(robotCueAudioUrl, { volume: 0.9 })) {
+      await sound.pattern(3, 90);
+    }
+  },
+});
 const formTracker = createUpdateCueTracker({
   onCue: (token) => playFormReadyCue({
     includeFinish: !token.endsWith(':999') && !timerMilestones.has('end'),
@@ -198,6 +253,8 @@ const formTracker = createUpdateCueTracker({
 
 function render(current) {
   state = current;
+  robotCueAudioUrl = current?.study?.sounds?.robotCue?.audioUrl || '';
+  puzzleFinishAudioUrl = current?.study?.sounds?.puzzleFinish?.audioUrl || '';
   const session = current?.session || {};
   const instructionList = byId('subject-instructions');
   if (instructionList) {
@@ -253,6 +310,7 @@ function render(current) {
     const hint = String(current?.hint?.text || '').trim();
     byId('subject-hint').textContent = hint || 'No hint right now — continue with the puzzle.';
     byId('subject-updated').textContent = current?.hint?.updatedAt ? `Last updated ${formatTimestamp(current.hint.updatedAt)}` : 'No hint received yet.';
+    renderHintHistory(current?.hint, session.activeRound);
     renderTimer();
   } else if (session.status === 'completed' || session.finalSurveySubmitted) {
     showPanel('subject-complete');

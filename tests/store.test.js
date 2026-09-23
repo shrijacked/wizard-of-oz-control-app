@@ -31,6 +31,7 @@ test('store persists hints, actions, and HRV telemetry to disk-backed state', as
 
   const state = store.getState();
   assert.equal(state.hint.text, 'Try the outer edge first.');
+  assert.deepEqual(state.hint.history.map((entry) => entry.text), ['Try the outer edge first.']);
   assert.equal(state.robotAction.pieceLabel, 'Purple Triangle');
   assert.equal(state.robotAction.programNumber, 7);
   assert.equal(state.robotAction.slot, 7);
@@ -41,10 +42,29 @@ test('store persists hints, actions, and HRV telemetry to disk-backed state', as
 
   const savedState = JSON.parse(await fs.readFile(path.join(dataDir, 'state.json'), 'utf8'));
   assert.equal(savedState.hint.text, 'Try the outer edge first.');
+  assert.deepEqual(savedState.hint.history.map((entry) => entry.text), ['Try the outer edge first.']);
 
   const eventsLog = await fs.readFile(path.join(dataDir, 'events.jsonl'), 'utf8');
   assert.match(eventsLog, /hint\.updated/);
   assert.match(eventsLog, /robot\.action\.logged/);
+});
+
+test('hint history keeps earlier hints when the current hint is cleared', async () => {
+  const { store } = await createStore();
+
+  await store.setHint({ text: 'Start with the outside edge.' });
+  await store.setHint({ text: 'Try the blue triangle next.' });
+  assert.deepEqual(
+    store.getState().hint.history.map((entry) => entry.text),
+    ['Start with the outside edge.', 'Try the blue triangle next.'],
+  );
+
+  await store.clearHint({ author: 'Researcher' });
+  assert.equal(store.getState().hint.text, '');
+  assert.deepEqual(
+    store.getState().hint.history.map((entry) => entry.text),
+    ['Start with the outside edge.', 'Try the blue triangle next.'],
+  );
 });
 
 test('watch recalibration stays pending until fresh collector telemetry acknowledges it', async () => {
@@ -73,6 +93,50 @@ test('watch recalibration stays pending until fresh collector telemetry acknowle
   assert.equal(acknowledged.requestId, 'calibration-1');
 });
 
+test('watch entries save every raw notification with session and round context', async () => {
+  const { store, dataDir } = await createStore();
+  await store.ingestWatchEntry({
+    timestamp: '2026-04-01T06:31:30.000Z',
+    raw_readings: [{
+      timestamp: 1775025091,
+      timestamp_iso: '2026-04-01T12:01:31+05:30',
+      raw_packet_hex: '1648ff03',
+      flags: 22,
+      heart_rate_bpm: 72,
+      rr_raw_1024: [1023],
+      rr_ms: [999.0234375],
+    }],
+    watch_data: {
+      is_baseline: false,
+      current_metrics: { hr: 72, rmssd: 30 },
+      stress_score: 0.56,
+      stress_level: 'Possible arousal — review participant',
+      arousal: {
+        status: 'possible_arousal',
+        label: 'Possible arousal — review participant',
+        possible: true,
+        score: 0.56,
+        heart_rate_delta_bpm: 8,
+      },
+      quality: {
+        heart_rate_reliable: true,
+        hrv_reliable: false,
+      },
+    },
+  });
+
+  const state = store.getState();
+  assert.equal(state.telemetry.hrv.arousal.status, 'possible_arousal');
+  assert.equal(state.telemetry.hrv.rawReadingsSaved, 1);
+  assert.equal(state.adaptive.status, 'observe');
+  const raw = await fs.readFile(path.join(dataDir, 'export', `${state.session.id}.watch.jsonl`), 'utf8');
+  const saved = JSON.parse(raw.trim());
+  assert.equal(saved.raw_packet_hex, '1648ff03');
+  assert.equal(saved.heart_rate_bpm, 72);
+  assert.equal(saved.app_context.sessionId, state.session.id);
+  assert.equal(saved.app_context.participantId, state.session.metadata.participantId);
+});
+
 test('starting a new round clears the previous round hint', async () => {
   const { store, dataDir } = await createStore();
   await store.uploadPuzzleAssets([
@@ -85,11 +149,17 @@ test('starting a new round clears the previous round hint', async () => {
   await store.startSession({ operator: 'Researcher' });
   await store.startRound({ operator: 'Researcher' });
   await store.setHint({ text: 'This must not carry into the next puzzle.' });
-  await store.completeRound({ operator: 'Researcher' });
+  await store.completeRound({ operator: 'Researcher', solved: false });
+  assert.equal(store.getState().session.rounds[0].solved, false);
+  assert.equal(store.getState().session.rounds[0].outcome, 'not_solved');
+  const roundExport = await store.buildOperatorExport(store.getState().session.id);
+  assert.equal(roundExport.rounds[0].solved, false);
+  assert.equal(roundExport.rounds[0].outcome, 'not_solved');
   await store.skipRoundSurvey({ roundIndex: 1, reason: 'Test transition' });
   await store.startRound({ operator: 'Researcher' });
 
   assert.equal(store.getState().hint.text, '');
+  assert.deepEqual(store.getState().hint.history, []);
   const events = await fs.readFile(path.join(dataDir, 'events.jsonl'), 'utf8');
   assert.match(events, /Previous hint cleared before round 2/);
 });
@@ -476,7 +546,7 @@ test('store runs one persisted nine-round participant study with surveys and sit
       await store.resumeRound({ operator: 'Researcher' });
     }
     now = new Date(now.getTime() + 30_000);
-    await store.completeRound({ operator: 'Researcher' });
+    await store.completeRound({ operator: 'Researcher', solved: roundIndex % 2 === 1 });
     const condition = store.getState().session.rounds.at(-1).condition;
     await store.submitRoundSurvey({
       roundIndex,
@@ -495,6 +565,8 @@ test('store runs one persisted nine-round participant study with surveys and sit
   }
 
   assert.equal(store.getState().session.finalSurveyRequired, true);
+  assert.equal(store.getState().session.rounds.filter((round) => round.solved === true).length, 5);
+  assert.equal(store.getState().session.rounds.filter((round) => round.solved === false).length, 4);
   await store.submitFinalSurvey({ responses: {
     overallHelpfulness: 5,
     overallEfficacy: 5,

@@ -17,6 +17,10 @@ export function recordingsToDownloadAfterSitting(recordings = []) {
   return recordings.filter((entry) => entry.status === 'saved' || entry.status === 'partial');
 }
 
-export function shouldAutoStartSittingRecording({ cameraLive = false, recorderActive = false } = {}) {
-  return Boolean(cameraLive) && !recorderActive;
+export function shouldAutoStartSittingRecording({
+  cameraLive = false,
+  recorderActive = false,
+  autoRecordEnabled = false,
+} = {}) {
+  return Boolean(autoRecordEnabled) && Boolean(cameraLive) && !recorderActive;
 }

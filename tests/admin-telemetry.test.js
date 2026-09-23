@@ -24,6 +24,8 @@ function createTelemetryElements() {
     pnn50: createTextNode(),
     stressScore: createTextNode(),
     stressLevel: createTextNode(),
+    heartRateDelta: createTextNode(),
+    signalQuality: createTextNode(),
     distraction: createTextNode(),
     source: createTextNode(),
     updated: createTextNode(),
@@ -49,6 +51,16 @@ test('renderHrvTelemetry fills the admin dashboard with live HRV metrics', async
         stressScore: 0.35,
         stressLevel: 'Not Stressed',
         distractionDetected: false,
+        arousal: {
+          status: 'possible_arousal',
+          label: 'Possible arousal — review participant',
+          possible: true,
+          heartRateDeltaBpm: 7.5,
+        },
+        quality: {
+          heartRateReliable: true,
+          hrvReliable: false,
+        },
         interpretation: 'HRV telemetry received.',
       },
     },
@@ -59,7 +71,9 @@ test('renderHrvTelemetry fills the admin dashboard with live HRV metrics', async
   assert.equal(elements.rmssd.textContent, '34.4 ms');
   assert.equal(elements.pnn50.textContent, '20.1%');
   assert.equal(elements.stressScore.textContent, '0.35');
-  assert.equal(elements.stressLevel.textContent, 'Not Stressed');
+  assert.equal(elements.stressLevel.textContent, 'Possible arousal — review participant');
+  assert.equal(elements.heartRateDelta.textContent, '+7.5 bpm');
+  assert.equal(elements.signalQuality.textContent, 'HR usable; RR/HRV unreliable');
   assert.equal(elements.distraction.textContent, 'No');
   assert.equal(elements.source.textContent, 'watch-bridge');
   assert.match(elements.updated.textContent, /2026|Apr|22|12/i);

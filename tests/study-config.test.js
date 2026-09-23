@@ -14,6 +14,9 @@ test('study config keeps valid pieces, slots, and hint presets', () => {
     slotCount: 7,
     pieces: [{ id: 'orange-triangle', label: 'Orange Triangle', color: '#e07a3f', programNumber: 1 }],
     hintPresets: ['Try rotating that piece.', ''],
+    hintPresetsByPuzzle: {
+      1: ['The orange triangle belongs in the upper-left.', ''],
+    },
   });
 
   assert.equal(config.plannedRounds, 3);
@@ -21,6 +24,9 @@ test('study config keeps valid pieces, slots, and hint presets', () => {
   assert.equal(config.pieces[0].id, 'orange-triangle');
   assert.equal(config.pieces[0].programNumber, 1);
   assert.deepEqual(config.hintPresets, ['Try rotating that piece.']);
+  assert.deepEqual(config.hintPresetsByPuzzle, {
+    1: ['The orange triangle belongs in the upper-left.'],
+  });
 });
 
 test('study config falls back to defaults when the file is missing', () => {
@@ -49,9 +55,15 @@ test('study config writes hint presets back to disk', () => {
     plannedRounds: 3,
     slotCount: 7,
     hintPresets: ['Try rotating that piece.', '  ', 'Look at the outline.'],
+    hintPresetsByPuzzle: {
+      2: ['The green square belongs at the far upper-left.', '  '],
+    },
   }, filePath);
   const loaded = loadStudyConfig(filePath);
   assert.deepEqual(loaded.hintPresets, ['Try rotating that piece.', 'Look at the outline.']);
+  assert.deepEqual(loaded.hintPresetsByPuzzle, {
+    2: ['The green square belongs at the far upper-left.'],
+  });
   fs.unlinkSync(filePath);
 });
 

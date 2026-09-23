@@ -59,7 +59,9 @@ test('participant instructions explain piece centers, sound cues, and form confi
   const instructions = SUBJECT_INSTRUCTIONS.join(' ');
   assert.match(instructions, /dot marking the center/i);
   assert.match(instructions, /robot can only pick pieces up from their marked starting spots/i);
-  assert.match(instructions, /high beep.*midpoint.*different low sound/i);
+  assert.match(instructions, /Enable study sounds/i);
+  assert.match(instructions, /high beep.*two medium beeps.*halfway.*descending low sound/i);
   assert.match(instructions, /bright two-beep alert.*questionnaire is ready/i);
   assert.match(instructions, /researcher will see when it has been filled/i);
+  assert.match(instructions, /keep every piece you are not actively using back on its own marked dot/i);
 });

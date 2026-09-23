@@ -265,6 +265,10 @@ function hydrateRound(round = {}) {
     skipped: Boolean(round.skipped),
     skipReason: round.skipReason ? String(round.skipReason) : null,
     endedEarly: Boolean(round.endedEarly),
+    solved: typeof round.solved === 'boolean' ? round.solved : null,
+    outcome: String(round.outcome || (
+      round.skipped ? 'skipped' : (round.solved === true ? 'solved' : (round.solved === false ? 'not_solved' : 'not_recorded'))
+    )),
   };
 }
 
@@ -331,6 +335,7 @@ function createInitialState(now = new Date(), options = {}) {
       text: '',
       updatedAt: null,
       author: null,
+      history: [],
     },
     robotAction: {
       actionId: null,
@@ -349,6 +354,18 @@ function createInitialState(now = new Date(), options = {}) {
         stressScore: 0,
         stressLevel: 'Not Stressed',
         distractionDetected: false,
+        arousal: {
+          status: 'awaiting_data',
+          label: 'Awaiting data',
+          possible: false,
+          score: 0,
+          heartRateDeltaBpm: null,
+        },
+        quality: {
+          heartRateReliable: false,
+          hrvReliable: false,
+        },
+        rawReadingsSaved: 0,
         interpretation: 'Awaiting HRV data.',
         feedback: 'Start the watch monitor or post HRV telemetry.',
         calibration: {
@@ -446,6 +463,16 @@ function hydrateState(parsed, now = new Date()) {
     hint: {
       ...initial.hint,
       ...(parsed.hint || {}),
+      history: Array.isArray(parsed.hint?.history)
+        ? parsed.hint.history
+          .map((entry) => ({
+            text: String(entry?.text || '').trim(),
+            updatedAt: entry?.updatedAt || null,
+            author: entry?.author || 'researcher',
+            roundIndex: Number(entry?.roundIndex) || null,
+          }))
+          .filter((entry) => entry.text)
+        : [],
     },
     robotAction: {
       ...initial.robotAction,
@@ -1253,6 +1280,7 @@ class ExperimentStore extends EventEmitter {
       text: '',
       updatedAt: startedAt,
       author: 'system',
+      history: [],
     };
     const activeRound = {
       index: nextIndex + 1,
@@ -1309,12 +1337,15 @@ class ExperimentStore extends EventEmitter {
       ? secondsBetween(activeRound.pauseStartedAt, completedAt) || 0
       : 0;
     const pausedDurationSeconds = (activeRound.pausedDurationSeconds || 0) + activePauseSeconds;
+    const solved = typeof payload.solved === 'boolean' ? payload.solved : null;
     const completedRound = {
       ...activeRound,
       pauseStartedAt: null,
       pausedDurationSeconds,
       completedAt,
       durationSeconds: Math.max(0, (secondsBetween(activeRound.startedAt, completedAt) || 0) - pausedDurationSeconds),
+      solved,
+      outcome: solved === true ? 'solved' : (solved === false ? 'not_solved' : 'not_recorded'),
     };
 
     this.state.session = {
@@ -1327,7 +1358,7 @@ class ExperimentStore extends EventEmitter {
 
     const event = this.#createEvent('round.completed', {
       source: payload.source || 'admin',
-      summary: `Round ${completedRound.index} completed on puzzle ${completedRound.puzzle.setId}.`,
+      summary: `Round ${completedRound.index} completed on puzzle ${completedRound.puzzle.setId} (${completedRound.outcome.replace('_', ' ')}).`,
       payload: {
         index: completedRound.index,
         sittingNumber: completedRound.sittingNumber,
@@ -1336,6 +1367,8 @@ class ExperimentStore extends EventEmitter {
         startedAt: completedRound.startedAt,
         completedAt,
         durationSeconds: completedRound.durationSeconds,
+        solved: completedRound.solved,
+        outcome: completedRound.outcome,
         operator: payload.operator || 'researcher',
       },
     });
@@ -1373,6 +1406,8 @@ class ExperimentStore extends EventEmitter {
       durationSeconds: 0,
       skipped: true,
       skipReason: reason.slice(0, 1000),
+      solved: null,
+      outcome: 'skipped',
       survey: {
         skipped: true,
         reason: `Round skipped: ${reason.slice(0, 1000)}`,
@@ -1400,6 +1435,8 @@ class ExperimentStore extends EventEmitter {
       durationSeconds: 0,
       skipped: true,
       skipReason: round.skipReason,
+      solved: null,
+      outcome: 'skipped',
       operator: payload.operator || 'researcher',
     };
     await this.#persistAndBroadcast([
@@ -1640,6 +1677,8 @@ class ExperimentStore extends EventEmitter {
         ...activeRound,
         completedAt: roundCompletedAt,
         durationSeconds: secondsBetween(activeRound.startedAt, roundCompletedAt),
+        solved: null,
+        outcome: 'not_recorded',
       };
       this.state.session = {
         ...this.state.session,
@@ -1656,6 +1695,8 @@ class ExperimentStore extends EventEmitter {
           startedAt: completedRound.startedAt,
           completedAt: roundCompletedAt,
           durationSeconds: completedRound.durationSeconds,
+          solved: null,
+          outcome: 'not_recorded',
           operator: payload.operator || 'researcher',
           autoClosed: true,
         },
@@ -1712,6 +1753,8 @@ class ExperimentStore extends EventEmitter {
         completedAt,
         durationSeconds: Math.max(0, (secondsBetween(activeRound.startedAt, completedAt) || 0) - pausedDurationSeconds),
         endedEarly: true,
+        solved: false,
+        outcome: 'not_solved',
       };
       this.state.session.rounds.push(completedRound);
       this.state.session.activeRound = null;
@@ -1729,6 +1772,8 @@ class ExperimentStore extends EventEmitter {
           durationSeconds: completedRound.durationSeconds,
           pausedDurationSeconds,
           endedEarly: true,
+          solved: false,
+          outcome: 'not_solved',
           operator: payload.operator || 'researcher',
         },
       }));
@@ -1766,16 +1811,24 @@ class ExperimentStore extends EventEmitter {
     }
 
     const timestamp = toIsoDate(this.now());
-    this.state.hint = {
+    const hintEntry = {
       text,
       updatedAt: timestamp,
       author: payload.author || 'researcher',
+      roundIndex: this.state.session.activeRound?.index || null,
+    };
+    const history = Array.isArray(this.state.hint?.history)
+      ? this.state.hint.history.filter((entry) => entry?.text)
+      : [];
+    this.state.hint = {
+      ...hintEntry,
+      history: [...history, hintEntry],
     };
 
     const event = this.#createEvent('hint.updated', {
       source: payload.source || 'admin',
       summary: `Hint broadcast: ${text}`,
-      payload: clone(this.state.hint),
+      payload: clone(hintEntry),
     });
 
     await this.#persistAndBroadcast([event]);
@@ -1825,12 +1878,17 @@ class ExperimentStore extends EventEmitter {
       text: '',
       updatedAt: timestamp,
       author: payload.author || 'researcher',
+      history: Array.isArray(this.state.hint?.history) ? this.state.hint.history : [],
     };
 
     const event = this.#createEvent('hint.cleared', {
       source: payload.source || 'admin',
       summary: 'Subject hint screen was cleared.',
-      payload: clone(this.state.hint),
+      payload: {
+        text: '',
+        updatedAt: timestamp,
+        author: this.state.hint.author,
+      },
     });
 
     await this.#persistAndBroadcast([event]);
@@ -1846,6 +1904,18 @@ class ExperimentStore extends EventEmitter {
       stressScore: 0,
       stressLevel: 'Calibrating',
       distractionDetected: false,
+      arousal: {
+        status: 'calibrating',
+        label: 'Calibrating',
+        possible: false,
+        score: 0,
+        heartRateDeltaBpm: null,
+      },
+      quality: {
+        heartRateReliable: false,
+        hrvReliable: false,
+      },
+      spike: null,
       interpretation: 'Recalibration requested; waiting for the watch collector to acknowledge it.',
       feedback: 'Keep the participant still and make sure the hBand is on and advertising.',
       calibration: {
@@ -1880,10 +1950,20 @@ class ExperimentStore extends EventEmitter {
     const stressScore = Number.isFinite(payload.stressScore) ? payload.stressScore : 0;
     const stressLevel = payload.stressLevel || 'Not Stressed';
     const distractionDetected = Boolean(payload.distractionDetected);
-
-    const previousScore = Number(this.state.telemetry.hrv.stressScore) || 0;
-    const spikeDelta = stressScore - previousScore;
-    const spikeDetected = stressScore >= 0.45 && spikeDelta >= 0.15;
+    const arousal = clone(payload.arousal || {
+      status: stressScore >= 0.45 ? 'possible_arousal' : 'normal',
+      label: stressScore >= 0.45 ? 'Possible arousal — review participant' : 'No arousal flag',
+      possible: stressScore >= 0.45,
+      score: stressScore,
+      heartRateDeltaBpm: null,
+    });
+    const quality = clone(payload.quality || arousal.quality || {
+      heartRateReliable: Number.isFinite(metrics.hr),
+      hrvReliable: Number.isFinite(metrics.rmssd),
+    });
+    const possibleArousal = Boolean(arousal.possible || arousal.status === 'possible_arousal');
+    const previousPossible = Boolean(this.state.telemetry.hrv.arousal?.possible);
+    const arousalDetected = possibleArousal && !previousPossible;
     const currentCalibration = this.state.telemetry.hrv.calibration || {};
     const incomingCalibration = payload.calibration ? clone(payload.calibration) : null;
     let calibration = currentCalibration;
@@ -1914,15 +1994,18 @@ class ExperimentStore extends EventEmitter {
       stressScore,
       stressLevel,
       distractionDetected,
+      arousal,
+      quality,
+      rawReadingsSaved: Number(this.state.telemetry.hrv.rawReadingsSaved || 0),
       interpretation: payload.interpretation || 'HRV telemetry received.',
       feedback: payload.feedback || 'Continue monitoring the participant.',
       calibration,
-      spike: spikeDetected ? {
+      spike: arousalDetected ? {
         detected: true,
         detectedAt: timestamp,
         stressScore,
-        delta: Number(spikeDelta.toFixed(2)),
-        message: `HRV stress score rose by ${spikeDelta.toFixed(2)}.`,
+        delta: Number(arousal.heartRateDeltaBpm ?? arousal.heart_rate_delta_bpm ?? 0),
+        message: 'Possible arousal detected; researcher review is required.',
       } : this.state.telemetry.hrv.spike,
     };
 
@@ -1931,18 +2014,22 @@ class ExperimentStore extends EventEmitter {
       stressScore,
       heartRate: Number.isFinite(metrics.hr) ? metrics.hr : null,
       stressLevel,
+      arousalStatus: arousal.status || null,
+      heartRateDeltaBpm: arousal.heartRateDeltaBpm ?? arousal.heart_rate_delta_bpm ?? null,
+      heartRateReliable: quality.heartRateReliable ?? quality.heart_rate_reliable ?? null,
+      hrvReliable: quality.hrvReliable ?? quality.hrv_reliable ?? null,
     });
 
     const telemetryEvent = this.#createEvent('telemetry.hrv.updated', {
       source: meta.source || payload.source || 'api',
-      summary: `HRV telemetry updated with stress level ${stressLevel}.`,
+      summary: `Watch telemetry updated: ${arousal.label || arousal.status || 'arousal advisory unavailable'}.`,
       payload: clone(this.state.telemetry.hrv),
     });
 
     const adaptiveEvents = await this.#refreshAdaptiveState(meta.source || payload.source || 'api');
-    const spikeEvent = spikeDetected ? [this.#createEvent('telemetry.hrv.spike.detected', {
+    const spikeEvent = arousalDetected ? [this.#createEvent('telemetry.arousal.detected', {
       source: meta.source || payload.source || 'api',
-      summary: `HRV spike detected (stress ${stressScore.toFixed(2)}, +${spikeDelta.toFixed(2)}).`,
+      summary: 'Possible arousal detected; admin review requested.',
       payload: clone(this.state.telemetry.hrv.spike),
     })] : [];
     const events = [telemetryEvent, ...spikeEvent, ...adaptiveEvents];
@@ -1960,6 +2047,7 @@ class ExperimentStore extends EventEmitter {
 
   async ingestWatchEntry(entry = {}) {
     const watchData = entry.watch_data || {};
+    await this.#appendRawWatchReadings(entry.raw_readings || []);
 
     if (watchData.is_baseline) {
       this.state.telemetry.hrv.baseline = clone(watchData.baseline_metrics || {});
@@ -2000,8 +2088,37 @@ class ExperimentStore extends EventEmitter {
       interpretation: watchData.interpretation,
       feedback: watchData.feedback,
       calibration: watchData.calibration,
+      arousal: watchData.arousal ? clone(watchData.arousal) : null,
+      quality: watchData.quality || watchData.arousal?.quality
+        ? clone(watchData.quality || watchData.arousal.quality)
+        : null,
       source: 'watch-bridge',
     }, { source: 'watch-bridge' });
+  }
+
+  async #appendRawWatchReadings(readings = []) {
+    if (!Array.isArray(readings) || readings.length === 0) {
+      return;
+    }
+
+    const session = this.state.session;
+    const activeRound = session.activeRound;
+    const receivedAt = toIsoDate(this.now());
+    const lines = readings.map((reading) => JSON.stringify({
+      ...clone(reading),
+      app_context: {
+        sessionId: session.id,
+        participantId: session.metadata?.participantId || '',
+        receivedAt,
+        sessionStatus: session.status,
+        roundIndex: activeRound?.index || null,
+        sittingNumber: activeRound?.sittingNumber || session.metadata?.sittingNumber || null,
+        condition: activeRound?.condition || null,
+      },
+    })).join('\n') + '\n';
+    await fs.appendFile(this.#watchRawPathForSession(session.id), lines, 'utf8');
+    this.state.telemetry.hrv.rawReadingsSaved = Number(this.state.telemetry.hrv.rawReadingsSaved || 0)
+      + readings.length;
   }
 
   async logSystemEvent(details = {}) {
@@ -2123,6 +2240,7 @@ class ExperimentStore extends EventEmitter {
           formsJson: `/api/exports/${session.sessionId}.forms.json`,
           bundleJson: `/api/exports/${session.sessionId}.bundle.json`,
           csv: `/api/exports/${session.sessionId}.csv`,
+          watchRaw: `/api/exports/${session.sessionId}.watch.jsonl`,
         },
       }));
 
@@ -2175,6 +2293,9 @@ class ExperimentStore extends EventEmitter {
         round.skipped = Boolean(saved.skipped);
         round.skipReason = saved.skipReason || null;
         round.endedEarly = Boolean(saved.endedEarly);
+        round.solved = typeof saved.solved === 'boolean' ? saved.solved : null;
+        round.outcome = saved.outcome
+          || (saved.solved === true ? 'solved' : (saved.solved === false ? 'not_solved' : 'not_recorded'));
       }
     }
     const totalDurationSeconds = rounds.reduce(
@@ -2206,7 +2327,25 @@ class ExperimentStore extends EventEmitter {
       rounds,
       finalSurvey: session.finalSurvey ? clone(session.finalSurvey) : null,
       recordings: (session.recordings || []).map((entry) => publicRecording(entry)),
+      watchTelemetry: {
+        advisory: clone(state.telemetry?.hrv?.arousal || null),
+        quality: clone(state.telemetry?.hrv?.quality || null),
+        rawReadingsSaved: Number(state.telemetry?.hrv?.rawReadingsSaved || 0),
+        rawFile: `${sessionId}.watch.jsonl`,
+      },
     };
+  }
+
+  async getRawWatchReadings(sessionIdInput) {
+    const sessionId = this.#resolveSessionId(sessionIdInput);
+    try {
+      return await fs.readFile(this.#watchRawPathForSession(sessionId), 'utf8');
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        return '';
+      }
+      throw error;
+    }
   }
 
   async buildFormResponsesExport(sessionIdInput) {
@@ -2242,6 +2381,8 @@ class ExperimentStore extends EventEmitter {
         condition: scheduled.condition || round?.condition || null,
         puzzleSetId: scheduled.puzzle?.setId || round?.puzzle?.setId || '',
         formStatus: responses ? (responses.skipped ? 'skipped' : 'submitted') : 'missing',
+        solved: typeof round?.solved === 'boolean' ? round.solved : null,
+        outcome: round?.outcome || (round?.skipped ? 'skipped' : 'not_recorded'),
         responses,
       };
     });
@@ -2310,6 +2451,8 @@ class ExperimentStore extends EventEmitter {
           durationSeconds: null,
           interventions: [],
           survey: null,
+          solved: null,
+          outcome: 'not_recorded',
         };
         continue;
       }
@@ -2320,6 +2463,9 @@ class ExperimentStore extends EventEmitter {
           current.durationSeconds = Number.isFinite(event.payload?.durationSeconds)
             ? event.payload.durationSeconds
             : secondsBetween(current.startedAt, current.completedAt);
+          current.solved = typeof event.payload?.solved === 'boolean' ? event.payload.solved : null;
+          current.outcome = event.payload?.outcome
+            || (current.solved === true ? 'solved' : (current.solved === false ? 'not_solved' : 'not_recorded'));
           rounds.push(current);
           current = null;
         }
@@ -2592,6 +2738,17 @@ class ExperimentStore extends EventEmitter {
     return csvPath;
   }
 
+  #watchRawPathForSession(sessionId = this.state.session.id) {
+    const rawPath = path.join(this.exportDir, `${sessionId}.watch.jsonl`);
+    const relative = path.relative(this.exportDir, rawPath);
+    if (relative.startsWith('..') || path.isAbsolute(relative)) {
+      const error = new Error('Invalid session identifier.');
+      error.statusCode = 400;
+      throw error;
+    }
+    return rawPath;
+  }
+
   async #preparePuzzleAsset(file = {}, meta = {}) {
     const originalName = String(file.name || file.originalName || '').trim();
     if (!originalName) {
@@ -2761,6 +2918,9 @@ class ExperimentStore extends EventEmitter {
           skipped: Boolean(event.payload.skipped),
           skipReason: event.payload.skipReason || null,
           endedEarly: Boolean(event.payload.endedEarly),
+          solved: typeof event.payload.solved === 'boolean' ? event.payload.solved : null,
+          outcome: event.payload.outcome
+            || (event.payload.skipped ? 'skipped' : (event.payload.solved === true ? 'solved' : (event.payload.solved === false ? 'not_solved' : 'not_recorded'))),
           survey: null,
         });
         reconstructed.session.activeRound = null;

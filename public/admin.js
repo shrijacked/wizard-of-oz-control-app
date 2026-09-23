@@ -58,6 +58,13 @@ const elements = {
   studyScriptUpload: document.querySelector('#study-script-upload'),
   studyScriptPlay: document.querySelector('#study-script-play'),
   studyScriptStatus: document.querySelector('#study-script-status'),
+  studySoundsForm: document.querySelector('#study-sounds-form'),
+  robotCueAudio: document.querySelector('#robot-cue-audio'),
+  robotCueAudioPreview: document.querySelector('#robot-cue-audio-preview'),
+  puzzleFinishAudio: document.querySelector('#puzzle-finish-audio'),
+  puzzleFinishAudioPreview: document.querySelector('#puzzle-finish-audio-preview'),
+  studySoundsReset: document.querySelector('#study-sounds-reset'),
+  studySoundsStatus: document.querySelector('#study-sounds-status'),
   sessionNotes: document.querySelector('#session-notes'),
   sessionSave: document.querySelector('#session-save'),
   puzzleUploadForm: document.querySelector('#puzzle-upload-form'),
@@ -79,6 +86,8 @@ const elements = {
   hrvPnn50: document.querySelector('#hrv-pnn50'),
   hrvStressScore: document.querySelector('#hrv-stress-score'),
   hrvStressLevel: document.querySelector('#hrv-stress-level'),
+  hrvHeartRateDelta: document.querySelector('#hrv-heart-rate-delta'),
+  hrvSignalQuality: document.querySelector('#hrv-signal-quality'),
   hrvDistraction: document.querySelector('#hrv-distraction'),
   hrvUpdated: document.querySelector('#hrv-updated'),
   hrvSource: document.querySelector('#hrv-source'),
@@ -91,6 +100,7 @@ const elements = {
   adminRoundCounter: document.querySelector('#admin-round-counter'),
   adminRoundFormStatus: document.querySelector('#admin-round-form-status'),
   adminRoundFormCard: document.querySelector('#admin-round-form-card'),
+  adminRoundOutcomeSummary: document.querySelector('#admin-round-outcome-summary'),
   screenLinks: document.querySelector('#screen-links'),
   sessionStart: document.querySelector('#session-start'),
   sessionComplete: document.querySelector('#session-complete'),
@@ -99,6 +109,7 @@ const elements = {
   roundPause: document.querySelector('#round-pause'),
   roundResume: document.querySelector('#round-resume'),
   roundComplete: document.querySelector('#round-complete'),
+  roundCompleteUnsolved: document.querySelector('#round-complete-unsolved'),
   roundSkip: document.querySelector('#round-skip'),
   resumeSitting: document.querySelector('#resume-sitting'),
   roundSurveyStatus: document.querySelector('#round-survey-status'),
@@ -110,12 +121,14 @@ const elements = {
   exportJsonLink: document.querySelector('#export-json-link'),
   exportFormsLink: document.querySelector('#export-forms-link'),
   exportCsvLink: document.querySelector('#export-csv-link'),
+  exportWatchLink: document.querySelector('#export-watch-link'),
   reviewSummary: document.querySelector('#review-summary'),
   reviewRounds: document.querySelector('#review-rounds'),
   hintForm: document.querySelector('#hint-form'),
   hintText: document.querySelector('#hint-text'),
   hintSend: document.querySelector('#hint-send'),
   hintSavePreset: document.querySelector('#hint-save-preset'),
+  hintPresetSummary: document.querySelector('#hint-preset-summary'),
   clearHint: document.querySelector('#clear-hint'),
   hintPreview: document.querySelector('#hint-preview'),
   hintPresets: document.querySelector('#hint-presets'),
@@ -306,6 +319,7 @@ function studyConfig() {
     slotCount: 7,
     pieces: [],
     hintPresets: [],
+    hintPresetsByPuzzle: {},
   };
 }
 
@@ -811,8 +825,36 @@ function renderInterventionLog() {
   });
 }
 
-async function persistHintPresets(presets) {
-  await postJson('/api/hint-presets', { presets }, {
+function activePuzzleSetId() {
+  return String(
+    currentState?.session?.activeRound?.puzzle?.setId
+      || currentState?.session?.puzzleSet?.setId
+      || '',
+  ).trim();
+}
+
+function visibleHintPresets() {
+  const puzzleSetId = activePuzzleSetId();
+  const puzzlePresets = puzzleSetId
+    ? studyConfig().hintPresetsByPuzzle?.[puzzleSetId] || []
+    : [];
+  const sharedPresets = studyConfig().hintPresets || [];
+  const seen = new Set();
+
+  return [
+    ...puzzlePresets.map((text) => ({ text, puzzleSetId })),
+    ...sharedPresets.map((text) => ({ text, puzzleSetId: '' })),
+  ].filter(({ text }) => {
+    if (seen.has(text)) {
+      return false;
+    }
+    seen.add(text);
+    return true;
+  });
+}
+
+async function persistHintPresets(presets, puzzleSetId = '') {
+  await postJson('/api/hint-presets', { presets, puzzleSetId }, {
     headers: buildHeaders(),
   });
   await refreshState();
@@ -823,8 +865,19 @@ function renderHintPresets(hintPolicy) {
     return;
   }
 
+  const puzzleSetId = activePuzzleSetId();
+  if (elements.hintPresetSummary) {
+    const puzzleCount = puzzleSetId
+      ? studyConfig().hintPresetsByPuzzle?.[puzzleSetId]?.length || 0
+      : 0;
+    const sharedCount = studyConfig().hintPresets?.length || 0;
+    elements.hintPresetSummary.textContent = puzzleSetId
+      ? `Puzzle ${puzzleSetId}: ${puzzleCount} puzzle-specific hints and ${sharedCount} shared hints.`
+      : `${sharedCount} shared hints available. Puzzle-specific hints appear when a round starts.`;
+  }
+
   elements.hintPresets.innerHTML = '';
-  studyConfig().hintPresets.forEach((preset) => {
+  visibleHintPresets().forEach(({ text: preset, puzzleSetId }) => {
     const chip = document.createElement('div');
     chip.className = 'preset-chip';
 
@@ -861,7 +914,13 @@ function renderHintPresets(hintPolicy) {
       event.preventDefault();
       event.stopPropagation();
       try {
-        await persistHintPresets(studyConfig().hintPresets.filter((entry) => entry !== preset));
+        const sourcePresets = puzzleSetId
+          ? studyConfig().hintPresetsByPuzzle?.[puzzleSetId] || []
+          : studyConfig().hintPresets || [];
+        await persistHintPresets(
+          sourcePresets.filter((entry) => entry !== preset),
+          puzzleSetId,
+        );
       } catch (error) {
         await handleError(error);
       }
@@ -941,6 +1000,9 @@ function renderSession() {
   if (elements.adminRoundFormCard) {
     elements.adminRoundFormCard.dataset.status = roundProgress.formStatus;
   }
+  const solvedRounds = completedRounds.filter((round) => round.solved === true).length;
+  const unsolvedRounds = completedRounds.filter((round) => round.solved === false).length;
+  setText(elements.adminRoundOutcomeSummary, `Solved ${solvedRounds} • Not solved ${unsolvedRounds}`);
   if (elements.adminRoundTimer) {
     const remaining = durationSeconds == null ? null : plannedDurationSeconds - durationSeconds;
     const displaySeconds = remaining == null ? null : Math.abs(remaining);
@@ -1002,6 +1064,17 @@ function renderSession() {
         ? `Displayed script loaded from ${studyConfig().customTextName}.`
         : 'The default script is currently displayed.'));
   }
+  const soundCues = studyConfig().sounds || {};
+  const robotSound = soundCues.robotCue || {};
+  const finishSound = soundCues.puzzleFinish || {};
+  if (elements.robotCueAudioPreview && elements.robotCueAudioPreview.getAttribute('src') !== robotSound.audioUrl) {
+    elements.robotCueAudioPreview.src = robotSound.audioUrl || '';
+  }
+  if (elements.puzzleFinishAudioPreview && elements.puzzleFinishAudioPreview.getAttribute('src') !== finishSound.audioUrl) {
+    elements.puzzleFinishAudioPreview.src = finishSound.audioUrl || '';
+  }
+  setText(elements.studySoundsStatus,
+    `Robot: ${robotSound.audioName || 'built-in cue'} • Puzzle finished: ${finishSound.audioName || 'built-in definitive cue'}.`);
   setText(elements.adminConsentStatement, studyConfig().consentStatement
     ? `Researcher cross-check: ${studyConfig().consentStatement}`
     : 'I confirm that the participant consented using the statement on their screen.');
@@ -1110,6 +1183,7 @@ function renderSession() {
   setElementDisabled(elements.roundPause, !pausePolicy.allowed, pausePolicy.reason);
   setElementDisabled(elements.roundResume, !resumePolicy.allowed, resumePolicy.reason);
   setElementDisabled(elements.roundComplete, !completeRoundPolicy.allowed, completeRoundPolicy.reason);
+  setElementDisabled(elements.roundCompleteUnsolved, !completeRoundPolicy.allowed, completeRoundPolicy.reason);
   setElementDisabled(elements.roundSkip, !skipRoundPolicy.allowed, skipRoundPolicy.reason);
   if (elements.resumeSitting) {
     elements.resumeSitting.hidden = !session.betweenSittings;
@@ -1149,14 +1223,16 @@ function renderSession() {
   );
 
   const spike = currentState?.telemetry?.hrv?.spike;
+  const possibleArousal = Boolean(currentState?.telemetry?.hrv?.arousal?.possible);
   const spikeAt = spike?.detectedAt || spike?.at;
   const showSpike = Boolean(activeRound?.condition === 'adaptive'
+    && possibleArousal
     && spikeAt
     && Date.parse(spikeAt) >= Date.parse(activeRound.startedAt));
   if (elements.hrvSpikeAlert) {
     elements.hrvSpikeAlert.hidden = !showSpike;
     setText(elements.hrvSpikeDetail, showSpike
-      ? `Detected ${formatTimestamp(spikeAt)} • stress ${Number(spike.stressScore || 0).toFixed(2)}. Use researcher judgment before intervening.`
+      ? `Detected ${formatTimestamp(spikeAt)} • HR change ${Number(spike.delta || 0) >= 0 ? '+' : ''}${Number(spike.delta || 0).toFixed(1)} bpm. This may reflect arousal, movement, or another cause; use researcher judgment.`
       : 'Review the signal and decide whether to intervene.');
   }
   const constantActive = activeRound?.condition === 'constant';
@@ -1280,7 +1356,12 @@ function renderReview() {
     title.textContent = `Round ${round.index} • Set ${round.puzzle?.setId || ''}`;
     const meta = document.createElement('p');
     meta.className = 'panel-note';
-    meta.textContent = `${round.puzzle?.subjectAsset?.originalName || ''} / ${round.puzzle?.solutionAsset?.originalName || ''} • ${formatDurationSeconds(round.durationSeconds)}`;
+    const outcome = round.solved === true
+      ? 'Solved'
+      : round.solved === false
+        ? 'Not solved'
+        : (round.skipped ? 'Skipped' : 'Outcome not recorded');
+    meta.textContent = `${outcome} • ${round.puzzle?.subjectAsset?.originalName || ''} / ${round.puzzle?.solutionAsset?.originalName || ''} • ${formatDurationSeconds(round.durationSeconds)}`;
     card.append(title, meta);
     elements.reviewRounds.append(card);
   });
@@ -1309,6 +1390,8 @@ function renderState() {
     pnn50: elements.hrvPnn50,
     stressScore: elements.hrvStressScore,
     stressLevel: elements.hrvStressLevel,
+    heartRateDelta: elements.hrvHeartRateDelta,
+    signalQuality: elements.hrvSignalQuality,
     distraction: elements.hrvDistraction,
     source: elements.hrvSource,
     updated: elements.hrvUpdated,
@@ -1689,6 +1772,43 @@ async function init() {
     }
   });
 
+  elements.studySoundsForm?.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const robotAudioFile = elements.robotCueAudio?.files?.[0] || null;
+    const puzzleFinishAudioFile = elements.puzzleFinishAudio?.files?.[0] || null;
+    if (!robotAudioFile && !puzzleFinishAudioFile) {
+      setText(elements.studySoundsStatus, 'Choose a robot movement sound, a puzzle-finished sound, or both.');
+      return;
+    }
+    try {
+      setText(elements.studySoundsStatus, 'Uploading cue sounds...');
+      await postJson('/api/study-sounds', {
+        robotAudioFile: robotAudioFile ? await readUploadFileAsBase64(robotAudioFile) : null,
+        puzzleFinishAudioFile: puzzleFinishAudioFile ? await readUploadFileAsBase64(puzzleFinishAudioFile) : null,
+        actor: actorName(),
+      }, { headers: buildHeaders() });
+      elements.robotCueAudio.value = '';
+      elements.puzzleFinishAudio.value = '';
+      await refreshState();
+    } catch (error) {
+      setText(elements.studySoundsStatus, error.message || 'The cue sounds could not be saved.');
+      await handleError(error);
+    }
+  });
+
+  elements.studySoundsReset?.addEventListener('click', async () => {
+    try {
+      setText(elements.studySoundsStatus, 'Restoring built-in cue sounds...');
+      await postJson('/api/study-sounds/reset', {
+        actor: actorName(),
+      }, { headers: buildHeaders() });
+      await refreshState();
+    } catch (error) {
+      setText(elements.studySoundsStatus, error.message || 'The built-in sounds could not be restored.');
+      await handleError(error);
+    }
+  });
+
   elements.puzzleClearSelection?.addEventListener('click', async () => {
     try {
       await persistQueue([]);
@@ -1725,10 +1845,11 @@ async function init() {
     }
   });
 
-  elements.roundComplete?.addEventListener('click', async () => {
+  async function finishRound(solved) {
     try {
       await postJson('/api/rounds/complete', {
         operator: actorName(),
+        solved,
       }, {
         headers: buildHeaders(),
       });
@@ -1736,6 +1857,14 @@ async function init() {
     } catch (error) {
       await handleError(error);
     }
+  }
+
+  elements.roundComplete?.addEventListener('click', async () => {
+    await finishRound(true);
+  });
+
+  elements.roundCompleteUnsolved?.addEventListener('click', async () => {
+    await finishRound(false);
   });
 
   elements.roundSkip?.addEventListener('click', async () => {
@@ -1871,19 +2000,31 @@ async function init() {
     }
   });
 
+  elements.exportWatchLink?.addEventListener('click', async () => {
+    try {
+      const sessionId = currentState?.session?.id || 'session';
+      await downloadExport('/api/export/current.watch.jsonl', `${sessionId}.watch.jsonl`);
+    } catch (error) {
+      await handleError(error);
+    }
+  });
+
   elements.hintSavePreset?.addEventListener('click', async () => {
     const text = String(elements.hintText?.value || '').trim();
     if (!text) {
       return;
     }
 
-    const presets = [...studyConfig().hintPresets];
+    const puzzleSetId = activePuzzleSetId();
+    const presets = puzzleSetId
+      ? [...(studyConfig().hintPresetsByPuzzle?.[puzzleSetId] || [])]
+      : [...studyConfig().hintPresets];
     if (presets.includes(text)) {
       return;
     }
 
     try {
-      await persistHintPresets([...presets, text]);
+      await persistHintPresets([...presets, text], puzzleSetId);
     } catch (error) {
       await handleError(error);
     }

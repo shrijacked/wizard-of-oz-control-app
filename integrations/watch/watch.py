@@ -22,6 +22,7 @@ if platform.system() == 'Windows':
 
 import numpy as np
 from bleak import BleakClient, BleakScanner
+from watch_core import live_arousal_assessment, parse_heart_rate_measurement
 
 try:
     from pylsl import StreamInfo, StreamOutlet
@@ -34,6 +35,9 @@ except ImportError:
 # --- PARAMETERS ------------------------------------------------
 BASELINE_DURATION = 60.0  # seconds
 WINDOW_DURATION = 30.0  # seconds
+AROUSAL_CURRENT_SECONDS = float(os.environ.get("WATCH_AROUSAL_CURRENT_SECONDS", "15"))
+AROUSAL_REFERENCE_SECONDS = float(os.environ.get("WATCH_AROUSAL_REFERENCE_SECONDS", "60"))
+AROUSAL_HR_RISE_BPM = float(os.environ.get("WATCH_AROUSAL_HR_RISE_BPM", "5"))
 SAMPLE_STALE_TIMEOUT = float(os.environ.get("WATCH_SAMPLE_STALE_SECONDS", "90"))
 RECONNECT_DELAY = float(os.environ.get("WATCH_RECONNECT_DELAY_SECONDS", "3"))
 MIN_BASELINE_HR_SAMPLES = int(os.environ.get("WATCH_MIN_BASELINE_HR_SAMPLES", "20"))
@@ -74,8 +78,8 @@ logger = logging.getLogger("hrv_processor")
 # --- MAIN PROCESSOR CLASS -------------------------------------
 class HRVProcessor:
     """
-    Connects to MAX-HEALTH-BAND, computes baseline + windowed HRV metrics,
-    detects stress -> distraction (3 windows in a row), streams and saves JSON.
+    Connects to MAX-HEALTH-BAND, computes windowed metrics, emits a cautious
+    possible-arousal advisory, and saves every raw notification.
     """
 
     def __init__(self):
@@ -83,6 +87,10 @@ class HRVProcessor:
         self.heart_rate_values = deque()
         self.rr_intervals_values = deque()
         self.raw_hr_data = []
+        self.pending_raw_readings = []
+        self.raw_capture_path = os.path.join(
+            RAW_DIR, f"watch_raw_{datetime.now():%Y%m%d_%H%M%S}.jsonl"
+        )
 
         # LSL stream: 4 channels (HR, SDNN, RMSSD, pNN50)
         self.stream_info = None
@@ -105,9 +113,6 @@ class HRVProcessor:
         self.baseline_complete = False
         self.ble_client = None
 
-        # Stress/distraction tracking
-        self.stress_count = 0
-
         # JSON data tracking - always start with sequence 1
         self.current_sequence = 0
         self.reset_json_file()
@@ -118,9 +123,6 @@ class HRVProcessor:
         # Monitoring control
         self.monitoring_mode = False
         self.monitoring_start_time = None
-        self.data_points_collected = 0
-        # Remove the limit on data points
-        self.continuous_monitoring = True
         self.last_control_request_id = self.load_existing_control_request_id()
         self.connected_at = None
         self.last_notification_time = None
@@ -142,13 +144,13 @@ class HRVProcessor:
         self.active_calibration_request_id = request_id
         self.heart_rate_values.clear()
         self.rr_intervals_values.clear()
+        self.raw_hr_data.clear()
         self.baseline_metrics = {}
         self.baseline_complete = False
         # Start timing on the first fresh notification, not on the request.
         self.baseline_start_time = None
         self.current_window_start = None
         self.monitoring_mode = False
-        self.stress_count = 0
         self.last_insufficient_baseline_log = None
         self.save_to_json({
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -158,6 +160,11 @@ class HRVProcessor:
                 "stress_score": 0,
                 "stress_level": "Calibrating",
                 "distraction_detected": False,
+                "arousal": self.current_arousal_assessment(time.time(), calibrating=True),
+                "quality": {
+                    "heart_rate_reliable": False,
+                    "hrv_reliable": False,
+                },
                 "interpretation": "Fresh participant baseline calibration started.",
                 "feedback": "Keep the participant still and relaxed.",
                 "calibration": {
@@ -226,6 +233,12 @@ class HRVProcessor:
             self.current_sequence += 1
             data_entry["sequence_number"] = self.current_sequence
 
+            # Carry every decoded notification through the bridge so it can be
+            # assigned to the currently active app session and round.
+            pending_raw = list(self.pending_raw_readings)
+            if pending_raw:
+                data_entry["raw_readings"] = pending_raw
+
             # Add new entry
             file_data["entries"].append(data_entry)
             file_data["current_sequence"] = self.current_sequence
@@ -233,6 +246,9 @@ class HRVProcessor:
             # Write back to file
             with open(WATCH_DATA_FILE, 'w') as f:
                 json.dump(file_data, f, indent=2)
+
+            if pending_raw:
+                del self.pending_raw_readings[:len(pending_raw)]
 
             logger.info(f"Saved entry #{self.current_sequence} to watch data file")
             return True
@@ -344,11 +360,30 @@ class HRVProcessor:
 
     async def hr_notification_handler(self, sender, data):
         """Called on each incoming HR notification from the band."""
-        decoded = self.decode_heart_rate(data.hex())
-        heart_rate = decoded["Heart Rate (BPM)"]
-        rr_intervals = decoded.get("RR Intervals (ms)", [])
+        raw_bytes = bytes(data)
+        try:
+            decoded = parse_heart_rate_measurement(raw_bytes)
+        except ValueError as error:
+            logger.warning(f"Ignored invalid heart-rate notification: {error}")
+            return
+        heart_rate = decoded["heart_rate_bpm"]
+        rr_intervals = decoded.get("rr_ms", [])
         timestamp = time.time()
         self.last_notification_time = timestamp
+
+        raw_sample = {
+            "timestamp": timestamp,
+            "timestamp_iso": datetime.fromtimestamp(timestamp).astimezone().isoformat(),
+            "raw_packet_hex": raw_bytes.hex(),
+            **decoded,
+        }
+        self.raw_hr_data.append(raw_sample)
+        self.pending_raw_readings.append(raw_sample)
+        try:
+            with open(self.raw_capture_path, "a", encoding="utf-8") as handle:
+                handle.write(json.dumps(raw_sample, separators=(",", ":")) + "\n")
+        except OSError as error:
+            logger.warning(f"Could not append raw watch capture: {error}")
 
         # Mark the overall session on its first sample.
         if self.session_start_time is None:
@@ -367,13 +402,15 @@ class HRVProcessor:
         for rr in rr_intervals:
             # convert ms to seconds
             self.rr_intervals_values.append((timestamp, rr / 1000.0))
-        self.raw_hr_data.append(
-            {
-                "timestamp": timestamp,
-                "heart_rate": heart_rate,
-                "rr_intervals": rr_intervals,
-            }
-        )
+        retention_seconds = max(600.0, AROUSAL_CURRENT_SECONDS + AROUSAL_REFERENCE_SECONDS + 30.0)
+        while self.heart_rate_values and timestamp - self.heart_rate_values[0][0] > retention_seconds:
+            self.heart_rate_values.popleft()
+        while self.rr_intervals_values and timestamp - self.rr_intervals_values[0][0] > retention_seconds:
+            self.rr_intervals_values.popleft()
+        self.raw_hr_data = [
+            sample for sample in self.raw_hr_data
+            if timestamp - float(sample.get("timestamp", 0)) <= retention_seconds
+        ]
 
         self.write_live_heart_rate(heart_rate, timestamp)
 
@@ -411,52 +448,6 @@ class HRVProcessor:
             self.process_window(self.current_window_start, timestamp)
             self.current_window_start = timestamp
 
-    def decode_heart_rate(self, hex_string):
-        """
-        Decodes the Heart Rate Measurement characteristic (UUID 0x2A37) from a BLE device.
-
-        Args:
-            hex_string: Raw heart rate measurement data in hexadecimal format.
-
-        Returns:
-            dict: Decoded values (Heart Rate, Sensor Contact, Energy Expended, RR Intervals).
-        """
-        data = bytes.fromhex(hex_string)
-        if len(data) < 2:
-            return {"error": "Invalid data length"}
-
-        flags = data[0]
-        # Bit 0: 0 => UINT8, 1 => UINT16 for heart rate value
-        hr_format_uint16 = flags & 0x01
-        # Bits 1-2: Sensor contact status
-        sensor_contact = (flags >> 1) & 0x03
-        # # Bit 3: Energy Expended field present
-        # energy_expended_present = (flags >> 3) & 0x01
-        # Bit 4: RR-Interval field present
-        rr_intervals_present = (flags >> 4) & 0x01
-
-        index = 1
-        if hr_format_uint16:
-            heart_rate = int.from_bytes(data[index : index + 2], byteorder="little")
-            index += 2
-        else:
-            heart_rate = data[index]
-            index += 1
-
-        # energy_expended = None
-        # if energy_expended_present and len(data) >= index + 2:
-        #     energy_expended = int.from_bytes(data[index:index+2], byteorder='little')
-        #     index += 2
-
-        rr_intervals = []
-        while rr_intervals_present and index + 1 < len(data):
-            rr_intervals.append(
-                int.from_bytes(data[index : index + 2], byteorder="little")
-            )
-            index += 2
-
-        return {"Heart Rate (BPM)": heart_rate, "RR Intervals (ms)": rr_intervals}
-
     def calculate_mean_hr(self, window):
         now = time.time()
         vals = [hr for t, hr in self.heart_rate_values if now - t <= window]
@@ -493,21 +484,24 @@ class HRVProcessor:
         if calibrating and self.baseline_start_time:
             # Reserve 100% for a baseline that passed the minimum-data checks.
             progress = min(99, int((timestamp - self.baseline_start_time) / BASELINE_DURATION * 100))
+        arousal = self.current_arousal_assessment(timestamp, calibrating=calibrating)
         self.save_to_json({
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "watch_data": {
                 "is_baseline": False,
                 "current_metrics": {
                     "hr": heart_rate,
-                    "sdnn": self.baseline_metrics.get("sdnn", 0) if self.baseline_metrics else 0,
-                    "rmssd": self.baseline_metrics.get("rmssd", 0) if self.baseline_metrics else 0,
-                    "pnn50": self.baseline_metrics.get("pnn50", 0) if self.baseline_metrics else 0,
+                    "sdnn": self.compute_sdnn_window(WINDOW_DURATION),
+                    "rmssd": self.compute_rmssd_window(WINDOW_DURATION),
+                    "pnn50": self.compute_pnn_window(WINDOW_DURATION, 50),
                 },
-                "stress_score": 0,
-                "stress_level": "Calibrating" if calibrating else "Not Stressed",
+                "stress_score": arousal["score"],
+                "stress_level": arousal["label"],
                 "distraction_detected": False,
-                "interpretation": "Watch live — calibrating baseline." if calibrating else "Heart rate sample received from the band.",
-                "feedback": "Keep the band on." if calibrating else "HRV monitoring is running.",
+                "arousal": arousal,
+                "quality": arousal["quality"],
+                "interpretation": "Watch live — calibrating baseline." if calibrating else f"{arousal['label']}. This is an arousal cue, not a stress diagnosis.",
+                "feedback": "Keep the band on." if calibrating else "Use participant behavior and researcher judgment before intervening.",
                 "calibration": {
                     "active": calibrating,
                     "progress": progress,
@@ -521,6 +515,37 @@ class HRVProcessor:
                 },
             },
         })
+
+    def current_arousal_assessment(self, timestamp, calibrating=False):
+        if calibrating:
+            return {
+                "status": "calibrating",
+                "label": "Calibrating",
+                "possible": False,
+                "score": 0.0,
+                "heart_rate_delta_bpm": None,
+                "current_median_bpm": None,
+                "reference_median_bpm": None,
+                "reference_source": None,
+                "threshold_bpm": AROUSAL_HR_RISE_BPM,
+                "current_window_seconds": AROUSAL_CURRENT_SECONDS,
+                "reference_window_seconds": AROUSAL_REFERENCE_SECONDS,
+                "quality": {
+                    "heart_rate_reliable": False,
+                    "hrv_reliable": False,
+                    "current_packet_count": 0,
+                    "current_heart_rate_samples": 0,
+                    "valid_rr_count": 0,
+                },
+            }
+        return live_arousal_assessment(
+            self.raw_hr_data,
+            now=timestamp,
+            baseline_heart_rate=self.baseline_metrics.get("hr"),
+            current_seconds=AROUSAL_CURRENT_SECONDS,
+            reference_seconds=AROUSAL_REFERENCE_SECONDS,
+            threshold_bpm=AROUSAL_HR_RISE_BPM,
+        )
 
     def compute_baseline_metrics(self):
         """Compute and LSL-stream the baseline HRV metrics."""
@@ -605,8 +630,8 @@ class HRVProcessor:
             "watch_data": {
                 "is_baseline": True,
                 "baseline_metrics": self.baseline_metrics,
-                "interpretation": "Baseline measurements established as reference point for stress detection",
-                "feedback": "Baseline calibration complete. Reference HRV metrics set.",
+                "interpretation": "Baseline measurements established as an arousal reference; they do not diagnose stress.",
+                "feedback": "Baseline calibration complete. Continue using researcher judgment.",
                 "calibration": {
                     "request_id": self.active_calibration_request_id,
                     "started_at": datetime.fromtimestamp(self.baseline_start_time).isoformat() if self.baseline_start_time else None,
@@ -624,53 +649,12 @@ class HRVProcessor:
 
         self.monitoring_mode = True
         self.monitoring_start_time = time.time()
-        self.data_points_collected = 0
         self.current_window_start = time.time()
         logger.info("Started monitoring phase - collecting data continuously")
         return True
 
-    def calculate_stress_score(self, changes):
-        """
-        Calculate a weighted stress score based on multiple HRV metrics.
-        Returns a score between 0.0 (no stress) and 1.0 (maximum stress).
-        """
-        # Apply weights to each normalized metric
-        # Current weights: HR (30%), SDNN (25%), RMSSD (25%), pNN50 (20%)
-        score = (
-            min(1.0, max(0, changes["hr"] / 15)) * 0.3
-            + min(1.0, max(0, -changes["sdnn"] / 20)) * 0.25
-            + min(1.0, max(0, -changes["rmssd"] / 20)) * 0.25
-            + min(1.0, max(0, -changes["pnn50"] / 25)) * 0.2
-        )
-        return score
-
-    def evaluate_distraction(self, stress_level, changes):
-        """
-        More sophisticated distraction detection with weighted stress accumulation
-        and gradual recovery. Takes into account stress severity.
-        """
-        # Increase counter based on stress level
-        if stress_level == "high":
-            self.stress_count += 1.5
-        elif stress_level == "mild":
-            self.stress_count += 0.7
-        else:
-            # Gradual recovery from stress when not stressed
-            self.stress_count = max(0, self.stress_count - 0.5)
-
-        # Default threshold for distraction
-        threshold = 4.0
-
-        # Consider additional factors (optional)
-        hr_volatility = abs(changes["hr"])
-        if hr_volatility > 20:
-            threshold -= 1.0  # Lower threshold if HR is very volatile
-
-        # Return whether distraction threshold is met
-        return self.stress_count >= threshold
-
     def process_window(self, start_time, end_time):
-        """Compute windowed HRV, detect stress/distraction, stream & save."""
+        """Compute windowed metrics and emit an advisory arousal flag."""
         window_duration = end_time - start_time
 
         # Current metrics
@@ -685,19 +669,14 @@ class HRVProcessor:
             base = self.baseline_metrics.get(k, 1)
             changes[k] = 100 * (cur - base) / base if base else 0
 
-        # Calculate stress score and determine level
-        stress_score = self.calculate_stress_score(changes)
-        level = (
-            "High" if stress_score > 0.7 else ("Mild" if stress_score > 0.4 else "Not Stressed")
-        )
-
-        # Evaluate distraction using the new method
-        distraction = self.evaluate_distraction(level, changes)
+        arousal = self.current_arousal_assessment(end_time)
+        stress_score = arousal["score"]
+        level = arousal["label"]
+        distraction = False
 
         logger.info(
-            f"Window @{end_time-self.session_start_time:.1f}s -> stress={level} "
-            f"(score={stress_score:.2f}, streak={self.stress_count:.1f})"
-            + ("!!! DISTRACTION !!!" if distraction else "")
+            f"Window @{end_time-self.session_start_time:.1f}s -> arousal={level} "
+            f"(HR delta={arousal.get('heart_rate_delta_bpm')})"
         )
 
         # Stream current HRV
@@ -723,9 +702,7 @@ class HRVProcessor:
             },
             "changes": changes,
             "stress_score": stress_score,
-            "stress": level,
-            "streak": self.stress_count,
-            "distraction": distraction,
+            "arousal": arousal,
         }
         fn = os.path.join(METRICS_DIR, f"metrics_{datetime.now():%Y%m%d_%H%M%S}.json")
         with open(fn, "w") as f:
@@ -747,40 +724,39 @@ class HRVProcessor:
                 "stress_score": stress_score,
                 "stress_level": level,
                 "distraction_detected": distraction,
-                "interpretation": self.get_stress_interpretation(level, stress_score, distraction),
-                "feedback": self.get_user_feedback(level, stress_score, distraction)
+                "arousal": arousal,
+                "quality": arousal["quality"],
+                "interpretation": f"{level}. This is an arousal cue, not a stress diagnosis.",
+                "feedback": "Review the participant and context before deciding whether to intervene."
             }
         }
         self.save_to_json(watch_data_entry)
-
-    def get_stress_interpretation(self, level, score, distraction):
-        """Generate an interpretation based on stress level and distraction status"""
-        if level == "High":
-            if distraction:
-                return "High stress detected with potential distraction. HRV metrics show significant deviation from baseline."
-            else:
-                return "High stress detected. HRV metrics show significant deviation from baseline."
-        elif level == "Mild":
-            return "Mild stress detected. HRV metrics show moderate deviation from baseline."
-        else:
-            return "Normal stress levels. HRV metrics are close to baseline."
-
-    def get_user_feedback(self, level, score, distraction):
-        """Generate user feedback based on stress level and distraction status"""
-        if distraction:
-            return "Consider taking a short break to refocus attention. Distraction detected."
-        elif level == "High":
-            return "Consider stress reduction techniques like deep breathing."
-        elif level == "Mild":
-            return "Be mindful of increasing stress levels."
-        else:
-            return "Current stress levels are within normal range."
 
     async def start(self):
         return await self.initialize_device()
 
     async def stop(self):
         logger.info("Stopping...")
+        if self.pending_raw_readings:
+            last = self.raw_hr_data[-1] if self.raw_hr_data else {}
+            timestamp = float(last.get("timestamp", time.time()))
+            arousal = self.current_arousal_assessment(
+                timestamp, calibrating=not self.baseline_complete
+            )
+            self.save_to_json({
+                "timestamp": datetime.fromtimestamp(timestamp).strftime("%Y-%m-%d %H:%M:%S"),
+                "watch_data": {
+                    "is_baseline": False,
+                    "current_metrics": {"hr": last.get("heart_rate_bpm")},
+                    "stress_score": arousal["score"],
+                    "stress_level": arousal["label"],
+                    "distraction_detected": False,
+                    "arousal": arousal,
+                    "quality": arousal["quality"],
+                    "interpretation": "Final buffered watch samples saved before disconnect.",
+                    "feedback": "Use researcher judgment before intervening.",
+                },
+            })
         client = self.ble_client
         self.ble_client = None
         if client and client.is_connected:

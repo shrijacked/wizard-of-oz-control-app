@@ -7,8 +7,9 @@
     "launch:study": "node src/study-launcher.js",
     "start": "node src/server.js",
     "study:reset": "node scripts/study-reset.js",
+    "watch:setup": ".venv/bin/python integrations/watch/watch_setup.py",
     "test": "node --test",
-    "test:python": "python3 -X pycache_prefix=/tmp/hti-pycache -m py_compile integrations/watch/watch.py",
+    "test:python": ".venv/bin/python -X pycache_prefix=/tmp/hti-pycache -m py_compile integrations/watch/watch.py integrations/watch/watch_core.py integrations/watch/watch_setup.py && .venv/bin/python -X pycache_prefix=/tmp/hti-pycache integrations/watch/test_watch_core.py",
     "verify": "npm test && npm run test:python"
   }
 }

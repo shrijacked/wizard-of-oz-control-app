@@ -112,3 +112,32 @@ test('audio cue controller accepts a distinct per-cue finish sound', async () =>
   assert.equal(start.waveform, 'triangle');
   assert.equal(stop.time, 4.36);
 });
+
+test('audio cue controller plays a backend recording after the screen is armed', async () => {
+  const { createAudioCueController } = await loadAudioCueModule();
+  const fake = createFakeAudioContext();
+  const events = [];
+  const controller = createAudioCueController({
+    createContext: () => fake.context,
+    createAudio(url) {
+      const listeners = new Map();
+      return {
+        currentTime: null,
+        preload: '',
+        volume: 0,
+        addEventListener(name, listener) { listeners.set(name, listener); },
+        removeEventListener(name) { listeners.delete(name); },
+        pause() { events.push({ type: 'pause', url }); },
+        async play() {
+          events.push({ type: 'play', url, volume: this.volume });
+          listeners.get('ended')?.();
+        },
+      };
+    },
+  });
+
+  assert.equal(await controller.playRecording('/sound.wav'), false);
+  await controller.arm();
+  assert.equal(await controller.playRecording('/sound.wav', { volume: 0.9, waitForEnd: true }), true);
+  assert.deepEqual(events, [{ type: 'play', url: '/sound.wav', volume: 0.9 }]);
+});

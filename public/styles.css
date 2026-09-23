@@ -1100,6 +1100,39 @@ body[data-session-phase="setup"] .queue-item {
   font-size: clamp(1.5rem, 3vw, 2.6rem);
 }
 
+.subject-hint-history-block {
+  display: grid;
+  gap: 8px;
+  min-height: 0;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+
+.subject-hint-history {
+  display: grid;
+  gap: 9px;
+  margin: 0;
+  padding: 0 0 0 22px;
+}
+
+.subject-hint-history li {
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: rgba(22, 51, 74, 0.06);
+  font-size: clamp(1rem, 1.7vw, 1.25rem);
+  line-height: 1.3;
+}
+
+.subject-hint-history li span,
+.subject-hint-history li small {
+  display: block;
+}
+
+.subject-hint-history li small {
+  margin-top: 4px;
+  font-size: 0.78rem;
+}
+
 body[data-subject-phase="round"] {
   align-items: start;
   padding: 12px;
@@ -1123,6 +1156,12 @@ body[data-subject-phase="round"] .subject-hint-card {
   min-height: 0;
   gap: 8px;
   padding: 16px 20px 20px;
+}
+
+body[data-subject-phase="round"] .subject-hint-panel {
+  max-height: 48vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 body[data-subject-phase="round"] .participant-round-head h1 {
@@ -1382,7 +1421,8 @@ body[data-session-phase="running"] .run-deck {
   align-items: stretch;
   gap: 8px;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
-  grid-template-rows: auto minmax(0, 2.4fr) auto;
+  /* Keep the camera row stable when telemetry labels or alerts change. */
+  grid-template-rows: auto minmax(0, 1fr) 220px;
   grid-template-areas:
     "ops ops ops"
     "cam cam sol"
@@ -1569,6 +1609,15 @@ body[data-session-phase="running"] #hint-text {
   min-height: 52px;
 }
 
+body[data-session-phase="running"] #hint-preset-summary {
+  margin: 0;
+  overflow: hidden;
+  font-size: 0.72rem;
+  line-height: 1.1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 body[data-session-phase="running"] .preset-row {
   max-height: 72px;
   overflow: auto;
@@ -1576,6 +1625,38 @@ body[data-session-phase="running"] .preset-row {
 
 body[data-session-phase="running"] .run-panel-hrv .compact-metrics {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+body[data-session-phase="running"] .run-panel-hrv .metric-card {
+  min-width: 0;
+  min-height: 58px;
+  max-height: 58px;
+  overflow: hidden;
+}
+
+body[data-session-phase="running"] #hrv-stress-level {
+  min-width: 0;
+  font-size: clamp(0.64rem, 0.78vw, 0.82rem);
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+body[data-session-phase="running"] #hrv-spike-alert strong {
+  font-size: 0.82rem;
+  line-height: 1.1;
+}
+
+body[data-session-phase="running"] #hrv-spike-detail {
+  font-size: 0.72rem;
+  line-height: 1.15;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
 body[data-session-phase="running"] .metric-card {

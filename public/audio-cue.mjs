@@ -10,6 +10,8 @@ function getDefaultContextFactory() {
 
 export function createAudioCueController(options = {}) {
   const createContext = options.createContext || getDefaultContextFactory();
+  const createAudio = options.createAudio
+    || (typeof globalThis.Audio === 'function' ? (url) => new globalThis.Audio(url) : null);
   const frequency = Number.isFinite(options.frequency) ? options.frequency : DEFAULT_FREQUENCY;
   const durationMs = Number.isFinite(options.durationMs) ? options.durationMs : DEFAULT_DURATION_MS;
   const gainValue = Number.isFinite(options.gainValue) ? options.gainValue : DEFAULT_GAIN;
@@ -17,6 +19,7 @@ export function createAudioCueController(options = {}) {
 
   let context = null;
   let armed = false;
+  let activeRecording = null;
 
   async function ensureContext() {
     if (!createContext) {
@@ -91,6 +94,43 @@ export function createAudioCueController(options = {}) {
         }
       }
       return true;
+    },
+
+    async playRecording(url, recordingOptions = {}) {
+      if (!armed || !createAudio || !url) {
+        return false;
+      }
+
+      try {
+        if (activeRecording?.pause) {
+          activeRecording.pause();
+        }
+        const audio = createAudio(url);
+        activeRecording = audio;
+        audio.preload = 'auto';
+        audio.volume = Math.max(0, Math.min(1, Number(recordingOptions.volume ?? 1)));
+        audio.currentTime = 0;
+
+        let completion = null;
+        if (recordingOptions.waitForEnd && typeof audio.addEventListener === 'function') {
+          completion = new Promise((resolve) => {
+            const finish = (played) => {
+              audio.removeEventListener?.('ended', onEnded);
+              audio.removeEventListener?.('error', onError);
+              resolve(played);
+            };
+            const onEnded = () => finish(true);
+            const onError = () => finish(false);
+            audio.addEventListener('ended', onEnded, { once: true });
+            audio.addEventListener('error', onError, { once: true });
+          });
+        }
+
+        await audio.play();
+        return completion ? completion : true;
+      } catch {
+        return false;
+      }
     },
   };
 }

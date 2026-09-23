@@ -92,3 +92,30 @@ test('camera recorder uploads chunks then finalizes the take', async () => {
   assert.equal(recorder.getActive().active, false);
   assert.match(statuses.at(-1), /saved/i);
 });
+
+test('a failed chunk upload finalizes a partial take without deadlocking stop', async () => {
+  const { createCameraRecorder } = await loadRecorderModule();
+  const finalized = [];
+  const FakeMediaRecorder = createFakeMediaRecorder();
+  const recorder = createCameraRecorder({
+    MediaRecorder: FakeMediaRecorder,
+    async createRecording() {
+      return { recordingId: 'rec-failed', filename: 'partial.webm', finalizeToken: 'tok-failed' };
+    },
+    async uploadChunk() {
+      throw new Error('Network upload failed.');
+    },
+    async finalizeRecording(recordingId, options) {
+      finalized.push({ recordingId, ...options });
+    },
+  });
+
+  await recorder.start({ id: 'stream' });
+  recorder.flush();
+  await new Promise((resolve) => setTimeout(resolve, 30));
+
+  assert.equal(recorder.getActive().active, false);
+  assert.equal(finalized.length, 1);
+  assert.equal(finalized[0].recordingId, 'rec-failed');
+  assert.equal(finalized[0].partial, true);
+});

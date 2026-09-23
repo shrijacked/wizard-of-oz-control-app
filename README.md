@@ -12,7 +12,7 @@ The host machine serves all three screens over the local network and keeps them 
 
 ## What the app does
 
-- shows a live Logitech C270 preview on the operator dashboard, with a camera picker
+- shows a live Logitech C270 preview on the operator dashboard, with a camera picker; recording is manual and off by default
 - seeds puzzle pairs from `tangram puzzles/` (`1.pdf`+`1s.pdf` through `9.pdf`+`9s.pdf`)
 - reserves the next participant ID (`P01`, `P02`, …) without reusing saved IDs
 - cycles participants through all six possible condition orders, with a manual-order override during setup
@@ -22,14 +22,15 @@ The host machine serves all three screens over the local network and keeps them 
 - sends text hints from the dashboard to the subject screen
 - sends each robot cue with one click using the shape's fixed robot program
 - plays a short alert beep on the subject screen when a new hint arrives
-- plays a short alert beep on the robot screen when a new robot cue arrives
+- plays backend-served robot-movement and definitive puzzle-finished sounds, with Admin-uploadable replacements
 - keeps consent/profile and puzzle scheduling as hard requirements while showing camera, watch, and display issues as non-blocking warnings
 - tracks study, sitting, and round lifecycle with start, pause, resume, skip, early end, breaks, and timers on both participant and admin screens
-- provides configurable constant-condition reminders and highlights detected HRV stress spikes in adaptive rounds
+- records each attempted puzzle as solved or not solved from explicit Admin finish buttons
+- provides configurable constant-condition reminders and highlights possible arousal for researcher review in adaptive rounds
 - allows watch recalibration between rounds and sittings without restarting the app
-- shows live HRV metrics and stress-spike guidance on the operator dashboard
-- accepts an optional replacement `.txt` script and an MP3/M4A/WAV/OGG recording for participant playback
-- continuously writes a full session JSON, a separate form-responses JSON, and a raw event CSV for every session
+- shows live watch metrics, rolling heart-rate change, and separate signal-quality guidance on the operator dashboard
+- accepts an optional replacement `.txt` script and an MP3/M4A/WAV/OGG recording that the researcher starts from Admin
+- continuously writes a full session JSON, a separate form-responses JSON, a raw event CSV, and raw watch JSONL for every session
 
 ## Puzzle file pairing
 
@@ -43,7 +44,7 @@ Manual upload remains a fallback for a missing or replaced file. Only complete p
 
 ## Robot cues
 
-Edit [`config/study.json`](config/study.json) to change piece names, fixed program numbers, planned rounds, and hint presets. No code change is required.
+Edit [`config/study.json`](config/study.json) to change piece names, fixed program numbers, planned rounds, shared hint presets, and the `hintPresetsByPuzzle` lists shown for each active puzzle. No code change is required.
 
 The dashboard has one button per shape. The configured robot programs are:
 
@@ -66,6 +67,7 @@ The robot screen shows a sentence such as `Run program 1 — ORANGE TRIANGLE`.
 - `GET /api/export/current.json`: concise primary session export
 - `GET /api/export/current.forms.json`: profiles and questionnaire responses only
 - `GET /api/export/current.csv`: raw timeline CSV
+- `GET /api/export/current.watch.jsonl`: decoded watch notifications, original packet hex, and app session/round context
 
 ## Quick start
 
@@ -96,10 +98,10 @@ That archives `data/state.json`, the event log, exports, and uploaded puzzles in
 2. Open `/admin` on the host machine. Choose the C270 in the camera list and click **Start camera**.
 3. Open `/subject` and `/robot` on the other two devices. Tap once on each so the alert sound is armed.
 4. Use the auto-assigned participant ID. Enter the researcher’s demographic/consent cross-check, timer length, constant reminder interval, and either the automatic or manual condition order, then save. The nine-round condition and puzzle schedule is generated once and shown in the dashboard.
-5. Read the on-screen participant script. You may upload replacement `.txt` copy and a prerecorded audio version during setup. On `/subject`, have the participant enter their own age/gender copy, baseline expected-efficacy rating, instruction acknowledgement, and consent.
+5. Read the on-screen participant script. You may upload replacement `.txt` copy and a prerecorded audio version during setup, then start the recording with **Play recording on Subject**. Use **Robot and puzzle-finished sounds** to preview or replace either cue; replacements persist in `data/study-sounds/`, and **Restore built-in sounds** returns to the defaults. On `/subject`, have the participant enter their own age/gender copy, baseline expected-efficacy rating, instruction acknowledgement, and consent.
 6. Click **Begin study** after the profile copies match and the nine-puzzle schedule is ready. Camera, watch, or display warnings remain visible but do not prevent starting, and accepting them is recorded in the session log.
-7. Click **Start round** when the participant begins. Use **Pause timer** and **Resume timer** when needed. The participant sees the countdown and hears start, midpoint, and end cues.
-8. Control rounds disable hints and robot movements. In constant rounds, use the configured researcher reminder. In adaptive rounds, use the HRV spike highlight as decision support rather than an automatic intervention.
+7. Click **Start round** when the participant begins. Use **Pause timer** and **Resume timer** when needed. The participant hears one start beep, two halfway beeps, and the distinct end sound when study sounds are enabled. Finish with either **Finish — solved** or **Finish — not solved** so the outcome is saved.
+8. Control rounds disable hints and robot movements. In constant rounds, use the configured researcher reminder. In adaptive rounds, use the possible-arousal highlight as decision support rather than an automatic intervention.
 9. Click **Complete round**. The next round remains locked until the participant submits the in-app questionnaire. A researcher can skip a waiting round or questionnaire only by recording a reason.
 10. After rounds 3 and 6, take a break. Recalibrate the watch if needed, click **Begin next sitting**, and continue the same participant record.
 11. After round 9, wait for the participant’s end-of-study questionnaire, click **End study**, and download the exports. **End early + save** closes a partial study safely when required.

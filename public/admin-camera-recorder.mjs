@@ -17,6 +17,7 @@ export function createCameraRecorder({
   let chunkQueue = Promise.resolve();
   let nextIndex = 0;
   let active = false;
+  let failureStopScheduled = false;
 
   function setStatus(message) {
     onStatus?.(message);
@@ -40,9 +41,18 @@ export function createCameraRecorder({
         }
       }
       throw lastError;
-    }).catch(async (error) => {
+    }).catch((error) => {
       setStatus(error?.message || 'Recording upload failed.');
-      await stop({ partial: true, silent: true });
+      // Do not await stop() from inside chunkQueue: stop() itself waits for
+      // chunkQueue, which would deadlock the finish-study controls.
+      if (!failureStopScheduled) {
+        failureStopScheduled = true;
+        globalThis.setTimeout(() => {
+          stop({ partial: true, silent: true })
+            .catch((stopError) => setStatus(stopError?.message || 'Unable to finalize the partial recording.'))
+            .finally(() => { failureStopScheduled = false; });
+        }, 0);
+      }
     });
   }
 
@@ -64,6 +74,7 @@ export function createCameraRecorder({
     startedAt = Date.now();
     nextIndex = 0;
     active = true;
+    failureStopScheduled = false;
     recorder = new MediaRecorderCtor(stream, {
       mimeType: 'video/webm',
       videoBitsPerSecond: 2_500_000,

@@ -94,10 +94,11 @@ test('finished sittings download every saved or partial take, not the in-progres
   );
 });
 
-test('a live camera should start recording when the sitting begins if no take is already running', async () => {
+test('camera recording stays manual by default and can be explicitly enabled', async () => {
   const { shouldAutoStartSittingRecording } = await loadAdminControlsModule();
 
-  assert.equal(shouldAutoStartSittingRecording({ cameraLive: true, recorderActive: false }), true);
+  assert.equal(shouldAutoStartSittingRecording({ cameraLive: true, recorderActive: false }), false);
+  assert.equal(shouldAutoStartSittingRecording({ cameraLive: true, recorderActive: false, autoRecordEnabled: true }), true);
   assert.equal(shouldAutoStartSittingRecording({ cameraLive: true, recorderActive: true }), false);
   assert.equal(shouldAutoStartSittingRecording({ cameraLive: false, recorderActive: false }), false);
 });

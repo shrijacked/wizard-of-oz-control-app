@@ -20,7 +20,27 @@ const DEFAULT_STUDY_CONFIG = Object.freeze({
     { id: 'purple-triangle', label: 'Purple Triangle', color: '#7a4fa0', programNumber: 7 },
   ],
   hintPresets: [],
+  hintPresetsByPuzzle: {},
 });
+
+function normalizeHintPresetList(value) {
+  return Array.isArray(value)
+    ? value.map((entry) => String(entry || '').trim()).filter(Boolean).slice(0, 24)
+    : [];
+}
+
+function normalizeHintPresetsByPuzzle(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    return {};
+  }
+
+  return Object.fromEntries(
+    Object.entries(value)
+      .slice(0, 64)
+      .map(([setId, presets]) => [String(setId || '').trim(), normalizeHintPresetList(presets)])
+      .filter(([setId, presets]) => setId && presets.length),
+  );
+}
 
 function normalizePiece(piece, index) {
   const label = String(piece?.label || '').trim();
@@ -60,9 +80,8 @@ function normalizeStudyConfig(raw = {}) {
     ? raw.pieces.map((piece, index) => normalizePiece(piece, index)).filter(Boolean)
     : [];
 
-  const hintPresets = Array.isArray(raw.hintPresets)
-    ? raw.hintPresets.map((entry) => String(entry || '').trim()).filter(Boolean).slice(0, 24)
-    : [];
+  const hintPresets = normalizeHintPresetList(raw.hintPresets);
+  const hintPresetsByPuzzle = normalizeHintPresetsByPuzzle(raw.hintPresetsByPuzzle);
 
   const tangramPuzzlesDir = String(raw.tangramPuzzlesDir || '').trim()
     || DEFAULT_STUDY_CONFIG.tangramPuzzlesDir;
@@ -76,6 +95,7 @@ function normalizeStudyConfig(raw = {}) {
     tangramPuzzlesDir,
     pieces: pieces.length ? pieces : DEFAULT_STUDY_CONFIG.pieces.map((piece) => ({ ...piece })),
     hintPresets,
+    hintPresetsByPuzzle,
   };
 }
 
@@ -107,6 +127,7 @@ function saveStudyConfig(config, configPath = path.join(process.cwd(), 'config',
     tangramPuzzlesDir: normalized.tangramPuzzlesDir,
     pieces: normalized.pieces,
     hintPresets: normalized.hintPresets,
+    hintPresetsByPuzzle: normalized.hintPresetsByPuzzle,
   };
   fs.mkdirSync(path.dirname(configPath), { recursive: true });
   fs.writeFileSync(configPath, `${JSON.stringify(payload, null, 2)}\n`);

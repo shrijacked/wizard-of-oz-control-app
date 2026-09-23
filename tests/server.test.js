@@ -160,8 +160,11 @@ test('server serves the simplified three-screen routes and aliases /audit to /ro
     assert.match(adminHtml, /id="round-start"/);
     assert.match(subjectHtml, /Participant Display/i);
     assert.match(subjectHtml, /id="subject-puzzle"/);
+    assert.match(subjectHtml, /id="subject-hint-history"/);
+    assert.match(subjectHtml, /id="subject-hint-history-block"/);
     assert.match(subjectHtml, /Your puzzle/i);
     assert.match(adminHtml, /id="study-script-play"/);
+    assert.match(adminHtml, /id="study-sounds-form"/);
     assert.doesNotMatch(subjectHtml, /id="subject-script-audio"[^>]*autoplay/);
     assert.match(subjectHtml, /I have read and understood the study instructions/);
     assert.match(robotHtml, /Robot Operator Screen/i);
@@ -256,6 +259,7 @@ test('subject and robot sockets receive role-specific snapshots for live interve
     const robotState = robotMessages.at(-1).data;
 
     assert.equal(subjectState.hint.text, 'Try the blue piece next.');
+    assert.deepEqual(subjectState.hint.history.map((entry) => entry.text), ['Try the blue piece next.']);
     assert.equal('puzzleSet' in subjectState, false);
     assert.equal('robotAction' in subjectState, false);
     assert.equal(subjectState.session.activeRound.puzzle.setId, '1');
@@ -301,8 +305,9 @@ test('interventions require an active round and are blocked between rounds and a
     const actionResponse = await postJson(baseUrl, '/api/actions', { pieceId: 'orange-triangle' });
     assert.equal(actionResponse.status, 200);
 
-    const completeRound = await postJson(baseUrl, '/api/rounds/complete', { operator: 'Shrijacked' });
+    const completeRound = await postJson(baseUrl, '/api/rounds/complete', { operator: 'Shrijacked', solved: false });
     assert.equal(completeRound.status, 200);
+    assert.equal((await completeRound.json()).session.rounds[0].solved, false);
 
     // Round closed — interventions blocked again.
     const betweenRoundsHint = await postJson(baseUrl, '/api/hints', { text: 'Blocked between rounds.' });
@@ -401,6 +406,10 @@ test('the round export carries metadata, per-round filenames, and ordered interv
     const forms = await formsResponse.json();
     assert.equal(forms.participantId, 'P-001');
     assert.equal(forms.roundForms[0].formStatus, 'missing');
+    const rawWatchResponse = await fetch(`${baseUrl}/api/export/current.watch.jsonl`);
+    assert.equal(rawWatchResponse.status, 200);
+    assert.match(rawWatchResponse.headers.get('content-disposition') || '', /\.watch\.jsonl/);
+    assert.equal(await rawWatchResponse.text(), '');
     screens.subject.socket.close();
     screens.robot.socket.close();
   } finally {
@@ -693,11 +702,27 @@ test('hint presets can be updated and persist into the next admin state snapshot
     const body = await saved.json();
     assert.deepEqual(body.hintPresets, ['Try rotating that piece.', 'Look at the outline.']);
 
+    const puzzleSaved = await postJson(baseUrl, '/api/hint-presets', {
+      puzzleSetId: '2',
+      presets: ['The green square belongs at the far upper-left.'],
+    });
+    assert.equal(puzzleSaved.status, 200);
+    const puzzleBody = await puzzleSaved.json();
+    assert.deepEqual(puzzleBody.hintPresetsByPuzzle, {
+      2: ['The green square belongs at the far upper-left.'],
+    });
+
     const state = await fetch(`${baseUrl}/api/state`).then((response) => response.json());
     assert.deepEqual(state.system.study.hintPresets, ['Try rotating that piece.', 'Look at the outline.']);
+    assert.deepEqual(state.system.study.hintPresetsByPuzzle, {
+      2: ['The green square belongs at the far upper-left.'],
+    });
 
     const disk = JSON.parse(await fs.readFile(configPath, 'utf8'));
     assert.deepEqual(disk.hintPresets, ['Try rotating that piece.', 'Look at the outline.']);
+    assert.deepEqual(disk.hintPresetsByPuzzle, {
+      2: ['The green square belongs at the far upper-left.'],
+    });
   } finally {
     await app.close();
     await fs.unlink(configPath).catch(() => {});
@@ -768,6 +793,61 @@ test('admin can explicitly start the instruction recording on the Subject screen
     assert.match(command.data.audioUrl, /\/media\/study-script\/script-audio\.mp3\?v=\d+$/);
   } finally {
     subject.socket.close();
+    await app.close();
+  }
+});
+
+test('backend serves default study sounds and persists uploaded replacements', async () => {
+  const { app, baseUrl, dataDir } = await startApp();
+  try {
+    const initialSubject = await fetch(`${baseUrl}/api/state?role=subject`).then((response) => response.json());
+    const initialRobot = await fetch(`${baseUrl}/api/state?role=robot`).then((response) => response.json());
+    assert.equal(initialSubject.study.sounds.robotCue.custom, false);
+    assert.equal(initialSubject.study.sounds.puzzleFinish.custom, false);
+    assert.equal(initialRobot.study.sounds.robotCue.audioUrl, initialSubject.study.sounds.robotCue.audioUrl);
+
+    const defaultFinish = await fetch(`${baseUrl}${initialSubject.study.sounds.puzzleFinish.audioUrl}`);
+    assert.equal(defaultFinish.status, 200);
+    const defaultBytes = Buffer.from(await defaultFinish.arrayBuffer());
+    assert.equal(defaultBytes.subarray(0, 4).toString(), 'RIFF');
+    assert.equal(defaultBytes.subarray(8, 12).toString(), 'WAVE');
+
+    const robotBytes = Buffer.from('custom-robot-audio');
+    const finishBytes = Buffer.from('custom-finish-audio');
+    const uploaded = await postJson(baseUrl, '/api/study-sounds', {
+      robotAudioFile: {
+        name: 'robot.mp3',
+        mimeType: 'audio/mpeg',
+        contentBase64: robotBytes.toString('base64'),
+      },
+      puzzleFinishAudioFile: {
+        name: 'finished.wav',
+        mimeType: 'audio/wav',
+        contentBase64: finishBytes.toString('base64'),
+      },
+      actor: 'Researcher',
+    });
+    assert.equal(uploaded.status, 200);
+    const sounds = await uploaded.json();
+    assert.equal(sounds.robotCue.custom, true);
+    assert.equal(sounds.puzzleFinish.custom, true);
+    assert.match(sounds.robotCue.audioUrl, /robot-cue\.mp3\?v=\d+$/);
+    assert.match(sounds.puzzleFinish.audioUrl, /puzzle-finished\.wav\?v=\d+$/);
+    assert.deepEqual(
+      Buffer.from(await fetch(`${baseUrl}${sounds.robotCue.audioUrl}`).then((response) => response.arrayBuffer())),
+      robotBytes,
+    );
+
+    const manifest = JSON.parse(await fs.readFile(path.join(dataDir, 'study-sounds', 'manifest.json'), 'utf8'));
+    assert.equal(manifest.robotCue.originalName, 'robot.mp3');
+    assert.equal(manifest.puzzleFinish.originalName, 'finished.wav');
+
+    const reset = await postJson(baseUrl, '/api/study-sounds/reset', { actor: 'Researcher' });
+    assert.equal(reset.status, 200);
+    const defaults = await reset.json();
+    assert.equal(defaults.robotCue.custom, false);
+    assert.equal(defaults.puzzleFinish.custom, false);
+  } finally {
     await app.close();
   }
 });

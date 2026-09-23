@@ -102,7 +102,7 @@ function buildReason({ compositeScore, hrvScore, distractionDetected, hrvFreshne
   const reasons = [];
 
   if (hrvFreshness > 0 && hrvScore >= 0.45) {
-    reasons.push('HRV stress indicators are elevated');
+    reasons.push('the watch indicates possible arousal');
   }
 
   if (distractionDetected) {
@@ -195,12 +195,22 @@ class AdaptiveEngine {
 
     const hrvFreshness = freshnessWeight(hrv.updatedAt, now, configuration.freshness);
 
-    const hrvStressScore = clamp(
-      Number.isFinite(hrv.stressScore) ? hrv.stressScore : normalizeStressLevel(hrv.stressLevel),
-    );
-    const distractionDetected = Boolean(hrv.distractionDetected);
+    const arousal = hrv.arousal || {};
+    const quality = hrv.quality || arousal.quality || {};
+    const heartRateReliable = quality.heartRateReliable ?? quality.heart_rate_reliable;
+    const hrvStressScore = heartRateReliable === false
+      ? 0
+      : clamp(Number.isFinite(arousal.score)
+        ? arousal.score
+        : (Number.isFinite(hrv.stressScore) ? hrv.stressScore : normalizeStressLevel(hrv.stressLevel)));
+    // The live collector emits an advisory only. It cannot promote the app to
+    // an automatic intervention recommendation.
+    const advisoryScore = arousal.status
+      ? Math.min(hrvStressScore, configuration.thresholds.intervene - 0.01)
+      : hrvStressScore;
+    const distractionDetected = arousal.status ? false : Boolean(hrv.distractionDetected);
 
-    const weightedHrvScore = clamp(hrvStressScore + (distractionDetected ? configuration.distractionBoost : 0)) * hrvFreshness;
+    const weightedHrvScore = clamp(advisoryScore + (distractionDetected ? configuration.distractionBoost : 0)) * hrvFreshness;
     const compositeScore = clamp(weightedHrvScore);
 
     let status = 'normal';

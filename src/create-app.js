@@ -17,6 +17,7 @@ const { summarizePreflight } = require('./preflight');
 const { assertPolicy, buildPolicy } = require('./session-policy');
 const { loadStudyConfig, normalizeStudyConfig, saveStudyConfig } = require('./study-config');
 const { CONSENT_STATEMENT, SUBJECT_INSTRUCTIONS } = require('./surveys');
+const { DEFAULT_STUDY_SOUNDS } = require('./default-sounds');
 
 // Requests carry base64-encoded puzzle uploads (up to ~8 MB raw), so the JSON
 // body cap sits above that with headroom but still bounds memory per request.
@@ -50,6 +51,7 @@ const SCRIPT_AUDIO_TYPES = Object.freeze({
 });
 const MAX_SCRIPT_TEXT_BYTES = 256 * 1024;
 const MAX_SCRIPT_AUDIO_BYTES = 10 * 1024 * 1024;
+const MAX_CUE_AUDIO_BYTES = 2 * 1024 * 1024;
 
 function scriptInstructions(textValue) {
   return String(textValue || '')
@@ -205,6 +207,7 @@ function roleState(store, role, systemStatus, studyDefinition = {}) {
         instructions: studyDefinition.instructions || SUBJECT_INSTRUCTIONS,
         scriptAudioUrl: studyDefinition.scriptAudioUrl || null,
         scriptAudioName: studyDefinition.scriptAudioName || null,
+        sounds: studyDefinition.sounds || {},
       },
     };
   }
@@ -218,6 +221,9 @@ function roleState(store, role, systemStatus, studyDefinition = {}) {
           : null,
       },
       robotAction: state.robotAction,
+      study: {
+        sounds: studyDefinition.sounds || {},
+      },
     };
   }
 
@@ -309,7 +315,10 @@ async function createApp(options = {}) {
   await store.initialize();
   const scriptDir = path.join(store.dataDir, 'study-script');
   const scriptManifestPath = path.join(scriptDir, 'manifest.json');
+  const soundDir = path.join(store.dataDir, 'study-sounds');
+  const soundManifestPath = path.join(soundDir, 'manifest.json');
   await fs.mkdir(scriptDir, { recursive: true });
+  await fs.mkdir(soundDir, { recursive: true });
   let studyScript = {
     text: SUBJECT_INSTRUCTIONS.join('\n'),
     customTextName: null,
@@ -319,15 +328,57 @@ async function createApp(options = {}) {
   };
   try {
     const persisted = JSON.parse(await fs.readFile(scriptManifestPath, 'utf8'));
-    if (typeof persisted.text === 'string' && persisted.text.trim()) {
-      studyScript = { ...studyScript, ...persisted };
-    }
+    const hasCustomText = Boolean(persisted.customTextName)
+      && typeof persisted.text === 'string'
+      && Boolean(persisted.text.trim());
+    studyScript = {
+      ...studyScript,
+      ...persisted,
+      // Stored default copy must not freeze old wording across app updates.
+      text: hasCustomText ? persisted.text : SUBJECT_INSTRUCTIONS.join('\n'),
+    };
   } catch (error) {
     if (error.code !== 'ENOENT') {
       // A damaged optional script should not prevent the experiment from opening.
       studyScript = { ...studyScript };
     }
   }
+  const emptySoundSelection = () => ({
+    robotCue: { fileName: null, originalName: null, revision: null },
+    puzzleFinish: { fileName: null, originalName: null, revision: null },
+  });
+  let studySounds = emptySoundSelection();
+  try {
+    const persisted = JSON.parse(await fs.readFile(soundManifestPath, 'utf8'));
+    for (const key of ['robotCue', 'puzzleFinish']) {
+      if (persisted?.[key]?.fileName) {
+        studySounds[key] = {
+          fileName: path.basename(String(persisted[key].fileName)),
+          originalName: path.basename(String(persisted[key].originalName || persisted[key].fileName)),
+          revision: String(persisted[key].revision || ''),
+        };
+      }
+    }
+  } catch (error) {
+    if (error.code !== 'ENOENT') {
+      studySounds = emptySoundSelection();
+    }
+  }
+  const getSoundDefinition = (key) => {
+    const selected = studySounds[key] || {};
+    const fallback = DEFAULT_STUDY_SOUNDS[key];
+    return selected.fileName
+      ? {
+        audioUrl: `/media/study-sounds/${selected.fileName}${selected.revision ? `?v=${encodeURIComponent(selected.revision)}` : ''}`,
+        audioName: selected.originalName || selected.fileName,
+        custom: true,
+      }
+      : {
+        audioUrl: `/media/study-sounds/${fallback.fileName}`,
+        audioName: fallback.label,
+        custom: false,
+      };
+  };
   const getStudyDefinition = () => ({
     instructions: scriptInstructions(studyScript.text).length
       ? scriptInstructions(studyScript.text)
@@ -337,6 +388,10 @@ async function createApp(options = {}) {
       : null,
     scriptAudioName: studyScript.audioOriginalName || null,
     customTextName: studyScript.customTextName || null,
+    sounds: {
+      robotCue: getSoundDefinition('robotCue'),
+      puzzleFinish: getSoundDefinition('puzzleFinish'),
+    },
   });
   await watchBridge.start();
 
@@ -366,6 +421,7 @@ async function createApp(options = {}) {
         slotCount: studyConfig.slotCount,
         pieces: studyConfig.pieces,
         hintPresets: studyConfig.hintPresets,
+        hintPresetsByPuzzle: studyConfig.hintPresetsByPuzzle,
         consentStatement: CONSENT_STATEMENT,
         ...getStudyDefinition(),
       },
@@ -489,6 +545,25 @@ async function createApp(options = {}) {
         }
       }
 
+      if (request.method === 'GET' && pathname.startsWith('/media/study-sounds/')) {
+        const fileName = decodeURIComponent(pathname.slice('/media/study-sounds/'.length));
+        const builtIn = Object.values(DEFAULT_STUDY_SOUNDS).find((entry) => entry.fileName === fileName);
+        if (builtIn) {
+          response.writeHead(200, {
+            'content-type': 'audio/wav',
+            'content-length': builtIn.buffer.length,
+          });
+          response.end(builtIn.buffer);
+          return;
+        }
+        const candidatePath = path.join(soundDir, fileName);
+        const relative = path.relative(soundDir, candidatePath);
+        if (!relative.startsWith('..') && !path.isAbsolute(relative)) {
+          await serveFile(response, candidatePath);
+          return;
+        }
+      }
+
       if (request.method === 'GET' && pathname === '/health') {
         const systemStatus = getSystemStatus();
         const healthLevel = systemStatus.sensorHealth?.overall?.level || 'healthy';
@@ -602,9 +677,30 @@ async function createApp(options = {}) {
         return;
       }
 
+      if (request.method === 'GET' && pathname === '/api/export/current.watch.jsonl') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        const raw = await store.getRawWatchReadings('current');
+        text(response, 200, raw, {
+          'content-type': 'application/x-ndjson; charset=utf-8',
+          'content-disposition': `attachment; filename="${store.getCurrentSessionId()}.watch.jsonl"`,
+        });
+        return;
+      }
+
       if (request.method === 'GET' && pathname.startsWith('/api/exports/')) {
         adminGuard.assertAuthorized(getAdminToken(request));
         const slug = pathname.slice('/api/exports/'.length);
+
+        if (slug.endsWith('.watch.jsonl')) {
+          const sessionId = slug.slice(0, -'.watch.jsonl'.length);
+          const resolvedSessionId = sessionId === 'current' ? store.getCurrentSessionId() : sessionId;
+          const raw = await store.getRawWatchReadings(sessionId);
+          text(response, 200, raw, {
+            'content-type': 'application/x-ndjson; charset=utf-8',
+            'content-disposition': `attachment; filename="${resolvedSessionId}.watch.jsonl"`,
+          });
+          return;
+        }
 
         if (slug.endsWith('.bundle.json')) {
           const sessionId = slug.slice(0, -'.bundle.json'.length);
@@ -661,16 +757,28 @@ async function createApp(options = {}) {
       if (request.method === 'POST' && pathname === '/api/hint-presets') {
         adminGuard.assertAuthorized(getAdminToken(request));
         const body = await readJsonBody(request);
-        const next = normalizeStudyConfig({
-          ...studyConfig,
-          hintPresets: Array.isArray(body.presets) ? body.presets : body.hintPresets,
-        });
+        const puzzleSetId = String(body.puzzleSetId || '').trim();
+        const requestedPresets = Array.isArray(body.presets) ? body.presets : body.hintPresets;
+        const updatedConfig = puzzleSetId
+          ? {
+            ...studyConfig,
+            hintPresetsByPuzzle: {
+              ...studyConfig.hintPresetsByPuzzle,
+              [puzzleSetId]: requestedPresets,
+            },
+          }
+          : { ...studyConfig, hintPresets: requestedPresets };
+        const next = normalizeStudyConfig(updatedConfig);
         studyConfig.hintPresets = next.hintPresets;
+        studyConfig.hintPresetsByPuzzle = next.hintPresetsByPuzzle;
         if (studyConfigPath) {
           saveStudyConfig(studyConfig, studyConfigPath);
         }
         hub.broadcastSnapshots();
-        json(response, 200, { hintPresets: studyConfig.hintPresets });
+        json(response, 200, {
+          hintPresets: studyConfig.hintPresets,
+          hintPresetsByPuzzle: studyConfig.hintPresetsByPuzzle,
+        });
         return;
       }
 
@@ -775,6 +883,82 @@ async function createApp(options = {}) {
           recipients,
           requestId: event.id,
         });
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/study-sounds') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        const body = await readJsonBody(request);
+        const uploads = [
+          { key: 'robotCue', field: 'robotAudioFile', prefix: 'robot-cue', label: 'robot movement sound' },
+          { key: 'puzzleFinish', field: 'puzzleFinishAudioFile', prefix: 'puzzle-finished', label: 'puzzle-finished sound' },
+        ];
+        if (!uploads.some(({ field }) => body[field])) {
+          const error = new Error('Choose a robot movement sound, a puzzle-finished sound, or both.');
+          error.statusCode = 400;
+          throw error;
+        }
+        const nextSounds = JSON.parse(JSON.stringify(studySounds));
+        for (const upload of uploads) {
+          const audioFile = body[upload.field];
+          if (!audioFile) {
+            continue;
+          }
+          const extension = path.extname(String(audioFile.name || '')).toLowerCase();
+          const mimeType = SCRIPT_AUDIO_TYPES[extension];
+          const audioBuffer = uploadedBuffer(audioFile);
+          if (!mimeType) {
+            const error = new Error(`Use an MP3, M4A, WAV, or OGG file for the ${upload.label}.`);
+            error.statusCode = 400;
+            throw error;
+          }
+          if (!audioBuffer.length || audioBuffer.length > MAX_CUE_AUDIO_BYTES) {
+            const error = new Error(`The ${upload.label} must be non-empty and no larger than 2 MB.`);
+            error.statusCode = 400;
+            throw error;
+          }
+          const storedName = `${upload.prefix}${extension}`;
+          await fs.writeFile(path.join(soundDir, storedName), audioBuffer);
+          nextSounds[upload.key] = {
+            fileName: storedName,
+            originalName: path.basename(String(audioFile.name || storedName)),
+            revision: String(Date.now()),
+          };
+        }
+        studySounds = nextSounds;
+        const temporaryManifest = `${soundManifestPath}.tmp`;
+        await fs.writeFile(temporaryManifest, `${JSON.stringify(studySounds, null, 2)}\n`, 'utf8');
+        await fs.rename(temporaryManifest, soundManifestPath);
+        await store.logSystemEvent({
+          type: 'study.sounds.updated',
+          source: 'admin',
+          summary: 'The researcher updated the study sound cues.',
+          payload: {
+            actor: body.actor || 'researcher',
+            robotCueName: studySounds.robotCue.originalName,
+            puzzleFinishName: studySounds.puzzleFinish.originalName,
+          },
+        });
+        hub.broadcastSnapshots();
+        json(response, 200, getStudyDefinition().sounds);
+        return;
+      }
+
+      if (request.method === 'POST' && pathname === '/api/study-sounds/reset') {
+        adminGuard.assertAuthorized(getAdminToken(request));
+        const body = await readJsonBody(request);
+        studySounds = emptySoundSelection();
+        const temporaryManifest = `${soundManifestPath}.tmp`;
+        await fs.writeFile(temporaryManifest, `${JSON.stringify(studySounds, null, 2)}\n`, 'utf8');
+        await fs.rename(temporaryManifest, soundManifestPath);
+        await store.logSystemEvent({
+          type: 'study.sounds.defaults.restored',
+          source: 'admin',
+          summary: 'The researcher restored the built-in study sound cues.',
+          payload: { actor: body.actor || 'researcher' },
+        });
+        hub.broadcastSnapshots();
+        json(response, 200, getStudyDefinition().sounds);
         return;
       }
 
@@ -906,6 +1090,7 @@ async function createApp(options = {}) {
         const body = await readJsonBody(request);
         const state = await store.completeRound({
           operator: body.operator || 'researcher',
+          solved: typeof body.solved === 'boolean' ? body.solved : null,
           source: 'admin',
         });
         json(response, 200, state);
