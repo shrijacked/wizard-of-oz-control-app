@@ -67,6 +67,23 @@ test('hint history keeps earlier hints when the current hint is cleared', async 
   );
 });
 
+test('startup reuses existing automatic exports instead of rebuilding event history', async () => {
+  const { store, dataDir } = await createStore();
+  const sessionId = store.getState().session.id;
+  const jsonPath = path.join(dataDir, 'export', `${sessionId}.json`);
+  const formsPath = path.join(dataDir, 'export', `${sessionId}-forms.json`);
+  const existingExport = '{"preserved":true}\n';
+
+  await fs.writeFile(jsonPath, existingExport, 'utf8');
+  await fs.writeFile(formsPath, existingExport, 'utf8');
+
+  const restartedStore = new ExperimentStore({ dataDir });
+  await restartedStore.initialize();
+
+  assert.equal(await fs.readFile(jsonPath, 'utf8'), existingExport);
+  assert.equal(await fs.readFile(formsPath, 'utf8'), existingExport);
+});
+
 test('watch recalibration stays pending until fresh collector telemetry acknowledges it', async () => {
   const { store } = await createStore();
   await store.requestWatchCalibration({

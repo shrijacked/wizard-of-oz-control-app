@@ -21,6 +21,11 @@ MIN_PLAUSIBLE_RR_MS = 300.0
 MAX_PLAUSIBLE_RR_MS = 2000.0
 
 
+def has_usable_sensor_contact(sample: dict[str, Any]) -> bool:
+    """Accept samples unless a contact-capable sensor explicitly reports no contact."""
+    return sample.get("sensor_contact_detected") is not False
+
+
 def live_arousal_assessment(
     samples: Sequence[dict[str, Any]],
     *,

@@ -2,10 +2,21 @@
 import math
 import unittest
 
-from watch_core import analyze_capture, hrv_metrics, live_arousal_assessment, parse_heart_rate_measurement
+from watch_core import (
+    analyze_capture,
+    has_usable_sensor_contact,
+    hrv_metrics,
+    live_arousal_assessment,
+    parse_heart_rate_measurement,
+)
 
 
 class HeartRateMeasurementTests(unittest.TestCase):
+    def test_explicit_poor_contact_is_not_usable_for_calibration(self):
+        self.assertFalse(has_usable_sensor_contact({"sensor_contact_detected": False}))
+        self.assertTrue(has_usable_sensor_contact({"sensor_contact_detected": True}))
+        self.assertTrue(has_usable_sensor_contact({"sensor_contact_detected": None}))
+
     def test_decodes_energy_before_rr_and_converts_1024_units(self):
         # flags: contact detected/supported + energy present + RR present
         packet = bytes([0x1E, 75, 0xD2, 0x04, 0x00, 0x04, 0x00, 0x02])

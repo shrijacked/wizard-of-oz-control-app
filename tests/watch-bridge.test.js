@@ -8,6 +8,44 @@ const path = require('node:path');
 
 const { WatchBridge } = require('../src/watch-bridge');
 
+test('watch bridge startup skips samples that were already present in the feed', async () => {
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'woz-watch-start-'));
+  const watchFilePath = path.join(directory, 'watch_data.json');
+  const received = [];
+  const bridge = new WatchBridge({
+    watchFilePath,
+    store: {
+      async ingestWatchEntry(entry) {
+        received.push(entry.sequence_number);
+      },
+    },
+  });
+
+  await fs.writeFile(watchFilePath, JSON.stringify({
+    current_sequence: 5000,
+    entries: [
+      { sequence_number: 4999, watch_data: {} },
+      { sequence_number: 5000, watch_data: {} },
+    ],
+  }));
+  await bridge.start();
+  bridge.stop();
+
+  assert.deepEqual(received, []);
+  assert.equal(bridge.getStatus().lastSequenceNumber, 5000);
+
+  await fs.writeFile(watchFilePath, JSON.stringify({
+    current_sequence: 5001,
+    entries: [
+      { sequence_number: 5000, watch_data: {} },
+      { sequence_number: 5001, watch_data: {} },
+    ],
+  }));
+  await bridge.processFile();
+
+  assert.deepEqual(received, [5001]);
+});
+
 test('watch bridge processes low sequence numbers after watch.py resets its file', async () => {
   const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'woz-watch-bridge-'));
   const watchFilePath = path.join(directory, 'watch_data.json');

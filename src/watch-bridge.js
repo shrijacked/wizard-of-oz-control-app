@@ -24,13 +24,36 @@ class WatchBridge {
 
   async start() {
     this.status.active = true;
-    await this.processFile();
+    await this.initializeCursor();
 
     this.listener = async () => {
       await this.processFile();
     };
 
     fs.watchFile(this.watchFilePath, { interval: 1000 }, this.listener);
+  }
+
+  async initializeCursor() {
+    this.status.lastCheckedAt = new Date().toISOString();
+
+    try {
+      const raw = await fs.promises.readFile(this.watchFilePath, 'utf8');
+      const parsed = JSON.parse(raw);
+      const entries = Array.isArray(parsed.entries) ? parsed.entries : [];
+      const fileSequenceNumber = Number.isFinite(Number(parsed.current_sequence))
+        ? Number(parsed.current_sequence)
+        : entries.reduce((maximum, entry) => Math.max(maximum, Number(entry.sequence_number || 0)), 0);
+      this.lastSequenceNumber = fileSequenceNumber;
+      this.status.lastSequenceNumber = fileSequenceNumber;
+      this.status.lastError = null;
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        this.status.lastError = null;
+        return;
+      }
+
+      this.status.lastError = error.message;
+    }
   }
 
   stop() {

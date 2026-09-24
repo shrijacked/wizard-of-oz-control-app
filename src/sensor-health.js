@@ -87,6 +87,27 @@ function summarizeWatchHealth(status = {}, now = new Date(), options = {}) {
       };
     }
 
+    const quality = options.quality || {};
+    const heartRateReliable = quality.heartRateReliable ?? quality.heart_rate_reliable;
+    const hrvReliable = quality.hrvReliable ?? quality.hrv_reliable;
+    const poorContactPct = Number(
+      quality.poorContactPacketPct ?? quality.poor_contact_packet_pct,
+    );
+    if (heartRateReliable === false || hrvReliable === false) {
+      const poorContactDetail = Number.isFinite(poorContactPct)
+        ? `${Math.round(poorContactPct)}% of recent packets report poor skin contact. `
+        : '';
+      return {
+        name: 'watch',
+        level: 'warning',
+        state: 'poor-signal',
+        stale: false,
+        ageSeconds: liveAgeSeconds,
+        summary: 'Watch is connected, but its signal is unreliable.',
+        detail: `${poorContactDetail}Reposition the band snugly on the wrist and recalibrate before using HRV guidance.`,
+      };
+    }
+
     return {
       name: 'watch',
       level: 'healthy',
@@ -144,6 +165,7 @@ function summarizeSensorHealth(input = {}, now = new Date(), options = {}) {
     ...(options.watch || {}),
     telemetryUpdatedAt: input.telemetry?.hrv?.updatedAt,
     calibration: input.telemetry?.hrv?.calibration,
+    quality: input.telemetry?.hrv?.quality,
   });
   const sessionStatus = input.sessionStatus || 'setup';
 

@@ -1,6 +1,16 @@
 'use strict';
 
 const { spawn } = require('node:child_process');
+const fs = require('node:fs');
+const path = require('node:path');
+
+function defaultPythonCommand() {
+  const virtualEnvironmentPython = process.platform === 'win32'
+    ? path.join(process.cwd(), '.venv', 'Scripts', 'python.exe')
+    : path.join(process.cwd(), '.venv', 'bin', 'python');
+
+  return fs.existsSync(virtualEnvironmentPython) ? virtualEnvironmentPython : 'python3';
+}
 
 function boolFrom(value, fallback = true) {
   if (value == null) {
@@ -22,7 +32,9 @@ function boolFrom(value, fallback = true) {
 function parseLauncherOptions(options = {}) {
   const host = String(options.host || process.env.HOST || '0.0.0.0').trim() || '0.0.0.0';
   const port = Number(options.port || process.env.PORT || 3000);
-  const pythonCommand = String(options.pythonCommand || process.env.PYTHON_BIN || 'python3').trim() || 'python3';
+  const pythonCommand = String(
+    options.pythonCommand || process.env.PYTHON_BIN || defaultPythonCommand(),
+  ).trim() || defaultPythonCommand();
   return {
     host,
     port,

@@ -22,7 +22,7 @@ if platform.system() == 'Windows':
 
 import numpy as np
 from bleak import BleakClient, BleakScanner
-from watch_core import live_arousal_assessment, parse_heart_rate_measurement
+from watch_core import has_usable_sensor_contact, live_arousal_assessment, parse_heart_rate_measurement
 
 try:
     from pylsl import StreamInfo, StreamOutlet
@@ -398,10 +398,14 @@ class HRVProcessor:
             logger.info("Baseline timer started with the first fresh watch sample.")
 
         # Buffer samples
-        self.heart_rate_values.append((timestamp, heart_rate))
-        for rr in rr_intervals:
-            # convert ms to seconds
-            self.rr_intervals_values.append((timestamp, rr / 1000.0))
+        # Do not allow explicit poor-contact packets to establish a baseline or
+        # contaminate windowed HRV metrics. Devices without a contact flag are
+        # still accepted and are assessed by the downstream RR quality checks.
+        if has_usable_sensor_contact(decoded):
+            self.heart_rate_values.append((timestamp, heart_rate))
+            for rr in rr_intervals:
+                # convert ms to seconds
+                self.rr_intervals_values.append((timestamp, rr / 1000.0))
         retention_seconds = max(600.0, AROUSAL_CURRENT_SECONDS + AROUSAL_REFERENCE_SECONDS + 30.0)
         while self.heart_rate_values and timestamp - self.heart_rate_values[0][0] > retention_seconds:
             self.heart_rate_values.popleft()
@@ -821,4 +825,7 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        logger.info("Watch collector stopped.")

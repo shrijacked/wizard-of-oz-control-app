@@ -281,6 +281,11 @@
                     <h2>HRV</h2>
                   </div>
                 </div>
+                <div id="hrv-spike-alert" class="callout hrv-spike-alert" hidden>
+                  <span class="callout-label">Researcher advisory</span>
+                  <strong>Possible arousal — review participant</strong>
+                  <p id="hrv-spike-detail">Review the signal and decide whether to intervene.</p>
+                </div>
                 <div class="metric-grid telemetry-metric-grid compact-metrics">
                   <article class="metric-card">
                     <span class="callout-label">Heart rate</span>
@@ -290,7 +295,7 @@
                     <span class="callout-label">RMSSD</span>
                     <strong id="hrv-rmssd">--</strong>
                   </article>
-                  <article class="metric-card">
+                  <article class="metric-card metric-card-arousal">
                     <span class="callout-label">Arousal advisory</span>
                     <strong id="hrv-stress-level">Awaiting data</strong>
                   </article>
@@ -306,11 +311,6 @@
                     <span class="callout-label">Last sample</span>
                     <strong id="hrv-updated">No HRV sample yet.</strong>
                   </article>
-                </div>
-                <div id="hrv-spike-alert" class="callout hrv-spike-alert" hidden>
-                  <span class="callout-label">Researcher advisory</span>
-                  <strong>Possible arousal — review participant</strong>
-                  <p id="hrv-spike-detail">Review the signal and decide whether to intervene.</p>
                 </div>
                 <div class="button-row">
                   <button id="watch-calibrate" class="button button-ghost" type="button">Recalibrate watch</button>

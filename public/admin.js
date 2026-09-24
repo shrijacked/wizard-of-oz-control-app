@@ -826,9 +826,13 @@ function renderInterventionLog() {
 }
 
 function activePuzzleSetId() {
+  const session = currentState?.session || {};
+  const nextRoundIndex = session.rounds?.length || 0;
   return String(
-    currentState?.session?.activeRound?.puzzle?.setId
-      || currentState?.session?.puzzleSet?.setId
+    session.activeRound?.puzzle?.setId
+      || session.puzzleSet?.setId
+      || session.schedule?.[nextRoundIndex]?.puzzle?.setId
+      || session.queue?.[nextRoundIndex]?.setId
       || '',
   ).trim();
 }
@@ -877,57 +881,84 @@ function renderHintPresets(hintPolicy) {
   }
 
   elements.hintPresets.innerHTML = '';
-  visibleHintPresets().forEach(({ text: preset, puzzleSetId }) => {
-    const chip = document.createElement('div');
-    chip.className = 'preset-chip';
+  const visiblePresets = visibleHintPresets();
+  const groups = puzzleSetId
+    ? [
+      {
+        label: `Puzzle ${puzzleSetId} hints`,
+        className: 'preset-group-puzzle',
+        presets: visiblePresets.filter((entry) => entry.puzzleSetId === puzzleSetId),
+      },
+      {
+        label: 'Shared hints',
+        className: 'preset-group-shared',
+        presets: visiblePresets.filter((entry) => !entry.puzzleSetId),
+      },
+    ]
+    : [{ label: 'Shared hints', className: 'preset-group-shared', presets: visiblePresets }];
 
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'button button-ghost';
-    button.textContent = preset;
-    button.addEventListener('click', async () => {
-      if (elements.hintText) {
-        elements.hintText.value = preset;
-      }
-      if (!hintPolicy.allowed) {
-        return;
-      }
-      try {
-        await postJson('/api/hints', {
-          text: preset,
-          author: actorName(),
-        }, {
-          headers: buildHeaders(),
-        });
-        await refreshState();
-      } catch (error) {
-        await handleError(error);
-      }
+  groups.filter((group) => group.presets.length > 0).forEach((group) => {
+    const section = document.createElement('section');
+    section.className = `preset-group ${group.className}`;
+
+    const heading = document.createElement('p');
+    heading.className = 'preset-group-title';
+    heading.textContent = `${group.label} (${group.presets.length})`;
+    section.append(heading);
+
+    group.presets.forEach(({ text: preset, puzzleSetId: sourcePuzzleSetId }) => {
+      const chip = document.createElement('div');
+      chip.className = 'preset-chip';
+
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'button button-ghost';
+      button.textContent = preset;
+      button.addEventListener('click', async () => {
+        if (elements.hintText) {
+          elements.hintText.value = preset;
+        }
+        if (!hintPolicy.allowed) {
+          return;
+        }
+        try {
+          await postJson('/api/hints', {
+            text: preset,
+            author: actorName(),
+          }, {
+            headers: buildHeaders(),
+          });
+          await refreshState();
+        } catch (error) {
+          await handleError(error);
+        }
+      });
+
+      const remove = document.createElement('button');
+      remove.type = 'button';
+      remove.className = 'preset-remove';
+      remove.setAttribute('aria-label', `Remove preset: ${preset}`);
+      remove.textContent = '×';
+      remove.addEventListener('click', async (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        try {
+          const sourcePresets = sourcePuzzleSetId
+            ? studyConfig().hintPresetsByPuzzle?.[sourcePuzzleSetId] || []
+            : studyConfig().hintPresets || [];
+          await persistHintPresets(
+            sourcePresets.filter((entry) => entry !== preset),
+            sourcePuzzleSetId,
+          );
+        } catch (error) {
+          await handleError(error);
+        }
+      });
+
+      chip.append(button, remove);
+      section.append(chip);
     });
-
-    const remove = document.createElement('button');
-    remove.type = 'button';
-    remove.className = 'preset-remove';
-    remove.setAttribute('aria-label', `Remove preset: ${preset}`);
-    remove.textContent = '×';
-    remove.addEventListener('click', async (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      try {
-        const sourcePresets = puzzleSetId
-          ? studyConfig().hintPresetsByPuzzle?.[puzzleSetId] || []
-          : studyConfig().hintPresets || [];
-        await persistHintPresets(
-          sourcePresets.filter((entry) => entry !== preset),
-          puzzleSetId,
-        );
-      } catch (error) {
-        await handleError(error);
-      }
-    });
-
-    chip.append(button, remove);
-    elements.hintPresets.append(chip);
+    elements.hintPresets.append(section);
   });
 }
 

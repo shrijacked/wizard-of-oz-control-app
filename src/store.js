@@ -636,7 +636,7 @@ class ExperimentStore extends EventEmitter {
     await this.#loadRecordingTokens();
     await this.promoteStaleCameraRecordings();
     await this.seedPuzzleLibraryFromDir();
-    await this.#writeAutomaticJson(this.getState());
+    await this.#ensureAutomaticJson(this.getState());
   }
 
   async #loadParticipantRegistry() {
@@ -2274,9 +2274,9 @@ class ExperimentStore extends EventEmitter {
     };
   }
 
-  async buildOperatorExport(sessionIdInput) {
+  async buildOperatorExport(sessionIdInput, persistedEventsInput = null) {
     const sessionId = this.#resolveSessionId(sessionIdInput);
-    const events = await this.#readPersistedEvents();
+    const events = persistedEventsInput || await this.#readPersistedEvents();
     const sessionEvents = events.filter((event) => event.sessionId === sessionId);
     const state = sessionId === this.getCurrentSessionId()
       ? this.getState()
@@ -2620,8 +2620,8 @@ class ExperimentStore extends EventEmitter {
 
   async #writeAutomaticJson(stateSnapshot) {
     const sessionId = stateSnapshot?.session?.id || this.state.session.id;
-    const jsonExport = await this.buildOperatorExport(sessionId);
     const persistedEvents = await this.#readPersistedEvents();
+    const jsonExport = await this.buildOperatorExport(sessionId, persistedEvents);
     const sessionEvents = persistedEvents.filter((event) => event.sessionId === sessionId);
     jsonExport.eventCounts = eventCounts(sessionEvents);
     jsonExport.events = sessionEvents;
@@ -2640,6 +2640,26 @@ class ExperimentStore extends EventEmitter {
     const formResponses = this.#formResponsesPayload(stateSnapshot, sessionId);
     await fs.writeFile(temporaryFormsPath, `${JSON.stringify(formResponses, null, 2)}\n`, 'utf8');
     await fs.rename(temporaryFormsPath, formsPath);
+  }
+
+  async #ensureAutomaticJson(stateSnapshot) {
+    const sessionId = stateSnapshot?.session?.id || this.state.session.id;
+    const jsonPath = path.join(this.exportDir, `${sessionId}.json`);
+    const formsPath = path.join(this.exportDir, `${sessionId}-forms.json`);
+
+    try {
+      await Promise.all([
+        fs.access(jsonPath),
+        fs.access(formsPath),
+      ]);
+      return;
+    } catch (error) {
+      if (error.code !== 'ENOENT') {
+        throw error;
+      }
+    }
+
+    await this.#writeAutomaticJson(stateSnapshot);
   }
 
   async #ensureCsvFile() {

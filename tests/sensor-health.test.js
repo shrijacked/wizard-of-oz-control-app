@@ -72,3 +72,30 @@ test('sensor health summarizes running-session watch warnings', () => {
   assert.equal(health.watch.state, 'stale');
   assert.equal('gaze' in health, false);
 });
+
+test('sensor health warns when fresh watch samples report unreliable contact', () => {
+  const now = new Date('2026-04-09T12:00:00.000Z');
+  const health = summarizeSensorHealth({
+    sessionStatus: 'setup',
+    watchBridge: {
+      active: true,
+      lastProcessedAt: '2026-04-09T11:59:59.000Z',
+      lastError: null,
+    },
+    telemetry: {
+      hrv: {
+        updatedAt: '2026-04-09T11:59:59.000Z',
+        quality: {
+          heart_rate_reliable: false,
+          hrv_reliable: false,
+          poor_contact_packet_pct: 100,
+        },
+      },
+    },
+  }, now);
+
+  assert.equal(health.watch.level, 'warning');
+  assert.equal(health.watch.state, 'poor-signal');
+  assert.match(health.watch.detail, /100%/);
+  assert.match(health.watch.detail, /recalibrate/i);
+});
