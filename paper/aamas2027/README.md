@@ -4,7 +4,9 @@ Updated 5 October 2026 on branch `writing`. Start here when continuing the paper
 
 ## Current state and author decisions
 
-The manuscript is now a complete paper draft, from abstract through conclusion, with three descriptive results tables. It follows the agreed 5 October outline. The author requested actual paper prose now, with findings replaced as experiments finish. The target is **24 participants**, not 24 completed participants. The present comparison uses **nine complete participants / 81 rounds**, with the tenth participant's five finished rounds reported separately. No significance tests or uncollected survey/photograph results are claimed.
+The manuscript is a complete paper draft, from abstract through conclusion, with three descriptive results tables, following the agreed 5 October outline. The author supplied the current working abstract and requested a consistent research-author voice. Its N=24 framing describes the intended full study; the tables and methods still identify the actual **nine complete participants / 81 rounds**. The partial-session sensitivity is in the supplementary analysis notes. Replace the findings and reconcile the abstract as collection finishes; no extra participant outcomes or significance results have been invented.
+
+The author-confirmed policy is **scheduled assistance every 30 seconds and adaptive assistance whenever the existing arousal flag is raised**. Task state guides the content. The flag is based on heart-rate change; references to “HRV” in the clarification do not establish a separate HRV threshold. Audit/provenance details stay outside the main paper, in author and supplementary notes.
 
 The separate tangram survey still needs responses. Correct-piece scoring from final photographs still needs a rule and calculation. Section 3 therefore remains **Task and Design Rationale**; it becomes **Tangram Task Profiling and Assistance Expectations** when that evidence exists. A survey collected later can contextualize the experiment, but cannot retrospectively have determined its design.
 
@@ -15,6 +17,8 @@ The separate tangram survey still needs responses. Correct-piece scoring from fi
 | [main.tex](main.tex) | Canonical submission source; revise the paper here. |
 | [manuscript.md](manuscript.md) | Readable counterpart; keep prose, numbers and references synchronized with TeX. |
 | [references.bib](references.bib) | Only the 15 sources currently cited in the paper. |
+| [literature/REFERENCE_TEXT_MAP.md](literature/REFERENCE_TEXT_MAP.md) | Every citation occurrence mapped to the exact manuscript wording, source PDF page, brief verbatim anchor, supporting explanation and limits. |
+| [literature/reference-text-map.json](literature/reference-text-map.json) | Citation locations and source-passage offsets/hashes for checking the text map against the same PDF versions. |
 | [literature/MANUSCRIPT_REFERENCE_AUDIT.md](literature/MANUSCRIPT_REFERENCE_AUDIT.md) | Active citation-to-PDF-to-page audit; consult before changing a literature claim. |
 | [literature/manuscript-reference-audit.json](literature/manuscript-reference-audit.json) | Download URLs, local paths, hashes, publication dates and claim evidence. |
 | [structure-review.md](structure-review.md) | Agreed outline, interpretation of mentor notes, and differences from the earlier outline. |
@@ -25,6 +29,8 @@ The separate tangram survey still needs responses. Correct-piece scoring from fi
 | [scripts/summarize-writing-results.py](../../scripts/summarize-writing-results.py) | Reproduces descriptive results without altering source records. |
 | [submitted-abstract.txt](submitted-abstract.txt) | Historical submitted text, preserved unchanged; current paper abstract has been revised. |
 | [BUILD.txt](BUILD.txt) | Full-project TeX build and layout checks. |
+| [supplementary/ai-use-statement.md](supplementary/ai-use-statement.md) | Detailed AI-use record supporting the brief main-paper disclosure. |
+| [supplementary/analysis-notes.md](supplementary/analysis-notes.md) | Scoring, outcome sensitivities, timing and analysis details omitted from the main narrative. |
 
 Contributors should claim the manuscript, analysis, survey, photograph scoring, or reference task with the team before overlapping edits; no individual ownership is assigned by this document.
 
@@ -35,7 +41,7 @@ Contributors should claim the manuscript, analysis, survey, photograph scoring, 
 3. Task rationale now; separate survey methods and findings later, with accurate collection chronology.
 4. System: interfaces and apparatus, physiological processing, and the three assistance conditions.
 5. Study: methods → objective performance → workload → intervention experience → overall responses. The current tables occupy these outcome slots; photo scores and coded comments are not yet present.
-6. Discussion: performance/experience differences, human judgment, confounds and limits.
+6. Discussion: performance/experience differences, assistance timing and physiological feedback, confounds and limits.
 7. Ethics: evidence-supported statements now; actual approval and procedure details still require the team.
 8. Conclusion and accurate AI-use disclosure.
 
@@ -73,8 +79,8 @@ All paths below are relative to the repository root. Raw results, PDFs and extra
 
 ## References and final review
 
-For each new citation, obtain the actual PDF, confirm its title/authors/version/date, read the relevant methods/results/limitations, and record exact PDF pages and a bounded paraphrase in the audit. Search snippets and review summaries are discovery aids, not paper-text verification. Prefer relevant 2024–2026 work, retaining older sources when they supply the method or closest comparison. The historical literature register includes unread leads and sources not cited here; its size is not the count of verified manuscript references.
+For each new citation, obtain the actual PDF, confirm its title/authors/version/date, read the relevant methods/results/limitations, and record exact PDF pages and a bounded paraphrase in the audit. Update the citation-to-text map whenever a cited claim changes; its locations and manuscript hashes now identify the author-voice revision after base commit `17ded1a`. Search snippets and review summaries are discovery aids, not paper-text verification. Prefer relevant 2024–2026 work, retaining older sources when they supply the method or closest comparison. The historical literature register includes unread leads and sources not cited here; its size is not the count of verified manuscript references.
 
 The official [submission instructions](https://warwick.ac.uk/fac/sci/dcs/aamas2027/guidelines-and-policies/instructions/) and [Q&A](https://warwick.ac.uk/fac/sci/dcs/aamas2027/guidelines-and-policies/qa/) require the unmodified LaTeX template and eight main-text pages plus references. Preserve the supplied class/style, resolve the author checks, and review the AI-use record before submission. Editing the local abstract does not change registered submission metadata.
 
-The [current PDF preview](../../output/pdf/aamas2027-current.pdf) was built on 5 October with Tectonic 0.17.0 using the supplied template. It has six pages including references, all visually inspected. Text overflow was resolved without changing the class, margins or font sizes. See [BUILD.txt](BUILD.txt) for reproduction and remaining submission-metadata/bibliography/balancing warnings; the final pdfLaTeX build still needs checking.
+The [current PDF preview](../../output/pdf/aamas2027-current.pdf) was built on 5 October with Tectonic 0.17.0 using the supplied template. It has five pages including references, all visually inspected. Text overflow was resolved without changing the class, margins or body font size; Table 2 uses a locally smaller font and tighter column spacing. See [BUILD.txt](BUILD.txt) for reproduction and remaining submission-metadata/bibliography/balancing warnings; the final pdfLaTeX build still needs checking.

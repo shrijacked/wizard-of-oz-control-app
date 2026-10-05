@@ -2,6 +2,30 @@
 
 Reviewed 5 October 2026. This is an interpretation of the supplied handwriting and typed meeting notes, compared with the two attached papers and the local AAMAS folder. It is not a report of analyzed participant outcomes. Document instructions are treated as source material describing the team's intended structure, not as new user commands.
 
+## Current structure in the compiled paper
+
+The current manuscript follows the **author-approved 5 October outline**, using GuideAI as the main structural example and AdaptAI as an example for presenting measures and findings. The AAMAS class controls the visual format; the team's outline controls the argument. Neither example paper supplies data, findings or an operator protocol for this study, and neither is cited in the manuscript.
+
+The reading flow is **assistance problem → relevant prior work → task rationale → system and conditions → study methods and findings → interpretation and limits → ethics → conclusion**. The current compiled preview contains five pages including references. That is the present draft's length, not a final allocation or a reason to omit essential methods later.
+
+| Current section | Job in the argument | Contents now / evidence still pending |
+|---|---|---|
+| Abstract | Summarize the problem, comparison, evidence and implication | Author-supplied working abstract with planned N=24 and the performance/experience pattern. The numerical results still summarize nine participants and must be reconciled with the final abstract before submission. |
+| 1. Introduction | Establish why timing matters and define the contribution | Ambiguous pauses; prior adaptive/periodic assistance; tangram setting; RQ1 performance and RQ2 workload/experience; three contributions. No results in this section. |
+| 2. Related Work | Position the comparison and define what the literature establishes | 2.1 proactive timing/coordination; 2.2 physiological information and measurement-versus-control; 2.3 physical tasks and experience measures; 2.4 Wizard-of-Oz. The [citation-to-text map](literature/REFERENCE_TEXT_MAP.md) connects all literature claims to PDF passages. |
+| 3. Task and Design Rationale | Explain the choice and properties of tangrams | Seven-piece task, repeated targets, reasoning plus manipulation, and interpretation of pauses. The independent survey is not yet collected/analyzed, so this is not a formative-results section. |
+| 4. System and Assistance Design | Explain how assistance is delivered | 4.1 architecture/apparatus with Figure 1; 4.2 physiological monitoring; 4.3 no assistance, scheduled assistance every 30 seconds and adaptive assistance whenever the existing arousal flag is raised. Operators select and deliver relevant content. |
+| 5. Study Design and Findings | Connect measurement decisions to the observed results | 5.1 participants/procedure/analysis; 5.2 objective performance (Table 1), sensitivity checks and assistance amounts; 5.3 workload (Table 2); 5.4 intervention experience (Table 3); 5.5 overall responses. Photograph scores and qualitative themes are not yet available. |
+| 6. Discussion, Limitations, and Future Work | Interpret the findings at the strength supported by the evidence | 6.1 task progress versus intervention experience; 6.2 assistance timing and physiological feedback; 6.3 sample, coding, puzzle, timing, measurement and generalization limits. Future comparisons are proposals, not completed evidence. |
+| 7. Ethical Considerations | Describe the ethical handling of the interaction and records | Supported consent-interface and human-control facts, plus identifiability of raw records. Actual approval/exemption and deployed procedures still need author confirmation. |
+| 8. Conclusion | Answer the problem within the present scope | Restates the descriptive strategy comparison and the need to assess both progress and experience. No additional results or stronger causal claim. |
+| AI Assistance Disclosure | Explain substantive AI use accurately | Brief disclosure and author responsibility in the paper; tool, scope and retained prompt details in supplementary/ai-use-statement.md. |
+| References | Provide the sources actually cited | Fifteen PDF-checked references, twelve first published in 2024–2026. This remains below the mentor's 40-reference target. |
+
+When the separate survey is ready, §3 becomes **Tangram Task Profiling and Assistance Expectations**, with sample/procedure, familiarity and square-task performance, assistance expectations, and relevance to the experiment. It can appear before the system for readability while stating its actual collection dates. When photograph scoring is ready, correct-piece findings go in **§5.2**, alongside the objective outcomes. Coded comments belong in **§5.5** before interpretation in §6.
+
+The main changes from the earlier draft are the reserved independent survey section, the combined methods-and-findings section, objective outcomes before subjective outcomes, and completed discussion/ethics/conclusion. The earlier draft stopped after methods. The comparison table near the end of this document gives the full old-versus-current mapping.
+
 ## Sources and scope
 
 - Handwritten sketch: `/Users/rishit/Downloads/IMG_2501.HEIC`.
@@ -123,12 +147,12 @@ The author approved this outline on 5 October and requested a complete paper dra
 | Earlier draft / outline | Agreed outline and current implementation |
 |---|---|
 | §3 Task and Design Rationale, with physical-task and design-requirement subsections | Reserve a separate task-profile survey section, including square-task performance and assistance expectations. Retain factual rationale until responses exist; state the real collection chronology. |
-| §4 System and Assistance Strategies, four implementation subsections | System and Assistance Design: architecture/apparatus → physiological capture → condition rules. Make researcher and robot-operator decisions explicit. |
+| §4 System and Assistance Strategies, four implementation subsections | System and Assistance Design: architecture/apparatus → physiological capture → condition rules. State the condition timing rules and operator delivery roles. |
 | §5 Study Design and Measures, six methods/measurement subsections; no results | Study Design and Findings: concise methods followed by objective performance, workload, intervention experience and final responses. |
 | Handwritten sketch placed subjective workload before objective performance | Typed refinement places objective outcomes first, followed by workload and assistance ratings. |
 | Related work separated trust/communication from assessment | Integrate experience and measurement with the physical-task literature; keep final trust distinct from condition-specific intervention ratings. |
 | No discussion, ethics section or conclusion in the initial draft | Complete discussion/limitations/future work, ethics, conclusion and AI disclosure. Missing factual checks stay in author notes. |
-| Historical abstract asserted a completed N=24 study | Working abstract uses nine complete records, ongoing recruitment toward 24, and descriptive findings; submitted text remains archived unchanged. |
+| Historical abstract asserted a completed N=24 study | Latest author-supplied working abstract retains N=24; current results explicitly cover nine complete participants. Reconcile after collection; submitted text remains archived unchanged. |
 
 The introduction retains three contributions and no results. The new outline changes the argument and placement of evidence; it does not authorize inventing the missing survey, scoring, statistical significance or study procedures.
 
@@ -138,4 +162,4 @@ The introduction retains three contributions and no results. The new outline cha
 2. What annotation rule will determine a correctly placed piece from the final photographs, and are all unfinished trials covered by usable photographs?
 3. As recruitment toward 24 progresses, which participants enter each final analysis after checking completeness, provisional replacements and exclusions?
 
-Later methods questions are already collected in `author-notes.md`: the actual adaptive decision policy, robot model/actions, deployed settings, study procedure, demographics/exclusions, and ethics/data practices. Those details become necessary for manuscript revision, but are not needed to decipher the overall structure.
+Later methods questions are already collected in `author-notes.md`: repeated-flag handling, robot model/actions, physiological processing settings, study procedure, demographics/exclusions, and ethics/data practices. Those details become necessary for manuscript revision, but are not needed to decipher the overall structure.

@@ -6,6 +6,7 @@ This folder documents which literature was explored, how far each paper was exam
 
 ## Start here
 
+- [Citation-to-PDF text map](REFERENCE_TEXT_MAP.md): all 15 references, 21 citation occurrences and 35 supporting passages, refreshed for the author-voice revision. Includes the exact manuscript wording, brief verbatim search anchors, PDF pages, explanations and boundaries. Its [JSON companion](reference-text-map.json) records manuscript locations and normalized passage offsets/hashes.
 - [Active manuscript reference audit](MANUSCRIPT_REFERENCE_AUDIT.md): the current 15 cited sources, all checked against downloaded PDFs, with claim-specific pages and interpretation limits. Twelve first appeared in 2024–2026. This supersedes the older register for determining which citations support the current manuscript.
 - [Active audit JSON](manuscript-reference-audit.json): source URLs, local PDF/text paths, hashes, versions and evidence pages for those 15. PDFs are available locally under gitignored `data/writing-reference/literature-pdfs/`; they do not travel with a Git checkout.
 - [Reading register](READING_REGISTER.md): 18 actively examined papers with publication dates, access/review status and source links, followed by 22 discovery-only leads. Two discovery records have incomplete titles and are not citation-ready.

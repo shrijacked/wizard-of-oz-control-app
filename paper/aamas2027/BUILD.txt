@@ -10,18 +10,20 @@ Or, from this directory with a local TeX distribution:
 
 The supplied aamas.cls and ACM-Reference-Format.bst remain unchanged.
 Replace DRAFT with the real submission ID and resolve author-notes.md.
-The working abstract and all paper sections use the through-P111 findings;
+The author-supplied working abstract retains the planned N=24 framing.
+The numerical findings summarize nine complete participants;
 submitted-abstract.txt remains an unchanged historical record.
 
 Preview built on 5 October 2026 with Tectonic 0.17.0 (XeTeX + BibTeX), using
 the repository class and bibliography style unchanged. Output:
   ../../output/pdf/aamas2027-current.pdf
 
-The preview is six pages including references. All six pages were rendered
+The preview is five pages including references. All five pages were rendered
 and visually inspected; no overfull boxes, undefined citations/references or
 missing-character warnings remain. Paragraph emergency stretch and two
 diagram label/path adjustments resolve the observed overflow/crowding.
-Margins, font sizes and the supplied class/style were not changed.
+Margins, body font size and the supplied class/style were not changed.
+Table 2 uses a local small font and reduced column spacing to fit one column.
 
 The temporary compiler is /private/tmp/hti-latex-preview/tectonic. Rebuild
 from the repository root while that executable and package cache remain:

@@ -2,22 +2,24 @@
 
 Updated 5 October 2026, branch `writing`, base `caea038`. Internal author material. Code demonstrates implementation; session records demonstrate recorded use; neither alone establishes all aspects of the actual experiment. Earlier source review used `modi5` at `cd1aa9d`; this table supersedes its participant and writing-status assumptions.
 
+**Protocol correction:** The author subsequently confirmed scheduled help every 30 seconds and adaptive help whenever the existing dashboard arousal flag is raised. This supersedes the earlier discretionary-timing interpretation. The main manuscript now states that protocol directly; exact processing settings and data provenance remain in supporting notes. The author-supplied working abstract retains N=24 while the actual numerical tables remain N=9 pending collection and replacement.
+
 ## Study and numerical claims
 
 Paths are relative to the repository root unless linked. The current snapshot root is `data/writing-reference/hti-results-2026-10-05/`.
 
 | Claim / paper location | Source | Limit or required follow-up |
 |---|---|---|
-| Target N=24; ongoing collection, abstract/§5.1 | Explicit author clarification in this task | Recruitment and sample-size rationale still needed |
+| Target N=24; analyzed subset N=9, §5.1 | Explicit author clarification and current working abstract; summary data | Finalize collection and reconcile abstract/results before submission |
 | Nine complete participants; tenth has five completed rounds | Snapshot `relevant-files/consolidated-data.json`, participant raw session records; [summary](analysis/interim-summary.json) | P111 counter is stale; count finished rounds |
 | Complete sample 81 rounds, 27 per condition | Summary cohort checks; [summary script](../../scripts/summarize-writing-results.py) | P108–P110 provisional exports |
 | Table 1 completion/rate/duration; §5.2 | Summary `primary`, `recorded_only`, `available_rounds`; source outcome provenance | P101 completion inference explicitly retained; duration includes unsuccessful attempts |
-| P101 alternative adaptive coding | Source R9 ambiguity; 13+1 adaptive successes / 27 | Sensitivity, not adjudication |
+| P101 alternative adaptive coding, supplementary analysis notes | Source R9 ambiguity; 13+1 adaptive successes / 27 | Sensitivity, not adjudication |
 | Six realized orders and uneven puzzle allocation | Summary `condition_order_counts`, `primary.*.puzzle_counts` | Manual overrides/difficulty matching not established |
 | Intervention amounts | Summary hint and robot-cue totals | Cues are commands, not verified physical completion |
 | Table 2 workload and composite | Summary `primary.*.survey`, `tlxMean`; source per-round questionnaire responses | Seven-point adaptation, performance reversed before mean; no weighting |
 | Table 3 intervention ratings | Same summary, assistance-only fields | No control responses; hints and robot actions rated together |
-| §5.5 final ratings, five written comments | Summary `overall`, `nonempty_comments`; source participant `final` objects | One questionnaire/person; comments not thematically coded |
+| §5.5 final ratings; five written comments documented in supplementary notes | Summary `overall`, `nonempty_comments`; source participant `final` objects | One questionnaire/person; comments not thematically coded |
 | Five-minute intended limit | Author confirmation; `config/study.json` | Actual records can exceed 300 s; timeout practice unresolved |
 | Separate survey pending; photo scores pending | Explicit author clarification | No survey or correct-piece findings available |
 
@@ -32,8 +34,8 @@ The summary records its exact consolidated-source SHA-256. The original archive 
 | Orangewood arm, Maxim H Band, Logitech C270 | Existing project apparatus documentation and team description | Exact robot model, dimensions, deployed hardware and setup photo |
 | Seven piece/program mappings | `config/study.json`; team note that robot brings a piece | Program trajectories and actual delivery/orientation behavior |
 | Hints, notification sounds and control restrictions | `public/subject.js`, `public/audio-cue.mjs`, `public/admin.js`, `config/study.json` | Preset/free-text use and pairing with movement |
-| 30-second scheduled reminder default | `config/study.json`, `public/admin.js` | Actual reminders/settings and researcher compliance |
-| Human interpretation of physiological cue | `integrations/watch/watch_core.py`, `integrations/watch/watch.py`, `src/adaptive-engine.js`, dashboard | Standardized operator rule, if one existed |
+| Scheduled assistance every 30 seconds | Author's explicit protocol clarification; `config/study.json` and dashboard support delivery | Operational timing deviations and first intervention |
+| Adaptive assistance whenever arousal is flagged | Author's explicit clarification and confirmation of the existing dashboard flag; watch collector/dashboard | Repeated-flag handling, refractory interval and signal-failure procedure |
 | 15/60-second windows and 5-bpm rise default | `live_arousal_assessment` and watch configuration | Environment overrides and historical deployment |
 | Signal filters, quality indicators and baseline fallback | Watch collector and calibration/baseline code | Actual calibration, missing signals, reuse and reliability |
 | Workload, intervention and final questions | `public/subject.js`, `src/surveys.js`; [questionnaire inventory](questionnaire-inventory.md) | Historical versions if different from bundled snapshots |
