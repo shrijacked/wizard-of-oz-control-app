@@ -15,16 +15,34 @@ The reading flow is **assistance problem → relevant prior work → task ration
 | 2. Related Work | Position the comparison and define what the literature establishes | 2.1 proactive timing/coordination; 2.2 physiological information and measurement-versus-control; 2.3 physical tasks and experience measures; 2.4 Wizard-of-Oz. The [citation-to-text map](literature/REFERENCE_TEXT_MAP.md) connects all literature claims to PDF passages. |
 | 3. Task and Design Rationale | Explain the choice and properties of tangrams | Seven-piece task, repeated targets, reasoning plus manipulation, and interpretation of pauses. The independent survey is not yet collected/analyzed, so this is not a formative-results section. |
 | 4. System and Assistance Design | Explain how assistance is delivered | 4.1 architecture/apparatus with Figure 1; 4.2 physiological monitoring; 4.3 no assistance, scheduled assistance every 30 seconds and adaptive assistance whenever the existing arousal flag is raised. Operators select and deliver relevant content. |
-| 5. Study Design and Findings | Connect measurement decisions to the observed results | 5.1 participants/procedure/analysis; 5.2 objective performance (Table 1), sensitivity checks and assistance amounts; 5.3 workload (Table 2); 5.4 intervention experience (Table 3); 5.5 overall responses. Photograph scores and qualitative themes are not yet available. |
-| 6. Discussion, Limitations, and Future Work | Interpret the findings at the strength supported by the evidence | 6.1 task progress versus intervention experience; 6.2 assistance timing and physiological feedback; 6.3 sample, coding, puzzle, timing, measurement and generalization limits. Future comparisons are proposals, not completed evidence. |
+| 5. Study Design and Findings | Connect measurement decisions to the observed results | 5.1 participants/procedure/analysis; 5.2 objective performance (Table 1), sensitivity checks; 5.3 workload (Table 2); 5.4 intervention experience (Table 3); 5.5 overall responses. Photograph scores and qualitative themes are not yet available. |
+| 6. Discussion, Limitations, and Future Work | Interpret the findings at the strength supported by the evidence | 6.1 task progress versus intervention experience; 6.2 assistance timing and physiological feedback; 6.3 the robot’s retrieval role versus hint usefulness, combined assistance ratings, measurement and generalization limits. Future comparisons are proposals, not completed evidence. |
 | 7. Ethical Considerations | Describe the ethical handling of the interaction and records | Supported consent-interface and human-control facts, plus identifiability of raw records. Actual approval/exemption and deployed procedures still need author confirmation. |
 | 8. Conclusion | Answer the problem within the present scope | Restates the descriptive strategy comparison and the need to assess both progress and experience. No additional results or stronger causal claim. |
-| AI Assistance Disclosure | Explain substantive AI use accurately | Brief disclosure and author responsibility in the paper; tool, scope and retained prompt details in supplementary/ai-use-statement.md. |
+| AI Assistance Disclosure | Explain substantive AI use accurately | Brief disclosure and author responsibility in the paper; tool, scope and retained prompt details retained separately in supplementary/ai-use-statement.md. |
 | References | Provide the sources actually cited | Fifteen PDF-checked references, twelve first published in 2024–2026. This remains below the mentor's 40-reference target. |
 
 When the separate survey is ready, §3 becomes **Tangram Task Profiling and Assistance Expectations**, with sample/procedure, familiarity and square-task performance, assistance expectations, and relevance to the experiment. It can appear before the system for readability while stating its actual collection dates. When photograph scoring is ready, correct-piece findings go in **§5.2**, alongside the objective outcomes. Coded comments belong in **§5.5** before interpretation in §6.
 
 The main changes from the earlier draft are the reserved independent survey section, the combined methods-and-findings section, objective outcomes before subjective outcomes, and completed discussion/ethics/conclusion. The earlier draft stopped after methods. The comparison table near the end of this document gives the full old-versus-current mapping.
+
+## Comparison after adding draft notes
+
+The section order still matches the approved outline. The visible notes are reminders, not completed additions. Main reminders are uppercase; the short survey bullets are lowercase. No em dashes are used in the inserted notes.
+
+| Planned component | Current draft with notes | Remaining work |
+|---|---|---|
+| Related work expansion | §2 now says FIND AND INSERT MORE REFERENCES | Add relevant sources and verify them against downloaded paper text |
+| Separate task profiling before the system | §3 retains task rationale and now lists survey participants/procedure, familiarity/performance, assistance expectations, and study relevance/chronology | Collect and analyze the survey; expand §3 into the planned 3.1–3.4 subsections |
+| System, apparatus and assistance design | §4 has the architecture diagram, a setup photo/details reminder and a monitoring/protocol reminder | Add the photograph and actual apparatus/protocol details |
+| Methods followed by objective findings | The final-results, pairwise-comparison and correlation-graph reminder is at the end of §5.1, immediately before §5.2 | Finalize participant/procedure details, outcome coding and statistical methods |
+| Completion, duration and correct pieces | §5.2 has existing completion/duration results and a note for piece counts, performance plots and statistical comparisons | Score photographs and replace the interim analysis |
+| Workload after objective findings | §5.3 has a workload-results/graphs reminder and the existing table | Final comparisons and planned workload plot |
+| Assistance-specific experience | §5.4 has an intervention-experience results/graphs reminder | Final scheduled/adaptive comparisons |
+| Overall ratings and qualitative experience | §5.5 has an overall-ratings/qualitative-findings reminder | Analyze comments and add themes and quotations with a stated method |
+| Discussion, ethics and conclusion | Sections remain in the planned order; §6 now requests final-form quotations and §6.3 discusses retrieval versus direct placement | Integrate completed findings, confirm ethics details and update final claims |
+
+There is no additional detailed note in §4.3; the §4.2 reminder covers physiological monitoring and the assistance protocol. The existing three results tables remain until the planned figures and final findings are ready.
 
 ## Sources and scope
 

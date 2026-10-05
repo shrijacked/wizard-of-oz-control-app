@@ -1,6 +1,6 @@
 # Manuscript citations mapped to source PDF text
 
-Updated 5 October 2026 for the metadata and draft-wording revision on branch `writing` (base commit `11c9a7b`). The exact manuscript versions are identified by hashes in the JSON companion. This maps **all 15 references and every in-text citation occurrence**, including repeated citations and both members of the joint tangram citation. It supplements the [reference audit](MANUSCRIPT_REFERENCE_AUDIT.md), rather than replacing its metadata/version history.
+Updated 5 October 2026 for the draft-note revision on branch `writing` (base commit `9840396`). The exact manuscript versions are identified by hashes in the JSON companion. This maps **all 15 references and every in-text citation occurrence**, including repeated citations and both members of the joint tangram citation. It supplements the [reference audit](MANUSCRIPT_REFERENCE_AUDIT.md), rather than replacing its metadata/version history.
 
 For each reference: **our exact wording → source PDF page and short verbatim search anchor → explanation of support → boundary on interpretation**. The surrounding explanations are paraphrases, not quotations. Short anchors normalize PDF line wrapping and typographic ligatures; no wording is invented. Page numbers are one-based **PDF pages**, including repository covers, rather than journal page numbers. Each source’s excerpts total at most 25 words.
 
@@ -37,10 +37,10 @@ Key: `andriella2025`. [Local PDF](../../../data/writing-reference/literature-pdf
 
 **Where our paper uses it**
 
-- **1. Introduction** — [Markdown line 15](../manuscript.md#L15); [LaTeX line 62](../main.tex#L62). Evidence: A1, A2.
+- **1. Introduction** — [Markdown line 15](../manuscript.md#L15); [LaTeX line 75](../main.tex#L75). Evidence: A1, A2.
   > Andriella et al. model assistance type, timing, and confidence [1]
 
-- **2.1. Assistance timing and proactive coordination** — [Markdown line 37](../manuscript.md#L37); [LaTeX line 86](../main.tex#L86). Evidence: A1, A2, A3.
+- **2.1. Assistance timing and proactive coordination** — [Markdown line 39](../manuscript.md#L39); [LaTeX line 101](../main.tex#L101). Evidence: A1, A2, A3.
   > Andriella et al. learn proactive assistance from user profiles and task state in a sequential memory game, jointly addressing assistance type, timing, and confidence [1].
 
 **Supporting PDF text**
@@ -69,7 +69,7 @@ Key: `caiazzo2024`. [Local PDF](../../../data/writing-reference/literature-pdfs/
 
 **Where our paper uses it**
 
-- **2.3. Physical tasks and participant experience** — [Markdown line 49](../manuscript.md#L49); [LaTeX line 98](../main.tex#L98). Evidence: C1, C2, C3.
+- **2.3. Physical tasks and participant experience** — [Markdown line 51](../manuscript.md#L51); [LaTeX line 113](../main.tex#L113). Evidence: C1, C2, C3.
   > Adjacent assembly work by Caiazzo et al. compares manual, collaborative, and guided collaborative conditions, with EEG used for workload assessment [2].
 
 **Supporting PDF text**
@@ -98,7 +98,7 @@ Key: `capponi2024`. [Local PDF](../../../data/writing-reference/literature-pdfs/
 
 **Where our paper uses it**
 
-- **2.2. Physiological information in assistance** — [Markdown line 45](../manuscript.md#L45); [LaTeX line 94](../main.tex#L94). Evidence: CP1, CP2.
+- **2.2. Physiological information in assistance** — [Markdown line 47](../manuscript.md#L47); [LaTeX line 109](../main.tex#L109). Evidence: CP1, CP2.
   > Capponi et al. similarly find no clear RMSSD pattern across their assembly configurations and distinguish cognitive effort from stress [3].
 
 **Supporting PDF text**
@@ -122,10 +122,10 @@ Key: `delazzari2025`. [Local PDF](../../../data/writing-reference/literature-pdf
 
 **Where our paper uses it**
 
-- **1. Introduction** — [Markdown line 15](../manuscript.md#L15); [LaTeX line 62](../main.tex#L62). Evidence: P1, P2.
+- **1. Introduction** — [Markdown line 15](../manuscript.md#L15); [LaTeX line 75](../main.tex#L75). Evidence: P1, P2.
   > PACE uses action-completion estimates to coordinate proactive assistance [4].
 
-- **2.1. Assistance timing and proactive coordination** — [Markdown line 37](../manuscript.md#L37); [LaTeX line 86](../main.tex#L86). Evidence: P1, P2, P3.
+- **2.1. Assistance timing and proactive coordination** — [Markdown line 39](../manuscript.md#L39); [LaTeX line 101](../main.tex#L101). Evidence: P1, P2, P3.
   > PACE estimates action completion from hand movements and uses a learned policy to coordinate assistance during collaborative assembly [4].
 
 **Supporting PDF text**
@@ -154,7 +154,7 @@ Key: `hart2006`. [Local PDF](../../../data/writing-reference/literature-pdfs/Har
 
 **Where our paper uses it**
 
-- **2.3. Physical tasks and participant experience** — [Markdown line 51](../manuscript.md#L51); [LaTeX line 100](../main.tex#L100). Evidence: H1, H2.
+- **2.3. Physical tasks and participant experience** — [Markdown line 53](../manuscript.md#L53); [LaTeX line 115](../main.tex#L115). Evidence: H1, H2.
   > Hart describes the six NASA-TLX workload dimensions and the use of an unweighted overall score [5].
 
 **Supporting PDF text**
@@ -178,7 +178,7 @@ Key: `hostettler2025`. [Local PDF](../../../data/writing-reference/literature-pd
 
 **Where our paper uses it**
 
-- **2.2. Physiological information in assistance** — [Markdown line 43](../manuscript.md#L43); [LaTeX line 92](../main.tex#L92). Evidence: HO1, HO2, HO3.
+- **2.2. Physiological information in assistance** — [Markdown line 45](../manuscript.md#L45); [LaTeX line 107](../main.tex#L107). Evidence: HO1, HO2, HO3.
   > Hostettler et al. adapt robot behavior to user distance while measuring pupil responses; direct pupil-driven adaptation is a future direction [6].
 
 **Supporting PDF text**
@@ -207,10 +207,10 @@ Key: `karbouj2026`. [Local PDF](../../../data/writing-reference/literature-pdfs/
 
 **Where our paper uses it**
 
-- **1. Introduction** — [Markdown line 15](../manuscript.md#L15); [LaTeX line 62](../main.tex#L62). Evidence: K1, K2.
+- **1. Introduction** — [Markdown line 15](../manuscript.md#L15); [LaTeX line 75](../main.tex#L75). Evidence: K1, K2.
   > A recent review distinguishes adaptation of robot motion from task-level decisions about timing, sequencing, and role allocation [7].
 
-- **2.1. Assistance timing and proactive coordination** — [Markdown line 35](../manuscript.md#L35); [LaTeX line 84](../main.tex#L84). Evidence: K1, K2.
+- **2.1. Assistance timing and proactive coordination** — [Markdown line 37](../manuscript.md#L37); [LaTeX line 99](../main.tex#L99). Evidence: K1, K2.
   > Karbouj et al.'s review of adaptive industrial HRC distinguishes motion, task, and control adaptations and identifies task-level timing and coordination as areas warranting further attention [7].
 
 **Supporting PDF text**
@@ -234,7 +234,7 @@ Key: `korivand2024`. [Local PDF](../../../data/writing-reference/literature-pdfs
 
 **Where our paper uses it**
 
-- **2.2. Physiological information in assistance** — [Markdown line 43](../manuscript.md#L43); [LaTeX line 92](../main.tex#L92). Evidence: KO1, KO2, KO3.
+- **2.2. Physiological information in assistance** — [Markdown line 45](../manuscript.md#L45); [LaTeX line 107](../main.tex#L107). Evidence: KO1, KO2, KO3.
   > Korivand et al. develop physiological task-load prediction and Q-learning-based adjustment, while explicitly reporting that their recorded wristband data could not be integrated directly for real-time use [8].
 
 **Supporting PDF text**
@@ -263,10 +263,10 @@ Key: `melo2026`. [Local PDF](../../../data/writing-reference/literature-pdfs/Sen
 
 **Where our paper uses it**
 
-- **1. Introduction** — [Markdown line 19](../manuscript.md#L19); [LaTeX line 66](../main.tex#L66). Evidence: M1.
+- **1. Introduction** — [Markdown line 19](../manuscript.md#L19); [LaTeX line 79](../main.tex#L79). Evidence: M1.
   > Recent work uses tangrams for collaborative HRI and as a simplified assembly task [12, 9].
 
-- **2.3. Physical tasks and participant experience** — [Markdown line 49](../manuscript.md#L49); [LaTeX line 98](../main.tex#L98). Evidence: M1, M2.
+- **2.3. Physical tasks and participant experience** — [Markdown line 51](../manuscript.md#L51); [LaTeX line 113](../main.tex#L113). Evidence: M1, M2.
   > SensCogAR uses tangrams as a proxy for small-object assembly, manipulating the visibility of piece contours to vary task demand [9].
 
 **Supporting PDF text**
@@ -290,7 +290,7 @@ Key: `ojstersek2024`. [Local PDF](../../../data/writing-reference/literature-pdf
 
 **Where our paper uses it**
 
-- **2.2. Physiological information in assistance** — [Markdown line 43](../manuscript.md#L43); [LaTeX line 92](../main.tex#L92). Evidence: O1, O2.
+- **2.2. Physiological information in assistance** — [Markdown line 45](../manuscript.md#L45); [LaTeX line 107](../main.tex#L107). Evidence: O1, O2.
   > Ojsteršek et al. personalize robot parameters using a preliminary skills test and analyze ECG recordings after the experiment [10].
 
 **Supporting PDF text**
@@ -314,7 +314,7 @@ Key: `pereira2025`. [Local PDF](../../../data/writing-reference/literature-pdfs/
 
 **Where our paper uses it**
 
-- **2.2. Physiological information in assistance** — [Markdown line 45](../manuscript.md#L45); [LaTeX line 94](../main.tex#L94). Evidence: PE1, PE2.
+- **2.2. Physiological information in assistance** — [Markdown line 47](../manuscript.md#L47); [LaTeX line 109](../main.tex#L109). Evidence: PE1, PE2.
   > Pereira et al.'s review documents heterogeneous workload measures and mixed cardiac findings across HRC studies [11].
 
 **Supporting PDF text**
@@ -338,10 +338,10 @@ Key: `tabatabaei2025`. [Local PDF](../../../data/writing-reference/literature-pd
 
 **Where our paper uses it**
 
-- **1. Introduction** — [Markdown line 19](../manuscript.md#L19); [LaTeX line 66](../main.tex#L66). Evidence: T1.
+- **1. Introduction** — [Markdown line 19](../manuscript.md#L19); [LaTeX line 79](../main.tex#L79). Evidence: T1.
   > Recent work uses tangrams for collaborative HRI and as a simplified assembly task [12, 9].
 
-- **2.3. Physical tasks and participant experience** — [Markdown line 49](../manuscript.md#L49); [LaTeX line 98](../main.tex#L98). Evidence: T1, T2.
+- **2.3. Physical tasks and participant experience** — [Markdown line 51](../manuscript.md#L51); [LaTeX line 113](../main.tex#L113). Evidence: T1, T2.
   > Tabatabaei et al. study gaze around robot failures during collaborative tangram solving [12].
 
 **Supporting PDF text**
@@ -365,7 +365,7 @@ Key: `teo2018`. [Local PDF](../../../data/writing-reference/literature-pdfs/Teo_
 
 **Where our paper uses it**
 
-- **2.2. Physiological information in assistance** — [Markdown line 41](../manuscript.md#L41); [LaTeX line 90](../main.tex#L90). Evidence: TE1, TE2.
+- **2.2. Physiological information in assistance** — [Markdown line 43](../manuscript.md#L43); [LaTeX line 105](../main.tex#L105). Evidence: TE1, TE2.
   > Earlier work by Teo et al. uses individualized physiological workload markers to trigger aid during robot supervision, imposing aid later when it has not been triggered [13].
 
 **Supporting PDF text**
@@ -389,7 +389,7 @@ Key: `thunberg2026`. [Local PDF](../../../data/writing-reference/literature-pdfs
 
 **Where our paper uses it**
 
-- **2.4. Wizard-of-Oz evaluation** — [Markdown line 55](../manuscript.md#L55); [LaTeX line 104](../main.tex#L104). Evidence: TH1.
+- **2.4. Wizard-of-Oz evaluation** — [Markdown line 57](../manuscript.md#L57); [LaTeX line 119](../main.tex#L119). Evidence: TH1.
   > A recent HRI workshop proposal by Thunberg et al. emphasizes the practical, ethical, and methodological tensions of the wizard's role [14].
 
 **Supporting PDF text**
@@ -408,10 +408,10 @@ Key: `yang2024`. [Local PDF](../../../data/writing-reference/literature-pdfs/Yan
 
 **Where our paper uses it**
 
-- **1. Introduction** — [Markdown line 17](../manuscript.md#L17); [LaTeX line 64](../main.tex#L64). Evidence: Y1, Y2, Y3.
+- **1. Introduction** — [Markdown line 17](../manuscript.md#L17); [LaTeX line 77](../main.tex#L77). Evidence: Y1, Y2, Y3.
   > Yang et al. compared workload-adaptive robotic suction with periodic support during surgical training [15].
 
-- **2.2. Physiological information in assistance** — [Markdown line 41](../manuscript.md#L41); [LaTeX line 90](../main.tex#L90). Evidence: Y1, Y2, Y3.
+- **2.2. Physiological information in assistance** — [Markdown line 43](../manuscript.md#L43); [LaTeX line 105](../main.tex#L105). Evidence: Y1, Y2, Y3.
   > Yang et al.'s surgical system uses EEG and eye tracking to inform adaptive suction, with a periodic comparator selected to approximate earlier observed assistance frequency [15].
 
 **Supporting PDF text**

@@ -44,3 +44,9 @@ The named draft uses authorsperrow=5 with compact inter-author spacing
 (0.2pc) to keep all five names on one line. Author font size and class file
 are unchanged. Empty affiliation fields reserve separate author blocks;
 replace them with actual affiliations when supplied.
+
+The current preview includes visible drafting reminders in sections 3–5.
+Remove these reminders before preparing a submission PDF.
+
+Submission Id: 2613 is displayed below the named author row. The source
+hook adds it only in named mode; anonymous mode uses the template output.
