@@ -14,7 +14,7 @@ Reviewed 5 October 2026. This is an interpretation of the supplied handwriting a
 ## User clarifications received during this review
 
 - A separate survey is planned for a substantially larger sample than the 24-person experiment; responses are not yet available. It covers prior tangram experience, time to solve a standard tangram square linked in the form, and expected effectiveness of hints and robot assistance. Exact sample size, recruitment, overlap with the experimental sample, and instrument wording remain unconfirmed. This supports a task-profiling and assistance-expectations section. Do not report findings yet or claim the pending survey informed the already conducted experiment.
-- All 24 participants experienced all three conditions. These are three conditions in a within-participant study, not three independent groups of eight. Final analysis inclusion/exclusions still need to be established from the records.
+- The author clarified that 24 is the **planned** sample; collection is ongoing. Each participant is intended to experience all three conditions in a within-participant study, not three independent groups of eight. The current export contains nine complete participants and a tenth with five completed rounds. Final inclusion/exclusions still need to be established.
 - Puzzle completion was recorded. Final photographs exist for unfinished puzzles, and correct-piece counts will be derived from those photographs. Those counts are a planned retrospective annotation, not an already analyzed outcome. Elapsed-time availability and definitions should still be verified against session records.
 - “Sid's diagram” means the diagram that still needs to be made; no existing figure needs to be located.
 
@@ -38,7 +38,7 @@ The top reads “8 pages” and “Oct 9.” The date should be reconciled with 
 
 - They explicitly prioritize objective task performance before subjective evidence. This reverses the order of the handwritten 5.1 and 5.2; the proposed outline below follows the typed refinement.
 - “Task solving performance over learning perf (GuideAI)” means adapt the reference paper's evaluation framing to tangram performance. No learning or retention claim follows from completion/time alone.
-- “3 groups, 3 bars each in NASA TLX” means three condition summaries per workload dimension: the user confirmed that all 24 participants experienced all three conditions.
+- “3 groups, 3 bars each in NASA TLX” means three condition summaries per workload dimension: participants experience all three conditions; 24 is the target sample, not a completed count.
 - “9th final from overall” likely means the overall questionnaire administered after the ninth puzzle. The questionnaire inventory corroborates this interpretation. It is not a ninth condition or a per-condition trust score.
 - “Put sids diagram” was clarified by the user as the diagram still to be made. Plan an architecture diagram; no existing asset is implied.
 - “After alms” may mean “after LLMs”; this is uncertain. The HRI introduction should only discuss LLMs where they matter to the actual study and gap.
@@ -85,7 +85,7 @@ This preserves the reference paper's survey-before-system reading order without 
 - **5.4 Intervention experience:** helpfulness, timing, disruption/seamlessness, frustration relief for the two assisted conditions.
 - **5.5 Overall and qualitative experience:** end-of-study ratings and participant comments, with mixed experiences represented faithfully.
 
-Separate Methods and Results into top-level sections if readability warrants it; the logical order matters more than preserving section numbers. The current repository draft already separates system (§4) and study methods (§5), but stops before results.
+Separate Methods and Results into top-level sections if readability warrants it; the logical order matters more than preserving section numbers. The earlier draft stopped after methods. The revised paper now follows the combined study-and-findings structure above.
 
 **6. Discussion, Limitations, and Future Work:** interpret performance/experience agreement or trade-offs; explain implications for assistance; discuss human mediation, intervention content/dose, physiological-signal interpretation, sample/task scope, and the arm's actual contribution. The note says the robot brings a piece while the participant solves the puzzle; verify the exact physical behavior.
 
@@ -116,10 +116,26 @@ Appendices in the paper count within eight pages. Missing AI records must be dis
 
 Illustrative eight-page allocation, including figures: front matter/abstract 0.4; introduction 0.9; related work 0.8; rationale/formative stage 0.5; system 1.2; study methods 1.1; findings 1.8; discussion/ethics/conclusion 1.3. This sums to eight but is not a compiled layout measurement.
 
-## Questions to settle first
+## Decisions and difference from the earlier outline
+
+The author approved this outline on 5 October and requested a complete paper draft using the available findings, to be replaced as experiments finish. The separate survey and photograph scoring remain pending. The current manuscript uses three results tables in place of the planned result figures; these preserve the same outcome order without implying that plots or piece scores already exist.
+
+| Earlier draft / outline | Agreed outline and current implementation |
+|---|---|
+| §3 Task and Design Rationale, with physical-task and design-requirement subsections | Reserve a separate task-profile survey section, including square-task performance and assistance expectations. Retain factual rationale until responses exist; state the real collection chronology. |
+| §4 System and Assistance Strategies, four implementation subsections | System and Assistance Design: architecture/apparatus → physiological capture → condition rules. Make researcher and robot-operator decisions explicit. |
+| §5 Study Design and Measures, six methods/measurement subsections; no results | Study Design and Findings: concise methods followed by objective performance, workload, intervention experience and final responses. |
+| Handwritten sketch placed subjective workload before objective performance | Typed refinement places objective outcomes first, followed by workload and assistance ratings. |
+| Related work separated trust/communication from assessment | Integrate experience and measurement with the physical-task literature; keep final trust distinct from condition-specific intervention ratings. |
+| No discussion, ethics section or conclusion in the initial draft | Complete discussion/limitations/future work, ethics, conclusion and AI disclosure. Missing factual checks stay in author notes. |
+| Historical abstract asserted a completed N=24 study | Working abstract uses nine complete records, ongoing recruitment toward 24, and descriptive findings; submitted text remains archived unchanged. |
+
+The introduction retains three contributions and no results. The new outline changes the argument and placement of evidence; it does not authorize inventing the missing survey, scoring, statistical significance or study procedures.
+
+## Remaining evidence needed
 
 1. Where is the larger-sample survey form? Review its exact questions and linked puzzle, including whether the task uses physical or digital pieces, how time and successful completion are recorded, and whether hint-only, robot-only, and combined assistance are rated separately. Confirm recruitment and any overlap with the 24-person experimental sample.
 2. What annotation rule will determine a correctly placed piece from the final photographs, and are all unfinished trials covered by usable photographs?
-3. After checking completeness and exclusions, how many of the 24 participants enter each analysis?
+3. As recruitment toward 24 progresses, which participants enter each final analysis after checking completeness, provisional replacements and exclusions?
 
 Later methods questions are already collected in `author-notes.md`: the actual adaptive decision policy, robot model/actions, deployed settings, study procedure, demographics/exclusions, and ethics/data practices. Those details become necessary for manuscript revision, but are not needed to decipher the overall structure.

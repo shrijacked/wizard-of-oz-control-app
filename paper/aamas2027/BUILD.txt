@@ -1,13 +1,37 @@
-AAMAS 2027 — first writing draft
+AAMAS 2027 — complete working paper, 5 October 2026
 
-Import this project in Overleaf and select main.tex.
-Use pdfLaTeX with BibTeX (Overleaf normally handles the passes).
+Import the full folder into Overleaf; select main.tex and pdfLaTeX with BibTeX.
+Or, from this directory with a local TeX distribution:
 
-The source uses the supplied anonymous AAMAS 2027 template unchanged.
-Replace DRAFT with the real submission ID. Resolve the factual checks in the accompanying author notes.
-Results, discussion, limitations and conclusion are deliberately unwritten.
-The manuscript preserves the author-supplied submitted abstract unchanged.
+  pdflatex -interaction=nonstopmode -halt-on-error main.tex
+  bibtex main
+  pdflatex -interaction=nonstopmode -halt-on-error main.tex
+  pdflatex -interaction=nonstopmode -halt-on-error main.tex
 
-The built-in editor could not compile the custom AAMAS class because it does not
-load additional project files. The class is included here. A full-project build,
-page count and final layout still need checking. This folder is not a submission-ready manuscript.
+The supplied aamas.cls and ACM-Reference-Format.bst remain unchanged.
+Replace DRAFT with the real submission ID and resolve author-notes.md.
+The working abstract and all paper sections use the through-P111 findings;
+submitted-abstract.txt remains an unchanged historical record.
+
+Preview built on 5 October 2026 with Tectonic 0.17.0 (XeTeX + BibTeX), using
+the repository class and bibliography style unchanged. Output:
+  ../../output/pdf/aamas2027-current.pdf
+
+The preview is six pages including references. All six pages were rendered
+and visually inspected; no overfull boxes, undefined citations/references or
+missing-character warnings remain. Paragraph emergency stretch and two
+diagram label/path adjustments resolve the observed overflow/crowding.
+Margins, font sizes and the supplied class/style were not changed.
+
+The temporary compiler is /private/tmp/hti-latex-preview/tectonic. Rebuild
+from the repository root while that executable and package cache remain:
+  /private/tmp/hti-latex-preview/tectonic --untrusted --outdir output/pdf paper/aamas2027/main.tex
+This writes output/pdf/main.pdf; rename it to aamas2027-current.pdf after QA.
+
+This is a review preview, not a submission-readiness check. Remaining build
+warnings concern missing CCS concepts, incomplete optional bibliography
+fields, and the class/bibliography end-of-document balancing/conditional
+warning. The preview displays all 15 references. Preserve those issues for
+final submission cleanup and rerun the recommended pdfLaTeX build above.
+
+See README.md for the writing flow and results/reference refresh procedure.
