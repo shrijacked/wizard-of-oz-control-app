@@ -10,6 +10,7 @@ This is a writing draft through methods, not a submission-ready paper. It is gro
 - `submitted-abstract.txt`: the submitted abstract, preserved unchanged. Its results have not been verified.
 - `questionnaire-inventory.md`: exact questions and scale anchors extracted from the current participant interface.
 - `evidence-map.md`: mapping from claims to repository files and literature.
+- [`literature/README.md`](literature/README.md): literature exploration register with dates and review status, plus source-located derivations from the 14 downloaded and reviewed papers. This audit is separate from the manuscript bibliography and includes additional unread follow-up leads.
 
 Edit `main.tex` for the AAMAS submission. `manuscript.md` is a readable copy; update both when revising the paper.
 

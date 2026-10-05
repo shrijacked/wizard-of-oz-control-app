@@ -1,0 +1,40 @@
+# AAMAS literature register and verified derivations
+
+Prepared 5 October 2026 for the paper on scheduled and physiology-informed assistance during physical tangram solving.
+
+This folder documents which literature was explored, how far each paper was examined, and what the downloaded and reviewed papers contribute to the research rationale. It is a targeted literature audit, not a systematic review or a reanalysis of participant results.
+
+## Start here
+
+- [Reading register](READING_REGISTER.md): 18 actively examined papers with publication dates, access/review status and source links, followed by 22 discovery-only leads. Two discovery records have incomplete titles and are not citation-ready.
+- [Findings derived from downloaded and reviewed papers](DERIVED_FINDINGS.md): 14 paper-specific evidence summaries, exact section/PDF-page locations, implications for this paper, and limits on those implications. Only papers that were both downloaded and reviewed appear here.
+- [Printable register](READING_REGISTER.html): standalone HTML for sharing or printing; download/open it in a browser.
+- [Machine-readable register](reading_register.json): the same records for later updates.
+- [Download provenance](download_provenance.json): original filenames, public download URLs, versions, page counts, download dates and SHA-256 hashes for the 14 locally reviewed PDFs. The PDFs and extracted full texts are not bundled; public source links identify the reviewed versions.
+- [Publication metadata](publication_metadata.json): retained bibliographic and publication-date fields from the earlier metadata checks.
+- [Literature-audit bibliography](reviewed-literature.bib): the 15 previously entered citations, including the HTML-read Javernik paper. This is a separate audit collection, not the manuscript bibliography or a list of all 40 explored/discovery records.
+- [Gap-search record](gap_search_log.json): the earlier targeted query log and unresolved candidates; not a complete systematic search protocol.
+
+## How to interpret the labels
+
+| Status | Number | Meaning |
+| --- | ---: | --- |
+| Downloaded PDF and targeted text review | 14 | Relevant methods, results, discussion and limitations were checked. This does not imply exhaustive appraisal of every page. Eligible for `DERIVED_FINDINGS.md`. |
+| Publisher HTML text read | 1 | Javernik: relevant full-text sections read online; PDF retrieval failed. Recorded for access history, excluded from derived findings under the downloaded-and-reviewed rule. |
+| Selective online reading/reference tracing | 1 | Morandini: used for discovery, without a comprehensive section audit or saved PDF. |
+| Abstract/metadata only | 2 | Knežević and the SSRN record: full texts remain unverified. |
+| Discovery-only leads | 22 | Search/reference leads without structured full-text review; some metadata remains unresolved. |
+
+First-online publication, issue dates, and preprint posting dates are distinguished. Unknown dates are marked rather than inferred from DOI strings. PDF page numbers count from the first page of the reviewed file, including covers; author-manuscript and journal pagination can differ.
+
+## Current interpretation
+
+Yang et al. already compare physiology-triggered robot assistance with periodic support in surgical training. The earlier broad claim that this comparison was missing or scarce was withdrawn. The defensible positioning is an empirical extension to physical spatial problem solving, with informational and physical assistance and participant-experience measures. The search does not establish first-ever novelty.
+
+Tangram rationale is grounded in Tabatabaei and Melo/SensCogAR. Physiological sensing and adaptation are established areas; none of these sources validates our particular heart-rate cue or establishes our participant outcomes. See the evidence and limitations in the derived-findings document before incorporating claims into the manuscript.
+
+## Scope of this repository update
+
+This addition preserves literature exploration and its evidence trail for collaborators. It does not revise the submitted abstract, manuscript prose, manuscript bibliography, or results. Findings in this folder are paraphrases with explicit study-specific limits. Unreviewed records are reading leads, not support for empirical claims.
+
+To extend the audit, retrieve a paper, record the exact version and access date, inspect the relevant text, and add page/section evidence before adding a derived finding. Keep online-only and abstract-only records separate until the required review has been completed.
