@@ -1,0 +1,13 @@
+AAMAS 2027 — first writing draft
+
+Import this project in Overleaf and select main.tex.
+Use pdfLaTeX with BibTeX (Overleaf normally handles the passes).
+
+The source uses the supplied anonymous AAMAS 2027 template unchanged.
+Replace DRAFT with the real submission ID. Resolve the factual checks in the accompanying author notes.
+Results, discussion, limitations and conclusion are deliberately unwritten.
+The manuscript preserves the author-supplied submitted abstract unchanged.
+
+The built-in editor could not compile the custom AAMAS class because it does not
+load additional project files. The class is included here. A full-project build,
+page count and final layout still need checking. This folder is not a submission-ready manuscript.
