@@ -1,7 +1,7 @@
 % Working paper, 5 October 2026. Main source for subsequent editing.
 % Findings use the through-P111 snapshot; see README.md and analysis/interim-summary.json.
 % Based on the supplied AAMAS 2027 template; class and layout unmodified.
-\documentclass[sigconf,anonymous]{aamas}
+\documentclass[sigconf]{aamas}
 \usepackage{balance}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta,positioning}
@@ -25,9 +25,25 @@ on Autonomous Agents and Multiagent Systems (AAMAS 2027)}{3--7 May 2027}{Hanoi, 
 \acmYear{2027}
 \acmDOI{}
 \acmISBN{}
-\acmSubmissionID{DRAFT}
+\acmSubmissionID{2613}
 \submissionType{Research Paper Track}
-\title{When to Help: Scheduled and Physiology-Informed Assistance in Physical Tangram Solving}
+\title{When to Intervene: Trade-offs Between Scheduled and Physiology-Triggered Robotic Assistance}
+\settopmatter{authorsperrow=5}
+% Compact inter-author spacing keeps full names on one line.
+\makeatletter
+\author@bx@sep=0.2pc\relax
+\makeatother
+\author{Rishit Anand}
+\affiliation{\institution{}\city{}\country{}}
+\author{Shrijak Kumar}
+\affiliation{\institution{}\city{}\country{}}
+\author{Tanvi Sanghai}
+\affiliation{\institution{}\city{}\country{}}
+\author{Sandeep Manjanna}
+\affiliation{\institution{}\city{}\country{}}
+\author{Siddharth}
+\affiliation{\institution{}\city{}\country{}}
+\renewcommand{\shortauthors}{Anand et al.}
 \keywords{Human--robot interaction, adaptive assistance, intervention timing, physiological sensing, Wizard-of-Oz, tangram}
 % Outstanding factual checks and refresh instructions are outside the paper in author-notes.md and README.md.
 \citestyle{acmnumeric}
@@ -129,7 +145,7 @@ The setup combines an Orangewood robotic arm, a Maxim H Band wrist sensor, and a
 
 \subsection{Physiological monitoring}
 
-The wrist sensor streams cardiac measurements over Bluetooth Low Energy to the study system. Physiological monitoring produces an arousal flag from an increase in heart rate relative to a recent reference. The dashboard displays the flag alongside the workspace view, allowing the researcher to deliver task-relevant assistance when the adaptive condition calls for it.
+The wrist sensor streams cardiac measurements over Bluetooth to the study system. Physiological monitoring produces an arousal flag from an increase in heart rate relative to a recent reference. The dashboard displays the flag alongside the workspace view, allowing the researcher to deliver task-relevant assistance when the adaptive condition calls for it.
 
 \subsection{Assistance conditions}
 
@@ -143,7 +159,7 @@ The wrist sensor streams cardiac measurements over Bluetooth Low Energy to the s
 
 \subsection{Participants, procedure, and analysis}
 
-The study uses a within-participant design with a target sample of 24. The present analysis includes nine participants who completed all nine puzzles, yielding 81 trials and 27 trials per condition.
+The study uses a within-participant design with a target sample of 24.
 
 Participants complete three sessions of three puzzles, with one assistance condition per session. Condition order varies across participants, and puzzles are randomly assigned to sessions. Participants provide consent and background information before beginning the task. Each puzzle is allotted five minutes, followed by a questionnaire. Breaks separate sessions, and an overall questionnaire follows the ninth puzzle.
 
@@ -157,7 +173,7 @@ Participants solved 36 of the 81 puzzles. Completion rates were 14.8\% without a
 
 \begin{table}[t]
 \centering
-\caption{Puzzle completion and round duration across nine participants. Duration includes all attempts; values are mean (SD) across participant-condition averages.}
+\caption{Puzzle completion and round duration. Duration includes all attempts; values are mean (SD) across participant-condition averages.}
 \label{tab:performance}
 \begin{tabular}{lrrr}
 \toprule
@@ -243,7 +259,7 @@ Future work could relate arousal events and intervention times to observed puzzl
 
 \subsection{Limitations and future work}
 
-The present analysis includes nine participants, and the study is continuing toward its target sample. Condition orders and puzzle assignments are not equally represented in this subset, and completion outcomes for one participant required reconstruction. These factors limit generalization from the descriptive comparisons.
+Condition orders and puzzle assignments are not equally represented in the data, and completion outcomes for one participant required reconstruction. These factors limit generalization from the descriptive comparisons.
 
 Scheduled and adaptive conditions also differed in intervention frequency, and the experience ratings combined text and robotic-arm assistance. Future comparisons should examine the contribution of each modality and the relationship between assistance amount and timing. Correct-piece scoring from final photographs will provide a finer measure of partial progress alongside binary completion.
 

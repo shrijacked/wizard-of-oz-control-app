@@ -9,7 +9,9 @@ Or, from this directory with a local TeX distribution:
   pdflatex -interaction=nonstopmode -halt-on-error main.tex
 
 The supplied aamas.cls and ACM-Reference-Format.bst remain unchanged.
-Replace DRAFT with the real submission ID and resolve author-notes.md.
+The working draft uses submission ID 2613 and the author names supplied
+from OpenReview. Restore the anonymous class option for review submission
+and resolve author-notes.md.
 The author-supplied working abstract retains the planned N=24 framing.
 The numerical findings summarize nine complete participants;
 submitted-abstract.txt remains an unchanged historical record.
@@ -37,3 +39,8 @@ warning. The preview displays all 15 references. Preserve those issues for
 final submission cleanup and rerun the recommended pdfLaTeX build above.
 
 See README.md for the writing flow and results/reference refresh procedure.
+
+The named draft uses authorsperrow=5 with compact inter-author spacing
+(0.2pc) to keep all five names on one line. Author font size and class file
+are unchanged. Empty affiliation fields reserve separate author blocks;
+replace them with actual affiliations when supplied.

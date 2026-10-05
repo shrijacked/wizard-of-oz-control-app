@@ -10,7 +10,7 @@ Paths are relative to the repository root unless linked. The current snapshot ro
 
 | Claim / paper location | Source | Limit or required follow-up |
 |---|---|---|
-| Target N=24; analyzed subset N=9, §5.1 | Explicit author clarification and current working abstract; summary data | Finalize collection and reconcile abstract/results before submission |
+| Target N=24 in §5.1; interim analyzed subset N=9 in author notes | Explicit author clarification and current working abstract; summary data | Finalize collection and reconcile abstract/results before submission |
 | Nine complete participants; tenth has five completed rounds | Snapshot `relevant-files/consolidated-data.json`, participant raw session records; [summary](analysis/interim-summary.json) | P111 counter is stale; count finished rounds |
 | Complete sample 81 rounds, 27 per condition | Summary cohort checks; [summary script](../../scripts/summarize-writing-results.py) | P108–P110 provisional exports |
 | Table 1 completion/rate/duration; §5.2 | Summary `primary`, `recorded_only`, `available_rounds`; source outcome provenance | P101 completion inference explicitly retained; duration includes unsuccessful attempts |

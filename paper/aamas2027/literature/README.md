@@ -43,3 +43,5 @@ Tangram rationale is grounded in Tabatabaei and Melo/SensCogAR. Physiological se
 The original register preserved literature exploration without revising the manuscript. The later writing pass now revises the paper and bibliography and adds the active audit linked above. The submitted abstract remains unchanged. Findings in this folder are paraphrases with explicit study-specific limits. Unreviewed records are reading leads, not support for empirical claims.
 
 To extend the audit, retrieve a paper, record the exact version and access date, inspect the relevant text, and add page/section evidence before adding a derived finding. Keep online-only and abstract-only records separate until the required review has been completed.
+
+[CITATION_COUNTS.md](CITATION_COUNTS.md) lists source-by-source frequencies: 15 references, 21 source mentions across 20 citation groups.

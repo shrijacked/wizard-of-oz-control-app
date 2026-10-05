@@ -2,11 +2,15 @@
 
 Updated 5 October 2026. Internal working material, excluded from the submission. Begin with [README.md](README.md) for the writing flow and refresh procedure.
 
+## OpenReview metadata and named working draft
+
+The author-provided OpenReview screenshot for https://openreview.net/forum?id=p8Xw6g42Zz supplies the title **When to Intervene: Trade-offs Between Scheduled and Physiology-Triggered Robotic Assistance**, author order **Rishit Anand, Shrijak Kumar, Tanvi Sanghai, Sandeep Manjanna, Siddharth**, and submission number **2613**. These are now used in both manuscript formats. No affiliations or email addresses were supplied or inferred. The working PDF displays author names; restore the `anonymous` class option for an anonymous review submission. The original submitted-abstract archive is unchanged.
+
 ## Author-voice and protocol revision
 
 The author supplied a new working abstract and clarified the enacted timing policy: **scheduled assistance is offered every 30 seconds; adaptive assistance is offered whenever the existing dashboard arousal flag is raised**. Task progress informs the assistance content, not a discretionary decision about whether to follow the timing trigger. The author confirmed that “HRV goes up” refers to this existing flag; the inspected signal is heart-rate change, not a separate HRV-increase threshold. This clarification supersedes the earlier draft's inference from what the interface permits.
 
-The main text now uses a consistent research-author voice. Software-default comparisons, export dates, provisional-file provenance, detailed outcome sensitivities and scoring mechanics belong in these notes and [supplementary analysis notes](supplementary/analysis-notes.md). The main paper retains the analyzed sample, a concise statement about reconstructed completion outcomes and the recorded-only sensitivity because those directly affect interpretation.
+The main text now uses a consistent research-author voice. Software-default comparisons, export dates, provisional-file provenance, detailed outcome sensitivities and scoring mechanics belong in these notes and [supplementary analysis notes](supplementary/analysis-notes.md). Following the subsequent author request, the interim sample-size statements are kept in author documentation rather than the main narrative. The paper retains a concise statement about reconstructed completion outcomes and the recorded-only sensitivity. All current numerical results still derive from nine complete participants and must be replaced before submission.
 
 The supplied working abstract describes N=24 and the anticipated full-paper framing. The actual tables still summarize nine complete participants; no outcomes have been invented for the planned remaining sample. Reconcile the abstract with the final dataset before submission. The historical `submitted-abstract.txt` is unchanged.
 

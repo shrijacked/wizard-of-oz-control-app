@@ -152,7 +152,7 @@ The author approved this outline on 5 October and requested a complete paper dra
 | Handwritten sketch placed subjective workload before objective performance | Typed refinement places objective outcomes first, followed by workload and assistance ratings. |
 | Related work separated trust/communication from assessment | Integrate experience and measurement with the physical-task literature; keep final trust distinct from condition-specific intervention ratings. |
 | No discussion, ethics section or conclusion in the initial draft | Complete discussion/limitations/future work, ethics, conclusion and AI disclosure. Missing factual checks stay in author notes. |
-| Historical abstract asserted a completed N=24 study | Latest author-supplied working abstract retains N=24; current results explicitly cover nine complete participants. Reconcile after collection; submitted text remains archived unchanged. |
+| Historical abstract asserted a completed N=24 study | Latest author-supplied working abstract retains N=24; current numerical results derive from nine complete participants, with that interim sample recorded in author documentation. Reconcile after collection; submitted text remains archived unchanged. |
 
 The introduction retains three contributions and no results. The new outline changes the argument and placement of evidence; it does not authorize inventing the missing survey, scoring, statistical significance or study procedures.
 

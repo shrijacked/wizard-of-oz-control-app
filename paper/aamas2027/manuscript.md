@@ -1,4 +1,8 @@
-# When to Help: Scheduled and Physiology-Informed Assistance in Physical Tangram Solving
+# When to Intervene: Trade-offs Between Scheduled and Physiology-Triggered Robotic Assistance
+
+Rishit Anand, Shrijak Kumar, Tanvi Sanghai, Sandeep Manjanna, Siddharth
+
+Submission number: 2613
 
 ## Abstract
 
@@ -72,7 +76,7 @@ The setup combines an Orangewood robotic arm, a Maxim H Band wrist sensor, and a
 
 ### 4.2. Physiological monitoring
 
-The wrist sensor streams cardiac measurements over Bluetooth Low Energy to the study system. Physiological monitoring produces an arousal flag from an increase in heart rate relative to a recent reference. The dashboard displays the flag alongside the workspace view, allowing the researcher to deliver task-relevant assistance when the adaptive condition calls for it.
+The wrist sensor streams cardiac measurements over Bluetooth to the study system. Physiological monitoring produces an arousal flag from an increase in heart rate relative to a recent reference. The dashboard displays the flag alongside the workspace view, allowing the researcher to deliver task-relevant assistance when the adaptive condition calls for it.
 
 ### 4.3. Assistance conditions
 
@@ -86,7 +90,7 @@ The wrist sensor streams cardiac measurements over Bluetooth Low Energy to the s
 
 ### 5.1. Participants, procedure, and analysis
 
-The study uses a within-participant design with a target sample of 24. The present analysis includes nine participants who completed all nine puzzles, yielding 81 trials and 27 trials per condition.
+The study uses a within-participant design with a target sample of 24.
 
 Participants complete three sessions of three puzzles, with one assistance condition per session. Condition order varies across participants, and puzzles are randomly assigned to sessions. Participants provide consent and background information before beginning the task. Each puzzle is allotted five minutes, followed by a questionnaire. Breaks separate sessions, and an overall questionnaire follows the ninth puzzle.
 
@@ -104,7 +108,7 @@ Participants solved 36 of the 81 puzzles. Completion rates were 14.8% without as
 | Scheduled | 19/27 | 70.4% | 234.11 (58.19) |
 | Adaptive | 13/27 | 48.1% | 276.48 (28.37) |
 
-*Table 1. Puzzle completion and round duration across nine participants. Duration includes all attempts; values are mean (SD) across participant-condition averages.*
+*Table 1. Puzzle completion and round duration. Duration includes all attempts; values are mean (SD) across participant-condition averages.*
 
 Excluding the participant with reconstructed completion outcomes yielded rates of 16.7%, 70.8%, and 54.2%, respectively, preserving the ordering across conditions.
 
@@ -163,7 +167,7 @@ Future work could relate arousal events and intervention times to observed puzzl
 
 ### 6.3. Limitations and future work
 
-The present analysis includes nine participants, and the study is continuing toward its target sample. Condition orders and puzzle assignments are not equally represented in this subset, and completion outcomes for one participant required reconstruction. These factors limit generalization from the descriptive comparisons.
+Condition orders and puzzle assignments are not equally represented in the data, and completion outcomes for one participant required reconstruction. These factors limit generalization from the descriptive comparisons.
 
 Scheduled and adaptive conditions also differed in intervention frequency, and the experience ratings combined text and robotic-arm assistance. Future comparisons should examine the contribution of each modality and the relationship between assistance amount and timing. Correct-piece scoring from final photographs will provide a finer measure of partial progress alongside binary completion.
 
