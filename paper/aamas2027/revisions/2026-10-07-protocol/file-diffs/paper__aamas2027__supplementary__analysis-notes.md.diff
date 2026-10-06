@@ -1,0 +1,23 @@
+--- before/paper/aamas2027/supplementary/analysis-notes.md
++++ current/paper/aamas2027/supplementary/analysis-notes.md
+@@ -26,14 +26,18 @@
+ 
+ The CSV contains 24 unique username rows; usernames are not reproduced in analysis outputs or manuscript. There are 15 reported complete, eight partial and one unsolved attempts. Time is categorical self-report and is not restricted to successful completers. Expected-helpfulness options are independently rated 1–5, lower better, not forced rankings. The unspecified robot-versus-digital item's anchors are unverified, so that item is not reported. The assistance checkbox permits contradictory combinations and is not treated as mutually exclusive. Survey figures show means with SD, not confidence intervals.
+ 
+-The author confirmed the linked task is a square tangram. No physical/digital interface, recruitment, independent cohort, or prospective chronology is inferred from the CSV alone. A method-confirmation note remains in §3.
++The author confirmed the linked task is a square tangram. The author confirms a digital task with a timer linked through a Google Form, college mailing-group recruitment, and overlap with some experimental participants. This does not establish prospective design chronology, exact overlap or independent samples. Time values remain self-reported categories, not extracted game timer logs.
+ 
+ ## Comments and remaining analysis
+ 
+ Six final forms have nonempty comments. The paper uses verbatim excerpts from P101 and P103 and describes the two fun comments; this is illustrative quotation selection, not formal thematic coding or a prevalence estimate. P104's critical robot comment and P118's questionnaire feedback remain available in the source, rather than being converted into invented themes. Further qualitative analysis should retain mixed experiences.
+ 
+-Correct-piece scoring is pending and requires final photographs, a rule, missingness handling, and documented annotator review. The final statistical model should consider repeated participants, puzzle/block effects and coding sensitivity. The final export must replace provisional records without duplication. This audit is kept separate from the manuscript's concise narrative.
++Correct-piece scoring is pending. The author specifies taking the orientation with more correct pieces when there are two possible orientations for a partial solution. Final photographs, placement tolerance, symmetry/occlusion/missingness rules and annotator review are still required; no score was inferred from binary completion. The final statistical model should consider repeated participants, puzzle/block effects and coding sensitivity. The final export must replace provisional records without duplication. This audit is kept separate from the manuscript's concise narrative.
+ 
+ ## Sources
+ 
+ [Results summary](../analysis/results-summary-2026-10-07.json) and [revision analysis](../analysis/revision-analysis.json) record source hashes and outputs. [README](../README.md) gives untouched archive locations, scripts and writing flow. [Author notes](../author-notes.md) track missing protocol facts. No raw usernames or source files are pushed with the paper.
++
++## Protocol clarification and timing audit
++
++The author specifies stopping unsolved trials at 5 minutes, five-minute inter-sitting breaks, preset hints and researcher choice of hint-only versus robot-plus-hint, with every movement paired with a hint. Rapid/sustained arousal flags are handled with a 15-second wait; these operational choices do not change the detector algorithm. Existing exported durations above 300 seconds remain untouched pending an agreed timing rule. The temporary three-minute preparation/baseline description must be reconciled with the collector’s 60-second baseline computation. No results, tests or plots changed in this protocol revision.

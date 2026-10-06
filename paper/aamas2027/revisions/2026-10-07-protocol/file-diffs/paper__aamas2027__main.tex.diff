@@ -1,0 +1,144 @@
+--- before/paper/aamas2027/main.tex
++++ current/paper/aamas2027/main.tex
+@@ -1,7 +1,7 @@
+ % Working paper, 7 October 2026. Main source for subsequent editing.
+-% Evidence and revision history: README.md and revisions/2026-10-07/.
++% Evidence and revision history: README.md and revisions/2026-10-07-protocol/.
+ % Based on the supplied AAMAS 2027 template; class and layout unmodified.
+-\documentclass[sigconf]{aamas}
++\documentclass[sigconf,anonymous]{aamas}
+ \usepackage{balance}
+ \usepackage{tikz}
+ \usetikzlibrary{arrows.meta,positioning}
+@@ -28,35 +28,8 @@
+ \acmSubmissionID{2613}
+ \submissionType{Research Paper Track}
+ \title{When to Intervene: Trade-offs Between Scheduled and Physiology-Triggered Robotic Assistance}
+-\settopmatter{authorsperrow=5}
+-% Compact inter-author spacing keeps full names on one line.
+-\makeatletter
+-\author@bx@sep=0.2pc\relax
+-\makeatother
+-\author{Rishit Anand}
+-\affiliation{\institution{}\city{}\country{}}
+-\author{Shrijak Kumar}
+-\affiliation{\institution{}\city{}\country{}}
+-\author{Tanvi Sanghai}
+-\affiliation{\institution{}\city{}\country{}}
+-\author{Sandeep Manjanna}
+-\affiliation{\institution{}\city{}\country{}}
+-\author{Siddharth}
+-\affiliation{\institution{}\city{}\country{}}
+-\renewcommand{\shortauthors}{Anand et al.}
+-% Show the submission ID below the named author row in this working draft.
+-% Anonymous mode already prints the ID through the template's author block.
+-\makeatletter
+-\g@addto@macro\@mkauthors{%
+-  \if@ACM@anonymous\else
+-    \global\setbox\mktitle@bx=\vbox{%
+-      \unvbox\mktitle@bx
+-      \hsize=\textwidth\centering
+-      {\@authorfont Submission Id: \@acmSubmissionID\par}\medskip
+-    }%
+-  \fi
+-}
+-\makeatother
++% Anonymous review copy; the class displays submission ID2613.
++\author{Anonymous Author(s)}
+ \keywords{Human--robot interaction, adaptive assistance, intervention timing, physiological sensing, Wizard-of-Oz, tangram}
+ % Outstanding factual checks and refresh instructions are outside the paper in author-notes.md and README.md.
+ \citestyle{acmnumeric}
+@@ -122,9 +95,7 @@
+ 
+ \subsection{Survey and task experience}
+ 
+-A task-profile survey collected responses from 24 people: 22 undergraduate students, one graduate student, and one faculty member. Respondents were aged 18--30 years ($M=20.17$, $SD=2.24$); 14 identified as men, nine as women, and one preferred not to disclose gender. The questionnaire asked respondents to attempt a linked square tangram puzzle and report their familiarity, completion, solving time, and moments of uncertainty. It also asked what assistance they would find helpful if stuck.
+-
+-\textbf{CONFIRM SURVEY INTERFACE, RECRUITMENT AND TIMING}
++A task-profile survey collected responses from 24 people: 22 undergraduate students, one graduate student, and one faculty member. Respondents were aged 18--30 years ($M=20.17$, $SD=2.24$); 14 identified as men, nine as women, and one preferred not to disclose gender. Respondents were recruited through forms shared on college mailing groups. A Google Form linked to an online square tangram with a timer; respondents attempted the puzzle and reported their familiarity, completion, solving time, and moments of uncertainty. They also rated the assistance they would find helpful if stuck. Some survey respondents also participated in the robot experiment.
+ 
+ Twelve respondents had previously solved tangrams, including two who solved them regularly. Seven had heard of tangrams without solving them, and five were unfamiliar with them. Fifteen respondents reported completing the puzzle (62.5\%), eight reported partial completion (33.3\%), and one did not solve it (4.2\%). Seventeen respondents (70.8\%) reported feeling stuck at least once. Twelve selected a solving time below one minute, eight selected one to five minutes, and two selected five to ten minutes; two selected the option for not attempting or solving the puzzle.
+ 
+@@ -140,7 +111,7 @@
+ \Description{Fifteen respondents completed the linked square puzzle, eight partially completed it, and one did not solve it. Mean expected-helpfulness ratings were 3.04 for robot placement, 2.58 for a video tutorial, 2.71 for a text hint, and 2.04 for a simpler puzzle, with lower values indicating greater helpfulness.}
+ \end{figure*}
+ 
+-Each experimental tangram requires all seven pieces to reproduce a target shape: two large triangles, one medium triangle, two small triangles, a square, and a parallelogram. Piece colors provide consistent references for hints and robot actions. We use nine targets, each with a solution available to the researcher.
++Each experimental tangram requires all seven pieces to reproduce a target shape: two large triangles, one medium triangle, two small triangles, a square, and a parallelogram. The seven colored pieces together form a $10\times10$-inch square. Their colors provide consistent references for hints and robot actions. We use nine targets, each with a solution available to the researcher.
+ 
+ Tangrams combine spatial reasoning with physical manipulation. Participants interpret the target, identify useful piece relationships, and test arrangements by moving and rotating the pieces. Informational assistance can address orientation or adjacency, while the arm can bring a relevant piece into the workspace. Different targets retain common materials and instructions, supporting repeated comparisons across conditions. Participants can revisit placements and work on different regions of the target rather than following a single prescribed sequence. The current arrangement guides assistance content, while the assigned condition determines its timing.
+ 
+@@ -160,7 +131,7 @@
+ \Description{Four modules show physiological processing, assistance timing, Wizard-of-Oz delivery and participant interaction. Current and reference heart-rate windows feed an arousal flag. Scheduled and adaptive triggers lead to hints or piece retrieval, coordinated through a local server.}
+ \end{figure*}
+ 
+-The setup combines an Orangewood robotic arm, a Maxim H Band wrist sensor, and a Logitech C270 workspace camera. An opaque partition separates the participant from two researchers, who administer the task and operate the arm (Figure~\ref{fig:setup}). The camera is mounted on top of the partition and covers the participant table. The participant faces a workspace with a puzzle assembly area in front of and to their left, a drop spot to their right, and a laptop for hints and questionnaires. Unused pieces occupy fixed, labeled pickup positions. The arm retrieves a selected piece using one of seven piece-specific programs and delivers it to the drop spot; the participant places it in the target arrangement. Text hints describe piece location, orientation, or adjacency and are accompanied by an audible notification.
++The setup combines an Orangewood robotic arm, a Maxim H Band wrist sensor, and a Logitech C270 workspace camera. An opaque partition separates the participant from two researchers, who administer the task and operate the arm (Figure~\ref{fig:setup}). The camera is mounted on top of the partition and covers the participant table. The participant faces a workspace with a puzzle assembly area in front of and to their left, a drop spot to their right, and a laptop for hints and questionnaires. Unused pieces occupy fixed, labeled pickup positions. The arm retrieves a selected piece using one of seven piece-specific programs and delivers it to the drop spot; the participant places it in the target arrangement. Preset text hints describe piece location, orientation, or adjacency, providing consistent assistance content across participants. Hints are accompanied by an audible notification. The researcher selects either a hint alone or a robot action paired with a hint, based on the current arrangement.
+ 
+ \begin{figure*}[t]
+ \centering
+@@ -172,31 +143,31 @@
+ \Description{The researchers and their controls occupy the left side of an opaque partition. On the right, the participant faces the table, with pickup positions near the robot, a drop spot to the participant's right, and an assembly area in front of and to the participant's left.}
+ \end{figure*}
+ 
+-\textbf{NEED TO ADD SETUP PHOTO HERE / ROBOT AND PIECE DETAILS}
++\textbf{NEED TO ADD SETUP PHOTO HERE / ROBOT AND PIECE MATERIAL DETAILS}
+ 
+ \subsection{Physiological monitoring}
+ 
+-The wrist sensor streams cardiac measurements over Bluetooth to a Python collector. To detect a short-term rise in heart rate, the collector compares median heart rate over the latest 15 seconds with median heart rate over the preceding 60 seconds. The arousal flag is raised when the difference is at least 5 beats per minute. A calibrated baseline provides the reference while the rolling reference is being established. Signal-quality checks exclude out-of-range readings and readings with poor sensor contact, and the detector requires sufficient usable samples before raising a flag.
++After receiving the study information, participants wore the wrist sensor during a three-minute pre-task baseline window. The sensor streams cardiac measurements over Bluetooth to a Python collector. To detect a short-term rise in heart rate, the collector compares median heart rate over the latest 15 seconds with median heart rate over the preceding 60 seconds. The arousal flag is raised when the difference is at least 5 beats per minute. A calibrated baseline provides the reference while the rolling reference is being established. Signal-quality checks exclude out-of-range readings and readings with poor sensor contact, and the detector requires sufficient usable samples before raising a flag.
+ 
+ The dashboard displays the flag alongside the workspace view. In the adaptive condition, the flag initiates assistance, while the puzzle arrangement determines the content of the hint or robot action. The flag is a heart-rate-rise cue for assistance timing; participant workload and frustration are assessed through questionnaires.
+ 
+-\textbf{ADD BASELINE PROCEDURE AND REPEATED-FLAG HANDLING}
++\textbf{CONFIRM ACTUAL BASELINE PROCEDURE}
+ 
+ \subsection{Assistance conditions}
+ 
+ \textbf{No assistance.} Participants solve the puzzle without text hints or robotic-arm assistance.
+ 
+-\textbf{Scheduled assistance.} Assistance is offered every 30 seconds during the puzzle. At each interval, the researcher delivers a text hint and/or a robotic-arm intervention relevant to the current arrangement.
+-
+-\textbf{Physiology-informed adaptive assistance.} Assistance is offered whenever physiological monitoring flags arousal. The researcher delivers a text hint and/or a robotic-arm intervention relevant to the current arrangement. The arousal flag determines when help is offered; the task state determines the assistance content.
++\textbf{Scheduled assistance.} Assistance is offered every 30 seconds during the puzzle. At each interval, the researcher delivers a preset text hint or a robotic-arm intervention accompanied by a hint, relevant to the current arrangement.
++
++\textbf{Physiology-informed adaptive assistance.} Assistance is offered whenever physiological monitoring flags arousal. The researcher delivers a preset text hint or a robotic-arm intervention accompanied by a hint, relevant to the current arrangement. Repeated flags prompt additional assistance. When a flag recurs rapidly or remains raised, the researcher waits 15 seconds before the next intervention. The arousal flag determines when help is offered; the task state guides the researcher’s choice of assistance content.
+ 
+ \section{Study Design and Findings}
+ 
+ \subsection{Participants, procedure, and analysis}
+ 
+-Twelve participants completed the experiment: seven men and five women, aged 20--27 years ($M=21.50$, $SD=2.02$). Each completed three sessions of three puzzles, with one assistance condition per session. Condition order varied across participants, and puzzles were randomly assigned to sessions. Participants provided consent and background information before beginning the task. Each puzzle was allotted five minutes, followed by a questionnaire. Breaks separated sessions, and an overall questionnaire followed the ninth puzzle.
+-
+-\textbf{ADD RECRUITMENT, PRACTICE AND ETHICS DETAILS}
++Twelve participants completed the experiment: seven men and five women, aged 20--27 years ($M=21.50$, $SD=2.02$). Participants volunteered through forms shared in college groups and received coupons as compensation. Each completed three sessions of three puzzles, with one assistance condition per session. Condition order varied across participants, and puzzles were randomly assigned to sessions. Participants provided consent and background information before beginning the task. A puzzle was judged solved when the arrangement resembled the target shape using all seven pieces. Unsolved attempts were stopped at five minutes. Each puzzle was followed by a questionnaire, with five-minute breaks between sessions and an overall questionnaire after the ninth puzzle.
++
++\textbf{ADD ELIGIBILITY AND PRACTICE DETAILS}
+ 
+ We measure puzzle completion and pause-adjusted round duration, including both solved and unsolved attempts. After each puzzle, participants rate the six NASA-TLX dimensions on seven-point scales: mental demand, physical demand, temporal demand, performance, effort, and frustration. An overall workload score averages the six items after aligning their direction so that higher values indicate greater workload. After assisted puzzles, participants also rate helpfulness, timing, seamlessness, and frustration relief. The final questionnaire assesses overall helpfulness, efficacy, trust, and reliance on the robot's guidance.
+ 
+@@ -206,7 +177,9 @@
+ 
+ \subsection{Objective task performance}
+ 
+-\textbf{INSERT CORRECT PIECE COUNT}
++For photograph-based partial-progress scoring, we count correctly placed pieces against the target arrangement. If a partial solution admits two possible orientations, we retain the orientation with more correctly placed pieces.
++
++\textbf{INSERT CORRECT PIECE COUNT / CONFIRM PLACEMENT TOLERANCE AND SCORERS}
+ 
+ Participants solved 47 of 108 puzzles. Completion rates were 13.9\% without assistance, 66.7\% with scheduled assistance, and 50.0\% with adaptive assistance (Table~\ref{tab:performance}; Figure~\ref{fig:performance}). Compared with control, completion was 52.8 percentage points higher with scheduled assistance ($p=.0015$) and 36.1 points higher with adaptive assistance ($p=.016$). The difference between the two assisted conditions was not statistically significant ($p=.156$).
+ 
+@@ -340,7 +313,11 @@
+ 
+ \section{Ethical Considerations}
+ 
+-Participants provide consent before the task and are informed that they may stop participating. The study involves cardiac measurements, workspace observations, and questionnaire responses. Human operators deliver the assistance and execute robot programs throughout the interaction. Participant codes link the study records; any release of data or workspace images must respect consent coverage and protect identifying information.
++Participants consented through the volunteer form and again before the experiment. The interface required consent and acknowledgement of instructions before the task began. Participation was voluntary, with the option to pause or stop without penalty. Participants consented to workspace recording and live viewing; the camera showed only the table and hands, excluding faces. Cardiac measurements and questionnaire responses were also collected.
++
++The concealed human operation in the Wizard-of-Oz setup was not disclosed during or after the task. Participant codes link the records; data release must respect consent coverage and protect identifying information.
++
++\textbf{ADD ETHICS APPROVAL OR EXEMPTION DETAILS}
+ 
+ \section{Conclusion}
+ 

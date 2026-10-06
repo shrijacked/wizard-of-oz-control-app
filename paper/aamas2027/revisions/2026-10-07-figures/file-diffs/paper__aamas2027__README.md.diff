@@ -1,0 +1,33 @@
+--- before/paper/aamas2027/README.md
++++ current/paper/aamas2027/README.md
+@@ -6,9 +6,9 @@
+ 
+ [main.tex](main.tex) is the canonical source; [manuscript.md](manuscript.md) is its readable counterpart. The draft follows the approved 5 October outline. It now contains the 24-response task-profile survey in §3, the updated apparatus and physiological pipeline in §4, and results for 12 complete participants / 108 rounds in §5. This is the actual analyzed sample, distinct from the planned target of 24. The historical [submitted abstract](submitted-abstract.txt) remains unchanged.
+ 
+-The updated paper includes three results tables and seven figures: survey, architecture, physical setup, performance, workload, correlations, and intervention experience. Comments are illustrated by verbatim excerpts, without claiming a formal thematic analysis. Pairwise tests are exploratory; do not convert higher average adaptive ratings into a significant advantage over scheduled assistance. The current draft is anonymous, with submission ID 2613; the prior named version remains in the protocol-revision baseline.
++The updated paper includes three results tables and six figures: survey, architecture, physical setup, workload, scheduled/adaptive correlations, and paired assistance differences. Comments are illustrated by verbatim excerpts, without claiming a formal thematic analysis. Pairwise tests are exploratory; do not convert higher average adaptive ratings into a significant advantage over scheduled assistance. The current draft is anonymous, with submission ID 2613; the prior named version remains in the protocol-revision baseline.
+ 
+-Every revision is reviewable in [the change log](revisions/2026-10-07-working-sample/CHANGELOG.md), [highlighted review](revisions/2026-10-07-working-sample/highlighted-review.html), and [exact TeX diff](revisions/2026-10-07-working-sample/main.tex.diff). The complete pre-change paper and PDF are frozen in [before/](revisions/2026-10-07-working-sample/before/); the baseline manifest records hashes. Do not edit this snapshot.
++Every revision is reviewable in [the change log](revisions/2026-10-07-figures/CHANGELOG.md), [highlighted review](revisions/2026-10-07-figures/highlighted-review.html), and [exact TeX diff](revisions/2026-10-07-figures/main.tex.diff). The complete pre-change paper and PDF are frozen in [before/](revisions/2026-10-07-figures/before/); the baseline manifest records hashes. Do not edit this snapshot.
+ 
+ The architecture TeX was pushed separately in commit `3c4ddb9`. The paper revision is local until reviewed and pushed. Do not include raw participant records or survey usernames in commits.
+ 
+@@ -47,7 +47,7 @@
+ ```sh
+ python3 scripts/summarize-writing-results.py --source data/writing-reference/hti-results-2026-10-06/relevant-files/consolidated-data.json --output paper/aamas2027/analysis/results-summary-2026-10-07.json
+ python3 scripts/update-paper-analysis.py
+-python3 scripts/review-paper-revision.py --revision 2026-10-07-working-sample
++python3 scripts/review-paper-revision.py --revision 2026-10-07-figures
+ ```
+ 
+ The first script uses the standard library. The graph/test script requires NumPy and Matplotlib. It uses the source's complete-cohort classification and existing `analysisSolved` labels; it does not adjudicate missing outcomes or merge new exports. Paths are at the top of the script. Retain source hashes, freeze a new pre-change snapshot, review participants/outcomes, regenerate analyses, update both manuscripts and evidence notes, build and inspect every PDF page, then regenerate the review package. Keep previous snapshots unchanged.
+@@ -63,3 +63,9 @@
+ ## Working sample and abstract
+ 
+ The author requested restoring the exact earlier abstract and keeping N=24 as the working sample size. The current manuscript identifies 24 as the planned sample and is visibly labeled as a working draft awaiting final results/demographics. Experimental graphs, numerical results, tests and source coding still use the 12 complete participant records; they were not inflated or regenerated as a 24-person analysis. Remove the draft notice only after the final data and all results are reconciled. The complete pre-change anonymous protocol draft is frozen in revisions/2026-10-07-working-sample/before/. Earlier revision packages are unchanged.
++
++## Figure revision
++
++The redundant performance graph and the three heatmaps are removed. Figure 4 retains the workload/frustration plot. Figure 5 shows matched scheduled/adaptive scatterplots for eight measures with Spearman correlations. Figure 6 replaces the four assistance-rating slope plots with adaptive-minus-scheduled differences, individual points and means with unadjusted 95% bootstrap intervals. This figure order follows the unchanged section order. Counts/tests and the restored abstract/planned N=24 are unchanged. The plot calculations still use the actual available matched records.
++
++Rebuild only the two new figures with `python3 scripts/plot-assisted-comparison.py`. The full analysis script also invokes this helper. The previous graphs/PDF are frozen in revisions/2026-10-07-figures/before/.

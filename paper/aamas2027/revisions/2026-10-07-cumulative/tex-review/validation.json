@@ -1,0 +1,16 @@
+{
+  "comparison_baseline_sha256": "fafc3848ac7f9301ebd4bebaa935e21a698f6ce4864a6cfabd0bee1651a77152",
+  "current_main_tex_sha256": "dce42496d0c633b919f42d0b5740052abbf8378ae80454fd821bd3a0670216b4",
+  "current_clean_pdf_sha256": "3bfd8e37a41b67e767ac277a7959aa664603216e8df14f93ff20a044f5c5e52d",
+  "review_tex_sha256": "d5748a9a0b7c3b5fe97fd94182c04e47df267d0ffa91dc24b48f642cf98c6b8e",
+  "review_pdf_sha256": "801f1b22af8431a3c1e8d033632cb868c1536007aef36e20daaea9bc7bf1c0ef",
+  "review_pdf_pages": 9,
+  "word_level_abstract_markup": true,
+  "green_additions_red_struck_deletions": true,
+  "removed_graphics_retained_with_red_crosses": true,
+  "template_and_bib_copies_verified": true,
+  "all_pages_rendered_and_visually_checked": true,
+  "final_overfull_or_unresolved_references": false,
+  "compiler": "Tectonic 0.17.0 / XeTeX + BibTeX",
+  "clean_manuscript_and_pdf_unchanged": true
+}

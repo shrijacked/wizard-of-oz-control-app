@@ -1,0 +1,21 @@
+{
+  "exact_previous_abstract_restored": true,
+  "working_sample": 24,
+  "actual_calculation_basis_unchanged": 12,
+  "visible_draft_notice": true,
+  "experimental_demographics_removed_pending_final": true,
+  "pdf_pages": 8,
+  "all_pages_visually_checked": true,
+  "final_log_overflow_or_unresolved_references": false,
+  "baseline_files_verified": 49,
+  "older_baselines_verified": true,
+  "results_and_figures_unchanged": true,
+  "reference_pdf_hashes_verified": 15,
+  "reference_text_anchors_verified": 35,
+  "citation_occurrences": 21,
+  "current_reference_map_hashes": true,
+  "highlight_review_matches_current_manuscript": true,
+  "changed_files": 12,
+  "pdf_sha256": "974f9c64870a032b80d1215c6a356dd70c041827d9f7754b2a721ccd9d7e2630",
+  "push_status": "Local only"
+}

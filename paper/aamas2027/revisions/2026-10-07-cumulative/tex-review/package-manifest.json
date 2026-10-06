@@ -1,0 +1,27 @@
+{
+  "files": {
+    "ACM-Reference-Format.bst": "8ec002c927068bfc5b3cfe71b66aa4767b9e485530ac3c67ba5c064df4c2e6ac",
+    "README.md": "33f150e1d42e8649d69c66d35955292c8190e390fec6152aadd830c016cf47d0",
+    "aamas.cls": "e88c8e3e5fd1e39f93a2a4fa5b664e125b67487996b4236668206acf5c70ca7e",
+    "by.pdf": "19b7b19350bb937afead8e45e4ad006187e14803bef783902dbd88e370fc9917",
+    "figures/assistance-architecture.png": "eb9f9565498ab30048d527ed48456db9b63ef83c9360326bc8b3c8515d60c25d",
+    "figures/assistance-architecture.tikz.tex": "19fa51bca538771923ce26587ee38cb67413d7b679eb843b2c656f2bbfe4ca64",
+    "figures/assistance-differences.pdf": "2715ed1c70123dac42f76e521540901ca1ed5e345db1055e571737f942837170",
+    "figures/assistance-differences.png": "7a160188677e7a93935ebd892a31ff8fcf2a4d47bc62a0f313ac80b1725f1692",
+    "figures/physical-setup-topdown.png": "14a68fc05e69732e506dbce92267a4eee7d1abc16af92c3c94d06ec85e75734c",
+    "figures/physical-setup-topdown.tikz.tex": "81f5daa270ab4c10bf6acd0d09e34d9b7266c393738b57e8e7bad5b19fc5ecb7",
+    "figures/scheduled-adaptive-correlations.pdf": "30c82cc2459beaea70c6e0c4e6060a4389607711bf4577347bf22107e815e84b",
+    "figures/scheduled-adaptive-correlations.png": "616d935f44158f66aa58361f59e4e8bc6247743cef3efbb304607616d83ae738",
+    "figures/task-profile-survey.pdf": "268c3845c3ee357387d8c8f685a746d42da1c527aad439dbb4b667d5d9a996ce",
+    "figures/task-profile-survey.png": "fe952fc0354d71734f00111fddc213127ae169d5f0fbfeba67b193a8b0fa81f0",
+    "figures/workload.pdf": "67aed93a0035843af7f24ed856b8f43f30eaf71e635f4a274cb3782128fdb161",
+    "figures/workload.png": "3a161610e99867c292277e5b8544cbe7448bfc0aa8e7a308980f6d520238ebb8",
+    "main-highlighted.pdf": "801f1b22af8431a3c1e8d033632cb868c1536007aef36e20daaea9bc7bf1c0ef",
+    "main-highlighted.tex": "d5748a9a0b7c3b5fe97fd94182c04e47df267d0ffa91dc24b48f642cf98c6b8e",
+    "previous-figures/correlations.pdf": "edf0378427705b3cb2bdaea49aa62eb396d6acb3520af9695d095575c2b1eeb4",
+    "previous-figures/intervention-experience.pdf": "d949a952c7be415ee539e5fc55c7eae419661d2c697e7c5400d821cacec9ba13",
+    "previous-figures/performance.pdf": "49bb523a727fce0c28d889a17a81f00279c05244465feb25c56c56b844990ce0",
+    "references.bib": "468bbfbd0e91f710347c524f63f0f93bc6627a66652a390e4e4eba54af52e0dc",
+    "validation.json": "66fc710755bb978ffa3040be9e932d3e42df571573340b24054c11a32d6d70cf"
+  }
+}

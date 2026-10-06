@@ -1,0 +1,184 @@
+{
+  "base_commit": "3c4ddb9",
+  "baseline_verified_files": 49,
+  "changes": [
+    {
+      "path": "paper/aamas2027/BUILD.txt",
+      "status": "modified",
+      "before_sha256": "399ce66dd9fba2b86a68cffb9fb7201308373e7ff1cb399d9d60a0aa7a7adc22",
+      "after_sha256": "89d8236534382b04370557e427bde1cd30130f56fb176aeb4493071a16e89921",
+      "diff_path": "file-diffs/paper__aamas2027__BUILD.txt.diff"
+    },
+    {
+      "path": "paper/aamas2027/README.md",
+      "status": "modified",
+      "before_sha256": "b4a931bacc69942e5cd3c741c6eb7c6f687887e916da9460139e4f56eef03eaa",
+      "after_sha256": "10dc99fac22278057ab5e9e65ef76f198755a7c6e0c7175b5fa1a0005be38f28",
+      "diff_path": "file-diffs/paper__aamas2027__README.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/analysis/assisted-comparison.json",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "5db17055d9dfa65a60338708e0c528e5bddc92bc91d0f9d7a8d91a3fe635709c",
+      "diff_path": "file-diffs/paper__aamas2027__analysis__assisted-comparison.json.diff"
+    },
+    {
+      "path": "paper/aamas2027/author-notes.md",
+      "status": "modified",
+      "before_sha256": "5e25c210015596cfe2b10fc663bd241157bd8fbb26ff6460a8b71d3637500aa5",
+      "after_sha256": "7543e89320f6fc5d00b0088e37748d0d65efba40f6f16280ecb6bfd75b132d00",
+      "diff_path": "file-diffs/paper__aamas2027__author-notes.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/evidence-map.md",
+      "status": "modified",
+      "before_sha256": "28f19981103964ed05d7f7fb133666a2e0fc44838502f6297a77239a4cddb116",
+      "after_sha256": "390d7d5c25c94db71992a853897b1026a8022923f4d406e54736282065b1034f",
+      "diff_path": "file-diffs/paper__aamas2027__evidence-map.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/figures/assistance-differences.pdf",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "2715ed1c70123dac42f76e521540901ca1ed5e345db1055e571737f942837170"
+    },
+    {
+      "path": "paper/aamas2027/figures/assistance-differences.png",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "7a160188677e7a93935ebd892a31ff8fcf2a4d47bc62a0f313ac80b1725f1692"
+    },
+    {
+      "path": "paper/aamas2027/figures/correlations.pdf",
+      "status": "removed",
+      "before_sha256": "edf0378427705b3cb2bdaea49aa62eb396d6acb3520af9695d095575c2b1eeb4",
+      "after_sha256": null
+    },
+    {
+      "path": "paper/aamas2027/figures/correlations.png",
+      "status": "removed",
+      "before_sha256": "9e445cc171e1fa909e665ea158d34dc946e8627582e6454f7fc928a25b795824",
+      "after_sha256": null
+    },
+    {
+      "path": "paper/aamas2027/figures/intervention-experience.pdf",
+      "status": "removed",
+      "before_sha256": "d949a952c7be415ee539e5fc55c7eae419661d2c697e7c5400d821cacec9ba13",
+      "after_sha256": null
+    },
+    {
+      "path": "paper/aamas2027/figures/intervention-experience.png",
+      "status": "removed",
+      "before_sha256": "3577052dca772a056c9688b222cde0f82638b9342177aea109f809248dcfa684",
+      "after_sha256": null
+    },
+    {
+      "path": "paper/aamas2027/figures/performance.pdf",
+      "status": "removed",
+      "before_sha256": "49bb523a727fce0c28d889a17a81f00279c05244465feb25c56c56b844990ce0",
+      "after_sha256": null
+    },
+    {
+      "path": "paper/aamas2027/figures/performance.png",
+      "status": "removed",
+      "before_sha256": "cd594008efa0c1975271b86946efc9bd08be98e93fe7c003e77f2674f508c09e",
+      "after_sha256": null
+    },
+    {
+      "path": "paper/aamas2027/figures/scheduled-adaptive-correlations.pdf",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "30c82cc2459beaea70c6e0c4e6060a4389607711bf4577347bf22107e815e84b"
+    },
+    {
+      "path": "paper/aamas2027/figures/scheduled-adaptive-correlations.png",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "616d935f44158f66aa58361f59e4e8bc6247743cef3efbb304607616d83ae738"
+    },
+    {
+      "path": "paper/aamas2027/literature/CITATION_COUNTS.md",
+      "status": "modified",
+      "before_sha256": "5eabab0356de058ad0d285d962d00dc03966ce426443f74286ca27ed5f4db5e1",
+      "after_sha256": "00f85e52d1b2003b43637933258660a06776c321e17b6e5f6546324e9d1eadbd",
+      "diff_path": "file-diffs/paper__aamas2027__literature__CITATION_COUNTS.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/literature/MANUSCRIPT_REFERENCE_AUDIT.md",
+      "status": "modified",
+      "before_sha256": "bae54b660d694ca0fb3a4da5f5283d8755d837edf060d075f8e0e0db3d9c2cb2",
+      "after_sha256": "653d507eddadb88b42349b4859cc51807178a57a5ceaaf4ea98cc61dfe29d69d",
+      "diff_path": "file-diffs/paper__aamas2027__literature__MANUSCRIPT_REFERENCE_AUDIT.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/literature/REFERENCE_TEXT_MAP.md",
+      "status": "modified",
+      "before_sha256": "b802e18e0d497bc32d64e3baf13036df7334ba938a83ee28ae100ce15a6543e4",
+      "after_sha256": "782d357dd255f1dd18e29d6f8b14080ef48f47f12ed2355d75af68f7c549fbe1",
+      "diff_path": "file-diffs/paper__aamas2027__literature__REFERENCE_TEXT_MAP.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/literature/reference-text-map.json",
+      "status": "modified",
+      "before_sha256": "c10d29699c0c34c55526e6eb6640e6bbcac94859a7b6a5af1cff5220e2774385",
+      "after_sha256": "09f046063b57c0a61adb10308ded50aca3c0a699690f866a5a1cd8e588dca171",
+      "diff_path": "file-diffs/paper__aamas2027__literature__reference-text-map.json.diff"
+    },
+    {
+      "path": "paper/aamas2027/main.tex",
+      "status": "modified",
+      "before_sha256": "4c293fdcde1592d8b00bdef34fd908ac567ab279a7cb4880a1aa09ddc00c5c49",
+      "after_sha256": "dce42496d0c633b919f42d0b5740052abbf8378ae80454fd821bd3a0670216b4",
+      "diff_path": "file-diffs/paper__aamas2027__main.tex.diff"
+    },
+    {
+      "path": "paper/aamas2027/manuscript.md",
+      "status": "modified",
+      "before_sha256": "e302e93d03f209920124d72d7bdff1906f562210a4cb708218ae974c48c12125",
+      "after_sha256": "511518a6c7b5ef74551e7d20a6e92802ec490c7348b9147cb5bd65ec5a681eb8",
+      "diff_path": "file-diffs/paper__aamas2027__manuscript.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/structure-review.md",
+      "status": "modified",
+      "before_sha256": "b3a876d959600338860cdbd5edd065c72599d782072a6f25af862f53729f4cc2",
+      "after_sha256": "323ce99f778c77042f4526dde5428293a0c4a5e3dbd7743cdad2fc9a96c7b184",
+      "diff_path": "file-diffs/paper__aamas2027__structure-review.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/supplementary/analysis-notes.md",
+      "status": "modified",
+      "before_sha256": "84aeabba7097075718ef586cbd45f5d0d2a6a5813504829735220c9b88fbb842",
+      "after_sha256": "6cb52c76c5a12e9767b1bd0e6a56b3a92ef9873de463da313101121c0a7c3254",
+      "diff_path": "file-diffs/paper__aamas2027__supplementary__analysis-notes.md.diff"
+    },
+    {
+      "path": "scripts/update-paper-analysis.py",
+      "status": "modified",
+      "before_sha256": "7139523608e971bc630985b8c6c9af0d60746bde3b5043aeca1886f1f0c5c34e",
+      "after_sha256": "1ed5843c19f29e8b84cb64312d8830ff1cbd3903430dd31000aa0f5e444a2940",
+      "diff_path": "file-diffs/scripts__update-paper-analysis.py.diff"
+    },
+    {
+      "path": "scripts/plot-assisted-comparison.py",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "8879ed56ff5cb101fe2bb5a4bac74581be171257388b0725b0dea5f77e163dd6",
+      "diff_path": "file-diffs/scripts__plot-assisted-comparison.py.diff"
+    },
+    {
+      "path": "scripts/review-paper-revision.py",
+      "status": "modified",
+      "before_sha256": "89369dd5bdd1fc73a074d1b3ed14418af6e67c77d6e780c44288610fa7633665",
+      "after_sha256": "52ca93c94d92c5b745e5cedf03eeb77d235cd9f05e64897a470a4b4cdf2dbc38",
+      "diff_path": "file-diffs/scripts__review-paper-revision.py.diff"
+    },
+    {
+      "path": "output/pdf/aamas2027-current.pdf",
+      "status": "modified",
+      "before_sha256": "974f9c64870a032b80d1215c6a356dd70c041827d9f7754b2a721ccd9d7e2630",
+      "after_sha256": "3bfd8e37a41b67e767ac277a7959aa664603216e8df14f93ff20a044f5c5e52d"
+    }
+  ]
+}

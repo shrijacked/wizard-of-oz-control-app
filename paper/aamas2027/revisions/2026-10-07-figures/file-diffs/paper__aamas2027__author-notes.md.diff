@@ -1,0 +1,28 @@
+--- before/paper/aamas2027/author-notes.md
++++ current/paper/aamas2027/author-notes.md
+@@ -16,7 +16,7 @@
+ 
+ §4 now contains the submitted architecture and current setup schematic, operator roles, pickup/drop/assembly arrangement, and concise 15-second/60-second/5-bpm processing. The author confirmed use of this arousal method throughout, repeated assistance and a 15-second wait for rapid/sustained flags. The three-minute baseline window is provisional pending an actual-procedure check. The detector identifies an HR-rise cue, not a validated psychological stress label.
+ 
+-§5 now has new participant demographics, all updated tables/ratings, paired-condition graphs, Spearman heatmaps and exploratory paired sign-flip tests with specified Holm families. Higher adaptive ratings do not establish a statistically significant adaptive-scheduled difference. Six participants left comments; the paper quotes three excerpts from two people and paraphrases the two “fun” responses. No formal coding or claimed qualitative themes were invented.
++§5 now has new participant demographics, all updated tables/ratings, paired-condition workload graphs, scheduled/adaptive Spearman scatterplots and exploratory paired sign-flip tests with specified Holm families. Higher adaptive ratings do not establish a statistically significant adaptive-scheduled difference. Six participants left comments; the paper quotes three excerpts from two people and paraphrases the two “fun” responses. No formal coding or claimed qualitative themes were invented.
+ 
+ §6 and the conclusion match the numerical findings, include a verbatim robot-motion comment, and retain direct placement as future work. The AI disclosure remains brief. Literature claims and references are unchanged; the source map has refreshed locations/hashes and verified anchors.
+ 
+@@ -41,7 +41,7 @@
+ 
+ P101 completion labels are reconstructed in the supplied coding: two scheduled successes; adaptive R9 remains ambiguous and is coded unsolved. Primary counts are 5/36, 24/36 and 18/36 (control, scheduled, adaptive). Recorded-only counts excluding P101 are 5/33, 22/33 and 18/33. Counting R9 solved gives 19/36 adaptive. Resolve these labels against original evidence before the final analysis. The paper does not narrate this audit; the exact sensitivity is in supplementary analysis notes.
+ 
+-Round duration includes failures and some records exceed the intended 300 seconds. Do not truncate without an agreed rule. Commands do not prove movement execution. Final trust/reliance are once per participant and cannot be separated by condition. Frustration is part of the workload composite, so workload-frustration correlations share measurement content. Tests were chosen during revision, not preregistered, and use sign-flip symmetry assumptions; review a final model with the team. Preserve allocation/exposure audits internally as requested.
++Round duration includes failures and some records exceed the intended 300 seconds. Do not truncate without an agreed rule. Commands do not prove movement execution. Final trust/reliance are once per participant and cannot be separated by condition. Frustration is part of the workload composite. The replacement correlations compare scheduled and adaptive scores for the same measure, not relationships between different measures. Tests were chosen during revision, not preregistered, and use sign-flip symmetry assumptions; review a final model with the team. Preserve allocation/exposure audits internally as requested.
+ 
+ ## Correct-piece scoring
+ 
+@@ -52,3 +52,7 @@
+ Keep audit provenance out of the research-author prose. Do not add interim dates, intervention totals, or removed allocation/frequency caveats to the limitations. Keep brief uppercase notes without em dashes; remove them when resolved. More references are still needed, and every addition must be checked against its downloaded PDF. No additional sources were added in this revision.
+ 
+ The current paper is anonymous, using the original template behavior and submission ID 2613. Author identities remain in internal notes/baselines only. Exclude those internal materials from an anonymous submission. Complete remaining ethics/protocol facts, CCS concepts, bibliography fields and final build checks. Retain the full AI-use record in the existing supplementary statement and conversation. Human authors remain responsible for scientific claims and disclosure compliance.
++
++## Figure comparison decisions
++
++The former performance plot and within-condition heatmaps are removed; their data remain archived. Six figures remain. Matched cross-condition Spearman correlations use participant averages and average tied ranks; they do not estimate condition effects. Assistance differences use exact adaptive-minus-scheduled participant values and existing mean/bootstrap intervals. These intervals are unadjusted, unlike the Holm-adjusted p-values; do not use them to claim a corrected significant assisted-policy difference. Existing primary results and working abstract are unchanged.

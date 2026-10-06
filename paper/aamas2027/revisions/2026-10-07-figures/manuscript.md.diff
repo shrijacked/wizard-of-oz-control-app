@@ -1,0 +1,87 @@
+--- before/manuscript.md
++++ current/manuscript.md
+@@ -128,7 +128,7 @@
+ 
+ We measure puzzle completion and pause-adjusted round duration, including both solved and unsolved attempts. After each puzzle, participants rate the six NASA-TLX dimensions on seven-point scales: mental demand, physical demand, temporal demand, performance, effort, and frustration. An overall workload score averages the six items after aligning their direction so that higher values indicate greater workload. After assisted puzzles, participants also rate helpfulness, timing, seamlessness, and frustration relief. The final questionnaire assesses overall helpfulness, efficacy, trust, and reliance on the robot's guidance.
+ 
+-We average ratings and durations across each participant's three trials per condition, then report means and standard deviations across participants. Completion is reported as the proportion of puzzles solved. Exploratory pairwise comparisons use two-sided paired sign-flip tests on participant-condition averages. Holm correction is applied to the three comparisons for each outcome and to the four assistance-rating comparisons; reported p values are adjusted. Spearman correlations summarize relationships between participant-level measures separately in each condition.
++We average ratings and durations across each participant's three trials per condition, then report means and standard deviations across participants. Completion is reported as the proportion of puzzles solved. Exploratory pairwise comparisons use two-sided paired sign-flip tests on participant-condition averages. Holm correction is applied to the three comparisons for each outcome and to the four assistance-rating comparisons; reported p values are adjusted. Spearman correlations compare each participant’s scheduled and adaptive averages for the same measure.
+ 
+ **UPDATE WITH FINAL RESULTS**
+ 
+@@ -138,7 +138,7 @@
+ 
+ **INSERT CORRECT PIECE COUNT / CONFIRM PLACEMENT TOLERANCE AND SCORERS**
+ 
+-Participants solved 47 of 108 puzzles. Completion rates were 13.9% without assistance, 66.7% with scheduled assistance, and 50.0% with adaptive assistance (Table 1; Figure 4). Compared with control, completion was 52.8 percentage points higher with scheduled assistance (p=.0015) and 36.1 points higher with adaptive assistance (p=.016). The difference between the two assisted conditions was not statistically significant (p=.156).
++Participants solved 47 of 108 puzzles. Completion rates were 13.9% without assistance, 66.7% with scheduled assistance, and 50.0% with adaptive assistance (Table 1). Compared with control, completion was 52.8 percentage points higher with scheduled assistance (p=.0015) and 36.1 points higher with adaptive assistance (p=.016). The difference between the two assisted conditions was not statistically significant (p=.156).
+ 
+ 
+ | Condition | Solved | Rate | Duration (s) |
+@@ -153,14 +153,9 @@
+ Scheduled assistance also had the shortest mean round duration. Its mean was 50.56 seconds below control (p=.012). The adaptive-control and adaptive-scheduled duration differences were not statistically significant (both p=.132). These durations summarize time spent across all attempts, rather than time to successful completion alone.
+ 
+ 
+-![Figure 4](figures/performance.png)
+-
+-*Figure 4. Puzzle completion and mean round duration. Gray lines connect the same participant across conditions; colored diamonds show condition means.*
+-
+-
+ ### 5.3. Subjective workload
+ 
+-Overall workload averaged 4.72 in control, 3.69 with scheduled assistance, and 3.74 with adaptive assistance (Table 2; Figure 5). Both assisted conditions had lower workload than control: the mean reductions were 1.03 points for scheduled assistance (p=.0020) and 0.98 points for adaptive assistance (p=.0015). Their overall workload scores did not differ significantly (p=.882).
++Overall workload averaged 4.72 in control, 3.69 with scheduled assistance, and 3.74 with adaptive assistance (Table 2; Figure 4). Both assisted conditions had lower workload than control: the mean reductions were 1.03 points for scheduled assistance (p=.0020) and 0.98 points for adaptive assistance (p=.0015). Their overall workload scores did not differ significantly (p=.882).
+ 
+ 
+ | Measure | Control | Scheduled | Adaptive |
+@@ -179,22 +174,14 @@
+ Mental demand averaged 4.69 with scheduled assistance and 4.81 with adaptive assistance, while frustration averaged 3.44 and 3.17, respectively. Adaptive assistance reduced frustration relative to control (p=.031). The scheduled-control and adaptive-scheduled frustration differences were not statistically significant (p=.068 and p=.470). Perceived performance averaged 5.03 and 5.06 in the assisted conditions.
+ 
+ 
+-![Figure 5](figures/workload.png)
+-
+-*Figure 5. Overall workload and frustration. Lines connect each participant's condition averages; diamonds show condition means. Higher values indicate greater burden.*
+-
+-
+-Figure 6 relates performance and experience across participants. Completion and duration were negatively correlated in control (ρ=-.80), scheduled assistance (ρ=-.89), and adaptive assistance (ρ=-.34). Completion and overall workload were also negatively correlated (ρ=-.43, -.36, and -.75, respectively). These associations describe co-occurring outcomes rather than causal relationships. Frustration contributes to the overall workload score, so their positive correlation partly reflects this shared measurement.
+-
+-
+-![Figure 6](figures/correlations.png)
+-
+-*Figure 6. Spearman correlations between participant-condition averages. Cells show correlation coefficients from -1 to 1; no significance threshold is applied. Frustration is one component of overall workload.*
++![Figure 4](figures/workload.png)
++
++*Figure 4. Overall workload and frustration. Lines connect each participant's condition averages; diamonds show condition means. Higher values indicate greater burden.*
+ 
+ 
+ ### 5.4. Intervention experience
+ 
+-Adaptive assistance received higher mean ratings on all four assistance-specific items (Table 3; Figure 7). Helpfulness averaged 5.06 with adaptive assistance and 4.83 with scheduled assistance; timing averaged 5.56 and 5.17, respectively. Mean seamlessness was 4.22 versus 4.11, and frustration relief was 5.14 versus 4.89. None of these paired differences was statistically significant after correction (timing p=.719; other items p=1.000).
++Adaptive assistance received higher mean ratings on all four assistance-specific items (Table 3; Figure 6). Helpfulness averaged 5.06 with adaptive assistance and 4.83 with scheduled assistance; timing averaged 5.56 and 5.17, respectively. Mean seamlessness was 4.22 versus 4.11, and frustration relief was 5.14 versus 4.89. None of these paired differences was statistically significant after correction (timing p=.719; other items p=1.000).
+ 
+ 
+ | Measure | Scheduled | Adaptive |
+@@ -207,12 +194,20 @@
+ *Table 3. Intervention experience in the two assisted conditions, mean (SD). Higher ratings indicate a more favorable experience.*
+ 
+ 
++Figure 5 compares participants’ scheduled and adaptive averages. Cross-condition correlations were .39 for completion, .10 for duration, .23 for workload, and -.07 for frustration. Assistance-rating correlations ranged from .50 for helpfulness to .64 for timing. These coefficients describe consistency across conditions, rather than the size or direction of their differences.
++
++
++![Figure 5](figures/scheduled-adaptive-correlations.png)
++
++*Figure 5. Scheduled versus adaptive participant averages for the same measure. Each point represents a matched pair; larger points indicate coincident pairs. Dashed diagonals indicate equal scores, and ρ denotes Spearman correlation.*
++
++
+ These ratings describe the combined experience of text hints and robotic-arm assistance. The higher adaptive averages alongside lower completion than scheduled assistance motivate examining both task progress and the experience of receiving help.
+ 
+ 
+-![Figure 7](figures/intervention-experience.png)
+-
+-*Figure 7. Assistance-specific ratings. Lines connect each participant's scheduled and adaptive averages; diamonds show condition means. Higher ratings indicate a more favorable experience.*
++![Figure 6](figures/assistance-differences.png)
++
++*Figure 6. Paired differences in assistance ratings, adaptive minus scheduled. Gray points show individual differences; diamonds show means with unadjusted 95% bootstrap intervals. Positive values favor adaptive assistance; negative values favor scheduled assistance.*
+ 
+ 
+ ### 5.5. Overall experience

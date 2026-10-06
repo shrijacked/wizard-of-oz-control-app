@@ -1,0 +1,11 @@
+--- before/paper/aamas2027/literature/MANUSCRIPT_REFERENCE_AUDIT.md
++++ current/paper/aamas2027/literature/MANUSCRIPT_REFERENCE_AUDIT.md
+@@ -8,7 +8,7 @@
+ 
+ **Local cache:** PDFs and page-labelled extracted text are under gitignored `data/writing-reference/literature-pdfs/` and `data/writing-reference/literature-text/` at the repository root. Twelve cited PDFs were copied from the earlier downloaded reference set and their hashes rechecked; PACE, Hart and Thunberg were newly downloaded on 5 October. The [JSON audit](manuscript-reference-audit.json) records exact paths, URLs, download dates, hashes, versions and page counts. Page numbers below are **PDF pages**, including cover pages, not necessarily printed pagination.
+ 
+-Current revision check (7 October): all 15 PDF file hashes and 35 normalized-page anchors match. No cited claim or bibliography entry changed; updated locations and manuscript hashes identify the anonymous protocol revision in REFERENCE_TEXT_MAP.md.
++Current revision check (7 October): all 15 PDF hashes and 35 supporting text anchors match. Citation locations and manuscript hashes now identify the working-sample draft revision; cited claims and bibliography are unchanged.
+ 
+ ## Citation-to-claim checks
+ 

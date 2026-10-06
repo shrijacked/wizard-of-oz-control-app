@@ -1,0 +1,11 @@
+--- before/paper/aamas2027/author-notes.md
++++ current/paper/aamas2027/author-notes.md
+@@ -8,7 +8,7 @@
+ 
+ Scheduled assistance is offered every 30 seconds; adaptive assistance is offered when the existing heart-rate-rise arousal flag is raised. The author confirmed this policy and the physical layout: opaque partition, camera mounted on it covering the table, fixed labeled pickup positions, participant laptop for forms, assembly area in front of/left of the participant and drop spot to their right. These details are now in §4 with both current diagrams.
+ 
+-The planned experimental sample is 24. The new export supports 12 complete participants / 108 rounds. The working abstract and methods now consistently report N=12; no unobserved outcomes were manufactured. The survey has 24 responses and is written as the supplied survey result, without interim wording. The author confirmed both input archives identified in README.
++The planned experimental sample is 24. The new export supports 12 complete participants / 108 rounds. At the author’s request, the exact earlier abstract is restored, using N=24. The procedure describes 24 as planned and the document has a visible working-draft notice. Numerical results, tests and graphs remain based on the existing 12 complete participants; no unobserved outcomes were manufactured. Experimental demographics are removed pending the final sample. The survey has 24 responses and is written as the supplied survey result, without interim wording. The author confirmed both input archives identified in README.
+ 
+ ## What is filled
+ 

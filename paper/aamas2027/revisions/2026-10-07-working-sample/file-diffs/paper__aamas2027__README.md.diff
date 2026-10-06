@@ -1,0 +1,28 @@
+--- before/paper/aamas2027/README.md
++++ current/paper/aamas2027/README.md
+@@ -8,7 +8,7 @@
+ 
+ The updated paper includes three results tables and seven figures: survey, architecture, physical setup, performance, workload, correlations, and intervention experience. Comments are illustrated by verbatim excerpts, without claiming a formal thematic analysis. Pairwise tests are exploratory; do not convert higher average adaptive ratings into a significant advantage over scheduled assistance. The current draft is anonymous, with submission ID 2613; the prior named version remains in the protocol-revision baseline.
+ 
+-Every revision is reviewable in [the change log](revisions/2026-10-07-protocol/CHANGELOG.md), [highlighted review](revisions/2026-10-07-protocol/highlighted-review.html), and [exact TeX diff](revisions/2026-10-07-protocol/main.tex.diff). The complete pre-change paper and PDF are frozen in [before/](revisions/2026-10-07-protocol/before/); the baseline manifest records hashes. Do not edit this snapshot.
++Every revision is reviewable in [the change log](revisions/2026-10-07-working-sample/CHANGELOG.md), [highlighted review](revisions/2026-10-07-working-sample/highlighted-review.html), and [exact TeX diff](revisions/2026-10-07-working-sample/main.tex.diff). The complete pre-change paper and PDF are frozen in [before/](revisions/2026-10-07-working-sample/before/); the baseline manifest records hashes. Do not edit this snapshot.
+ 
+ The architecture TeX was pushed separately in commit `3c4ddb9`. The paper revision is local until reviewed and pushed. Do not include raw participant records or survey usernames in commits.
+ 
+@@ -47,7 +47,7 @@
+ ```sh
+ python3 scripts/summarize-writing-results.py --source data/writing-reference/hti-results-2026-10-06/relevant-files/consolidated-data.json --output paper/aamas2027/analysis/results-summary-2026-10-07.json
+ python3 scripts/update-paper-analysis.py
+-python3 scripts/review-paper-revision.py --revision 2026-10-07-protocol
++python3 scripts/review-paper-revision.py --revision 2026-10-07-working-sample
+ ```
+ 
+ The first script uses the standard library. The graph/test script requires NumPy and Matplotlib. It uses the source's complete-cohort classification and existing `analysisSolved` labels; it does not adjudicate missing outcomes or merge new exports. Paths are at the top of the script. Retain source hashes, freeze a new pre-change snapshot, review participants/outcomes, regenerate analyses, update both manuscripts and evidence notes, build and inspect every PDF page, then regenerate the review package. Keep previous snapshots unchanged.
+@@ -59,3 +59,7 @@
+ The author confirmed the digital square-tangram survey, college-group recruitment and some overlap with the experiment. Exact overlap, task link and chronology remain unprovided. Preset hints, paired robot-plus-hint delivery, coupon compensation, five-minute breaks, success/timeout rules and the orientation-maximizing scoring rule are now documented. Add the setup photograph, robot model/piece material, actual baseline procedure, signal-loss behavior, eligibility/practice/ethics facts, and scored final photographs. The baseline window is provisional; the code’s 60-second calibration must be reconciled. Concealed operation was not disclosed afterward, per the author; the enacted instruction version and institutional review status remain open. Review the exploratory statistical model with the team before final submission, including coding adjudication and source checks. Add further relevant PDF-verified references. Keep the current anonymous author block and ID 2613. Resolve CCS/bibliography/build checks; affiliations belong only in a future named version. See [author notes](author-notes.md) for specifics.
+ 
+ The bibliography and 21 citation occurrences remain unchanged in content. All 15 PDF hashes and 35 source anchors are rechecked for this revision; the map's locations and manuscript hashes identify the updated text. Twelve sources first appeared in 2024–2026; older exceptions are retained for the measure or closest comparison. Downloaded PDFs and full extracted text stay in gitignored `data/`, and are not redistributed by pushing the branch.
++
++## Working sample and abstract
++
++The author requested restoring the exact earlier abstract and keeping N=24 as the working sample size. The current manuscript identifies 24 as the planned sample and is visibly labeled as a working draft awaiting final results/demographics. Experimental graphs, numerical results, tests and source coding still use the 12 complete participant records; they were not inflated or regenerated as a 24-person analysis. Remove the draft notice only after the final data and all results are reconciled. The complete pre-change anonymous protocol draft is frozen in revisions/2026-10-07-working-sample/before/. Earlier revision packages are unchanged.

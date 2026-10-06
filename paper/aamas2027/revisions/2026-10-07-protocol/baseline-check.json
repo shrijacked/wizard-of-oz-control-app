@@ -1,0 +1,12 @@
+{
+  "pdf_path": "data/writing-reference/literature-pdfs/Laborde_2017_HRV_Recommendations.pdf",
+  "pdf_sha256": "bee025e3a8868b7afd2fbaaf22ddd2ea11c13ac47df600cbe84056f584d53971",
+  "source_url": "https://public-pages-files-2025.frontiersin.org/articles/10.3389/fpsyg.2017.00213/pdf",
+  "read_pdf_pages": [
+    8,
+    9
+  ],
+  "scope": "Internal duration/baseline guidance; not a new active bibliography entry.",
+  "current_collector_baseline_seconds": 60,
+  "author_temporary_pretask_window_seconds": 180
+}

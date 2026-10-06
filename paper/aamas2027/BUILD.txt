@@ -1,52 +1,55 @@
-AAMAS 2027 — complete working paper, 5 October 2026
+AAMAS 2027 working paper, updated 7 October 2026
 
-Import the full folder into Overleaf; select main.tex and pdfLaTeX with BibTeX.
-Or, from this directory with a local TeX distribution:
+Import output/packages/aamas2027-complete-latex-project.zip into Overleaf;
+it contains the compile dependencies without the internal revision archive.
+select main.tex and pdfLaTeX with BibTeX. Locally:
 
   pdflatex -interaction=nonstopmode -halt-on-error main.tex
   bibtex main
   pdflatex -interaction=nonstopmode -halt-on-error main.tex
   pdflatex -interaction=nonstopmode -halt-on-error main.tex
 
-The supplied aamas.cls and ACM-Reference-Format.bst remain unchanged.
-The working draft uses submission ID 2613 and the author names supplied
-from OpenReview. Restore the anonymous class option for review submission
-and resolve author-notes.md.
-The author-supplied working abstract retains the planned N=24 framing.
-The numerical findings summarize nine complete participants;
-submitted-abstract.txt remains an unchanged historical record.
+The supplied aamas.cls and ACM-Reference-Format.bst are unchanged.
+The current manuscript uses the original template’s anonymous mode and
+Anonymous Author(s), with submission ID 2613 retained. Named author blocks
+and custom spacing are removed. The prior named copy is preserved in the
+protocol baseline; exclude internal notes and revisions from submission.
 
-Preview built on 5 October 2026 with Tectonic 0.17.0 (XeTeX + BibTeX), using
-the repository class and bibliography style unchanged. Output:
-  ../../output/pdf/aamas2027-current.pdf
+The previous author-approved abstract is restored exactly. The manuscript
+uses planned N=24 and is visibly marked as a working draft awaiting final
+results/demographics. The calculations still use 12 complete participants.
+The separate linked-square-tangram survey has 24 responses. Historical
+submitted-abstract.txt is unchanged; the planned experimental target 24 is
+retained in author notes. Visible drafting reminders remain for missing facts.
 
-The preview is five pages including references. All five pages were rendered
-and visually inspected; no overfull boxes, undefined citations/references or
-missing-character warnings remain. Paragraph emergency stretch and two
-diagram label/path adjustments resolve the observed overflow/crowding.
-Margins, body font size and the supplied class/style were not changed.
-Table 2 uses a local small font and reduced column spacing to fit one column.
+Current preview build: Tectonic 0.17.0 (XeTeX + BibTeX), using the supplied
+class/style. From the repository root while the temporary compiler/cache exist:
 
-The temporary compiler is /private/tmp/hti-latex-preview/tectonic. Rebuild
-from the repository root while that executable and package cache remain:
-  /private/tmp/hti-latex-preview/tectonic --untrusted --outdir output/pdf paper/aamas2027/main.tex
-This writes output/pdf/main.pdf; rename it to aamas2027-current.pdf after QA.
+  FONTCONFIG_FILE=/private/tmp/hti-latex-preview/fonts.conf /private/tmp/hti-latex-preview/tectonic --untrusted --only-cached --keep-intermediates --keep-logs --outdir output/pdf paper/aamas2027/main.tex
 
-This is a review preview, not a submission-readiness check. Remaining build
-warnings concern missing CCS concepts, incomplete optional bibliography
-fields, and the class/bibliography end-of-document balancing/conditional
-warning. The preview displays all 15 references. Preserve those issues for
-final submission cleanup and rerun the recommended pdfLaTeX build above.
+This writes output/pdf/main.pdf. After checking, copy it to
+output/pdf/aamas2027-current.pdf. The final preview has 8 pages including
+references, with main text continuing onto page 8. It includes 6 figures and
+3 tables, 15 references and 21 citation occurrences. Both diagrams are imported
+as TikZ from current editable sources; plots are vector PDFs. Two-panel plots
+are sized for one column; the eight-panel scheduled/adaptive correlation figure spans both
+columns; assistance differences use one column. Class margins and body font size remain unchanged.
 
-See README.md for the writing flow and results/reference refresh procedure.
+All 8 pages were rendered and visually inspected. The final build has no
+overfull boxes, undefined citations/references, missing characters or fatal
+errors. Remaining warnings concern underfull spacing, missing CCS concepts,
+some optional bibliography fields, and the supplied class's balancing/conditional
+state. These remain submission-cleanup items. The pdfLaTeX route above has not
+been run in this environment, so do not claim it independently verified.
 
-The named draft uses authorsperrow=5 with compact inter-author spacing
-(0.2pc) to keep all five names on one line. Author font size and class file
-are unchanged. Empty affiliation fields reserve separate author blocks;
-replace them with actual affiliations when supplied.
+The desktop compiler supports standalone documents; this multi-file paper was
+compiled with the established local Tectonic tool. The open standalone
+architecture editor is retained and its source is unchanged by paper edits.
 
-The current preview includes visible drafting reminders in sections 3–5.
-Remove these reminders before preparing a submission PDF.
-
-Submission Id: 2613 is displayed below the named author row. The source
-hook adds it only in named mode; anonymous mode uses the template output.
+The immediate pre-change paper/PDF is in revisions/2026-10-07-figures/before/.
+The pre-restoration paper/PDF remains in revisions/2026-10-07-working-sample/before/.
+The pre-protocol paper/PDF remains in revisions/2026-10-07-protocol/before/.
+The earlier results-revision baseline remains in revisions/2026-10-07/before/. Review
+CHANGELOG.md, highlighted-review.html, exact diffs and the hash inventory
+before committing the manuscript revision. See README.md for handoff and
+reproduction, author-notes.md for missing factual checks.

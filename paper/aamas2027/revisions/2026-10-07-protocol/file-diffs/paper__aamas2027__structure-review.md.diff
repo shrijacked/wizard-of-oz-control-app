@@ -1,0 +1,31 @@
+--- before/paper/aamas2027/structure-review.md
++++ current/paper/aamas2027/structure-review.md
+@@ -9,15 +9,15 @@
+ | Abstract | Problem, comparator, actual N=12, three policies, outcomes and qualified findings | Refresh with final accepted dataset/model; historical submitted abstract unchanged. |
+ | 1 Introduction | Timing problem, relevant prior work, RQ1/RQ2 and three contributions; no findings | Refine novelty after literature expansion. |
+ | 2 Related Work | Proactive timing, physiology, physical tasks/measures and Wizard-of-Oz;15 verified sources | Additional recent relevant sources, verified against PDFs. |
+-| 3 Task Profiling | 24-response survey demographics/procedure, familiarity, outcomes/time/stuckness, assistance expectations, graph and task rationale | Linked square task confirmed; interface, recruitment, cohort overlap and chronology; task image if useful. |
+-| 4 System | Current architecture and setup schematic; apparatus, roles, piece positions; medianHR processing and all three protocols | Setup photo, exact robot/piece details, baseline practice, repeated-flag and signal-failure handling. |
+-| 5.1 Methods | Actual N=12 demographics, three sessions, measures, participant averaging, exploratory paired tests/Holm and correlations | Recruitment, practice, ethics/procedure facts and final analysis decisions. |
+-| 5.2 Objective | Updated completion/time table, paired graph and comparisons | Correct-piece scoring, scoring rule/annotators, partial-progress graph. |
++| 3 Task Profiling | 24-response survey demographics/procedure, familiarity, outcomes/time/stuckness, assistance expectations, graph and task rationale | Digital/timed task, recruitment and some overlap now confirmed; exact overlap, task link and chronology remain. |
++| 4 System | Current architecture and setup schematic; apparatus, roles, piece positions; medianHR processing and all three protocols | Setup photo, robot model/piece material, actual baseline practice and signal-loss handling; repeated-flag 15-second wait and robot-plus-hint delivery now stated. |
++| 5.1 Methods | Actual N=12 demographics, three sessions, measures, participant averaging, exploratory paired tests/Holm and correlations | Eligibility, practice, ethics review and final analysis; recruitment/coupons, five-minute breaks and success/timeout rule now stated. |
++| 5.2 Objective | Updated completion/time table, paired graph and comparisons | Orientation-maximizing rule now stated; photographs, placement tolerance, scorers, scores and partial-progress graph remain. |
+ | 5.3 Workload | Updated dimensions/composite, paired workload/frustration graph and correlation heatmaps | Final results/model refresh; avoid independent interpretation of part-whole correlations. |
+ | 5.4 Assistance Experience | Updated four ratings, paired graph and qualified tests | Modality-specific evidence requires another analysis/study, not invented item separation. |
+ | 5.5 Overall | Final ratings and illustrative verbatim comments | Formal qualitative analysis only if undertaken and documented. |
+ | 6 Discussion | Performance/experience interpretation, physiology timing, robot-motion quote, direct-placement future work and limitations | Replace tangram-to-assembly drafting note with supported discussion; revisit scored partial progress. |
+-| 7 Ethics | Consent/withdrawal, physiological/camera data, operator role and handling principles | Approval/exemption identifier, actual consent/debriefing/data/safety facts. |
++| 7 Ethics | Consent/withdrawal, physiological/camera data, operator role and handling principles | Consent/form/app workflow and workspace-only recording now described; nondisclosure during/after confirmed. Institutional review, enacted instruction version and data/safety facts remain. |
+ | 8 Conclusion | Updated findings and calibrated implication | Refresh after final analysis. |
+ 
+ The survey occupies the correct pre-system position in the argument. Its planned sample/procedure, task performance, expectations and relevance slots are condensed into two subsections rather than four short ones. This does not claim the survey preceded or determined the experimental design. Objective findings precede workload, intervention experience and final comments, as agreed. The physical setup and architecture are separate figures; the paper now contains graphs alongside all three results tables.
+@@ -158,3 +158,7 @@
+ ## Remaining evidence needed now
+ 
+ Square task confirmed; survey interface/method/chronology confirmation; correct-piece photos and scoring; final participant-source and outcome adjudication; protocol/recruitment/ethics details; setup photograph and dimensions; additional verified references and submission metadata. See author-notes.md for the complete handoff.
++
++## Anonymous protocol revision
++
++The manuscript now uses the original class’s anonymous option and submission ID 2613, without the named author spacing/hook. Additional author-confirmed methods fill the same approved structure. The complete results/tables/plots stay unchanged. A new immutable pre-change copy and highlighted review are in revisions/2026-10-07-protocol/.

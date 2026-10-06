@@ -1,0 +1,452 @@
+--- before/paper/aamas2027/analysis/results-summary-2026-10-07.json
++++ current/paper/aamas2027/analysis/results-summary-2026-10-07.json
+@@ -0,0 +1,449 @@
++{
++  "snapshot_date": "2026-10-06",
++  "source_file": "data/writing-reference/hti-results-2026-10-06/relevant-files/consolidated-data.json",
++  "source_sha256": "d5c57286af539ef0628489c89a23bc304bfafe494b424f4a83640f88c3409019",
++  "scope": "Descriptive interim snapshot; existing source coding retained; no inferential tests.",
++  "aggregation": "Three rounds averaged within participant and condition; means and sample SD across complete participants. Solve rates use coded completed rounds.",
++  "complete_participants": [
++    "P101",
++    "P103",
++    "P104",
++    "P105",
++    "P106",
++    "P107",
++    "P108",
++    "P109",
++    "P110",
++    "P115",
++    "P116",
++    "P118"
++  ],
++  "complete_rounds": 108,
++  "scheduled_rounds": 117,
++  "completed_rounds": 113,
++  "provisional_participants": [
++    "P108",
++    "P109",
++    "P110"
++  ],
++  "condition_order_counts": {
++    "control → constant → adaptive": 3,
++    "constant → control → adaptive": 2,
++    "control → adaptive → constant": 2,
++    "constant → adaptive → control": 2,
++    "adaptive → control → constant": 2,
++    "adaptive → constant → control": 1
++  },
++  "primary": {
++    "control": {
++      "completed": 36,
++      "coded": 36,
++      "solved": 5,
++      "solve_rate": 0.1388888888888889,
++      "durationSeconds": {
++        "n": 12,
++        "mean": 289.5833333333333,
++        "participant_sd": 25.59439845597533
++      },
++      "hints": {
++        "n": 12,
++        "mean": 0,
++        "participant_sd": 0.0
++      },
++      "robots": {
++        "n": 12,
++        "mean": 0,
++        "participant_sd": 0.0
++      },
++      "tlxMean": {
++        "n": 12,
++        "mean": 4.722222222222222,
++        "participant_sd": 0.622709044765869
++      },
++      "survey": {
++        "mentalDemand": {
++          "n": 12,
++          "mean": 5.833333333333333,
++          "participant_sd": 0.9587449708822046
++        },
++        "physicalDemand": {
++          "n": 12,
++          "mean": 3.638888888888889,
++          "participant_sd": 1.6296391949520317
++        },
++        "temporalDemand": {
++          "n": 12,
++          "mean": 3.944444444444444,
++          "participant_sd": 1.2699585082964768
++        },
++        "performance": {
++          "n": 12,
++          "mean": 3.0833333333333335,
++          "participant_sd": 1.5050420310248864
++        },
++        "effort": {
++          "n": 12,
++          "mean": 5.555555555555555,
++          "participant_sd": 0.6716981845877292
++        },
++        "frustration": {
++          "n": 12,
++          "mean": 4.444444444444445,
++          "participant_sd": 1.2579712168772315
++        }
++      },
++      "puzzle_counts": {
++        "1": 4,
++        "2": 6,
++        "3": 6,
++        "4": 4,
++        "5": 1,
++        "6": 3,
++        "7": 3,
++        "8": 4,
++        "9": 5
++      },
++      "hints_total": 0,
++      "robot_cues_total": 0,
++      "rounds_over_300_seconds": 31
++    },
++    "constant": {
++      "completed": 36,
++      "coded": 36,
++      "solved": 24,
++      "solve_rate": 0.6666666666666666,
++      "durationSeconds": {
++        "n": 12,
++        "mean": 239.02777777777777,
++        "participant_sd": 51.415019291586475
++      },
++      "hints": {
++        "n": 12,
++        "mean": 10.38888888888889,
++        "participant_sd": 3.7868281371178356
++      },
++      "robots": {
++        "n": 12,
++        "mean": 2.0555555555555554,
++        "participant_sd": 0.838870492807861
++      },
++      "tlxMean": {
++        "n": 12,
++        "mean": 3.6944444444444446,
++        "participant_sd": 0.5420064979048165
++      },
++      "survey": {
++        "mentalDemand": {
++          "n": 12,
++          "mean": 4.694444444444445,
++          "participant_sd": 0.9040686187121348
++        },
++        "physicalDemand": {
++          "n": 12,
++          "mean": 3.111111111111111,
++          "participant_sd": 1.2818337033709337
++        },
++        "temporalDemand": {
++          "n": 12,
++          "mean": 3.3333333333333335,
++          "participant_sd": 0.8761716542303613
++        },
++        "performance": {
++          "n": 12,
++          "mean": 5.027777777777778,
++          "participant_sd": 1.0488891028933185
++        },
++        "effort": {
++          "n": 12,
++          "mean": 4.611111111111111,
++          "participant_sd": 0.9082487681884436
++        },
++        "frustration": {
++          "n": 12,
++          "mean": 3.4444444444444446,
++          "participant_sd": 0.9137925557897892
++        },
++        "helpfulness": {
++          "n": 12,
++          "mean": 4.833333333333333,
++          "participant_sd": 0.6276459144608479
++        },
++        "timingEffectiveness": {
++          "n": 12,
++          "mean": 5.166666666666667,
++          "participant_sd": 1.1055415967851334
++        },
++        "clarityAndDistraction": {
++          "n": 12,
++          "mean": 4.111111111111111,
++          "participant_sd": 1.3731430681184993
++        },
++        "stressReduction": {
++          "n": 12,
++          "mean": 4.888888888888889,
++          "participant_sd": 0.90267093384844
++        }
++      },
++      "puzzle_counts": {
++        "1": 4,
++        "2": 6,
++        "3": 6,
++        "4": 4,
++        "5": 4,
++        "6": 3,
++        "7": 4,
++        "8": 3,
++        "9": 2
++      },
++      "hints_total": 374,
++      "robot_cues_total": 74,
++      "rounds_over_300_seconds": 13
++    },
++    "adaptive": {
++      "completed": 36,
++      "coded": 36,
++      "solved": 18,
++      "solve_rate": 0.5,
++      "durationSeconds": {
++        "n": 12,
++        "mean": 268.77777777777777,
++        "participant_sd": 30.304292902989317
++      },
++      "hints": {
++        "n": 12,
++        "mean": 8.694444444444445,
++        "participant_sd": 2.77600953820929
++      },
++      "robots": {
++        "n": 12,
++        "mean": 1.1388888888888888,
++        "participant_sd": 0.6106518016804854
++      },
++      "tlxMean": {
++        "n": 12,
++        "mean": 3.740740740740741,
++        "participant_sd": 0.8093634601492498
++      },
++      "survey": {
++        "mentalDemand": {
++          "n": 12,
++          "mean": 4.805555555555555,
++          "participant_sd": 1.3959416888442004
++        },
++        "physicalDemand": {
++          "n": 12,
++          "mean": 3.2777777777777777,
++          "participant_sd": 1.4963479672379814
++        },
++        "temporalDemand": {
++          "n": 12,
++          "mean": 3.444444444444444,
++          "participant_sd": 1.3358561990393218
++        },
++        "performance": {
++          "n": 12,
++          "mean": 5.055555555555555,
++          "participant_sd": 1.2539499879941673
++        },
++        "effort": {
++          "n": 12,
++          "mean": 4.805555555555555,
++          "participant_sd": 1.077392412621516
++        },
++        "frustration": {
++          "n": 12,
++          "mean": 3.1666666666666665,
++          "participant_sd": 0.8102873913406629
++        },
++        "helpfulness": {
++          "n": 12,
++          "mean": 5.055555555555555,
++          "participant_sd": 0.8742481137010044
++        },
++        "timingEffectiveness": {
++          "n": 12,
++          "mean": 5.555555555555555,
++          "participant_sd": 0.9463735497270069
++        },
++        "clarityAndDistraction": {
++          "n": 12,
++          "mean": 4.222222222222222,
++          "participant_sd": 1.241808174432566
++        },
++        "stressReduction": {
++          "n": 12,
++          "mean": 5.138888888888889,
++          "participant_sd": 1.2828183408506817
++        }
++      },
++      "puzzle_counts": {
++        "1": 4,
++        "4": 4,
++        "5": 7,
++        "6": 6,
++        "7": 5,
++        "8": 5,
++        "9": 5
++      },
++      "hints_total": 313,
++      "robot_cues_total": 41,
++      "rounds_over_300_seconds": 19
++    }
++  },
++  "recorded_only": {
++    "control": {
++      "completed": 33,
++      "coded": 33,
++      "solved": 5,
++      "solve_rate": 0.15151515151515152
++    },
++    "constant": {
++      "completed": 33,
++      "coded": 33,
++      "solved": 22,
++      "solve_rate": 0.6666666666666666
++    },
++    "adaptive": {
++      "completed": 33,
++      "coded": 33,
++      "solved": 18,
++      "solve_rate": 0.5454545454545454
++    }
++  },
++  "available_rounds": {
++    "control": {
++      "completed": 39,
++      "coded": 39,
++      "solved": 5,
++      "solve_rate": 0.1282051282051282
++    },
++    "constant": {
++      "completed": 36,
++      "coded": 36,
++      "solved": 24,
++      "solve_rate": 0.6666666666666666
++    },
++    "adaptive": {
++      "completed": 38,
++      "coded": 38,
++      "solved": 19,
++      "solve_rate": 0.5
++    }
++  },
++  "overall": {
++    "overallHelpfulness": {
++      "n": 12,
++      "mean": 5.083333333333333,
++      "participant_sd": 1.2401124093721456
++    },
++    "overallEfficacy": {
++      "n": 12,
++      "mean": 4.916666666666667,
++      "participant_sd": 1.5050420310248864
++    },
++    "trust": {
++      "n": 12,
++      "mean": 4.75,
++      "participant_sd": 1.602554778527654
++    },
++    "automationBias": {
++      "n": 12,
++      "mean": 5.083333333333333,
++      "participant_sd": 1.3113721705515067
++    }
++  },
++  "nonempty_comments": 6,
++  "source_exclusions": [
++    "P102",
++    "P119 setup only",
++    "All IDs below P101",
++    "Duplicate writing-reference copies"
++  ],
++  "source_audit": [
++    [
++      "P101",
++      "Event export differences",
++      "CSV-only: 1 (telemetry.hrv.updated); JSON-only: 0 (). Union by timestamp/type; shared payloads verified."
++    ],
++    [
++      "P101",
++      "Watch count differs",
++      "File has 16988 rows; metadata says 16947."
++    ],
++    [
++      "P101",
++      "Earlier setup IDs retained",
++      "Schedule log contains P96, P101. Final metadata and actual round records selected; not extra participants."
++    ],
++    [
++      "P108",
++      "Earlier setup IDs retained",
++      "Schedule log contains P01, P108. Final metadata and actual round records selected; not extra participants."
++    ],
++    [
++      "P109",
++      "Missing source",
++      "session-20260928-115137.watch.jsonl"
++    ],
++    [
++      "P109",
++      "Earlier setup IDs retained",
++      "Schedule log contains P111, p09, P09. Final metadata and actual round records selected; not extra participants."
++    ],
++    [
++      "P110",
++      "Watch count differs",
++      "File has 3471 rows; metadata says 3465."
++    ],
++    [
++      "P110",
++      "Earlier setup IDs retained",
++      "Schedule log contains P109, P110. Final metadata and actual round records selected; not extra participants."
++    ],
++    [
++      "P115",
++      "Watch count differs",
++      "File has 2068 rows; metadata says 2065."
++    ],
++    [
++      "P115",
++      "Earlier setup IDs retained",
++      "Schedule log contains P234343, p115. Final metadata and actual round records selected; not extra participants."
++    ],
++    [
++      "P116",
++      "Earlier setup IDs retained",
++      "Schedule log contains P234344, p116. Final metadata and actual round records selected; not extra participants."
++    ],
++    [
++      "P118",
++      "Earlier setup IDs retained",
++      "Schedule log contains P108, P118. Final metadata and actual round records selected; not extra participants."
++    ],
++    [
++      "P111",
++      "Completion counter mismatch",
++      "roundsCompleted=6; completedAt and round.completed events support 5."
++    ],
++    [
++      "P111",
++      "Earlier setup IDs retained",
++      "Schedule log contains P112, P11. Final metadata and actual round records selected; not extra participants."
++    ],
++    [
++      "P118",
++      "Reused setup session ID",
++      "The filename dates from 27 September, but the current final metadata and completed rounds belong to P118 on 6 October. Replaces the former setup-only meaning of this session ID."
++    ],
++    [
++      "P115",
++      "Watch source and coverage",
++      "The unsuffixed .jsonl download is raw watch data. 2068 file rows versus 2065 in metadata. First received packet is after trial start, so early coverage is incomplete."
++    ],
++    [
++      "P119",
++      "Setup only",
++      "No completed rounds or round forms. Excluded from outcome, workload and completed-order counts."
++    ]
++  ]
++}

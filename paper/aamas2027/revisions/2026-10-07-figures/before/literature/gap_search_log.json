@@ -1,0 +1,41 @@
+{
+  "date": "2026-09-30",
+  "method": "Targeted web search and primary full-text verification; not systematic database screening",
+  "queries": [
+    "robot physiological adaptive assistance fixed scheduled assistance puzzle timing heart rate study",
+    "human robot collaboration physiological adaptive assistance compared fixed assistance workload timing",
+    "physiology adaptive robotic assistance fixed automation workload surgery scheduled baseline",
+    "\"Adaptive aiding of human-robot teaming\" Teo 2020 pdf",
+    "\"physiological\" \"scheduled\" \"robot\" assistance workload",
+    "\"adaptive\" \"tangram\" physiological robot assistance",
+    "\"An Adaptive Human-Robotic Interaction Architecture\" workload fixed conditions",
+    "\"physiological\" \"periodic assistance\" robot",
+    "\"physiology\" \"tangram\" assistance robot",
+    "\"adaptive assistance\" \"fixed\" \"physiological\" assembly 2024 2025",
+    "\"Teo\" \"2020\" \"adaptive\" \"workload\" robot aid",
+    "robot assembly \"workload\" \"adaptive\" \"EEG\" \"2024\" assistance",
+    "robot assistance \"fixed intervals\" physiological",
+    "robot \"scheduled assistance\" heart rate",
+    "human robot \"physiological\" \"adaptive\" \"puzzle\"",
+    "\"Toward Industry 5.0\" \"Neuroergonomic Workstation\" pdf",
+    "\"physiological\" \"scheduled\" \"assistance\" robot -site:researchgate.net -site:scribd.com -exoskeleton",
+    "\"physiological\" \"adaptive assistance\" \"assembly\" \"2025\" -site:researchgate.net",
+    "\"physiological\" \"adaptive assistance\" \"problem solving\" robot",
+    "\"Knezevic\" \"Neuroergonomic\" filetype:pdf",
+    "\"3487323\" pdf",
+    "\"BARI\" \"Brain-Augmented\" robot assistance fixed workload"
+  ],
+  "decision": "Broad scarcity claim withdrawn; direct precedent found in Yang et al.",
+  "unresolved": [
+    {
+      "title": "Toward Industry 5.0: A Neuroergonomic Workstation for a Human-Centered, Collaborative Robot-Supported Manual Assembly Process",
+      "doi": "10.1109/MRA.2024.3487323",
+      "status": "Institutional abstract/metadata checked; full text not retrieved"
+    },
+    {
+      "title": "Reading the Human Before Assistance",
+      "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7519002",
+      "status": "Indexed abstract describes proposed study and simulated examples; full text not verified; not treated as completed empirical evidence"
+    }
+  ]
+}

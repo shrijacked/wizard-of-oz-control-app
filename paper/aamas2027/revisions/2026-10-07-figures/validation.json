@@ -1,0 +1,22 @@
+{
+  "pdf_pages": 8,
+  "figures": 6,
+  "tables": 3,
+  "all_pages_visually_checked": true,
+  "final_log_overflows_or_unresolved_references": false,
+  "baseline_hashes_verified": 49,
+  "all_earlier_baselines_verified": true,
+  "abstract_unchanged": true,
+  "planned_sample": 24,
+  "actual_analysis_unchanged": true,
+  "primary_results_tests_and_tables_unchanged": true,
+  "eight_spearman_coefficients_independently_recomputed": true,
+  "paired_difference_means_and_existing_intervals_verified": true,
+  "reference_pdf_hashes_verified": 15,
+  "reference_text_anchors_verified": 35,
+  "current_reference_map_hashes": true,
+  "highlighted_review_reconstructs_current_manuscript": true,
+  "changed_files_in_inventory": 27,
+  "pdf_sha256": "3bfd8e37a41b67e767ac277a7959aa664603216e8df14f93ff20a044f5c5e52d",
+  "push_status": "Local only"
+}

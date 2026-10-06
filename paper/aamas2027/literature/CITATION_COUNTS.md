@@ -1,6 +1,6 @@
 # In-text citation counts
 
-Counted directly from `main.tex` after the title/author and wording revision. The bibliography itself is excluded. Each source in a grouped citation counts once.
+Recounted directly from `main.tex` on 7 October 2026 after the figure-comparison draft revision. The bibliography itself is excluded. Each source in a grouped citation counts once.
 
 **15 distinct references; 21 source mentions across 20 citation groups.**
 

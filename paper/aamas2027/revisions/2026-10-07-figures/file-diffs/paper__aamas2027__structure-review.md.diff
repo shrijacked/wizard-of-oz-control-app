@@ -1,0 +1,10 @@
+--- before/paper/aamas2027/structure-review.md
++++ current/paper/aamas2027/structure-review.md
+@@ -166,3 +166,7 @@
+ ## Working-sample restoration
+ 
+ The exact earlier abstract is restored at the author’s request. The study targets N=24; current draft values await the final analysis, as stated in the visible draft notice. Demographics are pending and experimental figure captions no longer state an N. Numeric results and source analyses are unchanged. The approved section structure is unchanged. Review revisions/2026-10-07-working-sample/ for the new snapshot and changes.
++
++## Revised comparison figures
++
++The section order remains unchanged. Remove the performance plot (Table 1 already reports those outcomes) and the three heatmaps. Retain workload/frustration as Figure 4. Add scheduled-versus-adaptive matched scatterplots for eight measures as Figure 5 and an assistance-rating difference plot as Figure 6. Correlation discussion now belongs to §5.4 alongside the assisted-condition comparison. The full pre-change paper and figure assets are preserved in revisions/2026-10-07-figures/before/.

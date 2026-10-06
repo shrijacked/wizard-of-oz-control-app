@@ -1,0 +1,38 @@
+--- before/scripts/review-paper-revision.py
++++ current/scripts/review-paper-revision.py
+@@ -5,10 +5,13 @@
+ The inventory excludes this revision directory itself to avoid recursive hashing.
+ """
+ from pathlib import Path
+-import difflib,hashlib,html,json,subprocess
++import argparse,difflib,hashlib,html,json,subprocess
+ ROOT=Path(__file__).resolve().parents[1]
+ PAPER=ROOT/'paper/aamas2027'
+-REV=PAPER/'revisions/2026-10-07'
++parser=argparse.ArgumentParser()
++parser.add_argument('--revision',default='2026-10-07-protocol')
++args=parser.parse_args()
++REV=PAPER/'revisions'/args.revision
+ BEFORE=REV/'before'
+ sha=lambda p:hashlib.sha256(p.read_bytes()).hexdigest()
+ baseline=json.loads((REV/'baseline-manifest.json').read_text())
+@@ -42,14 +45,16 @@
+  before=BEFORE/path;current=PAPER/path
+  oldsha=sha(before) if before.exists() else None;newsha=sha(current) if current.exists() else None
+  if oldsha!=newsha: inventory.append({'path':str(Path('paper/aamas2027')/path),'status':'added' if oldsha is None else 'removed' if newsha is None else 'modified','before_sha256':oldsha,'after_sha256':newsha})
+-for path in [ROOT/'scripts/update-paper-analysis.py',ROOT/'scripts/review-paper-revision.py',ROOT/'output/pdf/aamas2027-current.pdf']:
+- original=BEFORE/'aamas2027-current.pdf' if path.suffix=='.pdf' else None
++for path in [ROOT/'scripts/update-paper-analysis.py',ROOT/'scripts/plot-assisted-comparison.py',ROOT/'scripts/review-paper-revision.py',ROOT/'output/pdf/aamas2027-current.pdf']:
++ original=BEFORE/'aamas2027-current.pdf' if path.suffix=='.pdf' else REV/'before-tools'/path.name
++ if not original.exists():original=None
++ if original and sha(original)==sha(path):continue
+  inventory.append({'path':str(path.relative_to(ROOT)),'status':'modified' if original else 'added','before_sha256':sha(original) if original else None,'after_sha256':sha(path)})
+ diffdir=REV/'file-diffs';diffdir.mkdir(exist_ok=True)
+ for entry in inventory:
+  path=ROOT/entry['path']
+  if path.suffix.lower() in {'.md','.tex','.json','.py','.txt'}:
+-  previous=BEFORE/path.relative_to(PAPER) if path.is_relative_to(PAPER) else None
++  previous=BEFORE/path.relative_to(PAPER) if path.is_relative_to(PAPER) else REV/'before-tools'/path.name
+   old=previous.read_text() if previous and previous.exists() else ''
+   new=path.read_text() if path.exists() else ''
+   diff=''.join(difflib.unified_diff(old.splitlines(keepends=True),new.splitlines(keepends=True),fromfile='before/'+entry['path'],tofile='current/'+entry['path']))

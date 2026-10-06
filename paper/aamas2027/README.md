@@ -1,90 +1,73 @@
-# Writing handoff — AAMAS 2027
+# Writing handoff: AAMAS 2027
 
-Updated 5 October 2026 on branch `writing`. Start here when continuing the paper.
+Updated 7 October 2026 on branch `writing`. Start here when continuing the paper.
 
-## Current state and author decisions
+## Current draft and review trail
 
-The manuscript is a complete paper draft, from abstract through conclusion, with three descriptive results tables, following the agreed 5 October outline. The author supplied the current working abstract and requested a consistent research-author voice. Its N=24 framing describes the intended full study; the tables and methods still identify the actual **nine complete participants / 81 rounds**. The partial-session sensitivity is in the supplementary analysis notes. Replace the findings and reconcile the abstract as collection finishes; no extra participant outcomes or significance results have been invented.
+For current, old and highlighted versions plus downloadable projects, start with [VERSIONS.md](VERSIONS.md).
 
-The author-confirmed policy is **scheduled assistance every 30 seconds and adaptive assistance whenever the existing arousal flag is raised**. Task state guides the content. The flag is based on heart-rate change; references to “HRV” in the clarification do not establish a separate HRV threshold. Audit/provenance details stay outside the main paper, in author and supplementary notes.
+[main.tex](main.tex) is the canonical source; [manuscript.md](manuscript.md) is its readable counterpart. The draft follows the approved 5 October outline. It now contains the 24-response task-profile survey in §3, the updated apparatus and physiological pipeline in §4, and results for 12 complete participants / 108 rounds in §5. This is the actual analyzed sample, distinct from the planned target of 24. The historical [submitted abstract](submitted-abstract.txt) remains unchanged.
 
-The separate tangram survey still needs responses. Correct-piece scoring from final photographs still needs a rule and calculation. Section 3 therefore remains **Task and Design Rationale**; it becomes **Tangram Task Profiling and Assistance Expectations** when that evidence exists. A survey collected later can contextualize the experiment, but cannot retrospectively have determined its design.
+The updated paper includes three results tables and six figures: survey, architecture, physical setup, workload, scheduled/adaptive correlations, and paired assistance differences. Comments are illustrated by verbatim excerpts, without claiming a formal thematic analysis. Pairwise tests are exploratory; do not convert higher average adaptive ratings into a significant advantage over scheduled assistance. The current draft is anonymous, with submission ID 2613; the prior named version remains in the protocol-revision baseline.
 
-## Files and ownership
+The recent three rounds are reviewable together in [the cumulative change log](revisions/2026-10-07-cumulative/CHANGELOG.md), [highlighted review](revisions/2026-10-07-cumulative/highlighted-review.html), [marked-up TeX](revisions/2026-10-07-cumulative/tex-review/main-highlighted.tex) and [exact cumulative TeX diff](revisions/2026-10-07-cumulative/main.tex.diff). The complete pre-change paper and PDF are frozen in [before/](revisions/2026-10-07-figures/before/); the baseline manifest records hashes. Do not edit this snapshot.
 
-| File | Purpose / next editor's responsibility |
+The architecture TeX was pushed separately in commit `3c4ddb9`. The paper and preserved review versions are versioned together on branch writing. Do not include raw participant records or survey usernames in commits.
+
+## Author decisions and writing voice
+
+The protocol revision adds the author-confirmed survey/procedure/consent facts and anonymous formatting. Earlier revision packages remain unchanged under revisions/2026-10-07/. The new complete pre-change snapshot is under revisions/2026-10-07-protocol/before/. Do not edit either baseline or regenerate an older review against a later manuscript.
+
+Scheduled help is offered every 30 seconds; adaptive help is offered whenever the existing arousal flag is raised. Task state guides content. The flag uses a heart-rate rise, not an HRV-increase threshold. The researcher chooses the hint or robot action and the operator executes the arm program. The paper states the protocol directly; provenance, coding sensitivities, and configuration checks remain in author documentation.
+
+Keep the research-author voice concise. Avoid software-default-versus-deployed-settings narration, snapshot dates, interim/subset commentary, intervention totals, and the phrase removed by the author for describing the repeated-person design. Preserve brief uppercase drafting reminders where facts remain missing. Do not invent recruitment, ethics approval, correct-piece scores, or study chronology.
+
+## Files and flow
+
+| File | Responsibility |
 |---|---|
-| [main.tex](main.tex) | Canonical submission source; revise the paper here. |
-| [manuscript.md](manuscript.md) | Readable counterpart; keep prose, numbers and references synchronized with TeX. |
-| [references.bib](references.bib) | Only the 15 sources currently cited in the paper. |
-| [literature/REFERENCE_TEXT_MAP.md](literature/REFERENCE_TEXT_MAP.md) | Every citation occurrence mapped to the exact manuscript wording, source PDF page, brief verbatim anchor, supporting explanation and limits. |
-| [literature/reference-text-map.json](literature/reference-text-map.json) | Citation locations and source-passage offsets/hashes for checking the text map against the same PDF versions. |
-| [literature/MANUSCRIPT_REFERENCE_AUDIT.md](literature/MANUSCRIPT_REFERENCE_AUDIT.md) | Active citation-to-PDF-to-page audit; consult before changing a literature claim. |
-| [literature/manuscript-reference-audit.json](literature/manuscript-reference-audit.json) | Download URLs, local paths, hashes, publication dates and claim evidence. |
-| [structure-review.md](structure-review.md) | Agreed outline, interpretation of mentor notes, and differences from the earlier outline. |
-| [author-notes.md](author-notes.md) | Outstanding factual checks and author decisions; these do not belong as TODOs in the paper. |
-| [evidence-map.md](evidence-map.md) | Where the study's methods and findings come from. |
-| [questionnaire-inventory.md](questionnaire-inventory.md) | Exact administered interface wording and scale anchors. |
-| [analysis/interim-summary.json](analysis/interim-summary.json) | Reproducible numerical source for the current tables and descriptive statements. |
-| [scripts/summarize-writing-results.py](../../scripts/summarize-writing-results.py) | Reproduces descriptive results without altering source records. |
-| [submitted-abstract.txt](submitted-abstract.txt) | Historical submitted text, preserved unchanged; current paper abstract has been revised. |
-| [BUILD.txt](BUILD.txt) | Full-project TeX build and layout checks. |
-| [supplementary/ai-use-statement.md](supplementary/ai-use-statement.md) | Detailed AI-use record supporting the brief main-paper disclosure. |
-| [supplementary/analysis-notes.md](supplementary/analysis-notes.md) | Scoring, outcome sensitivities, timing and analysis details omitted from the main narrative. |
+| [main.tex](main.tex), [manuscript.md](manuscript.md) | Keep all prose, numbers, references and reminders synchronized. |
+| [references.bib](references.bib) | The 15 verified cited sources; add only after checking the actual PDF. |
+| [figures/](figures/) | Vector graphs, PNG previews, and embedded TikZ copies. |
+| [analysis/results-summary-2026-10-07.json](analysis/results-summary-2026-10-07.json) | Means, SDs, completion counts, coding sensitivity and record audit. |
+| [analysis/revision-analysis.json](analysis/revision-analysis.json) | Survey summaries, participant averages, paired tests and correlations. |
+| [author-notes.md](author-notes.md) | Unresolved factual and editorial decisions. |
+| [supplementary/analysis-notes.md](supplementary/analysis-notes.md) | Exact scoring, exploratory analysis, outcome sensitivity and missingness. |
+| [evidence-map.md](evidence-map.md) | Where each claim comes from. |
+| [structure-review.md](structure-review.md) | Current outline comparison and original agreed plan. |
+| [literature/REFERENCE_TEXT_MAP.md](literature/REFERENCE_TEXT_MAP.md) | Every citation connected to verified PDF text. |
+| [BUILD.txt](BUILD.txt) | Build method, QA and remaining submission checks. |
 
-Contributors should claim the manuscript, analysis, survey, photograph scoring, or reference task with the team before overlapping edits; no individual ownership is assigned by this document.
+Reading order: introduction and RQs → related work → task-profile survey and rationale → system and conditions → study methods, objective results, workload, assistance ratings and final comments → discussion → ethics → conclusion and disclosure.
 
-## Reading flow
+## Inputs and reproducibility
 
-1. Introduction: assistance timing problem, research questions and three contributions; no findings.
-2. Related work: proactive timing; physiological measurement versus control; tangrams/assembly and experience; human operator role.
-3. Task rationale now; separate survey methods and findings later, with accurate collection chronology.
-4. System: interfaces and apparatus, physiological processing, and the three assistance conditions.
-5. Study: methods → objective performance → workload → intervention experience → overall responses. The current tables occupy these outcome slots; photo scores and coded comments are not yet present.
-6. Discussion: performance/experience differences, assistance timing and physiological feedback, confounds and limits.
-7. Ethics: evidence-supported statements now; actual approval and procedure details still require the team.
-8. Conclusion and accurate AI-use disclosure.
+Original inputs remain untouched. Current results were extracted from `/Users/rishit/Desktop/hti3/outputs/hti-results-2026-10-06-no-media.zip` to `data/writing-reference/hti-results-2026-10-06/`. The survey was extracted from `/Users/rishit/Downloads/Puzzle Solving and Tangram Research Survey.csv.zip` to `data/writing-reference/task-profile-survey-2026-10-05/`. The author confirmed these are the intended exports. Source hashes are recorded in the revision input manifest and analysis outputs. The older through-P111 export is preserved separately.
 
-## Local results and reference cache
+Run from the repository root:
 
-All paths below are relative to the repository root. Raw results, PDFs and extracted full texts are local, under gitignored `data/`; collaborators do not receive these merely by pulling this branch.
+```sh
+python3 scripts/summarize-writing-results.py --source data/writing-reference/hti-results-2026-10-06/relevant-files/consolidated-data.json --output paper/aamas2027/analysis/results-summary-2026-10-07.json
+python3 scripts/update-paper-analysis.py
+python3 scripts/review-paper-revision.py --revision 2026-10-07-figures
+```
 
-- Results: `data/writing-reference/hti-results-2026-10-05/`, extracted from `/Users/rishit/Desktop/hti3/outputs/hti-results-through-P111-no-media.zip`.
-- Archive SHA-256: `27b259048f1e0dd0dd30e760c77e5ce2a3cc0efa282def46eda257ef3d45468e`.
-- The 50-file extraction contains the workbook, consolidated records, raw participant files, source manifest, study snapshots and independent analysis script. The 43 manifest source copies matched their listed hashes and sizes. Media is absent by design.
-- Literature PDFs: `data/writing-reference/literature-pdfs/`; extracted page-labelled text: `data/writing-reference/literature-text/`.
-- The active bibliography has 15 PDF-checked sources. Twelve (80%) first appeared in 2024–2026. Hart (2006), Teo (online 2017 / issue 2018), and Yang (online 2022 / issue 2024) are retained for measurement or direct comparison. Do not count Yang as newly published in 2024. This is below the mentor's 40-reference target; extend only with directly relevant, text-verified sources.
-- Restore results from the team's original archive and verify its hash. Restore each cited PDF from the audit's source URL and check its hash, or document a new version and update its page evidence. Do not commit participant records or redistribute publisher PDFs without checking the applicable permissions.
+The first script uses the standard library. The graph/test script requires NumPy and Matplotlib. It uses the source's complete-cohort classification and existing `analysisSolved` labels; it does not adjudicate missing outcomes or merge new exports. Paths are at the top of the script. Retain source hashes, freeze a new pre-change snapshot, review participants/outcomes, regenerate analyses, update both manuscripts and evidence notes, build and inspect every PDF page, then regenerate the review package. Keep previous snapshots unchanged.
 
-## Refreshing findings as collection progresses
+Original diagrams are `output/figures/assistance-architecture.tex` and `output/figures/physical-setup-topdown.tex`. Their current color/macro definitions and TikZ drawing code are copied into `figures/*.tikz.tex` for the manuscript. If a diagram changes, refresh those copies and PNG previews; do not use stale exported diagrams. The standalone originals remain editable.
 
-1. Keep the through-P111 snapshot unchanged. Put the next export in a new dated directory, record source hashes, and reconcile participant aliases, provisional replacements, exclusions and duplicate sessions before combining anything.
-2. Review outcome provenance: P101 binary outcomes are inferred in the current working coding; P111 is partial, and unfinished rounds are missing outcomes, not failures. Resolve evidence before changing those labels. Preserve a recorded-only sensitivity.
-3. Reconcile round status, actual duration, questionnaire direction, puzzle allocation and intervention counts. Do not interpret robot commands as confirmed physical execution or all-round duration as successful completion time.
-4. Generate the same consolidated schema, with explicit cohort and outcome coding. The summary script reproduces that coding; it does not discover sessions, merge exports or adjudicate missing outcomes.
-5. Run from the repository root:
+## Remaining work
 
-   ```sh
-   python3 scripts/summarize-writing-results.py \
-     --source data/writing-reference/hti-results-2026-10-05/relevant-files/consolidated-data.json \
-     --output paper/aamas2027/analysis/interim-summary.json
-   ```
+The author confirmed the digital square-tangram survey, college-group recruitment and some overlap with the experiment. Exact overlap, task link and chronology remain unprovided. Preset hints, paired robot-plus-hint delivery, coupon compensation, five-minute breaks, success/timeout rules and the orientation-maximizing scoring rule are now documented. Add the setup photograph, robot model/piece material, actual baseline procedure, signal-loss behavior, eligibility/practice/ethics facts, and scored final photographs. The baseline window is provisional; the code’s 60-second calibration must be reconciled. Concealed operation was not disclosed afterward, per the author; the enacted instruction version and institutional review status remain open. Review the exploratory statistical model with the team before final submission, including coding adjudication and source checks. Add further relevant PDF-verified references. Keep the current anonymous author block and ID 2613. Resolve CCS/bibliography/build checks; affiliations belong only in a future named version. See [author notes](author-notes.md) for specifics.
 
-   For a new snapshot, change the source path and review the resulting diff. The script uses the Python standard library.
+The bibliography and 21 citation occurrences remain unchanged in content. All 15 PDF hashes and 35 source anchors are rechecked for this revision; the map's locations and manuscript hashes identify the updated text. Twelve sources first appeared in 2024–2026; older exceptions are retained for the measure or closest comparison. Downloaded PDFs and full extracted text stay in gitignored `data/`, and are not redistributed by pushing the branch.
 
-6. Decide the final repeated-measures analysis with the team, including puzzle identity, block position, exclusions, missingness and uncertainty. The current draft reports descriptive means and participant-level SDs only; it makes no significance claim.
-7. Replace findings in **both formats**: abstract, §5.1 sample/analysis, Tables 1–3, §5.2 sensitivities/dose, §5.5 overall ratings, discussion and conclusion. Check every numerical claim against the new summary. Update this guide's snapshot/cohort state and the evidence map.
-8. Add the independent survey and photograph scores only after their instruments, scoring rules, denominators and chronology are documented. Document a qualitative method before claiming themes or selecting quotations.
-9. Build the complete TeX project and inspect the PDF: numeric references, float order, overflow, anonymity, eight-page main-text limit and reference pages. Do not declare submission readiness from source checks alone.
+## Working sample and abstract
 
-## References and final review
+The author requested restoring the exact earlier abstract and keeping N=24 as the working sample size. The current manuscript identifies 24 as the planned sample and is visibly labeled as a working draft awaiting final results/demographics. Experimental graphs, numerical results, tests and source coding still use the 12 complete participant records; they were not inflated or regenerated as a 24-person analysis. Remove the draft notice only after the final data and all results are reconciled. The complete pre-change anonymous protocol draft is frozen in revisions/2026-10-07-working-sample/before/. Earlier revision packages are unchanged.
 
-For each new citation, obtain the actual PDF, confirm its title/authors/version/date, read the relevant methods/results/limitations, and record exact PDF pages and a bounded paraphrase in the audit. Update the citation-to-text map whenever a cited claim changes; its locations and manuscript hashes now identify the draft-note revision after base commit `9840396`. Search snippets and review summaries are discovery aids, not paper-text verification. Prefer relevant 2024–2026 work, retaining older sources when they supply the method or closest comparison. The historical literature register includes unread leads and sources not cited here; its size is not the count of verified manuscript references.
+## Figure revision
 
-The official [submission instructions](https://warwick.ac.uk/fac/sci/dcs/aamas2027/guidelines-and-policies/instructions/) and [Q&A](https://warwick.ac.uk/fac/sci/dcs/aamas2027/guidelines-and-policies/qa/) require the unmodified LaTeX template and eight main-text pages plus references. Preserve the supplied class/style, resolve the author checks, and review the AI-use record before submission. Editing the local abstract does not change registered submission metadata.
+The redundant performance graph and the three heatmaps are removed. Figure 4 retains the workload/frustration plot. Figure 5 shows matched scheduled/adaptive scatterplots for eight measures with Spearman correlations. Figure 6 replaces the four assistance-rating slope plots with adaptive-minus-scheduled differences, individual points and means with unadjusted 95% bootstrap intervals. This figure order follows the unchanged section order. Counts/tests and the restored abstract/planned N=24 are unchanged. The plot calculations still use the actual available matched records.
 
-The [current PDF preview](../../output/pdf/aamas2027-current.pdf) was built on 5 October with Tectonic 0.17.0 using the supplied template. It has five pages including references, all visually inspected. Text overflow was resolved without changing the class, margins or body font size; Table 2 uses a locally smaller font and tighter column spacing. See [BUILD.txt](BUILD.txt) for reproduction and remaining submission-metadata/bibliography/balancing warnings; the final pdfLaTeX build still needs checking.
-
-The current working PDF displays the title, five author names and submission ID 2613 from the author-provided OpenReview screenshot. Affiliations remain to be supplied. Restore the `anonymous` class option before an anonymous review submission.
-
-See [per-reference citation counts](literature/CITATION_COUNTS.md) alongside the [reference-to-PDF text map](literature/REFERENCE_TEXT_MAP.md).
+Rebuild only the two new figures with `python3 scripts/plot-assisted-comparison.py`. The full analysis script also invokes this helper. The previous graphs/PDF are frozen in revisions/2026-10-07-figures/before/.

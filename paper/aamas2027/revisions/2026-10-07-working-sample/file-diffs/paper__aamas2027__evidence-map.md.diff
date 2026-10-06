@@ -1,0 +1,11 @@
+--- before/paper/aamas2027/evidence-map.md
++++ current/paper/aamas2027/evidence-map.md
+@@ -4,7 +4,7 @@
+ 
+ | Claim/location | Evidence | Scope and remaining checks |
+ |---|---|---|
+-| Abstract and §5.1: N=12, ages/gender, nine trials each | Complete-cohort records; results summary and revision analysis | Actual observed records; planned target 24 remains in author notes. |
++| Abstract: restored working N=24; §5.1: planned N=24, nine trials each | Complete-cohort records; results summary and revision analysis | Working draft clearly identifies planned 24; current analysis uses 12 complete records. Experimental demographics await the final sample. |
+ | §3:24 respondents, familiarity, reported completion/time/stuckness | Survey CSV headers and rows; revision-analysis `survey` | Self-report; digital timed square tangram, college mailing groups and some overlap confirmed; exact overlap/link/chronology pending. |
+ | §3 assistance expectations | Four explicitly anchored 1–5 survey columns | Independent hypothetical ratings, lower helpfulness scores better; not measured robot performance. |
+ | §4 apparatus/layout | Project documentation and author's confirmed sketch/layout | Opaque wall, top-mounted camera, pickup/drop/assembly positions and laptop confirmed; 10×10-inch piece set confirmed; robot model, piece material and photo pending. |

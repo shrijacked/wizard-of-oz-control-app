@@ -1,0 +1,16 @@
+{
+  "pdf_pages": 8,
+  "figures": 7,
+  "tables": 3,
+  "table_numbers_checked": "All completion/rate/duration, workload dimension/composite, and assistance mean/SD cells match source summaries after rounding.",
+  "baseline_hashes_verified": 32,
+  "changed_files_in_inventory": 32,
+  "reference_pdf_hashes_verified": 15,
+  "reference_text_anchors_verified": 35,
+  "citation_occurrences": 21,
+  "highlighted_review_reconstructs_current_manuscript": true,
+  "latex_overflow_or_unresolved_references": false,
+  "build_engine": "Tectonic0.17.0 / XeTeX + BibTeX",
+  "page_QA": "All8 pages inspected; latest survey/table pages rechecked after last revisions.",
+  "paper_push_status": "Local; architecture TeX pushed as3c4ddb9."
+}

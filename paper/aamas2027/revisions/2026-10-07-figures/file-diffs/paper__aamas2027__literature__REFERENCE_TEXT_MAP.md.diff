@@ -1,0 +1,10 @@
+--- before/paper/aamas2027/literature/REFERENCE_TEXT_MAP.md
++++ current/paper/aamas2027/literature/REFERENCE_TEXT_MAP.md
+@@ -1,6 +1,6 @@
+ # Manuscript citations mapped to source PDF text
+ 
+-Updated 7 October 2026 for the working-sample draft revision on branch `writing` (base commit `3c4ddb9`). Literature claims are unchanged; locations and manuscript hashes identify the new paper. The exact manuscript versions are identified by hashes in the JSON companion. This maps **all 15 references and every in-text citation occurrence**, including repeated citations and both members of the joint tangram citation. It supplements the [reference audit](MANUSCRIPT_REFERENCE_AUDIT.md), rather than replacing its metadata/version history.
++Updated 7 October 2026 for the figure-comparison draft revision on branch `writing` (base commit `3c4ddb9`). Literature claims are unchanged; locations and manuscript hashes identify the new paper. The exact manuscript versions are identified by hashes in the JSON companion. This maps **all 15 references and every in-text citation occurrence**, including repeated citations and both members of the joint tangram citation. It supplements the [reference audit](MANUSCRIPT_REFERENCE_AUDIT.md), rather than replacing its metadata/version history.
+ 
+ For each reference: **our exact wording → source PDF page and short verbatim search anchor → explanation of support → boundary on interpretation**. The surrounding explanations are paraphrases, not quotations. Short anchors normalize PDF line wrapping and typographic ligatures; no wording is invented. Page numbers are one-based **PDF pages**, including repository covers, rather than journal page numbers. Each source’s excerpts total at most 25 words.
+ 

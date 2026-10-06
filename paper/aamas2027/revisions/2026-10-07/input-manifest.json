@@ -1,0 +1,19 @@
+{
+  "selection": "Locally found candidate inputs; source-confirmation question pending.",
+  "archives": [
+    {
+      "path": "/Users/rishit/Desktop/hti3/outputs/hti-results-2026-10-06-no-media.zip",
+      "bytes": 7106320,
+      "sha256": "a5dfb079438c91ac16e84b1982f3368b364af6cad74dfd428874a17e130acc98"
+    },
+    {
+      "path": "/Users/rishit/Downloads/Puzzle Solving and Tangram Research Survey.csv.zip",
+      "bytes": 2561,
+      "sha256": "999e48d84e5df9b4f26ed39e05a5fd2f53afeb59baacbddb131d5d07d6919c8a"
+    }
+  ],
+  "extracted_analysis_sources": {
+    "data/writing-reference/hti-results-2026-10-06/relevant-files/consolidated-data.json": "d5c57286af539ef0628489c89a23bc304bfafe494b424f4a83640f88c3409019",
+    "data/writing-reference/task-profile-survey-2026-10-05/Puzzle Solving and Tangram Research Survey.csv": "4c82ba49a14643596ee97732eb3374de123b61ece0b5f780dc501a02c48da166"
+  }
+}

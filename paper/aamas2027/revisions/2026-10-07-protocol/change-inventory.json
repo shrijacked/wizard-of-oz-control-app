@@ -1,0 +1,110 @@
+{
+  "base_commit": "3c4ddb9",
+  "baseline_verified_files": 48,
+  "changes": [
+    {
+      "path": "paper/aamas2027/BUILD.txt",
+      "status": "modified",
+      "before_sha256": "c0a181f687cebf62d44e1bab489e887fbd4e02678b32508b8ace4a5fea52b716",
+      "after_sha256": "4f6f431e5bcb90ce36ca513ada1870b37a26f8526ea518976cf346e44ddbaf77",
+      "diff_path": "file-diffs/paper__aamas2027__BUILD.txt.diff"
+    },
+    {
+      "path": "paper/aamas2027/README.md",
+      "status": "modified",
+      "before_sha256": "105eeb7d93c51ff5d4e380c66a811fd9aaf64ca2f5a7dea2969d31d40a14e7a4",
+      "after_sha256": "c972271ea095d5a0b6ea2785c44612477e24ad5b2096e2f4ce58e4d4536cbfc7",
+      "diff_path": "file-diffs/paper__aamas2027__README.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/author-notes.md",
+      "status": "modified",
+      "before_sha256": "f24e8251c900c16094d0213816068c310ce526197406ea0cf72673914e75378d",
+      "after_sha256": "5229642a4a71c7f9938309f3b0ee8d8af4c37eef6ba879d51c5b239e2740bdbb",
+      "diff_path": "file-diffs/paper__aamas2027__author-notes.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/evidence-map.md",
+      "status": "modified",
+      "before_sha256": "98195fbd879b94d82803670b288ddcd3f63ee427eddaa3feed69a26b4ba6553e",
+      "after_sha256": "99d145199b95e4d297682f6430744be2f125fe2f2cb4794b0de93502e3dee73e",
+      "diff_path": "file-diffs/paper__aamas2027__evidence-map.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/literature/CITATION_COUNTS.md",
+      "status": "modified",
+      "before_sha256": "5e13379175791ae70c1141c7ba23c81e1f7a059b153829cc6d99811dd831de07",
+      "after_sha256": "a197cebf995a798b27d374d95b48c76a4cea9b4821a769f959d7bec81868c547",
+      "diff_path": "file-diffs/paper__aamas2027__literature__CITATION_COUNTS.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/literature/MANUSCRIPT_REFERENCE_AUDIT.md",
+      "status": "modified",
+      "before_sha256": "29d6a637f98c69939bf7616b600041890cd8a70335e62b9cf0f49c965580aaaf",
+      "after_sha256": "58a8b7b80b5751d629add259cf9173c2558b655618a2beac89d8ae77be82cf98",
+      "diff_path": "file-diffs/paper__aamas2027__literature__MANUSCRIPT_REFERENCE_AUDIT.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/literature/REFERENCE_TEXT_MAP.md",
+      "status": "modified",
+      "before_sha256": "3b569fc9be119ba8fc14a7b3ae078d210ce6dd1adde42896d28a13757a70600b",
+      "after_sha256": "8f1f049fdc999bc7974ea237e9083051e69531b2cfa81b91fb571b18bd315596",
+      "diff_path": "file-diffs/paper__aamas2027__literature__REFERENCE_TEXT_MAP.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/literature/reference-text-map.json",
+      "status": "modified",
+      "before_sha256": "5e12a83c7c574b8d514e96569378a073ea28527968c819ac7476763dfab5607d",
+      "after_sha256": "4d4d2fd0c44746f83dc4220d83172b619b929145579e094954d44d71edbcc8bb",
+      "diff_path": "file-diffs/paper__aamas2027__literature__reference-text-map.json.diff"
+    },
+    {
+      "path": "paper/aamas2027/main.tex",
+      "status": "modified",
+      "before_sha256": "fafc3848ac7f9301ebd4bebaa935e21a698f6ce4864a6cfabd0bee1651a77152",
+      "after_sha256": "9adca1014328d44e2b80be2a7bbdb09c34b45906258c022a06a7cf4c9d67a990",
+      "diff_path": "file-diffs/paper__aamas2027__main.tex.diff"
+    },
+    {
+      "path": "paper/aamas2027/manuscript.md",
+      "status": "modified",
+      "before_sha256": "916e1f2ff4f88732db5b8eef116dfd7e71c1b23f4b723920c74349e983eff040",
+      "after_sha256": "1e90c7be80c9de1e36f71b18c664ac57e4c9c8e778cca9b4d96d8b15f9922b91",
+      "diff_path": "file-diffs/paper__aamas2027__manuscript.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/method-checks/baseline-recording.md",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "98c621fa9e36221ab7cf232be70951029aa867b56ee92918b9b3858fd592fe16",
+      "diff_path": "file-diffs/paper__aamas2027__method-checks__baseline-recording.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/structure-review.md",
+      "status": "modified",
+      "before_sha256": "927f7f86748fa390f5afc48a1f121a1f830e45bb7bb588d18f672e7dff318d8b",
+      "after_sha256": "df61dee010c5fd013a9f4cdd3bb26c39c068f3118a83cb23ac6ec685d7c65e21",
+      "diff_path": "file-diffs/paper__aamas2027__structure-review.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/supplementary/analysis-notes.md",
+      "status": "modified",
+      "before_sha256": "69777802e72181b5402ecc4c505751e9e29835791a466417fda9df8c968bdb0e",
+      "after_sha256": "84aeabba7097075718ef586cbd45f5d0d2a6a5813504829735220c9b88fbb842",
+      "diff_path": "file-diffs/paper__aamas2027__supplementary__analysis-notes.md.diff"
+    },
+    {
+      "path": "scripts/review-paper-revision.py",
+      "status": "modified",
+      "before_sha256": "8eabfb21dd9c7e00eb629363a8dfb397028c42fd08ac3c5115f5f1fe72b3e784",
+      "after_sha256": "89369dd5bdd1fc73a074d1b3ed14418af6e67c77d6e780c44288610fa7633665",
+      "diff_path": "file-diffs/scripts__review-paper-revision.py.diff"
+    },
+    {
+      "path": "output/pdf/aamas2027-current.pdf",
+      "status": "modified",
+      "before_sha256": "39b2d20da9dec387110dbb9d95d1ea2eea302ca7c1f9b797742871e002322181",
+      "after_sha256": "a682497decec3aef11530fa6e30404b1d768de2eb9d2a2c3c75e77418e1dbe6e"
+    }
+  ]
+}

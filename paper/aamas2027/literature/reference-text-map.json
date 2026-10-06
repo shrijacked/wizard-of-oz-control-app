@@ -1,13 +1,13 @@
 {
-  "checked_on": "2026-10-05",
-  "manuscript_base_commit": "9840396",
-  "manuscript_state": "Working tree after draft-note revision",
+  "checked_on": "2026-10-07",
+  "manuscript_base_commit": "3c4ddb9",
+  "manuscript_state": "Local figure-comparison draft revision; pre-change snapshot in revisions/2026-10-07-figures/before/",
   "reference_count": 15,
   "citation_occurrence_count": 21,
   "scope": "Every in-text citation occurrence in the current manuscript. Source anchors are printed only in the Markdown map; this file stores their offsets and hashes in normalized PDF page text.",
   "normalization": "pypdf page.extract_text(); Unicode NFKC; split on whitespace and join with one ASCII space. Offsets are Python Unicode character offsets; pages are one-based.",
-  "manuscript_sha256": "f6497f7e74aa34018eeabb8332695bbbbe7132750d734cfb6d2dc2e627e537e0",
-  "latex_sha256": "d7ebe7db4332705160ecf9492f70a99367b51052c130fc3db871fb60dd1d8591",
+  "manuscript_sha256": "511518a6c7b5ef74551e7d20a6e92802ec490c7348b9147cb5bd65ec5a681eb8",
+  "latex_sha256": "dce42496d0c633b919f42d0b5740052abbf8378ae80454fd821bd3a0670216b4",
   "references": [
     {
       "reference_number": 1,
@@ -17,8 +17,8 @@
       "source_url": "https://link.springer.com/content/pdf/10.1007/s11257-024-09421-1.pdf",
       "occurrences": [
         {
-          "markdown_line": 15,
-          "latex_line": 75,
+          "markdown_line": 17,
+          "latex_line": 50,
           "section": "1. Introduction",
           "manuscript_excerpt": "Andriella et al. model assistance type, timing, and confidence [1]",
           "evidence_ids": [
@@ -27,8 +27,8 @@
           ]
         },
         {
-          "markdown_line": 39,
-          "latex_line": 101,
+          "markdown_line": 41,
+          "latex_line": 76,
           "section": "2.1. Assistance timing and proactive coordination",
           "manuscript_excerpt": "Andriella et al. learn proactive assistance from user profiles and task state in a sequential memory game, jointly addressing assistance type, timing, and confidence [1].",
           "evidence_ids": [
@@ -77,8 +77,8 @@
       "source_url": "https://scidar.kg.ac.rs/bitstream/123456789/21811/1/comparative-analysis-of-mental-workload-in-adaptive-human-robot-collaboration-during-assembly-tasks.pdf",
       "occurrences": [
         {
-          "markdown_line": 51,
-          "latex_line": 113,
+          "markdown_line": 53,
+          "latex_line": 88,
           "section": "2.3. Physical tasks and participant experience",
           "manuscript_excerpt": "Adjacent assembly work by Caiazzo et al. compares manual, collaborative, and guided collaborative conditions, with EEG used for workload assessment [2].",
           "evidence_ids": [
@@ -127,8 +127,8 @@
       "source_url": "https://www.qualityengineering.polito.it/content/download/1126/6184/file/Assembly%20complexity%20and%20physiological%20response%20in%20human-robot%20collaboration%20_%20Insights%20from%20a%20preliminary%20experimental%20analysis.pdf",
       "occurrences": [
         {
-          "markdown_line": 47,
-          "latex_line": 109,
+          "markdown_line": 49,
+          "latex_line": 84,
           "section": "2.2. Physiological information in assistance",
           "manuscript_excerpt": "Capponi et al. similarly find no clear RMSSD pattern across their assembly configurations and distinguish cognitive effort from stress [3].",
           "evidence_ids": [
@@ -167,8 +167,8 @@
       "source_url": "https://www.merl.com/publications/docs/TR2025-064.pdf",
       "occurrences": [
         {
-          "markdown_line": 15,
-          "latex_line": 75,
+          "markdown_line": 17,
+          "latex_line": 50,
           "section": "1. Introduction",
           "manuscript_excerpt": "PACE uses action-completion estimates to coordinate proactive assistance [4].",
           "evidence_ids": [
@@ -177,8 +177,8 @@
           ]
         },
         {
-          "markdown_line": 39,
-          "latex_line": 101,
+          "markdown_line": 41,
+          "latex_line": 76,
           "section": "2.1. Assistance timing and proactive coordination",
           "manuscript_excerpt": "PACE estimates action completion from hand movements and uses a learned policy to coordinate assistance during collaborative assembly [4].",
           "evidence_ids": [
@@ -227,8 +227,8 @@
       "source_url": "https://www.nasa.gov/wp-content/uploads/2026/01/hfes-2006-paper.pdf",
       "occurrences": [
         {
-          "markdown_line": 53,
-          "latex_line": 115,
+          "markdown_line": 55,
+          "latex_line": 90,
           "section": "2.3. Physical tasks and participant experience",
           "manuscript_excerpt": "Hart describes the six NASA-TLX workload dimensions and the use of an unweighted overall score [5].",
           "evidence_ids": [
@@ -267,8 +267,8 @@
       "source_url": "https://alexandria.unisg.ch/bitstreams/b9548afd-a853-40ed-9141-7bb837ce1f77/download",
       "occurrences": [
         {
-          "markdown_line": 45,
-          "latex_line": 107,
+          "markdown_line": 47,
+          "latex_line": 82,
           "section": "2.2. Physiological information in assistance",
           "manuscript_excerpt": "Hostettler et al. adapt robot behavior to user distance while measuring pupil responses; direct pupil-driven adaptation is a future direction [6].",
           "evidence_ids": [
@@ -317,8 +317,8 @@
       "source_url": "https://publica-rest.fraunhofer.de/server/api/core/bitstreams/e60c03db-8192-404a-a885-43c61307f554/content",
       "occurrences": [
         {
-          "markdown_line": 15,
-          "latex_line": 75,
+          "markdown_line": 17,
+          "latex_line": 50,
           "section": "1. Introduction",
           "manuscript_excerpt": "A recent review distinguishes adaptation of robot motion from task-level decisions about timing, sequencing, and role allocation [7].",
           "evidence_ids": [
@@ -327,8 +327,8 @@
           ]
         },
         {
-          "markdown_line": 37,
-          "latex_line": 99,
+          "markdown_line": 39,
+          "latex_line": 74,
           "section": "2.1. Assistance timing and proactive coordination",
           "manuscript_excerpt": "Karbouj et al.'s review of adaptive industrial HRC distinguishes motion, task, and control adaptations and identifies task-level timing and coordination as areas warranting further attention [7].",
           "evidence_ids": [
@@ -367,8 +367,8 @@
       "source_url": "https://mdpi-res.com/d_attachment/sensors/sensors-24-02817/article_deploy/sensors-24-02817.pdf",
       "occurrences": [
         {
-          "markdown_line": 45,
-          "latex_line": 107,
+          "markdown_line": 47,
+          "latex_line": 82,
           "section": "2.2. Physiological information in assistance",
           "manuscript_excerpt": "Korivand et al. develop physiological task-load prediction and Q-learning-based adjustment, while explicitly reporting that their recorded wristband data could not be integrated directly for real-time use [8].",
           "evidence_ids": [
@@ -417,8 +417,8 @@
       "source_url": "https://www.jstage.jst.go.jp/article/ijabc/2026/1/2026_147/_pdf",
       "occurrences": [
         {
-          "markdown_line": 19,
-          "latex_line": 79,
+          "markdown_line": 21,
+          "latex_line": 54,
           "section": "1. Introduction",
           "manuscript_excerpt": "Recent work uses tangrams for collaborative HRI and as a simplified assembly task [12, 9].",
           "evidence_ids": [
@@ -426,8 +426,8 @@
           ]
         },
         {
-          "markdown_line": 51,
-          "latex_line": 113,
+          "markdown_line": 53,
+          "latex_line": 88,
           "section": "2.3. Physical tasks and participant experience",
           "manuscript_excerpt": "SensCogAR uses tangrams as a proxy for small-object assembly, manipulating the visibility of piece contours to vary task demand [9].",
           "evidence_ids": [
@@ -466,8 +466,8 @@
       "source_url": "https://mdpi-res.com/d_attachment/machines/machines-12-00546/article_deploy/machines-12-00546.pdf",
       "occurrences": [
         {
-          "markdown_line": 45,
-          "latex_line": 107,
+          "markdown_line": 47,
+          "latex_line": 82,
           "section": "2.2. Physiological information in assistance",
           "manuscript_excerpt": "Ojsteršek et al. personalize robot parameters using a preliminary skills test and analyze ECG recordings after the experiment [10].",
           "evidence_ids": [
@@ -506,8 +506,8 @@
       "source_url": "https://mdpi-res.com/d_attachment/applsci/applsci-15-03317/article_deploy/applsci-15-03317.pdf",
       "occurrences": [
         {
-          "markdown_line": 47,
-          "latex_line": 109,
+          "markdown_line": 49,
+          "latex_line": 84,
           "section": "2.2. Physiological information in assistance",
           "manuscript_excerpt": "Pereira et al.'s review documents heterogeneous workload measures and mixed cardiac findings across HRC studies [11].",
           "evidence_ids": [
@@ -546,8 +546,8 @@
       "source_url": "https://arxiv.org/pdf/2502.16899",
       "occurrences": [
         {
-          "markdown_line": 19,
-          "latex_line": 79,
+          "markdown_line": 21,
+          "latex_line": 54,
           "section": "1. Introduction",
           "manuscript_excerpt": "Recent work uses tangrams for collaborative HRI and as a simplified assembly task [12, 9].",
           "evidence_ids": [
@@ -555,8 +555,8 @@
           ]
         },
         {
-          "markdown_line": 51,
-          "latex_line": 113,
+          "markdown_line": 53,
+          "latex_line": 88,
           "section": "2.3. Physical tasks and participant experience",
           "manuscript_excerpt": "Tabatabaei et al. study gaze around robot failures during collaborative tangram solving [12].",
           "evidence_ids": [
@@ -595,8 +595,8 @@
       "source_url": "https://sciences.ucf.edu/psychology/perl/wp-content/uploads/sites/29/2019/08/Enhancing-the-effectiveness-of-human-robot-teaming-with-a-closed-loop-system..pdf",
       "occurrences": [
         {
-          "markdown_line": 43,
-          "latex_line": 105,
+          "markdown_line": 45,
+          "latex_line": 80,
           "section": "2.2. Physiological information in assistance",
           "manuscript_excerpt": "Earlier work by Teo et al. uses individualized physiological workload markers to trigger aid during robot supervision, imposing aid later when it has not been triggered [13].",
           "evidence_ids": [
@@ -635,8 +635,8 @@
       "source_url": "https://repositum.tuwien.at/bitstream/20.500.12708/227993/1/Thunberg-2026-Unpacking%20Lived%20Experiences%20of%20Wizards%20of%20Oz-vor.pdf",
       "occurrences": [
         {
-          "markdown_line": 57,
-          "latex_line": 119,
+          "markdown_line": 59,
+          "latex_line": 94,
           "section": "2.4. Wizard-of-Oz evaluation",
           "manuscript_excerpt": "A recent HRI workshop proposal by Thunberg et al. emphasizes the practical, ethical, and methodological tensions of the wizard's role [14].",
           "evidence_ids": [
@@ -665,8 +665,8 @@
       "source_url": "https://scholarworks.indianapolis.iu.edu/bitstreams/5eb42ad8-e6eb-4495-9c1d-f520e3877a06/download",
       "occurrences": [
         {
-          "markdown_line": 17,
-          "latex_line": 77,
+          "markdown_line": 19,
+          "latex_line": 52,
           "section": "1. Introduction",
           "manuscript_excerpt": "Yang et al. compared workload-adaptive robotic suction with periodic support during surgical training [15].",
           "evidence_ids": [
@@ -676,8 +676,8 @@
           ]
         },
         {
-          "markdown_line": 43,
-          "latex_line": 105,
+          "markdown_line": 45,
+          "latex_line": 80,
           "section": "2.2. Physiological information in assistance",
           "manuscript_excerpt": "Yang et al.'s surgical system uses EEG and eye tracking to inform adaptive suction, with a periodic comparator selected to approximate earlier observed assistance frequency [15].",
           "evidence_ids": [

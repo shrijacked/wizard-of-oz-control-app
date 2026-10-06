@@ -1,0 +1,10 @@
+--- before/paper/aamas2027/structure-review.md
++++ current/paper/aamas2027/structure-review.md
+@@ -162,3 +162,7 @@
+ ## Anonymous protocol revision
+ 
+ The manuscript now uses the original class’s anonymous option and submission ID 2613, without the named author spacing/hook. Additional author-confirmed methods fill the same approved structure. The complete results/tables/plots stay unchanged. A new immutable pre-change copy and highlighted review are in revisions/2026-10-07-protocol/.
++
++## Working-sample restoration
++
++The exact earlier abstract is restored at the author’s request. The study targets N=24; current draft values await the final analysis, as stated in the visible draft notice. Demographics are pending and experimental figure captions no longer state an N. Numeric results and source analyses are unchanged. The approved section structure is unchanged. Review revisions/2026-10-07-working-sample/ for the new snapshot and changes.

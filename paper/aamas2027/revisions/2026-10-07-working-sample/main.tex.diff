@@ -1,0 +1,55 @@
+--- before/main.tex
++++ current/main.tex
+@@ -1,5 +1,5 @@
+ % Working paper, 7 October 2026. Main source for subsequent editing.
+-% Evidence and revision history: README.md and revisions/2026-10-07-protocol/.
++% Evidence and revision history: README.md and revisions/2026-10-07-working-sample/.
+ % Based on the supplied AAMAS 2027 template; class and layout unmodified.
+ \documentclass[sigconf,anonymous]{aamas}
+ \usepackage{balance}
+@@ -35,11 +35,13 @@
+ \citestyle{acmnumeric}
+ 
+ \begin{abstract}
+-In human–robot interaction (HRI), deciding when to provide assistance requires understanding how different intervention strategies affect both task performance and the user experience. Previous work has compared physiology-triggered robotic assistance with periodic support in surgical training. We extend this comparison to physical spatial problem solving through an experiment with three conditions: no assistance, scheduled assistance, and adaptive assistance triggered by an arousal flag. Twelve participants ($N=12$) each attempt nine physical tangram puzzles across three sessions, with varied condition orders and randomly assigned puzzles. Participants receive on-screen hints and robotic-arm interventions through a Wizard-of-Oz setup. Assistance is offered every 30 seconds in the scheduled condition and whenever heart-rate monitoring flags arousal in the adaptive condition. We evaluate puzzle completion, round duration, workload, helpfulness, intervention timing, frustration, and trust. Completion rates are 13.9\% without assistance, 66.7\% with scheduled assistance, and 50.0\% with adaptive assistance. Scheduled assistance has the shortest mean round duration. Adaptive assistance receives higher average helpfulness and timing ratings and lower frustration, although differences between the two assisted conditions are not statistically significant. These findings connect assistance timing with task performance and user experience, motivating HRI systems that support both progress and the experience of receiving help.
++In human–robot interaction (HRI), deciding when to provide assistance requires understanding how different intervention strategies affect both task performance and the user experience. Previous work has compared physiology-triggered robotic assistance with periodic support in surgical training. We extend this work to physical spatial problem solving by conducting an experiment to compare three conditions: no assistance, scheduled assistance, and adaptive assistance based on physiological signals. Twenty-four participants (N = 24) solve nine physical tangram puzzles across three sessions. The order of the conditions is varied across participants, and puzzles are randomly assigned to the sessions. Tangrams combine spatial reasoning with physical manipulation, providing a simple task for studying informational and physical assistance. Participants receive on-screen hints and robotic-arm interventions through a Wizard-of-Oz setup, with assistance either scheduled or adapted using heart-rate signals and task progress. We evaluate puzzle completion, completion time, workload, helpfulness, intervention timing, frustration, and trust. Both assistance conditions improve completion rates compared with no assistance; scheduled assistance achieves the highest completion and shortest duration, while adaptive assistance receives higher helpfulness and timing ratings and lower frustration. Together, these findings highlight distinct trade-offs between assistance strategies in task performance and user experience, providing insights for designing HRI systems that adapt assistance to the needs of the user.
+ \end{abstract}
+ 
+ \begin{document}
+ \maketitle
++
++\noindent\textbf{WORKING DRAFT: N = 24 IS THE PLANNED SAMPLE. RESULTS AND DEMOGRAPHICS AWAIT FINAL UPDATE.}
+ 
+ \section{Introduction}
+ 
+@@ -165,9 +167,9 @@
+ 
+ \subsection{Participants, procedure, and analysis}
+ 
+-Twelve participants completed the experiment: seven men and five women, aged 20--27 years ($M=21.50$, $SD=2.02$). Participants volunteered through forms shared in college groups and received coupons as compensation. Each completed three sessions of three puzzles, with one assistance condition per session. Condition order varied across participants, and puzzles were randomly assigned to sessions. Participants provided consent and background information before beginning the task. A puzzle was judged solved when the arrangement resembled the target shape using all seven pieces. Unsolved attempts were stopped at five minutes. Each puzzle was followed by a questionnaire, with five-minute breaks between sessions and an overall questionnaire after the ninth puzzle.
+-
+-\textbf{ADD ELIGIBILITY AND PRACTICE DETAILS}
++The study targets twenty-four participants ($N=24$). Participants volunteered through forms shared in college groups and received coupons as compensation. Each completed three sessions of three puzzles, with one assistance condition per session. Condition order varied across participants, and puzzles were randomly assigned to sessions. Participants provided consent and background information before beginning the task. A puzzle was judged solved when the arrangement resembled the target shape using all seven pieces. Unsolved attempts were stopped at five minutes. Each puzzle was followed by a questionnaire, with five-minute breaks between sessions and an overall questionnaire after the ninth puzzle.
++
++\textbf{INSERT FINAL DEMOGRAPHICS / ADD ELIGIBILITY AND PRACTICE DETAILS}
+ 
+ We measure puzzle completion and pause-adjusted round duration, including both solved and unsolved attempts. After each puzzle, participants rate the six NASA-TLX dimensions on seven-point scales: mental demand, physical demand, temporal demand, performance, effort, and frustration. An overall workload score averages the six items after aligning their direction so that higher values indicate greater workload. After assisted puzzles, participants also rate helpfulness, timing, seamlessness, and frustration relief. The final questionnaire assesses overall helpfulness, efficacy, trust, and reliance on the robot's guidance.
+ 
+@@ -203,7 +205,7 @@
+ \begin{figure}[t]
+ \centering
+ \includegraphics[width=\columnwidth]{figures/performance.pdf}
+-\caption{Puzzle completion and mean round duration ($N=12$). Gray lines connect the same participant across conditions; colored diamonds show condition means.}
++\caption{Puzzle completion and mean round duration. Gray lines connect the same participant across conditions; colored diamonds show condition means.}
+ \label{fig:performance}
+ \Description{Paired participant plots show the highest completion and shortest mean round duration with scheduled assistance.}
+ \end{figure}
+@@ -248,7 +250,7 @@
+ \begin{figure*}[t]
+ \centering
+ \includegraphics[width=.94\textwidth]{figures/correlations.pdf}
+-\caption{Spearman correlations between participant-condition averages ($N=12$ per panel). Cells show correlation coefficients from $-1$ to $1$; no significance threshold is applied. Frustration is one component of overall workload.}
++\caption{Spearman correlations between participant-condition averages. Cells show correlation coefficients from $-1$ to $1$; no significance threshold is applied. Frustration is one component of overall workload.}
+ \label{fig:correlations}
+ \Description{Three heatmaps show relationships among puzzle completion, duration, workload and frustration separately for control, scheduled and adaptive assistance.}
+ \end{figure*}

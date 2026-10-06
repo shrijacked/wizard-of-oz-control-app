@@ -1,0 +1,89 @@
+{
+  "source_analysis_sha256": "063b624a40fca20be22ca66b0fc33f528fb59188294dbb047ca6cfa44483b34a",
+  "actual_matched_participants": 12,
+  "correlation_definition": "Scheduled versus adaptive averages for the same measure and participant, Spearman rank correlation with average ties.",
+  "correlations": [
+    {
+      "measure": "completion",
+      "spearman_rho": 0.386510341261963
+    },
+    {
+      "measure": "durationSeconds",
+      "spearman_rho": 0.0979020979020979
+    },
+    {
+      "measure": "tlxMean",
+      "spearman_rho": 0.2280701754385965
+    },
+    {
+      "measure": "frustration",
+      "spearman_rho": -0.06618973023925166
+    },
+    {
+      "measure": "helpfulness",
+      "spearman_rho": 0.49818840579710144
+    },
+    {
+      "measure": "timingEffectiveness",
+      "spearman_rho": 0.6370147098993604
+    },
+    {
+      "measure": "clarityAndDistraction",
+      "spearman_rho": 0.5167644091319125
+    },
+    {
+      "measure": "stressReduction",
+      "spearman_rho": 0.5871881242032966
+    }
+  ],
+  "assistance_differences": [
+    {
+      "measure": "helpfulness",
+      "contrast": "adaptive minus constant",
+      "n": 12,
+      "mean_difference": 0.2222222222222221,
+      "ci95_percentile": [
+        -0.22222222222222232,
+        0.5833333333333334
+      ],
+      "p_raw": 0.40625,
+      "p_holm": 1
+    },
+    {
+      "measure": "timingEffectiveness",
+      "contrast": "adaptive minus constant",
+      "n": 12,
+      "mean_difference": 0.38888888888888884,
+      "ci95_percentile": [
+        -0.05555555555555584,
+        0.8611111111111112
+      ],
+      "p_raw": 0.1796875,
+      "p_holm": 0.71875
+    },
+    {
+      "measure": "clarityAndDistraction",
+      "contrast": "adaptive minus constant",
+      "n": 12,
+      "mean_difference": 0.11111111111111116,
+      "ci95_percentile": [
+        -0.6388888888888887,
+        0.8888888888888888
+      ],
+      "p_raw": 0.8408203125,
+      "p_holm": 1
+    },
+    {
+      "measure": "stressReduction",
+      "contrast": "adaptive minus constant",
+      "n": 12,
+      "mean_difference": 0.24999999999999992,
+      "ci95_percentile": [
+        -0.30555555555555564,
+        0.8055555555555554
+      ],
+      "p_raw": 0.46875,
+      "p_holm": 1
+    }
+  ]
+}

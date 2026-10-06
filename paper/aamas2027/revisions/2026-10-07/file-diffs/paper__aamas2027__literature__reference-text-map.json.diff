@@ -1,0 +1,21 @@
+--- before/paper/aamas2027/literature/reference-text-map.json
++++ current/paper/aamas2027/literature/reference-text-map.json
+@@ -1,13 +1,13 @@
+ {
+-  "checked_on": "2026-10-05",
+-  "manuscript_base_commit": "9840396",
+-  "manuscript_state": "Working tree after draft-note revision",
++  "checked_on": "2026-10-07",
++  "manuscript_base_commit": "3c4ddb9",
++  "manuscript_state": "Local survey/results revision; pre-change snapshot in revisions/2026-10-07/before/",
+   "reference_count": 15,
+   "citation_occurrence_count": 21,
+   "scope": "Every in-text citation occurrence in the current manuscript. Source anchors are printed only in the Markdown map; this file stores their offsets and hashes in normalized PDF page text.",
+   "normalization": "pypdf page.extract_text(); Unicode NFKC; split on whitespace and join with one ASCII space. Offsets are Python Unicode character offsets; pages are one-based.",
+-  "manuscript_sha256": "f6497f7e74aa34018eeabb8332695bbbbe7132750d734cfb6d2dc2e627e537e0",
+-  "latex_sha256": "d7ebe7db4332705160ecf9492f70a99367b51052c130fc3db871fb60dd1d8591",
++  "manuscript_sha256": "916e1f2ff4f88732db5b8eef116dfd7e71c1b23f4b723920c74349e983eff040",
++  "latex_sha256": "fafc3848ac7f9301ebd4bebaa935e21a698f6ce4864a6cfabd0bee1651a77152",
+   "references": [
+     {
+       "reference_number": 1,

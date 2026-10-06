@@ -1,0 +1,23 @@
+--- before/paper/aamas2027/BUILD.txt
++++ current/paper/aamas2027/BUILD.txt
+@@ -14,7 +14,9 @@
+ and custom spacing are removed. The prior named copy is preserved in the
+ protocol baseline; exclude internal notes and revisions from submission.
+ 
+-The current abstract and methods report the actual 12 analyzed participants.
++The previous author-approved abstract is restored exactly. The manuscript
++uses planned N=24 and is visibly marked as a working draft awaiting final
++results/demographics. The calculations still use 12 complete participants.
+ The separate linked-square-tangram survey has 24 responses. Historical
+ submitted-abstract.txt is unchanged; the planned experimental target 24 is
+ retained in author notes. Visible drafting reminders remain for missing facts.
+@@ -43,7 +45,8 @@
+ compiled with the established local Tectonic tool. The open standalone
+ architecture editor is retained and its source is unchanged by paper edits.
+ 
+-The complete pre-protocol paper/PDF is in revisions/2026-10-07-protocol/before/.
++The immediate pre-change paper/PDF is in revisions/2026-10-07-working-sample/before/.
++The pre-protocol paper/PDF remains in revisions/2026-10-07-protocol/before/.
+ The earlier results-revision baseline remains in revisions/2026-10-07/before/. Review
+ CHANGELOG.md, highlighted-review.html, exact diffs and the hash inventory
+ before committing the manuscript revision. See README.md for handoff and

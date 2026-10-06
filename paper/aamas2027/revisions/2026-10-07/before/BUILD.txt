@@ -1,0 +1,52 @@
+AAMAS 2027 — complete working paper, 5 October 2026
+
+Import the full folder into Overleaf; select main.tex and pdfLaTeX with BibTeX.
+Or, from this directory with a local TeX distribution:
+
+  pdflatex -interaction=nonstopmode -halt-on-error main.tex
+  bibtex main
+  pdflatex -interaction=nonstopmode -halt-on-error main.tex
+  pdflatex -interaction=nonstopmode -halt-on-error main.tex
+
+The supplied aamas.cls and ACM-Reference-Format.bst remain unchanged.
+The working draft uses submission ID 2613 and the author names supplied
+from OpenReview. Restore the anonymous class option for review submission
+and resolve author-notes.md.
+The author-supplied working abstract retains the planned N=24 framing.
+The numerical findings summarize nine complete participants;
+submitted-abstract.txt remains an unchanged historical record.
+
+Preview built on 5 October 2026 with Tectonic 0.17.0 (XeTeX + BibTeX), using
+the repository class and bibliography style unchanged. Output:
+  ../../output/pdf/aamas2027-current.pdf
+
+The preview is five pages including references. All five pages were rendered
+and visually inspected; no overfull boxes, undefined citations/references or
+missing-character warnings remain. Paragraph emergency stretch and two
+diagram label/path adjustments resolve the observed overflow/crowding.
+Margins, body font size and the supplied class/style were not changed.
+Table 2 uses a local small font and reduced column spacing to fit one column.
+
+The temporary compiler is /private/tmp/hti-latex-preview/tectonic. Rebuild
+from the repository root while that executable and package cache remain:
+  /private/tmp/hti-latex-preview/tectonic --untrusted --outdir output/pdf paper/aamas2027/main.tex
+This writes output/pdf/main.pdf; rename it to aamas2027-current.pdf after QA.
+
+This is a review preview, not a submission-readiness check. Remaining build
+warnings concern missing CCS concepts, incomplete optional bibliography
+fields, and the class/bibliography end-of-document balancing/conditional
+warning. The preview displays all 15 references. Preserve those issues for
+final submission cleanup and rerun the recommended pdfLaTeX build above.
+
+See README.md for the writing flow and results/reference refresh procedure.
+
+The named draft uses authorsperrow=5 with compact inter-author spacing
+(0.2pc) to keep all five names on one line. Author font size and class file
+are unchanged. Empty affiliation fields reserve separate author blocks;
+replace them with actual affiliations when supplied.
+
+The current preview includes visible drafting reminders in sections 3–5.
+Remove these reminders before preparing a submission PDF.
+
+Submission Id: 2613 is displayed below the named author row. The source
+hook adds it only in named mode; anonymous mode uses the template output.

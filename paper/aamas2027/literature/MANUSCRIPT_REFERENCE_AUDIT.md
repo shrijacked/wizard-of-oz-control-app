@@ -2,11 +2,13 @@
 
 For the exact manuscript sentences and short supporting excerpts from each PDF, use the [citation-to-text map](REFERENCE_TEXT_MAP.md). It covers all 15 references and 21 in-text citation occurrences; this document retains the broader verification and access history.
 
-Checked 5 October 2026. All **15 retained citations have downloaded PDFs**, and their identifying metadata and relevant methods, results or limitations passages were checked against the paper text. This is claim-focused verification, not a systematic review or a claim that every page was read exhaustively. No source is treated as verified solely from a search snippet.
+Checked 7 October 2026. All **15 retained citations have downloaded PDFs**, and their identifying metadata and relevant methods, results or limitations passages were checked against the paper text. This is claim-focused verification, not a systematic review or a claim that every page was read exhaustively. No source is treated as verified solely from a search snippet.
 
 **Recency:** 12/15 (80%) first appeared in calendar years 2024–2026. The three older exceptions are Hart (NASA-TLX measurement), Teo (physiologically triggered aid), and Yang (closest adaptive/periodic comparator). Yang first appeared online in 2022 despite its 2024 issue; Teo appeared online in 2017 despite its 2018 issue. Andriella appeared online in late 2024 and Karbouj in late 2025. The bibliography remains below the mentor's 40-reference target.
 
 **Local cache:** PDFs and page-labelled extracted text are under gitignored `data/writing-reference/literature-pdfs/` and `data/writing-reference/literature-text/` at the repository root. Twelve cited PDFs were copied from the earlier downloaded reference set and their hashes rechecked; PACE, Hart and Thunberg were newly downloaded on 5 October. The [JSON audit](manuscript-reference-audit.json) records exact paths, URLs, download dates, hashes, versions and page counts. Page numbers below are **PDF pages**, including cover pages, not necessarily printed pagination.
+
+Current revision check (7 October): all 15 PDF hashes and 35 supporting text anchors match. Citation locations and manuscript hashes identify the figure-comparison revision. Cited claims and bibliography are unchanged.
 
 ## Citation-to-claim checks
 

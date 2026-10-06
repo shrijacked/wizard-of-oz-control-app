@@ -1,0 +1,48 @@
+AAMAS 2027 working paper, updated 7 October 2026
+
+Import the complete paper/aamas2027 folder into Overleaf, including figures/;
+select main.tex and pdfLaTeX with BibTeX. Locally:
+
+  pdflatex -interaction=nonstopmode -halt-on-error main.tex
+  bibtex main
+  pdflatex -interaction=nonstopmode -halt-on-error main.tex
+  pdflatex -interaction=nonstopmode -halt-on-error main.tex
+
+The supplied aamas.cls and ACM-Reference-Format.bst are unchanged.
+Submission ID 2613 and the five author names remain in the named working draft,
+with authorsperrow=5 and compact spacing. Affiliations remain to be supplied;
+restore anonymous mode when preparing an anonymous submission.
+
+The current abstract and methods report the actual 12 analyzed participants.
+The separate linked-square-tangram survey has 24 responses. Historical
+submitted-abstract.txt is unchanged; the planned experimental target 24 is
+retained in author notes. Visible drafting reminders remain for missing facts.
+
+Current preview build: Tectonic 0.17.0 (XeTeX + BibTeX), using the supplied
+class/style. From the repository root while the temporary compiler/cache exist:
+
+  FONTCONFIG_FILE=/private/tmp/hti-latex-preview/fonts.conf /private/tmp/hti-latex-preview/tectonic --untrusted --only-cached --keep-intermediates --keep-logs --outdir output/pdf paper/aamas2027/main.tex
+
+This writes output/pdf/main.pdf. After checking, copy it to
+output/pdf/aamas2027-current.pdf. The final preview has 8 pages including
+references, with main text continuing onto page 8. It includes 7 figures and
+3 tables, 15 references and 21 citation occurrences. Both diagrams are imported
+as TikZ from current editable sources; plots are vector PDFs. Two-panel plots
+are sized for one column; the four-panel intervention plot spans both columns
+for readable labels. Class margins and body font size remain unchanged.
+
+All 8 pages were rendered and visually inspected. The final build has no
+overfull boxes, undefined citations/references, missing characters or fatal
+errors. Remaining warnings concern underfull spacing, missing CCS concepts,
+some optional bibliography fields, and the supplied class's balancing/conditional
+state. These remain submission-cleanup items. The pdfLaTeX route above has not
+been run in this environment, so do not claim it independently verified.
+
+The desktop compiler supports standalone documents; this multi-file paper was
+compiled with the established local Tectonic tool. The open standalone
+architecture editor is retained and its source is unchanged by paper edits.
+
+The complete previous paper/PDF is in revisions/2026-10-07/before/; review
+CHANGELOG.md, highlighted-review.html, exact diffs and the hash inventory
+before committing the manuscript revision. See README.md for handoff and
+reproduction, author-notes.md for missing factual checks.

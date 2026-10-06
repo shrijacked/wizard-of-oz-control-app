@@ -1,0 +1,89 @@
+{
+  "base_commit": "3c4ddb9",
+  "baseline_verified_files": 49,
+  "changes": [
+    {
+      "path": "paper/aamas2027/BUILD.txt",
+      "status": "modified",
+      "before_sha256": "4f6f431e5bcb90ce36ca513ada1870b37a26f8526ea518976cf346e44ddbaf77",
+      "after_sha256": "399ce66dd9fba2b86a68cffb9fb7201308373e7ff1cb399d9d60a0aa7a7adc22",
+      "diff_path": "file-diffs/paper__aamas2027__BUILD.txt.diff"
+    },
+    {
+      "path": "paper/aamas2027/README.md",
+      "status": "modified",
+      "before_sha256": "c972271ea095d5a0b6ea2785c44612477e24ad5b2096e2f4ce58e4d4536cbfc7",
+      "after_sha256": "b4a931bacc69942e5cd3c741c6eb7c6f687887e916da9460139e4f56eef03eaa",
+      "diff_path": "file-diffs/paper__aamas2027__README.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/author-notes.md",
+      "status": "modified",
+      "before_sha256": "5229642a4a71c7f9938309f3b0ee8d8af4c37eef6ba879d51c5b239e2740bdbb",
+      "after_sha256": "5e25c210015596cfe2b10fc663bd241157bd8fbb26ff6460a8b71d3637500aa5",
+      "diff_path": "file-diffs/paper__aamas2027__author-notes.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/evidence-map.md",
+      "status": "modified",
+      "before_sha256": "99d145199b95e4d297682f6430744be2f125fe2f2cb4794b0de93502e3dee73e",
+      "after_sha256": "28f19981103964ed05d7f7fb133666a2e0fc44838502f6297a77239a4cddb116",
+      "diff_path": "file-diffs/paper__aamas2027__evidence-map.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/literature/CITATION_COUNTS.md",
+      "status": "modified",
+      "before_sha256": "a197cebf995a798b27d374d95b48c76a4cea9b4821a769f959d7bec81868c547",
+      "after_sha256": "5eabab0356de058ad0d285d962d00dc03966ce426443f74286ca27ed5f4db5e1",
+      "diff_path": "file-diffs/paper__aamas2027__literature__CITATION_COUNTS.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/literature/MANUSCRIPT_REFERENCE_AUDIT.md",
+      "status": "modified",
+      "before_sha256": "58a8b7b80b5751d629add259cf9173c2558b655618a2beac89d8ae77be82cf98",
+      "after_sha256": "bae54b660d694ca0fb3a4da5f5283d8755d837edf060d075f8e0e0db3d9c2cb2",
+      "diff_path": "file-diffs/paper__aamas2027__literature__MANUSCRIPT_REFERENCE_AUDIT.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/literature/REFERENCE_TEXT_MAP.md",
+      "status": "modified",
+      "before_sha256": "8f1f049fdc999bc7974ea237e9083051e69531b2cfa81b91fb571b18bd315596",
+      "after_sha256": "b802e18e0d497bc32d64e3baf13036df7334ba938a83ee28ae100ce15a6543e4",
+      "diff_path": "file-diffs/paper__aamas2027__literature__REFERENCE_TEXT_MAP.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/literature/reference-text-map.json",
+      "status": "modified",
+      "before_sha256": "4d4d2fd0c44746f83dc4220d83172b619b929145579e094954d44d71edbcc8bb",
+      "after_sha256": "c10d29699c0c34c55526e6eb6640e6bbcac94859a7b6a5af1cff5220e2774385",
+      "diff_path": "file-diffs/paper__aamas2027__literature__reference-text-map.json.diff"
+    },
+    {
+      "path": "paper/aamas2027/main.tex",
+      "status": "modified",
+      "before_sha256": "9adca1014328d44e2b80be2a7bbdb09c34b45906258c022a06a7cf4c9d67a990",
+      "after_sha256": "4c293fdcde1592d8b00bdef34fd908ac567ab279a7cb4880a1aa09ddc00c5c49",
+      "diff_path": "file-diffs/paper__aamas2027__main.tex.diff"
+    },
+    {
+      "path": "paper/aamas2027/manuscript.md",
+      "status": "modified",
+      "before_sha256": "1e90c7be80c9de1e36f71b18c664ac57e4c9c8e778cca9b4d96d8b15f9922b91",
+      "after_sha256": "e302e93d03f209920124d72d7bdff1906f562210a4cb708218ae974c48c12125",
+      "diff_path": "file-diffs/paper__aamas2027__manuscript.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/structure-review.md",
+      "status": "modified",
+      "before_sha256": "df61dee010c5fd013a9f4cdd3bb26c39c068f3118a83cb23ac6ec685d7c65e21",
+      "after_sha256": "b3a876d959600338860cdbd5edd065c72599d782072a6f25af862f53729f4cc2",
+      "diff_path": "file-diffs/paper__aamas2027__structure-review.md.diff"
+    },
+    {
+      "path": "output/pdf/aamas2027-current.pdf",
+      "status": "modified",
+      "before_sha256": "a682497decec3aef11530fa6e30404b1d768de2eb9d2a2c3c75e77418e1dbe6e",
+      "after_sha256": "974f9c64870a032b80d1215c6a356dd70c041827d9f7754b2a721ccd9d7e2630"
+    }
+  ]
+}

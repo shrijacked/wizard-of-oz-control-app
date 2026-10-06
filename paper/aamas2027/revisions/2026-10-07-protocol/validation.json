@@ -1,0 +1,27 @@
+{
+  "pdf_pages": 8,
+  "figures": 7,
+  "tables": 3,
+  "pdf_sha256": "a682497decec3aef11530fa6e30404b1d768de2eb9d2a2c3c75e77418e1dbe6e",
+  "anonymous_source_and_pdf": true,
+  "submission_id": 2613,
+  "current_baseline_hashes_verified": 48,
+  "earlier_baseline_hashes_verified": 32,
+  "changed_files_in_inventory": 15,
+  "results_analysis_figures_bibliography_template_and_historical_abstract_unchanged": true,
+  "reference_pdf_hashes_verified": 15,
+  "reference_text_anchors_verified": 35,
+  "citation_occurrences": 21,
+  "reference_map_current_hashes": true,
+  "highlighted_review_reconstructs_current_manuscript": true,
+  "inventory_hashes_verified": true,
+  "final_latex_log_overflow_or_unresolved_references": false,
+  "build_engine": "Tectonic 0.17.0 / XeTeX + BibTeX",
+  "page_QA": "All eight final PDF pages rendered and visually inspected.",
+  "pending_checks": [
+    "Delivered participant instruction version",
+    "Institutional ethics approval/exemption",
+    "Actual baseline procedure; author account provisional"
+  ],
+  "paper_push_status": "Local; architecture TeX previously pushed as 3c4ddb9."
+}

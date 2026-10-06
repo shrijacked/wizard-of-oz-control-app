@@ -1,0 +1,16 @@
+{
+  "covers_rounds": [
+    "2026-10-07-protocol",
+    "2026-10-07-working-sample",
+    "2026-10-07-figures"
+  ],
+  "baseline_source": "2026-10-07-protocol/before",
+  "baseline_hashes_verified": 48,
+  "earlier_review_files_verified_unchanged": 276,
+  "highlighted_review_reconstructs_current_manuscript": true,
+  "inventory_hashes_verified": true,
+  "cumulative_changed_files": 28,
+  "manuscript_sha256": "dce42496d0c633b919f42d0b5740052abbf8378ae80454fd821bd3a0670216b4",
+  "pdf_sha256": "3bfd8e37a41b67e767ac277a7959aa664603216e8df14f93ff20a044f5c5e52d",
+  "request_changes": "Review documents only; no paper or PDF changes"
+}

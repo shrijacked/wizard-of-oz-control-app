@@ -1,0 +1,90 @@
+--- before/main.tex
++++ current/main.tex
+@@ -1,5 +1,5 @@
+ % Working paper, 7 October 2026. Main source for subsequent editing.
+-% Evidence and revision history: README.md and revisions/2026-10-07-working-sample/.
++% Evidence and revision history: README.md and revisions/2026-10-07-figures/.
+ % Based on the supplied AAMAS 2027 template; class and layout unmodified.
+ \documentclass[sigconf,anonymous]{aamas}
+ \usepackage{balance}
+@@ -173,7 +173,7 @@
+ 
+ We measure puzzle completion and pause-adjusted round duration, including both solved and unsolved attempts. After each puzzle, participants rate the six NASA-TLX dimensions on seven-point scales: mental demand, physical demand, temporal demand, performance, effort, and frustration. An overall workload score averages the six items after aligning their direction so that higher values indicate greater workload. After assisted puzzles, participants also rate helpfulness, timing, seamlessness, and frustration relief. The final questionnaire assesses overall helpfulness, efficacy, trust, and reliance on the robot's guidance.
+ 
+-We average ratings and durations across each participant's three trials per condition, then report means and standard deviations across participants. Completion is reported as the proportion of puzzles solved. Exploratory pairwise comparisons use two-sided paired sign-flip tests on participant-condition averages. Holm correction is applied to the three comparisons for each outcome and to the four assistance-rating comparisons; reported $p$ values are adjusted. Spearman correlations summarize relationships between participant-level measures separately in each condition.
++We average ratings and durations across each participant's three trials per condition, then report means and standard deviations across participants. Completion is reported as the proportion of puzzles solved. Exploratory pairwise comparisons use two-sided paired sign-flip tests on participant-condition averages. Holm correction is applied to the three comparisons for each outcome and to the four assistance-rating comparisons; reported $p$ values are adjusted. Spearman correlations compare each participant’s scheduled and adaptive averages for the same measure.
+ 
+ \textbf{UPDATE WITH FINAL RESULTS}
+ 
+@@ -183,7 +183,7 @@
+ 
+ \textbf{INSERT CORRECT PIECE COUNT / CONFIRM PLACEMENT TOLERANCE AND SCORERS}
+ 
+-Participants solved 47 of 108 puzzles. Completion rates were 13.9\% without assistance, 66.7\% with scheduled assistance, and 50.0\% with adaptive assistance (Table~\ref{tab:performance}; Figure~\ref{fig:performance}). Compared with control, completion was 52.8 percentage points higher with scheduled assistance ($p=.0015$) and 36.1 points higher with adaptive assistance ($p=.016$). The difference between the two assisted conditions was not statistically significant ($p=.156$).
++Participants solved 47 of 108 puzzles. Completion rates were 13.9\% without assistance, 66.7\% with scheduled assistance, and 50.0\% with adaptive assistance (Table~\ref{tab:performance}). Compared with control, completion was 52.8 percentage points higher with scheduled assistance ($p=.0015$) and 36.1 points higher with adaptive assistance ($p=.016$). The difference between the two assisted conditions was not statistically significant ($p=.156$).
+ 
+ \begin{table}[t]
+ \centering
+@@ -202,13 +202,6 @@
+ 
+ Scheduled assistance also had the shortest mean round duration. Its mean was 50.56 seconds below control ($p=.012$). The adaptive-control and adaptive-scheduled duration differences were not statistically significant (both $p=.132$). These durations summarize time spent across all attempts, rather than time to successful completion alone.
+ 
+-\begin{figure}[t]
+-\centering
+-\includegraphics[width=\columnwidth]{figures/performance.pdf}
+-\caption{Puzzle completion and mean round duration. Gray lines connect the same participant across conditions; colored diamonds show condition means.}
+-\label{fig:performance}
+-\Description{Paired participant plots show the highest completion and shortest mean round duration with scheduled assistance.}
+-\end{figure}
+ 
+ \subsection{Subjective workload}
+ 
+@@ -245,16 +238,6 @@
+ \Description{Paired plots show lower mean workload and frustration in the assisted conditions than in control.}
+ \end{figure}
+ 
+-Figure~\ref{fig:correlations} relates performance and experience across participants. Completion and duration were negatively correlated in control ($\rho=-.80$), scheduled assistance ($\rho=-.89$), and adaptive assistance ($\rho=-.34$). Completion and overall workload were also negatively correlated ($\rho=-.43$, $-.36$, and $-.75$, respectively). These associations describe co-occurring outcomes rather than causal relationships. Frustration contributes to the overall workload score, so their positive correlation partly reflects this shared measurement.
+-
+-\begin{figure*}[t]
+-\centering
+-\includegraphics[width=.94\textwidth]{figures/correlations.pdf}
+-\caption{Spearman correlations between participant-condition averages. Cells show correlation coefficients from $-1$ to $1$; no significance threshold is applied. Frustration is one component of overall workload.}
+-\label{fig:correlations}
+-\Description{Three heatmaps show relationships among puzzle completion, duration, workload and frustration separately for control, scheduled and adaptive assistance.}
+-\end{figure*}
+-
+ \subsection{Intervention experience}
+ 
+ Adaptive assistance received higher mean ratings on all four assistance-specific items (Table~\ref{tab:assistance}; Figure~\ref{fig:assistance}). Helpfulness averaged 5.06 with adaptive assistance and 4.83 with scheduled assistance; timing averaged 5.56 and 5.17, respectively. Mean seamlessness was 4.22 versus 4.11, and frustration relief was 5.14 versus 4.89. None of these paired differences was statistically significant after correction (timing $p=.719$; other items $p=1.000$).
+@@ -275,15 +258,25 @@
+ \end{tabular}
+ \end{table}
+ 
++Figure~\ref{fig:correlations} compares participants’ scheduled and adaptive averages. Cross-condition correlations were .39 for completion, .10 for duration, .23 for workload, and $-.07$ for frustration. Assistance-rating correlations ranged from .50 for helpfulness to .64 for timing. These coefficients describe consistency across conditions, rather than the size or direction of their differences.
++
++\begin{figure*}[t]
++\centering
++\includegraphics[width=.98\textwidth]{figures/scheduled-adaptive-correlations.pdf}
++\caption{Scheduled versus adaptive participant averages for the same measure. Each point represents a matched pair; larger points indicate coincident pairs. Dashed diagonals indicate equal scores, and $\rho$ denotes Spearman correlation.}
++\label{fig:correlations}
++\Description{Eight scatterplots compare scheduled scores on the horizontal axis with adaptive scores on the vertical axis for completion, duration, workload, frustration and four assistance ratings.}
++\end{figure*}
++
+ These ratings describe the combined experience of text hints and robotic-arm assistance. The higher adaptive averages alongside lower completion than scheduled assistance motivate examining both task progress and the experience of receiving help.
+ 
+-\begin{figure*}[t]
+-\centering
+-\includegraphics[width=.94\textwidth]{figures/intervention-experience.pdf}
+-\caption{Assistance-specific ratings. Lines connect each participant's scheduled and adaptive averages; diamonds show condition means. Higher ratings indicate a more favorable experience.}
++\begin{figure}[t]
++\centering
++\includegraphics[width=\columnwidth]{figures/assistance-differences.pdf}
++\caption{Paired differences in assistance ratings, adaptive minus scheduled. Gray points show individual differences; diamonds show means with unadjusted 95\% bootstrap intervals. Positive values favor adaptive assistance; negative values favor scheduled assistance.}
+ \label{fig:assistance}
+-\Description{Four paired plots compare helpfulness, timing, seamlessness and frustration relief in scheduled and adaptive assistance.}
+-\end{figure*}
++\Description{A horizontal difference plot compares four assistance ratings. Individual points lie on both sides of zero, while all four mean differences are positive.}
++\end{figure}
+ 
+ \subsection{Overall experience}
+ 

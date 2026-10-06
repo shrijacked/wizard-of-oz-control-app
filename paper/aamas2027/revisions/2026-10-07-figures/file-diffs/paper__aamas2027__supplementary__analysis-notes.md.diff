@@ -1,0 +1,12 @@
+--- before/paper/aamas2027/supplementary/analysis-notes.md
++++ current/paper/aamas2027/supplementary/analysis-notes.md
+@@ -41,3 +41,9 @@
+ ## Protocol clarification and timing audit
+ 
+ The author specifies stopping unsolved trials at 5 minutes, five-minute inter-sitting breaks, preset hints and researcher choice of hint-only versus robot-plus-hint, with every movement paired with a hint. Rapid/sustained arousal flags are handled with a 15-second wait; these operational choices do not change the detector algorithm. Existing exported durations above 300 seconds remain untouched pending an agreed timing rule. The temporary three-minute preparation/baseline description must be reconciled with the collector’s 60-second baseline computation. No results, tests or plots changed in this protocol revision.
++
++## Scheduled/adaptive figure revision
++
++`plot-assisted-comparison.py` reads the existing analysis JSON without changing records or tests. Each Spearman coefficient correlates scheduled and adaptive participant averages for the same measure, using average ranks for ties rounded to twelve decimals. Scatterplot coordinates are not jittered; coincident pairs have larger markers. Eight measures cover completion, duration, overall workload, frustration and the four assistance ratings. `assisted-comparison.json` records the analysis hash and exact coefficients. Within-condition matrices remain an internal audit only and are no longer displayed.
++
++The assistance difference figure uses adaptive minus scheduled; vertical offsets separate participants while preserving exact horizontal values. Diamonds show means and bars the existing 20,000-replicate percentile bootstrap intervals (seed 2613). These intervals are not multiplicity-adjusted and do not replace the Holm-adjusted tests. The abstract, planned sample and all numerical estimates/tests are unchanged.

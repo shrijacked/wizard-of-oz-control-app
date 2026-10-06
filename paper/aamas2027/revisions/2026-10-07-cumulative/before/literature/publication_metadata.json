@@ -1,0 +1,1483 @@
+{
+  "Teo_2018_Closed_Loop_Teaming_crossref.json": {
+    "title": [
+      "Enhancing the effectiveness of human-robot teaming with a closed-loop system"
+    ],
+    "author": [
+      {
+        "ORCID": "https://orcid.org/0000-0003-4591-3615",
+        "authenticated-orcid": false,
+        "given": "Grace",
+        "family": "Teo",
+        "sequence": "first",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Lauren",
+        "family": "Reinerman-Jones",
+        "sequence": "additional",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Gerald",
+        "family": "Matthews",
+        "sequence": "additional",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "James",
+        "family": "Szalma",
+        "sequence": "additional",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Florian",
+        "family": "Jentsch",
+        "sequence": "additional",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Peter",
+        "family": "Hancock",
+        "sequence": "additional",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      }
+    ],
+    "DOI": "10.1016/j.apergo.2017.07.007",
+    "URL": "https://doi.org/10.1016/j.apergo.2017.07.007",
+    "container-title": [
+      "Applied Ergonomics"
+    ],
+    "publisher": "Elsevier BV",
+    "volume": "67",
+    "page": "91-103",
+    "published-print": {
+      "date-parts": [
+        [
+          2018,
+          2
+        ]
+      ]
+    },
+    "published": {
+      "date-parts": [
+        [
+          2018,
+          2
+        ]
+      ]
+    },
+    "issued": {
+      "date-parts": [
+        [
+          2018,
+          2
+        ]
+      ]
+    }
+  },
+  "capponi_crossref.json": {
+    "title": [
+      "Assembly complexity and physiological response in human-robot collaboration: Insights from a preliminary experimental analysis"
+    ],
+    "author": [
+      {
+        "given": "Matteo",
+        "family": "Capponi",
+        "sequence": "first",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Riccardo",
+        "family": "Gervasi",
+        "sequence": "additional",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Luca",
+        "family": "Mastrogiacomo",
+        "sequence": "additional",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "ORCID": "https://orcid.org/0000-0001-7131-4419",
+        "authenticated-orcid": false,
+        "given": "Fiorenzo",
+        "family": "Franceschini",
+        "sequence": "additional",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      }
+    ],
+    "DOI": "10.1016/j.rcim.2024.102789",
+    "URL": "https://doi.org/10.1016/j.rcim.2024.102789",
+    "container-title": [
+      "Robotics and Computer-Integrated Manufacturing"
+    ],
+    "publisher": "Elsevier BV",
+    "volume": "89",
+    "page": "102789",
+    "article-number": "102789",
+    "published-print": {
+      "date-parts": [
+        [
+          2024,
+          10
+        ]
+      ]
+    },
+    "published": {
+      "date-parts": [
+        [
+          2024,
+          10
+        ]
+      ]
+    },
+    "issued": {
+      "date-parts": [
+        [
+          2024,
+          10
+        ]
+      ]
+    }
+  },
+  "Korivand_2024_Physiological_Task_Load_Adjustment_crossref.json": {
+    "title": [
+      "Optimizing Human–Robot Teaming Performance through Q-Learning-Based Task Load Adjustment and Physiological Data Analysis"
+    ],
+    "author": [
+      {
+        "given": "Soroush",
+        "family": "Korivand",
+        "sequence": "first",
+        "affiliation": [
+          {
+            "name": "Department of Mechanical Engineering, Southern Methodist University, Dallas, TX 75205, USA"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Gustavo",
+        "family": "Galvani",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "Department of Mechanical Engineering, The University of Alabama, Tuscaloosa, AL 35487, USA"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Arash",
+        "family": "Ajoudani",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "Human-Robot Interfaces and Physical Interaction Laboratory (HRI<sup>2</sup>), Istituto Italiano di Tecnologia, 16163 Genoa, Italy"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Jiaqi",
+        "family": "Gong",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "Department of Computer Science, The University of Alabama, Tuscaloosa, AL 35487, USA"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Nader",
+        "family": "Jalili",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "Department of Mechanical Engineering, Southern Methodist University, Dallas, TX 75205, USA"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      }
+    ],
+    "DOI": "10.3390/s24092817",
+    "URL": "https://doi.org/10.3390/s24092817",
+    "container-title": [
+      "Sensors"
+    ],
+    "publisher": "MDPI AG",
+    "volume": "24",
+    "issue": "9",
+    "page": "2817",
+    "published-online": {
+      "date-parts": [
+        [
+          2024,
+          4,
+          28
+        ]
+      ]
+    },
+    "published": {
+      "date-parts": [
+        [
+          2024,
+          4,
+          28
+        ]
+      ]
+    },
+    "issued": {
+      "date-parts": [
+        [
+          2024,
+          4,
+          28
+        ]
+      ]
+    }
+  },
+  "Sanna_2022_BARI_Assembly_Assistance_crossref.json": {
+    "title": [
+      "BARI: An Affordable Brain-Augmented Reality Interface to Support Human–Robot Collaboration in Assembly Tasks"
+    ],
+    "author": [
+      {
+        "ORCID": "https://orcid.org/0000-0001-7916-1699",
+        "authenticated-orcid": false,
+        "given": "Andrea",
+        "family": "Sanna",
+        "sequence": "first",
+        "affiliation": [
+          {
+            "name": "Dipartimento di Automatica e Informatica, Politecnico di Torino, 10129 Torino, Italy"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "ORCID": "https://orcid.org/0000-0002-6599-9949",
+        "authenticated-orcid": false,
+        "given": "Federico",
+        "family": "Manuri",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "Dipartimento di Automatica e Informatica, Politecnico di Torino, 10129 Torino, Italy"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Jacopo",
+        "family": "Fiorenza",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "Dipartimento di Automatica e Informatica, Politecnico di Torino, 10129 Torino, Italy"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "ORCID": "https://orcid.org/0000-0001-8772-4105",
+        "authenticated-orcid": false,
+        "given": "Francesco",
+        "family": "De Pace",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "Faculty of Informatics, Institute of Visual Computing & Human-Centered Technology, TU Wien University, 1040 Wien, Austria"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      }
+    ],
+    "DOI": "10.3390/info13100460",
+    "URL": "https://doi.org/10.3390/info13100460",
+    "container-title": [
+      "Information"
+    ],
+    "publisher": "MDPI AG",
+    "volume": "13",
+    "issue": "10",
+    "page": "460",
+    "published-online": {
+      "date-parts": [
+        [
+          2022,
+          9,
+          28
+        ]
+      ]
+    },
+    "published": {
+      "date-parts": [
+        [
+          2022,
+          9,
+          28
+        ]
+      ]
+    },
+    "issued": {
+      "date-parts": [
+        [
+          2022,
+          9,
+          28
+        ]
+      ]
+    }
+  },
+  "Ojstersek_2024_Personalizing_Workplace_crossref.json": {
+    "title": [
+      "Personalizing Human–Robot Workplace Parameters in Human-Centered Manufacturing"
+    ],
+    "author": [
+      {
+        "ORCID": "https://orcid.org/0000-0001-6244-3737",
+        "authenticated-orcid": false,
+        "given": "Robert",
+        "family": "Ojsteršek",
+        "sequence": "first",
+        "affiliation": [
+          {
+            "name": "Laboratory for Production and Operations Management, Faculty of Mechanical Engineering, University of Maribor, SI-2000 Maribor, Slovenia"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "ORCID": "https://orcid.org/0000-0003-3549-9596",
+        "authenticated-orcid": false,
+        "given": "Borut",
+        "family": "Buchmeister",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "Laboratory for Production and Operations Management, Faculty of Mechanical Engineering, University of Maribor, SI-2000 Maribor, Slovenia"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "ORCID": "https://orcid.org/0009-0007-4570-0536",
+        "authenticated-orcid": false,
+        "given": "Aljaž",
+        "family": "Javernik",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "Laboratory for Production and Operations Management, Faculty of Mechanical Engineering, University of Maribor, SI-2000 Maribor, Slovenia"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      }
+    ],
+    "DOI": "10.3390/machines12080546",
+    "URL": "https://doi.org/10.3390/machines12080546",
+    "container-title": [
+      "Machines"
+    ],
+    "publisher": "MDPI AG",
+    "volume": "12",
+    "issue": "8",
+    "page": "546",
+    "published-online": {
+      "date-parts": [
+        [
+          2024,
+          8,
+          11
+        ]
+      ]
+    },
+    "published": {
+      "date-parts": [
+        [
+          2024,
+          8,
+          11
+        ]
+      ]
+    },
+    "issued": {
+      "date-parts": [
+        [
+          2024,
+          8,
+          11
+        ]
+      ]
+    }
+  },
+  "hostettler_crossref.json": {
+    "title": [
+      "Real-Time Adaptive Industrial Robots: Improving Safety And Comfort In Human-Robot Collaboration"
+    ],
+    "author": [
+      {
+        "ORCID": "https://orcid.org/0000-0001-6278-5032",
+        "authenticated-orcid": false,
+        "given": "Damian",
+        "family": "Hostettler",
+        "sequence": "first",
+        "affiliation": [
+          {
+            "name": "Interactions Research Group, Institute of Computer Science, University of St. Gallen, St. Gallen, St. Gallen, Switzerland"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "ORCID": "https://orcid.org/0000-0001-6367-3454",
+        "authenticated-orcid": false,
+        "given": "Simon",
+        "family": "Mayer",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "Interactions Research Group, Institute of Computer Science, University of St. Gallen, St. Gallen, St. Gallen, Switzerland"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "ORCID": "https://orcid.org/0000-0003-3073-9423",
+        "authenticated-orcid": false,
+        "given": "Jan Liam",
+        "family": "Albert",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "Interactions Research Group, Institute of Computer Science, University St. Gallen, St. Gallen, St. Gallen, Switzerland"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "ORCID": "https://orcid.org/0000-0002-8895-8381",
+        "authenticated-orcid": false,
+        "given": "Kay Erik",
+        "family": "Jenss",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "Interactions Research Group, Institute of Computer Science, University of St. Gallen, St. Gallen, St. Gallen, Switzerland"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "ORCID": "https://orcid.org/0000-0003-4366-3093",
+        "authenticated-orcid": false,
+        "given": "Christian",
+        "family": "Hildebrand",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "Institute of Behavioral Science &amp; Technology, University of St. Gallen, St. Gallen, St. Gallen, Switzerland"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      }
+    ],
+    "DOI": "10.1145/3706598.3713889",
+    "URL": "https://doi.org/10.1145/3706598.3713889",
+    "container-title": [
+      "Proceedings of the 2025 CHI Conference on Human Factors in Computing Systems"
+    ],
+    "publisher": "ACM",
+    "page": "1-16",
+    "published-online": {
+      "date-parts": [
+        [
+          2025,
+          4,
+          25
+        ]
+      ]
+    },
+    "published-print": {
+      "date-parts": [
+        [
+          2025,
+          4,
+          26
+        ]
+      ]
+    },
+    "published": {
+      "date-parts": [
+        [
+          2025,
+          4,
+          25
+        ]
+      ]
+    },
+    "issued": {
+      "date-parts": [
+        [
+          2025,
+          4,
+          25
+        ]
+      ]
+    }
+  },
+  "Javernik_2026_Personalized_Workload_crossref.json": {
+    "title": [
+      "Workload Intensity in Human–Robot Collaboration: A Personalized Approach to Sustainable Efficiency and Well-Being"
+    ],
+    "author": [
+      {
+        "ORCID": "https://orcid.org/0009-0007-4570-0536",
+        "authenticated-orcid": false,
+        "given": "Aljaz",
+        "family": "Javernik",
+        "sequence": "first",
+        "affiliation": [
+          {
+            "name": "University of Maribor"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Robert",
+        "family": "Ojstersek",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "University of Maribor"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Katja",
+        "family": "Kerman",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "University of Maribor"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      }
+    ],
+    "DOI": "10.1177/00187208261423621",
+    "URL": "https://doi.org/10.1177/00187208261423621",
+    "container-title": [
+      "Human Factors: The Journal of the Human Factors and Ergonomics Society"
+    ],
+    "publisher": "SAGE Publications",
+    "volume": "68",
+    "issue": "7",
+    "page": "913-929",
+    "published-online": {
+      "date-parts": [
+        [
+          2026,
+          2,
+          11
+        ]
+      ]
+    },
+    "published-print": {
+      "date-parts": [
+        [
+          2026,
+          7
+        ]
+      ]
+    },
+    "published": {
+      "date-parts": [
+        [
+          2026,
+          2,
+          11
+        ]
+      ]
+    },
+    "issued": {
+      "date-parts": [
+        [
+          2026,
+          2,
+          11
+        ]
+      ]
+    }
+  },
+  "Pereira_2025_Workload_Sensors_Review_crossref.json": {
+    "title": [
+      "Capturing Mental Workload Through Physiological Sensors in Human–Robot Collaboration: A Systematic Literature Review"
+    ],
+    "author": [
+      {
+        "ORCID": "https://orcid.org/0000-0002-6139-4942",
+        "authenticated-orcid": false,
+        "given": "Eduarda",
+        "family": "Pereira",
+        "sequence": "first",
+        "affiliation": [
+          {
+            "name": "ALGORITMI Research Center/LASI, University of Minho, 4800-058 Guimarães, Portugal"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "ORCID": "https://orcid.org/0000-0002-9968-5024",
+        "authenticated-orcid": false,
+        "given": "Luis",
+        "family": "Sigcha",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "Department of Physical Education and Sports Science (PESS), Data-Driven Computer Engineering Research Centre (D2iCE) & Health Research Institute (HRI), University of Limerick, V94 T9PX Limerick, Ireland"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "ORCID": "https://orcid.org/0000-0002-8498-5278",
+        "authenticated-orcid": false,
+        "given": "Emanuel",
+        "family": "Silva",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "ALGORITMI Research Center/LASI, University of Minho, 4800-058 Guimarães, Portugal"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Adriana",
+        "family": "Sampaio",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "Psychological Neuroscience Laboratory, CIPsi, School of Psychology, University of Minho, 4704-553 Braga, Portugal"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "ORCID": "https://orcid.org/0000-0002-8425-3501",
+        "authenticated-orcid": false,
+        "given": "Nuno",
+        "family": "Costa",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "DTX-Colab, 4800-056 Guimarães, Portugal"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "ORCID": "https://orcid.org/0000-0002-9348-8038",
+        "authenticated-orcid": false,
+        "given": "Nélson",
+        "family": "Costa",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "ALGORITMI Research Center/LASI, University of Minho, 4800-058 Guimarães, Portugal"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      }
+    ],
+    "DOI": "10.3390/app15063317",
+    "URL": "https://doi.org/10.3390/app15063317",
+    "container-title": [
+      "Applied Sciences"
+    ],
+    "publisher": "MDPI AG",
+    "volume": "15",
+    "issue": "6",
+    "page": "3317",
+    "published-online": {
+      "date-parts": [
+        [
+          2025,
+          3,
+          18
+        ]
+      ]
+    },
+    "published": {
+      "date-parts": [
+        [
+          2025,
+          3,
+          18
+        ]
+      ]
+    },
+    "issued": {
+      "date-parts": [
+        [
+          2025,
+          3,
+          18
+        ]
+      ]
+    }
+  },
+  "Karbouj_2026_Adaptive_HRC_Review_crossref.json": {
+    "title": [
+      "Adaptive Robotic Behavior in Industrial Human–Robot Collaboration: A Systematic Review of Taxonomies, Enabling Mechanisms, and Research Frontiers"
+    ],
+    "author": [
+      {
+        "ORCID": "https://orcid.org/0009-0001-1163-5218",
+        "authenticated-orcid": false,
+        "given": "Bsher",
+        "family": "Karbouj",
+        "sequence": "first",
+        "affiliation": [
+          {
+            "name": "Department of Industrial Automation Technology, Technical University of Berlin, Berlin, Germany"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Rajwinder",
+        "family": "Garha",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "Department of Industrial Automation Technology, Technical University of Berlin, Berlin, Germany"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Konstantin",
+        "family": "KeßLer",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "Department of Industrial Automation Technology, Technical University of Berlin, Berlin, Germany"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Jörg",
+        "family": "Krüger",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "Department of Automation Technology, Fraunhofer IPK, Berlin, Germany"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      }
+    ],
+    "DOI": "10.1109/access.2025.3649702",
+    "URL": "https://doi.org/10.1109/access.2025.3649702",
+    "container-title": [
+      "IEEE Access"
+    ],
+    "publisher": "Institute of Electrical and Electronics Engineers (IEEE)",
+    "volume": "14",
+    "page": "1398-1422",
+    "published-print": {
+      "date-parts": [
+        [
+          2026
+        ]
+      ]
+    },
+    "published": {
+      "date-parts": [
+        [
+          2026
+        ]
+      ]
+    },
+    "issued": {
+      "date-parts": [
+        [
+          2026
+        ]
+      ]
+    }
+  },
+  "Andriella_2025_Bayesian_Proactive_Assistance_crossref.json": {
+    "title": [
+      "A Bayesian framework for learning proactive robot behaviour in assistive tasks"
+    ],
+    "author": [
+      {
+        "given": "Antonio",
+        "family": "Andriella",
+        "sequence": "first",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Ilenia",
+        "family": "Cucciniello",
+        "sequence": "additional",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Antonio",
+        "family": "Origlia",
+        "sequence": "additional",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Silvia",
+        "family": "Rossi",
+        "sequence": "additional",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      }
+    ],
+    "DOI": "10.1007/s11257-024-09421-1",
+    "URL": "https://doi.org/10.1007/s11257-024-09421-1",
+    "container-title": [
+      "User Modeling and User-Adapted Interaction"
+    ],
+    "publisher": "Springer Science and Business Media LLC",
+    "volume": "35",
+    "issue": "1",
+    "article-number": "1",
+    "published-online": {
+      "date-parts": [
+        [
+          2024,
+          12,
+          26
+        ]
+      ]
+    },
+    "published-print": {
+      "date-parts": [
+        [
+          2025,
+          3
+        ]
+      ]
+    },
+    "published": {
+      "date-parts": [
+        [
+          2024,
+          12,
+          26
+        ]
+      ]
+    },
+    "issued": {
+      "date-parts": [
+        [
+          2024,
+          12,
+          26
+        ]
+      ]
+    }
+  },
+  "tabatabaei_crossref.json": {
+    "title": [
+      "Gazing at Failure: Investigating Human Gaze in Response to Robot Failure in Collaborative Tasks"
+    ],
+    "author": [
+      {
+        "given": "Ramtin",
+        "family": "Tabatabaei",
+        "sequence": "first",
+        "affiliation": [
+          {
+            "name": "The University of Melbourne,Melbourne,Australia"
+          }
+        ],
+        "role": [
+          {
+            "role": "author",
+            "vocabulary": "crossref"
+          }
+        ]
+      },
+      {
+        "given": "Vassilis",
+        "family": "Kostakos",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "The University of Melbourne,Melbourne,Australia"
+          }
+        ],
+        "role": [
+          {
+            "role": "author",
+            "vocabulary": "crossref"
+          }
+        ]
+      },
+      {
+        "given": "Wafa",
+        "family": "Johal",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "The University of Melbourne,Melbourne,Australia"
+          }
+        ],
+        "role": [
+          {
+            "role": "author",
+            "vocabulary": "crossref"
+          }
+        ]
+      }
+    ],
+    "DOI": "10.1109/hri61500.2025.10973935",
+    "URL": "https://doi.org/10.1109/hri61500.2025.10973935",
+    "container-title": [
+      "2025 20th ACM/IEEE International Conference on Human-Robot Interaction (HRI)"
+    ],
+    "publisher": "IEEE",
+    "page": "939-948",
+    "published-print": {
+      "date-parts": [
+        [
+          2025,
+          3,
+          4
+        ]
+      ]
+    },
+    "published": {
+      "date-parts": [
+        [
+          2025,
+          3,
+          4
+        ]
+      ]
+    },
+    "issued": {
+      "date-parts": [
+        [
+          2025,
+          3,
+          4
+        ]
+      ]
+    }
+  },
+  "Morandini_2025_Psychological_State_Adaptation_Review_crossref.json": {
+    "title": [
+      "Collaborative Robots Adapting Their Behavior Based on Workers’ Psychological States: A Systematic Scoping Review"
+    ],
+    "author": [
+      {
+        "ORCID": "https://orcid.org/0009-0007-3984-164X",
+        "authenticated-orcid": false,
+        "given": "Sofia",
+        "family": "Morandini",
+        "sequence": "first",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "ORCID": "https://orcid.org/0009-0005-2259-529X",
+        "authenticated-orcid": false,
+        "given": "Francesco",
+        "family": "Currò",
+        "sequence": "additional",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "ORCID": "https://orcid.org/0000-0002-2040-3507",
+        "authenticated-orcid": false,
+        "given": "Oronzo",
+        "family": "Parlangeli",
+        "sequence": "additional",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "ORCID": "https://orcid.org/0000-0002-3966-3800",
+        "authenticated-orcid": false,
+        "given": "Luca",
+        "family": "Pietrantoni",
+        "sequence": "additional",
+        "affiliation": [],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      }
+    ],
+    "DOI": "10.1155/hbe2/6361777",
+    "URL": "https://doi.org/10.1155/hbe2/6361777",
+    "container-title": [
+      "Human Behavior and Emerging Technologies"
+    ],
+    "publisher": "Wiley",
+    "volume": "2025",
+    "issue": "1",
+    "article-number": "6361777",
+    "published-online": {
+      "date-parts": [
+        [
+          2025,
+          7,
+          22
+        ]
+      ]
+    },
+    "published-print": {
+      "date-parts": [
+        [
+          2025,
+          1
+        ]
+      ]
+    },
+    "published": {
+      "date-parts": [
+        [
+          2025,
+          1
+        ]
+      ]
+    },
+    "issued": {
+      "date-parts": [
+        [
+          2025,
+          1
+        ]
+      ]
+    }
+  },
+  "Yang_2024_Adaptive_Surgical_Assistance_crossref.json": {
+    "title": [
+      "An Adaptive Human-Robotic Interaction Architecture for Augmenting Surgery Performance Using Real-Time Workload Sensing—Demonstration of a Semi-autonomous Suction Tool"
+    ],
+    "author": [
+      {
+        "given": "Jing",
+        "family": "Yang",
+        "sequence": "first",
+        "affiliation": [
+          {
+            "name": "School of Industrial Engineering, Purdue University, West Lafayette, Indiana, USA"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Juan Antonio",
+        "family": "Barragan",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "School of Industrial Engineering, Purdue University, West Lafayette, Indiana, USA"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Jason Michael",
+        "family": "Farrow",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "Department of Urology, Indiana University School of Medicine, Indianapolis, Indiana, USA"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Chandru P.",
+        "family": "Sundaram",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "Department of Urology, Indiana University School of Medicine, Indianapolis, Indiana, USA"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "given": "Juan P.",
+        "family": "Wachs",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "School of Industrial Engineering, Purdue University, West Lafayette, Indiana, USA"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      },
+      {
+        "ORCID": "https://orcid.org/0000-0002-5083-1713",
+        "authenticated-orcid": false,
+        "given": "Denny",
+        "family": "Yu",
+        "sequence": "additional",
+        "affiliation": [
+          {
+            "name": "School of Industrial Engineering, Purdue University, West Lafayette, Indiana, USA"
+          }
+        ],
+        "role": [
+          {
+            "vocabulary": "crossref",
+            "role": "author"
+          }
+        ]
+      }
+    ],
+    "DOI": "10.1177/00187208221129940",
+    "URL": "https://doi.org/10.1177/00187208221129940",
+    "container-title": [
+      "Human Factors: The Journal of the Human Factors and Ergonomics Society"
+    ],
+    "publisher": "SAGE Publications",
+    "volume": "66",
+    "issue": "4",
+    "page": "1081-1102",
+    "published-online": {
+      "date-parts": [
+        [
+          2022,
+          11,
+          11
+        ]
+      ]
+    },
+    "published-print": {
+      "date-parts": [
+        [
+          2024,
+          4
+        ]
+      ]
+    },
+    "published": {
+      "date-parts": [
+        [
+          2022,
+          11,
+          11
+        ]
+      ]
+    },
+    "issued": {
+      "date-parts": [
+        [
+          2022,
+          11,
+          11
+        ]
+      ]
+    }
+  },
+  "SensCogAR_2026_verified_metadata.json": {
+    "title": "SensCogAR: Cognitive Load Estimation Via Movement Data in Assembly Tasks",
+    "doi": "10.60401/ijabc.147",
+    "year": 2026,
+    "volume": "2026",
+    "issue": "1",
+    "pages": "1-20",
+    "source": "https://www.jstage.jst.go.jp/browse/ijabc/2026/1/_contents/-char/en",
+    "note": "Verified from PDF and publisher issue listing; Crossref API returned 404.",
+    "jstage_release": "2026-04-13"
+  }
+}
