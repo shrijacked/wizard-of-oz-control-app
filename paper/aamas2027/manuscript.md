@@ -49,6 +49,10 @@ In a separate memory-game study, Andriella et al. combine Q-learning with a heur
 
 Vitry et al. compare proactive and reactive robot interaction in an escape-room task with 56 analyzed participants working in 28 pairs. Proactivity increases interaction but does not produce a significant overall task-performance difference; scheduled hints are provided in both conditions [25]. This distinction motivates evaluating intervention experience alongside completion and duration.
 
+Candon et al. study verbal feedback reminders during continuous Space Invaders collaboration with 71 participants. Reminders before a change in robot behavior elicit faster feedback and more feedback in the following ten seconds, but timing does not significantly affect the feedback rate across whole games [31]. The study concerns soliciting feedback rather than offering task assistance.
+
+Cao et al. classify and respond to user-initiated interruptions in a conversational robot. Their study with 21 participants uses timed decision-making and contentious discussion tasks; exploratory analyses associate unsuccessful interruption handling with lower perceived inclusion and discussion satisfaction [32]. These findings concern responding to the user's interruptions, complementing the question of when a robot should initiate assistance.
+
 Our study examines fixed-interval and arousal-triggered assistance in a physical reasoning task, considering both task outcomes and the experience of the intervention.
 
 ### 2.2. Physiological information in assistance
@@ -60,6 +64,8 @@ Other work integrates physiological measurement with broader adaptation strategi
 Recent systems extend physiological adaptation beyond robotic task execution. GuideAI combines cardiac, gaze, and behavioral information to adapt learning content, pacing, and feedback [13]. In a single-surgeon simulation study, Wei et al. identify subjective workload and mean heart rate among the influential features in a task-performance prediction model [18]. These findings motivate examining physiology alongside reported experience, while their tasks and inference methods differ from our assistance policy.
 
 Prajod et al. examine ECG-derived heart-rate variability and facial-expression estimates under different robot pacing conditions in collaborative assembly. Their perceived-challenge classifier is evaluated offline, and the adaptive condition uses Wizard-of-Oz judgments of task progress rather than physiological triggers [26].
+
+Bhagat Smith and Adams review workload estimation for unknown tasks, emphasizing that the relevance of physiological signals can change across tasks and individuals. They assess machine learning approaches by portability, model complexity, and adaptability, and identify domain generalization and few-shot learning as promising directions requiring further empirical investigation [33].
 
 Pereira et al.'s review documents heterogeneous workload measures and mixed cardiac findings across HRC studies [11]. Capponi et al. similarly find no clear RMSSD pattern across their assembly configurations and distinguish cognitive effort from stress [3]. Cardiac measurement guidelines distinguish heart rate from beat-to-beat variability and emphasize signal quality and the influence of physical activity on wearable measurements [12]. We therefore evaluate arousal-triggered assistance through its effects on task performance and participant experience, alongside the physiological signal used to initiate it.
 
@@ -74,6 +80,8 @@ In an assembly study with 20 participants, van Dijk et al. report lower scores o
 Varrasi et al. compare human and robot guidance in a modified Trail Making Test with 60 younger and older adults. Older adults report greater workload under robot than human assistance, whereas the corresponding difference in younger adults is not significant [29]. This highlights the importance of participant population when evaluating guidance.
 
 In supply-chain operations, Smit et al. model collaborative human-robot order picking and jointly optimize picking efficiency and workload fairness through simulation [14]. This work highlights the importance of evaluating human demands alongside system performance when extending assistance to logistics.
+
+In a medical-training simulation with 84 participants, Tanjim et al. use a Wizard-of-Oz robotic crash cart to compare speech and light cues for object search and medication reminders. Verbal object-search guidance with visual reminders yields lower reported workload and higher perceived usefulness and ease of use than the reversed cue assignment or no feedback [34]. This comparison concerns assistance format rather than physiological triggering.
 
 Hart describes the six NASA-TLX workload dimensions and the use of an unweighted overall score [5]. We assess these dimensions alongside helpfulness, timing, seamlessness, and frustration relief. This combination connects the demands of solving a puzzle with the participant's experience of the assistance itself.
 
@@ -340,3 +348,11 @@ AI-assisted tools were used in preparing this manuscript. The authors are respon
 [29] Varrasi, Simone; Vagnetti, Roberto; Camp, Nicola; Hough, John; Di Nuovo, Alessandro; Castellano, Sabrina; Magistro, Daniele. 2026. [Human and Robot Assistance for Cognitive Load in Younger and Older Adults: Multimodal Within-Subject Experimental Study](https://doi.org/10.2196/94738). *Journal of Medical Internet Research*.
 
 [30] Bejarano, Alexandra; Elbeleidy, Saad; Mott, Terran; Negrete-Alamillo, Sebastian; Armenta, Luis Angel; Williams, Tom. 2024. [Hardships in the Land of Oz: Robot Control Challenges Faced by HRI Researchers and Real-World Teleoperators](https://doi.org/10.1109/RO-MAN60168.2024.10731251). *2024 IEEE 33rd International Conference on Robot and Human Interactive Communication (RO-MAN)*.
+
+[31] Candon, Kate; Zhou, Helen; Gillet, Sarah; Vázquez, Marynel. 2023. [Verbally Soliciting Human Feedback in Continuous Human-Robot Collaboration: Effects of the Framing and Timing of Reminders](https://doi.org/10.1145/3568162.3576980). *Proceedings of the 2023 ACM/IEEE International Conference on Human-Robot Interaction, 290–300*.
+
+[32] Cao, Shiye; Moon, Jiwon; Mahmood, Amama; Antony, Victor Nikhil; Xiao, Ziang; Liu, Anqi; Huang, Chien-Ming. 2025. [Interruption Handling for Conversational Robots](https://doi.org/10.15607/RSS.2025.XXI.089). *Proceedings of Robotics: Science and Systems XXI*.
+
+[33] Bhagat Smith, Joshua; Adams, Julie A.. 2026. [A survey of machine learning for estimating workload: considering unknown tasks](https://doi.org/10.3389/frobt.2026.1872363). *Frontiers in Robotics and AI 13, 1872363*.
+
+[34] Tanjim, Tauhid; St. George, Jonathan; Ching, Kevin; Taylor, Angelique. 2025. [Help or Hindrance: Understanding the Impact of Robot Communication in Action Teams](https://doi.org/10.1109/RO-MAN63969.2025.11217909). *2025 34th IEEE International Conference on Robot and Human Interactive Communication (RO-MAN), 1460–1465*.
