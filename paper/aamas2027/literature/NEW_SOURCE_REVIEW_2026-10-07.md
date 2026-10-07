@@ -1,0 +1,18 @@
+# New-source reading record, 7 October 2026
+
+No manuscript claims were derived from abstracts or search snippets alone. Each retained new citation was downloaded and relevant PDF text read. The exact current claims, page anchors and hashes are in REFERENCE_TEXT_MAP.md/json. This is a targeted review, not an exhaustive literature survey.
+
+| Source | Pages read | Use and boundary |
+|---|---|---|
+| Quigley et al., 2024 | 1–4, 8–9, 12 | HR/HRV distinction and artifact considerations. Does not validate the 15/60-second, 5-bpm trigger, three-minute baseline, or wearable device. |
+| Shukla et al., GuideAI, 2026 | 1–2, 6, 8–9, 12 | Recent multimodal physiological learning adaptation; contributions reviewed for organization. Cardiac interval metrics and adaptive content differ from our policy. No effectiveness estimates or statistical method imported. Baseline descriptions are inconsistent within the source and are not adopted. |
+| Smit et al., 2024 | 1–8, 12, 21, 23, 25 | Collaborative order-picking simulation jointly considers efficiency and workload fairness. No human study of tangram transfer; final journal venue not verified. |
+| Wei et al., 2025 | 1, 3, 5–6 | Single-expert simulated surgery, subjective workload and mean HR as model features. Model associations are not causal and do not validate intervention triggers. Local PDF filename uses corresponding author Shimomura; citation correctly uses first author Wei. |
+| Zhao et al., MRChaos, 2025 | 1–2, 5–6 | Autonomous tangram assembly and task-specific extensions to cutlery/cans. Not a human assistance study or an unchanged-policy transfer demonstration. |
+| AdaptAI, 2025 | 1–3 | Downloaded and read for contribution/architecture presentation only. Not cited in the manuscript or used as experimental evidence. |
+| PACE, 2025, previously downloaded | 3, 7–8 rechecked | Explicit-query button requests after human actions produced longer participant waiting than proactive modes. No universal claim that requested help is less helpful; no unreported query-versus-PACE significance claim. |
+| Yang et al., surgical study, previously downloaded | 8–10 rechecked | Adaptive versus periodic suction, not a requested-help condition. |
+
+Source recovery: GuideAI https://arxiv.org/pdf/2601.20402v1 ; AdaptAI https://arxiv.org/pdf/2503.09150v1 ; Smit https://arxiv.org/pdf/2404.08006v1 ; Quigley https://knowledge.uchicago.edu/records/fnp5p-m0q24 ; Wei https://doi.org/10.3389/fnhum.2025.1611524 ; Zhao https://arxiv.org/pdf/2505.11818v1 .
+
+Unverified leads excluded from manuscript: Ramnauth et al. (2026), To Help or Not to Help?, DOI 10.1145/3797264 (PDF download rejected with HTTP 403); Keidar et al. (2024), proactive/reactive robotic telecare (PDF not downloaded). Publisher HTML/search metadata does not satisfy the author’s PDF-reading rule.

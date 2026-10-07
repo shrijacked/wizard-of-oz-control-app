@@ -42,7 +42,7 @@
   {\textbf{Workspace camera}\\Puzzle solution\\Observed task progress};
 
 % Unequal module widths reserve room for the two parallel HR windows.
-\foreach \xa/\xb/\col in {0/5/capture,5.6/8.5/policy,9.1/12.6/delivery,13.2/16.8/interaction} {
+\foreach \xa/\xb/\col in {0/5/capture,5.6/8.5/policy,9.1/12.85/delivery,13.2/16.8/interaction} {
  \draw[fill=\col!5,draw=\col!65,rounded corners=3pt,line width=.7pt]
    (\xa,1) rectangle (\xb,8.65);
 }
@@ -93,7 +93,7 @@
 \node[card=interaction,text width=2.7cm,minimum height=1.45cm] (participant) at (14.85,7)
   {\textbf{Participant}\\Solves the tangram puzzle};
 \node[card=interaction,text width=2.7cm,minimum height=1.2cm] (laptop) at (14.85,4.75)
-  {\textbf{Participant laptop}\\Hints, timer and questionnaires};
+  {\textbf{Participant laptop}\\For hints, timer and questionnaires};
 \node[card=interaction,text width=2.7cm,minimum height=1.35cm] (robot) at (14.85,2.5)
   {\textbf{Robotic arm}\\Retrieves the selected piece};
 
@@ -102,7 +102,7 @@
 \draw[flow,draw=policy] (constant.east) -- (researcher.west |- constant.east);
 \draw[flow,draw=policy] (adaptive.east) -- (8.8,5.35) -- (8.8,6.65) -- (researcher.west |- 0,6.65);
 \draw[flow,draw=delivery] (researcher.south) -- (hint.north);
-\draw[flow,draw=delivery] (researcher.east) -- (12.45,7) -- (12.45,3.55) -- (10.85,3.55) -- (operator.north);
+\draw[flow,draw=delivery] (researcher.east) -- (12.60,7) -- (12.60,3.55) -- (10.85,3.55) -- (operator.north);
 \draw[flow,draw=delivery] (hint.east) -- (laptop.west);
 \draw[flow,draw=delivery] (operator.east) -- (robot.west);
 \draw[flow,draw=interaction] (laptop.north) -- (participant.south);

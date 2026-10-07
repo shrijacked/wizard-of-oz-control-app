@@ -1,0 +1,27 @@
+--- before/scripts/review-paper-revision.py
++++ current/scripts/review-paper-revision.py
+@@ -45,19 +45,19 @@
+  before=BEFORE/path;current=PAPER/path
+  oldsha=sha(before) if before.exists() else None;newsha=sha(current) if current.exists() else None
+  if oldsha!=newsha: inventory.append({'path':str(Path('paper/aamas2027')/path),'status':'added' if oldsha is None else 'removed' if newsha is None else 'modified','before_sha256':oldsha,'after_sha256':newsha})
+-for path in [ROOT/'scripts/update-paper-analysis.py',ROOT/'scripts/plot-assisted-comparison.py',ROOT/'scripts/review-paper-revision.py',ROOT/'output/pdf/aamas2027-current.pdf']:
+- original=BEFORE/'aamas2027-current.pdf' if path.suffix=='.pdf' else REV/'before-tools'/path.name
++for path in [ROOT/'scripts/update-paper-analysis.py',ROOT/'scripts/plot-assisted-comparison.py',ROOT/'scripts/review-paper-revision.py',ROOT/'scripts/analyze-all-paper-outcomes.py',ROOT/'scripts/validate-paper-reference-map.py',ROOT/'output/pdf/aamas2027-current.pdf',ROOT/'output/figures/assistance-architecture.tex',ROOT/'output/figures/physical-setup-topdown.tex',*[ROOT/'output/figures'/f'{name}.{ext}' for name in ['assistance-architecture','physical-setup-topdown'] for ext in ['pdf','png']],ROOT/'output/packages/aamas2027-complete-latex-project.zip',ROOT/'output/packages/aamas2027-figures.zip']:
++ original=REV/'before-packages'/path.name if path.parent.name=='packages' else REV/'before-diagrams'/path.name if path.parent.name=='figures' else BEFORE/'aamas2027-current.pdf' if path.suffix=='.pdf' else REV/'before-tools'/path.name
+  if not original.exists():original=None
+  if original and sha(original)==sha(path):continue
+  inventory.append({'path':str(path.relative_to(ROOT)),'status':'modified' if original else 'added','before_sha256':sha(original) if original else None,'after_sha256':sha(path)})
+ diffdir=REV/'file-diffs';diffdir.mkdir(exist_ok=True)
+ for entry in inventory:
+  path=ROOT/entry['path']
+- if path.suffix.lower() in {'.md','.tex','.json','.py','.txt'}:
+-  previous=BEFORE/path.relative_to(PAPER) if path.is_relative_to(PAPER) else REV/'before-tools'/path.name
++ if path.suffix.lower() in {'.md','.tex','.json','.py','.txt','.bib','.csv'}:
++  previous=BEFORE/path.relative_to(PAPER) if path.is_relative_to(PAPER) else REV/('before-diagrams' if path.parent.name=='figures' else 'before-tools')/path.name
+   old=previous.read_text() if previous and previous.exists() else ''
+   new=path.read_text() if path.exists() else ''
+   diff=''.join(difflib.unified_diff(old.splitlines(keepends=True),new.splitlines(keepends=True),fromfile='before/'+entry['path'],tofile='current/'+entry['path']))
+   name=entry['path'].replace('/','__')+'.diff';(diffdir/name).write_text(diff);entry['diff_path']='file-diffs/'+name
+-(REV/'change-inventory.json').write_text(json.dumps({'base_commit':'3c4ddb9','baseline_verified_files':len(items),'changes':inventory},indent=2)+'\n')
++(REV/'change-inventory.json').write_text(json.dumps({'base_commit':baseline.get('base_commit','unknown'),'baseline_verified_files':len(items),'changes':inventory},indent=2)+'\n')
+ print(f'Baseline {len(items)} hashes verified. Wrote 2 exact diffs, highlighted review and {len(inventory)} file changes.')

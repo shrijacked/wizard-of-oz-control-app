@@ -1,0 +1,39 @@
+{
+  "base_commit": "e99b8bb",
+  "abstract_unchanged": true,
+  "class_style_unchanged": true,
+  "clean_pdf_pages": 9,
+  "main_text_last_page": 8,
+  "highlighted_pdf_pages": 9,
+  "reference_count": 20,
+  "citation_mentions": 31,
+  "pdf_text_anchors": 49,
+  "observed_analysis_n": 12,
+  "planned_experiment_n": 24,
+  "experiment_tests": 31,
+  "formative_tests": 6,
+  "native_diagram_compilation": "Both source paths returned success from the desktop compiler.",
+  "known_warning": "Clean build final bibliography emits a 1.17-point overfull vertical-box warning; rendered output has no clipping. Review-only duplicate destination warnings follow moved section headers.",
+  "packages": [
+    {
+      "path": "output/packages/aamas2027-complete-latex-project.zip",
+      "sha256": "2655c937cc8e207dcda308f66b0749001f0114650b3e06b239f69cd49fefd110",
+      "entries": 22,
+      "verified_entry_hashes": 20
+    },
+    {
+      "path": "output/packages/aamas2027-figures.zip",
+      "sha256": "9b640b10f11bb43761f438f99c2a1fe475bdedee3a0b348f28833179413afdc9",
+      "entries": 15,
+      "verified_entry_hashes": 13
+    },
+    {
+      "path": "paper/aamas2027/revisions/2026-10-07-methods-findings/aamas2027-methods-findings-highlighted-tex.zip",
+      "sha256": "0be543b65535b59e0a77f95e20c309a70731534b21d87a1cc87458fb2473bb3d",
+      "entries": 14,
+      "verified_entry_hashes": 12
+    }
+  ],
+  "source_sha256": "03bf227bc1e4191209e6cd867d4ebe655c63f163118c4a74fdf8465f70f26c4b",
+  "pdf_sha256": "61c14dca16ade72538b8ca777be0960225346e92cca881aade8c11ee63b5111d"
+}

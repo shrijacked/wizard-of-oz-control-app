@@ -1,0 +1,22 @@
+--- before/output/figures/physical-setup-topdown.tex
++++ current/output/figures/physical-setup-topdown.tex
+@@ -42,8 +42,8 @@
+ \fill[wallfill] (3.95,.75) rectangle (4.21,11.1);
+ \fill[wallfill] (-1.35,.75) rectangle (4.21,1.01);
+ \node[rotate=90,text=white,font=\sffamily\footnotesize] at (4.08,3.25) {Opaque partition};
+-\node[label,font=\sffamily\bfseries] at (2.25,10.2) {Researcher side};
+-\node[label,font=\sffamily\bfseries] at (7.7,10.2) {Participant table};
++\node[label,font=\sffamily\bfseries] at (2.25,10.2) {Researchers' side};
++\node[label,font=\sffamily\bfseries] at (7.7,10.2) {Participants' side};
+ 
+ % Admin sits to the left; host laptop faces left toward the admin.
+ \begin{scope}[shift={(2.3,7.05)},rotate=-90]
+@@ -145,7 +145,7 @@
+ \begin{scope}[shift={(6.27,3.03)},rotate=115]
+ \planlaptop
+ \end{scope}
+-\node[label,anchor=west,font=\sffamily\footnotesize] at (10.8,2.9) {Participant laptop\\Hints and questionnaires};
++\node[label,anchor=west,font=\sffamily\footnotesize] at (10.8,2.9) {Participant laptop\\For hints and questionnaires};
+ \draw[leader] (10.7,3.05) -- (6.88,3.05);
+ \node[label,font=\sffamily\footnotesize,anchor=west] at (-1.35,.35) {Top-down schematic. Not to scale.};
+ \end{tikzpicture}

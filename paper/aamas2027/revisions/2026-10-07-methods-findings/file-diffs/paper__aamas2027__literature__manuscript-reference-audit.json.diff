@@ -1,0 +1,341 @@
+--- before/paper/aamas2027/literature/manuscript-reference-audit.json
++++ current/paper/aamas2027/literature/manuscript-reference-audit.json
+@@ -1,8 +1,8 @@
+ {
+   "checked_on": "2026-10-07",
+   "scope": "Active manuscript citations only. Metadata and relevant methods/results/limitations passages read from actual PDFs; this is claim-focused verification, not a systematic review or a claim to exhaustive cover-to-cover reading.",
+-  "reference_count": 15,
+-  "recent_count": 12,
++  "reference_count": 20,
++  "recent_count": 17,
+   "recent_definition": "First publication in calendar years 2024–2026; online publication takes precedence over issue year.",
+   "references": [
+     {
+@@ -26,9 +26,9 @@
+         23,
+         24
+       ],
+-      "manuscript_sections": "Introduction; §2.1",
+-      "supported_claim": "Models proactive assistance type, timing and confidence in a sequential memory game using user and task information.",
+-      "interpretation_limit": "Different task and policy; does not validate wrist-HR inference. Online 26 December 2024, journal issue 2025."
++      "manuscript_sections": "1. Introduction; 2.1. Assistance timing and proactive coordination",
++      "supported_claim": "Andriella et al. model assistance type, timing, and confidence [1] Andriella et al. learn proactive assistance from user profiles and task state in a sequential memory game, jointly addressing assistance type, timing, and confidence [1].",
++      "interpretation_limit": "Supports the three decision dimensions and this particular game implementation. It does not establish a physiological trigger or validate the present HR-rise threshold."
+     },
+     {
+       "key": "caiazzo2024",
+@@ -50,9 +50,9 @@
+         6,
+         9
+       ],
+-      "manuscript_sections": "§2.3",
+-      "supported_claim": "Three-participant comparison of manual, collaborative and guided collaborative assembly; EEG measures workload.",
+-      "interpretation_limit": "Small exploratory study; physiology is assessment, not demonstrated online intervention triggering. DOI/pagination not verified and omitted."
++      "manuscript_sections": "2.3. Physical tasks and participant experience",
++      "supported_claim": "Adjacent assembly work by Caiazzo et al. compares manual, collaborative, and guided collaborative conditions, with EEG used for workload assessment [2].",
++      "interpretation_limit": "The N=3 qualification is essential. This is adjacent assembly evidence, not a test of our timing policy. Unverified DOI and proceedings pagination are omitted from the bibliography."
+     },
+     {
+       "key": "capponi2024",
+@@ -74,9 +74,9 @@
+         8,
+         13
+       ],
+-      "manuscript_sections": "§2.2",
+-      "supported_claim": "Assembly configurations did not yield a clear significant RMSSD pattern; paper distinguishes cognitive effort and stress.",
+-      "interpretation_limit": "Does not validate the present HR-rise threshold or establish that HRV never reflects workload."
++      "manuscript_sections": "2.2. Physiological information in assistance",
++      "supported_claim": "Capponi et al. similarly find no clear RMSSD pattern across their assembly configurations and distinguish cognitive effort from stress [3].",
++      "interpretation_limit": "The negative RMSSD finding is specific to these tasks/configurations. It does not mean every cardiac measure is uninformative or that physiological state has no relationship with workload."
+     },
+     {
+       "key": "delazzari2025",
+@@ -100,9 +100,9 @@
+         7,
+         8
+       ],
+-      "manuscript_sections": "Introduction; §2.1",
+-      "supported_claim": "PACE estimates action completion from hand motion and learns a proactive assistance policy; evaluated in collaborative assembly.",
+-      "interpretation_limit": "Different sensing and assistance mechanism. Manuscript imports no numerical benefit or universal superiority claim. MERL cover and blank page precede paper."
++      "manuscript_sections": "1. Introduction; 2.1. Assistance timing and proactive coordination; 6.3. Limitations and future work",
++      "supported_claim": "PACE uses action-completion estimates to coordinate proactive assistance [4]. PACE also compares proactive assistance with an explicit-query condition in which participants press a button to request help; participant waiting times were longest under explicit query [4]. PACE estimates action completion from hand movements and uses a learned policy to coordinate assistance during collaborative assembly [4]. PACE found longer participant waiting times under explicit query than under proactive assistance [4]",
++      "interpretation_limit": "This is hand-motion/task-progress assistance, not physiology-based assistance. PDF p. 1 is a MERL cover and p. 2 is blank; the actual article begins on PDF p. 3. Explicit query requests follow completion of each assembly action; it is not necessarily a request for a reasoning hint. No claim that requested help is universally less helpful or a significant query-versus-PACE waiting contrast is imported."
+     },
+     {
+       "key": "hart2006",
+@@ -122,9 +122,9 @@
+         1,
+         3
+       ],
+-      "manuscript_sections": "§2.3",
+-      "supported_claim": "NASA-TLX has six dimensions; unweighted scoring is discussed; modifications require validation; workload and performance need not covary.",
+-      "interpretation_limit": "Does not validate this study's seven-point adaptation. NASA web upload in 2026 is not the publication year."
++      "manuscript_sections": "2.3. Physical tasks and participant experience",
++      "supported_claim": "Hart describes the six NASA-TLX workload dimensions and the use of an unweighted overall score [5].",
++      "interpretation_limit": "Hart supports describing and qualifying an adaptation; it does not validate our particular seven-point items, scoring, or psychometric properties. The paper is from 2006, regardless of its 2026 NASA upload path."
+     },
+     {
+       "key": "hostettler2025",
+@@ -146,9 +146,9 @@
+         6,
+         12
+       ],
+-      "manuscript_sections": "§2.2",
+-      "supported_claim": "Robot behavior is adapted using user distance, while pupil responses are evaluated.",
+-      "interpretation_limit": "Pupil-driven adaptation is a future direction, not the implemented trigger."
++      "manuscript_sections": "2.2. Physiological information in assistance",
++      "supported_claim": "Hostettler et al. adapt robot behavior to user distance while measuring pupil responses; direct pupil-driven adaptation is a future direction [6].",
++      "interpretation_limit": "Do not cite the paper as an implemented pupil-triggered assistance policy. Its table of possible human characteristics includes prior literature; that table alone is not evidence of what its own experiment implemented."
+     },
+     {
+       "key": "karbouj2026",
+@@ -170,9 +170,9 @@
+         15,
+         21
+       ],
+-      "manuscript_sections": "Introduction; §2.1",
+-      "supported_claim": "Systematic review distinguishes motion/task/control adaptation and discusses timing, sequencing and role coordination.",
+-      "interpretation_limit": "Taxonomy supplies context, not proof that the exact research comparison is absent. Published 30 December 2025; 2026 volume."
++      "manuscript_sections": "1. Introduction; 2.1. Assistance timing and proactive coordination",
++      "supported_claim": "A recent review distinguishes adaptation of robot motion from task-level decisions about timing, sequencing, and role allocation [7]. Karbouj et al.'s review of adaptive industrial HRC distinguishes motion, task, and control adaptations and identifies task-level timing and coordination as areas warranting further attention [7].",
++      "interpretation_limit": "This supports the taxonomy and the review authors’ emphasis. It does not establish that no earlier study made our particular comparison. First publication was December 2025; the issue/volume is 2026."
+     },
+     {
+       "key": "korivand2024",
+@@ -194,9 +194,9 @@
+         15,
+         18
+       ],
+-      "manuscript_sections": "§2.2",
+-      "supported_claim": "Physiological task-load analysis and Q-learning-based adjustment; the authors state that recorded wristband data could not be integrated directly in real time.",
+-      "interpretation_limit": "Do not describe it as an end-to-end real-time wrist-triggered robot policy. PDF p18 was also visually inspected."
++      "manuscript_sections": "2.2. Physiological information in assistance",
++      "supported_claim": "Korivand et al. develop physiological task-load prediction and Q-learning-based adjustment, while explicitly reporting that their recorded wristband data could not be integrated directly for real-time use [8].",
++      "interpretation_limit": "The limitation qualifies the implemented evidence. The framework should not be presented as a demonstrated end-to-end real-time wrist-triggered deployment."
+     },
+     {
+       "key": "melo2026",
+@@ -217,9 +217,9 @@
+         8,
+         15
+       ],
+-      "manuscript_sections": "Introduction; §2.3",
+-      "supported_claim": "Tangrams serve as a proxy for small-object assembly; visibility of piece contours varies task demand.",
+-      "interpretation_limit": "Seated/simplified task; transfer to industrial work remains limited. No performance values imported."
++      "manuscript_sections": "1. Introduction; 2.3. Physical tasks and participant experience",
++      "supported_claim": "Recent work uses tangrams for collaborative HRI and as a simplified assembly task [15, 9]. SensCogAR uses tangrams as a proxy for small-object assembly, manipulating the visibility of piece contours to vary task demand [9].",
++      "interpretation_limit": "Task rationale transfers at the level of spatial manipulation. Neither the validity of all nine current puzzles nor generalization to industrial assembly follows automatically. PDF p. 15 discusses task/context limitations."
+     },
+     {
+       "key": "ojstersek2024",
+@@ -242,9 +242,9 @@
+         6,
+         8
+       ],
+-      "manuscript_sections": "§2.2",
+-      "supported_claim": "Workplace parameters personalized using a preliminary skills test; ECG transferred and analyzed after experiments.",
+-      "interpretation_limit": "Do not present ECG as the real-time adaptation trigger."
++      "manuscript_sections": "2.2. Physiological information in assistance",
++      "supported_claim": "Ojsteršek et al. personalize robot parameters using a preliminary skills test and analyze ECG recordings after the experiment [10].",
++      "interpretation_limit": "Personalization and physiological measurement both occur, but the described ECG analysis is not the real-time control input. The PDF extraction repeats some layout text; locators refer to the actual PDF page."
+     },
+     {
+       "key": "pereira2025",
+@@ -267,9 +267,9 @@
+         15,
+         18
+       ],
+-      "manuscript_sections": "§2.2",
+-      "supported_claim": "Review describes heterogeneous physiological workload measures and mixed cardiac findings in HRC.",
+-      "interpretation_limit": "Different sensors/tasks and mixed evidence; no validation of a universal HR threshold."
++      "manuscript_sections": "2.2. Physiological information in assistance",
++      "supported_claim": "Pereira et al.'s review documents heterogeneous workload measures and mixed cardiac findings across HRC studies [11].",
++      "interpretation_limit": "We cite the review’s synthesis, not independently verified findings from every study it includes. It supplies no validation for our specific sensor, threshold or task."
+     },
+     {
+       "key": "tabatabaei2025",
+@@ -290,9 +290,9 @@
+         3,
+         8
+       ],
+-      "manuscript_sections": "Introduction; §2.3",
+-      "supported_claim": "Studies gaze around robot failures in collaborative physical tangram solving.",
+-      "interpretation_limit": "Robot-failure/gaze study, not a scheduled-versus-physiological assistance experiment. Downloaded arXiv v1 of accepted HRI paper."
++      "manuscript_sections": "1. Introduction; 2.3. Physical tasks and participant experience",
++      "supported_claim": "Recent work uses tangrams for collaborative HRI and as a simplified assembly task [15, 9]. Tabatabaei et al. study gaze around robot failures during collaborative tangram solving [15].",
++      "interpretation_limit": "This is a gaze-and-failure study, not a test of physiological or scheduled help. The local version is arXiv v1 of the accepted HRI paper, so its PDF page numbers differ from proceedings pagination."
+     },
+     {
+       "key": "teo2018",
+@@ -314,9 +314,9 @@
+         6,
+         11
+       ],
+-      "manuscript_sections": "§2.2",
+-      "supported_claim": "Individualized physiological workload markers can trigger aid during robot supervision; aid imposed later if not triggered.",
+-      "interpretation_limit": "Online 3 October 2017; 2018 issue. Different task and physiological indices; not evidence for the present threshold."
++      "manuscript_sections": "2.2. Physiological information in assistance",
++      "supported_claim": "Earlier work by Teo et al. uses individualized physiological workload markers to trigger aid during robot supervision, imposing aid later when it has not been triggered [16].",
++      "interpretation_limit": "The study uses personalized multimeasure workload logic in robot supervision. It does not establish our heart-rate-rise threshold or identical assistance mechanics. Online publication was 2017; journal issue 2018."
+     },
+     {
+       "key": "thunberg2026",
+@@ -337,9 +337,9 @@
+         2,
+         3
+       ],
+-      "manuscript_sections": "§2.4",
+-      "supported_claim": "Workshop proposal foregrounds practical, ethical and methodological tensions in the wizard's role.",
+-      "interpretation_limit": "Three-page workshop agenda, not a completed empirical evaluation or validated protocol. Explicitly called a proposal in the manuscript."
++      "manuscript_sections": "2.4. Wizard-of-Oz evaluation",
++      "supported_claim": "A recent HRI workshop proposal by Thunberg et al. emphasizes the practical, ethical, and methodological tensions of the wizard's role [17].",
++      "interpretation_limit": "Supports identifying a methodological concern and research agenda. It is explicitly a workshop proposal, not completed empirical evidence or a validated operator protocol."
+     },
+     {
+       "key": "yang2024",
+@@ -362,9 +362,142 @@
+         10,
+         12
+       ],
+-      "manuscript_sections": "Introduction; §2.2",
+-      "supported_claim": "EEG and gaze inform adaptive suction; periodic comparator uses 150-second intervals selected to approximate earlier assistance frequency.",
+-      "interpretation_limit": "First online 11 November 2022, 2024 issue. Author manuscript version. Direct precedent, but different task/sensors; not evidence validating 5 bpm."
++      "manuscript_sections": "1. Introduction; 2.2. Physiological information in assistance",
++      "supported_claim": "Yang et al. compared workload-adaptive robotic suction with periodic support during surgical training [19]. Yang et al.'s surgical system uses EEG and eye tracking to inform adaptive suction, with a periodic comparator selected to approximate earlier observed assistance frequency [19].",
++      "interpretation_limit": "This is the direct precedent that prevents a claim that the comparison itself is new. “Closest” is our assessment within the reviewed set, not proof from an exhaustive review. Online publication was 2022 despite the 2024 issue; the cached PDF is an author manuscript."
++    },
++    {
++      "key": "quigley2024",
++      "publication_year": 2024,
++      "first_publication_year": 2024,
++      "recent_2024_2026": true,
++      "pdf_path": "data/writing-reference/literature-pdfs/Quigley_2024_Cardiac_Guidelines.pdf",
++      "text_path": "data/writing-reference/literature-text/Quigley_2024_Cardiac_Guidelines.txt",
++      "source_url": "https://knowledge.uchicago.edu/records/fnp5p-m0q24/files/Publication-guidelines-for-human-heart-rate-and-heart-rate-variability-studies-in-psychophysiology.pdf?download=1",
++      "downloaded": "2026-10-07",
++      "rechecked": "2026-10-07",
++      "version": "Published open-access committee report; university repository PDF",
++      "sha256": "de52a210ed198f1a14b069b052fee813cc313b1fe87bf526ebd447ed5d57a27e",
++      "bytes": 7682617,
++      "pdf_pages": 63,
++      "evidence_pdf_pages": [
++        1,
++        2,
++        3,
++        4,
++        8,
++        9,
++        12
++      ],
++      "supported_claim": "Cardiac measurement guidelines distinguish heart rate from beat-to-beat variability and emphasize signal quality and the influence of physical activity on wearable measurements [12] Wearable cardiac signals can be affected by movement and sensor contact [12]",
++      "interpretation_limit": "Measurement guidance supports distinguishing HR from HRV and attending to artifacts. It does not validate this device, the three-minute baseline, the 15/60-second windows, the 5-bpm threshold, or inference of frustration from a flag.",
++      "manuscript_sections": "2.2. Physiological information in assistance; 6.2. Assistance timing and physiological feedback"
++    },
++    {
++      "key": "shukla2026",
++      "publication_year": 2026,
++      "first_publication_year": 2026,
++      "recent_2024_2026": true,
++      "pdf_path": "data/writing-reference/literature-pdfs/GuideAI_2026.pdf",
++      "text_path": "data/writing-reference/literature-text/GuideAI_2026.txt",
++      "source_url": "https://arxiv.org/pdf/2601.20402v1",
++      "downloaded": "2026-10-07",
++      "rechecked": "2026-10-07",
++      "version": "IUI 2026 accepted-paper preprint, arXiv v1",
++      "sha256": "688c0e9037f80b1723d3a1ba2e77db59d50e289fcee002fa438caa87c726b263",
++      "bytes": 12261742,
++      "pdf_pages": 17,
++      "evidence_pdf_pages": [
++        1,
++        2,
++        6,
++        8,
++        9,
++        12
++      ],
++      "supported_claim": "GuideAI combines cardiac, gaze, and behavioral information to adapt learning content, pacing, and feedback [13]",
++      "interpretation_limit": "A learning system combining multiple signals, not a robotic-assistance timing experiment. Its baseline/threshold text has inconsistencies and it uses interval-derived HRV; neither is imported as validation of our HR-rise detector. Its reported statistical method is not adopted.",
++      "manuscript_sections": "2.2. Physiological information in assistance"
++    },
++    {
++      "key": "smit2024",
++      "publication_year": 2024,
++      "first_publication_year": 2024,
++      "recent_2024_2026": true,
++      "pdf_path": "data/writing-reference/literature-pdfs/Smit_2024_Order_Picking.pdf",
++      "text_path": "data/writing-reference/literature-text/Smit_2024_Order_Picking.txt",
++      "source_url": "https://arxiv.org/pdf/2404.08006v1",
++      "downloaded": "2026-10-07",
++      "rechecked": "2026-10-07",
++      "version": "arXiv v1 preprint; final journal venue not verified or asserted",
++      "sha256": "ce8836a4336b385262089d53110470ebaa6f1c47a1fc48a213ac39c16d07c563",
++      "bytes": 1819765,
++      "pdf_pages": 38,
++      "evidence_pdf_pages": [
++        1,
++        2,
++        3,
++        4,
++        5,
++        6,
++        7,
++        8,
++        12,
++        21,
++        23,
++        25
++      ],
++      "supported_claim": "In supply-chain operations, Smit et al. model collaborative human-robot order picking and jointly optimize picking efficiency and workload fairness through simulation [14] human-robot order-picking research examines efficiency alongside workload fairness [14]",
++      "interpretation_limit": "Simulation of allocation policies, not a human experiment demonstrating tangram-to-supply-chain transfer. Workload fairness is distribution of picking burden, not NASA-TLX or physiological arousal.",
++      "manuscript_sections": "2.3. Physical tasks and participant experience; 6.3. Limitations and future work"
++    },
++    {
++      "key": "wei2025",
++      "publication_year": 2025,
++      "first_publication_year": 2025,
++      "recent_2024_2026": true,
++      "pdf_path": "data/writing-reference/literature-pdfs/Shimomura_2025_Surgical_Workload.pdf",
++      "text_path": "data/writing-reference/literature-text/Shimomura_2025_Surgical_Workload.txt",
++      "source_url": "https://www.frontiersin.org/journals/human-neuroscience/articles/10.3389/fnhum.2025.1611524/pdf",
++      "downloaded": "2026-10-07",
++      "rechecked": "2026-10-07",
++      "version": "Published Frontiers article, 18 June 2025; local filename names the corresponding author, first author is Wei",
++      "sha256": "d26df27fd47600204c820ba9480a9089bd6bca8e8543130b84eb6d27cdee591f",
++      "bytes": 3693985,
++      "pdf_pages": 9,
++      "evidence_pdf_pages": [
++        1,
++        3,
++        5,
++        6
++      ],
++      "supported_claim": "In a single-surgeon simulation study, Wei et al. identify subjective workload and mean heart rate among the influential features in a task-performance prediction model [18]",
++      "interpretation_limit": "One expert surgeon and model-derived associations. Does not establish causation, population-wide prediction, assistance timing effectiveness, or validation of a heart-rate-rise trigger. SDHR is explicitly cautioned as an inadequate HRV proxy on p.5.",
++      "manuscript_sections": "2.2. Physiological information in assistance"
++    },
++    {
++      "key": "zhao2025",
++      "publication_year": 2025,
++      "first_publication_year": 2025,
++      "recent_2024_2026": true,
++      "pdf_path": "data/writing-reference/literature-pdfs/Zhao_2025_MRChaos.pdf",
++      "text_path": "data/writing-reference/literature-text/Zhao_2025_MRChaos.txt",
++      "source_url": "https://arxiv.org/pdf/2505.11818v1",
++      "downloaded": "2026-10-07",
++      "rechecked": "2026-10-07",
++      "version": "ICRA 2025 accepted-paper preprint, arXiv v1",
++      "sha256": "7a83713f30c553b28b687a26a6aa719168a926fad1726329cc79664e9740bcbd",
++      "bytes": 1358170,
++      "pdf_pages": 7,
++      "evidence_pdf_pages": [
++        1,
++        2,
++        5,
++        6
++      ],
++      "supported_claim": "MRChaos uses tangrams to investigate robotic reasoning, planning, and manipulation from silhouette targets and extends its assembly approach to cutlery and soda-can arrangements [20] MRChaos demonstrates related spatial assembly tasks [20]",
++      "interpretation_limit": "Autonomous robotic assembly with fixed piece sequence; not a human assistance-policy comparison. Cutlery/can experiments involve task-specific training with substituted objects, not unchanged tangram policy transfer, and no supply-chain user experiment.",
++      "manuscript_sections": "2.3. Physical tasks and participant experience; 6.3. Limitations and future work"
+     }
+   ],
+   "excluded_download_attempts": [

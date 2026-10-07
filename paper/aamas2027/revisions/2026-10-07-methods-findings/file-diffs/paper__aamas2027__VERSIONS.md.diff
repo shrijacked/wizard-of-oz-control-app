@@ -1,0 +1,39 @@
+--- before/paper/aamas2027/VERSIONS.md
++++ current/paper/aamas2027/VERSIONS.md
+@@ -1,6 +1,8 @@
+ # Paper versions and collaborator handoff
+ 
+-7 October 2026. Branch: writing. This publishing commit keeps the current draft, old source/PDF snapshots and cumulative highlighted review together. Find the publishing commit with `git log -- paper/aamas2027/VERSIONS.md`. The manuscript itself is unchanged by packaging/documentation.
++Current methods/findings revision: [change log](revisions/2026-10-07-methods-findings/CHANGELOG.md), [highlighted review](revisions/2026-10-07-methods-findings/highlighted-review.html), [frozen pre-change source](revisions/2026-10-07-methods-findings/before/main.tex), [full p-value audit](analysis/ALL_OUTCOMES.md), and [current structure](structure-review.md). §3 is the formative assessment; §4 combines the system and experimental method; §5 contains findings only. Twenty downloaded-PDF-verified references now support 31 source mentions and 49 anchors. Statistics use the observed 12 matched participants, not fabricated N=24 data. All numerical results remain provisional in this internal documentation and must be refreshed from the final export. The original abstract, anonymous format and submission ID 2613 are unchanged.
++
++7 October 2026. Branch: writing. This publishing commit keeps the current draft, old source/PDF snapshots and cumulative highlighted review together. Find the publishing commit with `git log -- paper/aamas2027/VERSIONS.md`. Historical publishing notes below describe their own earlier revisions. The latest methods/findings revision changes the manuscript and preserves a new baseline.
+ 
+ Terminology revision: [constant assistance terminology](revisions/2026-10-07-constant-assistance/CHANGELOG.md), with [highlighted changes](revisions/2026-10-07-constant-assistance/highlighted-review.html). The source, current PDF, plots and clean ZIP now use the new name. The earlier cumulative review remains a historical review of the preceding rounds.
+ 
+@@ -10,7 +12,7 @@
+ 
+ | Version | Source | PDF or review |
+ |---|---|---|
+-| Current clean working paper | [main.tex](main.tex), [readable manuscript](manuscript.md) | [Current eight-page PDF](../../output/pdf/aamas2027-current.pdf) |
++| Current clean working paper | [main.tex](main.tex), [readable manuscript](manuscript.md) | [Current nine-page PDF](../../output/pdf/aamas2027-current.pdf) |
+ | Earlier version before protocol/anonymity/abstract/graph edits | [Frozen source](revisions/2026-10-07-cumulative/before/main.tex) | [Frozen PDF](revisions/2026-10-07-cumulative/before/aamas2027-current.pdf) |
+ | Cumulative highlighted version covering all three recent rounds | [Marked-up TeX](revisions/2026-10-07-cumulative/tex-review/main-highlighted.tex) | [Nine-page marked-up PDF](revisions/2026-10-07-cumulative/tex-review/main-highlighted.pdf), [HTML review](revisions/2026-10-07-cumulative/highlighted-review.html), [combined change log](revisions/2026-10-07-cumulative/CHANGELOG.md) |
+ | Original draft before the newer survey/results revision | [Frozen source](revisions/2026-10-07/before/main.tex) | [Frozen PDF](revisions/2026-10-07/before/aamas2027-current.pdf), [original revision log](revisions/2026-10-07/CHANGELOG.md) |
+@@ -29,7 +31,7 @@
+ 
+ The earlier abstract is retained with the condition name updated to constant assistance. The working sample is planned N=24, and the visible draft notice identifies pending final results/demographics. Anonymous authors and submission ID 2613 are retained. The current data calculations have not been inflated to the planned sample. Survey and protocol details have been added; final photographs and correct-piece scores remain pending.
+ 
+-Five figures remain: task-profile survey, assistance architecture, physical setup, workload/frustration, and grouped constant/adaptive assistance-rating bars. The redundant performance plot and heatmaps are archived. The current PDF is eight pages; the cumulative review is nine pages with added/deleted text and replaced figures visible.
++Five figures remain: formative assessment, assistance architecture, physical setup, workload/frustration, and grouped constant/adaptive assistance-rating bars. The redundant performance plot and heatmaps are archived. The current PDF is nine pages; the cumulative review is nine pages with added/deleted text and replaced figures visible.
+ 
+ ## Continue the work
+ 
+@@ -38,7 +40,7 @@
+ 3. Resolve the remaining protocol facts: enacted participant instructions, institutional review status, eligibility/practice, robot/material/safety/data details and exact survey overlap. The supplied setup photograph is now in Figure 3; add scored final photos.
+ 4. Analyze the final export, reconcile inclusion/outcome/timing decisions, then replace all draft numerical claims, tables/graphs and demographics. Keep N=24 as a planned target until the observed sample is reconciled. Remove the draft notice only when the analysis is final.
+ 5. Use scripts/update-paper-analysis.py for the full analysis and scripts/plot-assisted-comparison.py for the grouped comparison bar chart. Both require NumPy/Matplotlib; input paths are in the scripts. Existing raw input archives and literature PDFs are local, ignored data files; teammates need authorized copies to rerun source analysis. The plot-only helper can use the tracked analysis JSON.
+-6. Edit canonical main.tex and synchronize manuscript.md. Maintain [evidence-map](evidence-map.md) and the [reference text map](literature/REFERENCE_TEXT_MAP.md) when claims/citation locations change. Fifteen sources, 21 citation occurrences and 35 PDF-text anchors are documented; every new reference requires downloaded-PDF checks.
++6. Edit canonical main.tex and synchronize manuscript.md. Maintain [evidence-map](evidence-map.md) and the [reference text map](literature/REFERENCE_TEXT_MAP.md) when claims/citation locations change. Twenty sources, 31 citation occurrences and 49 PDF-text anchors are documented; every new reference requires downloaded-PDF checks.
+ 7. Follow [BUILD.txt](BUILD.txt), compile the whole project, and inspect each PDF page. Keep output/pdf/aamas2027-current.pdf synchronized with the source. The standalone diagrams are output/figures/*.tex; their manuscript copies are figures/*.tikz.tex.
+ 8. Generate review files against the new frozen baseline with scripts/review-paper-revision.py --revision <new-folder>. Repackage downloadable projects after final source/PDF changes.
+ 

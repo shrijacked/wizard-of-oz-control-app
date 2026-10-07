@@ -1,0 +1,47 @@
+--- before/paper/aamas2027/references.bib
++++ current/paper/aamas2027/references.bib
+@@ -165,3 +165,44 @@
+   url = {https://doi.org/10.1177/00187208221129940},
+   note = {First published online 11 November 2022; journal issue April 2024}
+ }
++
++@article{quigley2024,
++  author = {Quigley, Karen S. and Gianaros, Peter J. and Norman, Greg J. and Jennings, J. Richard and Berntson, Gary G. and de Geus, Eco J. C.},
++  title = {Publication guidelines for human heart rate and heart rate variability studies in psychophysiology: Part 1: Physiological underpinnings and foundations of measurement},
++  journal = {Psychophysiology},
++  year = {2024}, volume = {61}, articleno = {e14604},
++  doi = {10.1111/psyp.14604}, url = {https://doi.org/10.1111/psyp.14604}
++}
++
++@inproceedings{shukla2026,
++  author = {Shukla, Ananya and Modi, Chaitanya and Bajpai, Satvik and Siddharth, Siddharth},
++  title = {{GuideAI}: A Real-time Personalized Learning Solution with Adaptive Interventions},
++  booktitle = {Proceedings of the 31st International Conference on Intelligent User Interfaces},
++  year = {2026}, publisher = {ACM},
++  doi = {10.1145/3742413.3789125}, url = {https://doi.org/10.1145/3742413.3789125},
++  numpages = {17}
++}
++
++@misc{smit2024,
++  author = {Smit, Igor G. and Bukhsh, Zaharah and Pechenizkiy, Mykola and Alogariastos, Kostas and Hendriks, Kasper and Zhang, Yingqian},
++  title = {Learning Efficient and Fair Policies for Uncertainty-Aware Collaborative Human-Robot Order Picking},
++  year = {2024}, eprint = {2404.08006}, archiveprefix = {arXiv},
++  doi = {10.48550/arXiv.2404.08006}, url = {https://arxiv.org/abs/2404.08006},
++  note = {Reviewed preprint, arXiv v1}
++}
++
++@article{wei2025,
++  author = {Wei, Kaiqi and Kimura, Chika and Shimura, Megumi and Shimomura, Yoshihiro and Zhao, Xue and Tamura, Takaaki and Sakamoto, Shinichi},
++  title = {Predicting task performance in robot-assisted surgery using physiological stress and subjective workload: a case study with interpretable machine learning},
++  journal = {Frontiers in Human Neuroscience},
++  year = {2025}, volume = {19}, articleno = {1611524},
++  doi = {10.3389/fnhum.2025.1611524}, url = {https://doi.org/10.3389/fnhum.2025.1611524}
++}
++
++@inproceedings{zhao2025,
++  author = {Zhao, Chao and Jiang, Chunli and Luo, Lifan and Zhang, Guanlan and Yu, Hongyu and Wang, Michael Yu and Chen, Qifeng},
++  title = {Master Rules from Chaos: Learning to Reason, Plan, and Interact from Chaos for Tangram Assembly},
++  booktitle = {2025 IEEE International Conference on Robotics and Automation (ICRA)},
++  year = {2025}, publisher = {IEEE},
++  url = {https://arxiv.org/abs/2505.11818}, note = {Reviewed accepted-paper preprint, arXiv v1}
++}

@@ -1,5 +1,7 @@
 # Findings derived from downloaded and reviewed papers
 
+Current expansion: see [7 October downloaded-PDF reading record](NEW_SOURCE_REVIEW_2026-10-07.md) and [current reference text map](REFERENCE_TEXT_MAP.md). The historical counts below describe the 5 October review. Five additional sources are now cited; AdaptAI was read only for presentation.
+
 Prepared 5 October 2026 from the preserved full-text audits. **Eligibility: a PDF was downloaded and its relevant text reviewed.** All 14 eligible papers are included below. Online-only reading, abstracts, and search leads are excluded from this findings document, even where their metadata appears in the [reading register](READING_REGISTER.md).
 
 Each entry separates what the source reports from our interpretation for this paper. Page numbers refer to the exact saved PDF version identified in [download provenance](download_provenance.json); they are not necessarily journal page numbers. The audits checked selected relevant passages, not every claim in every paper. These literature findings do not independently establish our experimental results.

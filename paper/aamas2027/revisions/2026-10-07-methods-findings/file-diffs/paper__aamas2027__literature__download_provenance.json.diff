@@ -1,0 +1,83 @@
+--- before/paper/aamas2027/literature/download_provenance.json
++++ current/paper/aamas2027/literature/download_provenance.json
+@@ -122,7 +122,7 @@
+   },
+   {
+     "source_url": "https://scholarworks.indianapolis.iu.edu/bitstreams/5eb42ad8-e6eb-4495-9c1d-f520e3877a06/download",
+-    "version": "Author manuscript; published Human Factors 66(4), 1081–1102 (2024); first online 2022-11-11",
++    "version": "Author manuscript; published Human Factors 66(4), 1081\u20131102 (2024); first online 2022-11-11",
+     "downloaded": "2026-09-30",
+     "doi": "10.1177/00187208221129940",
+     "bytes": 1912832,
+@@ -152,5 +152,71 @@
+     "sha256": "cd4a99428a3e335b7253bf851210bd69db60a6b5301f56d0e54270dffa0ac284",
+     "original_filename": "Sanna_2022_BARI_Assembly_Assistance.pdf",
+     "availability": "Reviewed local PDF; repository includes provenance and public source link, not full text."
++  },
++  {
++    "source_url": "https://knowledge.uchicago.edu/records/fnp5p-m0q24/files/Publication-guidelines-for-human-heart-rate-and-heart-rate-variability-studies-in-psychophysiology.pdf?download=1",
++    "version": "Published open-access committee report; university repository PDF",
++    "downloaded": "2026-10-07",
++    "doi": "10.1111/psyp.14604",
++    "bytes": 7682617,
++    "pages": 63,
++    "sha256": "de52a210ed198f1a14b069b052fee813cc313b1fe87bf526ebd447ed5d57a27e",
++    "original_filename": "Quigley_2024_Cardiac_Guidelines.pdf",
++    "availability": "Downloaded locally; relevant text read. Gitignored full text; provenance and claim map are versioned."
++  },
++  {
++    "source_url": "https://arxiv.org/pdf/2601.20402v1",
++    "version": "IUI 2026 accepted-paper preprint, arXiv v1",
++    "downloaded": "2026-10-07",
++    "doi": "10.1145/3742413.3789125",
++    "bytes": 12261742,
++    "pages": 17,
++    "sha256": "688c0e9037f80b1723d3a1ba2e77db59d50e289fcee002fa438caa87c726b263",
++    "original_filename": "GuideAI_2026.pdf",
++    "availability": "Downloaded locally; relevant text read. Gitignored full text; provenance and claim map are versioned."
++  },
++  {
++    "source_url": "https://arxiv.org/pdf/2404.08006v1",
++    "version": "arXiv v1 preprint; final journal venue not verified or asserted",
++    "downloaded": "2026-10-07",
++    "doi": "10.48550/arXiv.2404.08006",
++    "bytes": 1819765,
++    "pages": 38,
++    "sha256": "ce8836a4336b385262089d53110470ebaa6f1c47a1fc48a213ac39c16d07c563",
++    "original_filename": "Smit_2024_Order_Picking.pdf",
++    "availability": "Downloaded locally; relevant text read. Gitignored full text; provenance and claim map are versioned."
++  },
++  {
++    "source_url": "https://www.frontiersin.org/journals/human-neuroscience/articles/10.3389/fnhum.2025.1611524/pdf",
++    "version": "Published Frontiers article, 18 June 2025; local filename names the corresponding author, first author is Wei",
++    "downloaded": "2026-10-07",
++    "doi": "10.3389/fnhum.2025.1611524",
++    "bytes": 3693985,
++    "pages": 9,
++    "sha256": "d26df27fd47600204c820ba9480a9089bd6bca8e8543130b84eb6d27cdee591f",
++    "original_filename": "Shimomura_2025_Surgical_Workload.pdf",
++    "availability": "Downloaded locally; relevant text read. Gitignored full text; provenance and claim map are versioned."
++  },
++  {
++    "source_url": "https://arxiv.org/pdf/2505.11818v1",
++    "version": "ICRA 2025 accepted-paper preprint, arXiv v1",
++    "downloaded": "2026-10-07",
++    "doi": null,
++    "bytes": 1358170,
++    "pages": 7,
++    "sha256": "7a83713f30c553b28b687a26a6aa719168a926fad1726329cc79664e9740bcbd",
++    "original_filename": "Zhao_2025_MRChaos.pdf",
++    "availability": "Downloaded locally; relevant text read. Gitignored full text; provenance and claim map are versioned."
++  },
++  {
++    "source_url": "https://arxiv.org/pdf/2503.09150v1",
++    "version": "CHI EA 2025 accepted-paper preprint, arXiv v1",
++    "downloaded": "2026-10-07",
++    "doi": null,
++    "bytes": 3226136,
++    "pages": 11,
++    "sha256": "429806d98326524f008066ff77023ff325d25ba9a4739ac0aa8b733dc10f20a6",
++    "original_filename": "AdaptAI_2025.pdf",
++    "availability": "Downloaded and pp.1\u20133 read for contribution/architecture style only; not cited or used as experimental evidence."
+   }
+ ]

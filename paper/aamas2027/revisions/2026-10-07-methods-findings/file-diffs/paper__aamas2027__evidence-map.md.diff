@@ -1,0 +1,17 @@
+--- before/paper/aamas2027/evidence-map.md
++++ current/paper/aamas2027/evidence-map.md
+@@ -1,4 +1,6 @@
+ # Evidence map: current manuscript
++
++Current methods/findings revision: [change log](revisions/2026-10-07-methods-findings/CHANGELOG.md), [highlighted review](revisions/2026-10-07-methods-findings/highlighted-review.html), [frozen pre-change source](revisions/2026-10-07-methods-findings/before/main.tex), [full p-value audit](analysis/ALL_OUTCOMES.md), and [current structure](structure-review.md). §3 is the formative assessment; §4 combines the system and experimental method; §5 contains findings only. Twenty downloaded-PDF-verified references now support 31 source mentions and 49 anchors. Statistics use the observed 12 matched participants, not fabricated N=24 data. All numerical results remain provisional in this internal documentation and must be refreshed from the final export. The original abstract, anonymous format and submission ID 2613 are unchanged.
+ 
+ Updated 7 October 2026, branch `writing`, base `3c4ddb9`. Internal author material.
+ 
+@@ -31,3 +33,7 @@
+ The performance plot, heatmaps, matched correlations and paired-difference figure are archived. Figure 5 now compares constant/adaptive assistance ratings using grouped bars with sample SDs.
+ 
+ 7 October presentation revision: the author confirmed the three-minute pre-task baseline procedure. Figure 3 now includes the supplied IMG_1687.HEIC, converted to figures/setup-photo.jpg. Tables 1–3 bold favorable cells without changing numbers or tests. The P101/P103 excerpts remain verbatim and are italicized; §5.5 no longer counts commenters.
++
++## Current methods/findings evidence additions
++
++§3 expected-helpfulness comparisons: six paired tests in analysis/all-outcomes.json, none significant after Holm. §4 collects the apparatus and protocol previously split across sections. §5.2 now reports all six workload-dimension pairwise p values, with individual frustration increases verified from paired condition averages. §6 waiting discussion comes from the author’s researcher observation; the cause remains speculative. New source claims are mapped to downloaded PDFs, not imported as evidence for our experiment. The PACE comparator is verified on PDF pp.7–8. HR-rise processing remains distinct from HRV.

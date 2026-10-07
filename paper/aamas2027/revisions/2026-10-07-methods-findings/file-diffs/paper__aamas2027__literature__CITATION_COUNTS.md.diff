@@ -1,0 +1,54 @@
+--- before/paper/aamas2027/literature/CITATION_COUNTS.md
++++ current/paper/aamas2027/literature/CITATION_COUNTS.md
+@@ -1,25 +1,30 @@
+-# In-text citation counts
++# Current in-text citation counts
+ 
+-Recounted directly from `main.tex` on 7 October 2026 after the figure-comparison draft revision. The bibliography itself is excluded. Each source in a grouped citation counts once.
++Counted from main.tex, 7 October 2026. **20 distinct references; 31 source mentions across 30 citation groups.** A grouped citation counts once per cited source; bibliography entries are excluded.
+ 
+-**15 distinct references; 21 source mentions across 20 citation groups.**
++| Number | Source key | Times cited |
++|---|---|---:|
++| [1] | andriella2025 | 2 |
++| [2] | caiazzo2024 | 1 |
++| [3] | capponi2024 | 1 |
++| [4] | delazzari2025 | 4 |
++| [5] | hart2006 | 1 |
++| [6] | hostettler2025 | 1 |
++| [7] | karbouj2026 | 2 |
++| [8] | korivand2024 | 1 |
++| [9] | melo2026 | 2 |
++| [10] | ojstersek2024 | 1 |
++| [11] | pereira2025 | 1 |
++| [12] | quigley2024 | 2 |
++| [13] | shukla2026 | 1 |
++| [14] | smit2024 | 2 |
++| [15] | tabatabaei2025 | 2 |
++| [16] | teo2018 | 1 |
++| [17] | thunberg2026 | 1 |
++| [18] | wei2025 | 1 |
++| [19] | yang2024 | 2 |
++| [20] | zhao2025 | 2 |
+ 
+-| Reference | Source | Times cited |
+-|---|---|---:|
+-| [1] | Andriella et al. (2025) | 2 |
+-| [2] | Caiazzo et al. (2024) | 1 |
+-| [3] | Capponi et al. (2024) | 1 |
+-| [4] | De Lazzari et al. / PACE (2025) | 2 |
+-| [5] | Hart (2006) | 1 |
+-| [6] | Hostettler et al. (2025) | 1 |
+-| [7] | Karbouj et al. (2026) | 2 |
+-| [8] | Korivand et al. (2024) | 1 |
+-| [9] | Melo et al. / SensCogAR (2026) | 2 |
+-| [10] | Ojsteršek et al. (2024) | 1 |
+-| [11] | Pereira et al. (2025) | 1 |
+-| [12] | Tabatabaei et al. (2025) | 2 |
+-| [13] | Teo et al. (2018) | 1 |
+-| [14] | Thunberg et al. (2026) | 1 |
+-| [15] | Yang et al. (2024) | 2 |
++17 of 20 sources first appeared in 2024–2026. Older exceptions: Hart, Teo, Yang (online 2022 despite its 2024 issue).
+ 
+-The [reference-to-PDF text map](REFERENCE_TEXT_MAP.md) records every manuscript location and its supporting source passage. Regenerate these counts and refresh the map whenever citations change.
++[Current text and PDF-page map](REFERENCE_TEXT_MAP.md).

@@ -1,0 +1,15 @@
+{
+  "base_commit": "e99b8bb",
+  "files": {
+    "before-tools/review-paper-revision.py": "52ca93c94d92c5b745e5cedf03eeb77d235cd9f05e64897a470a4b4cdf2dbc38",
+    "before-tools/plot-assisted-comparison.py": "3e033502acb2998a1f088bc523ac4b3f561b45b9f37787895cdd279e27c83ec5",
+    "before-tools/update-paper-analysis.py": "d7519de226f50e171c9c4b4f9a9e8b8051a02609f75ec0d3ec843c44119cde9c",
+    "before-diagrams/physical-setup-topdown.png": "82e57efe565ded01eca7ca93140a0ff9e488e1a8b0de7985d1051a3209ef7214",
+    "before-diagrams/physical-setup-topdown.pdf": "d3bcdec32cc9deacd8788faa0855ea80ebbf5514d25eff29c4ed0fc85e15b35a",
+    "before-diagrams/assistance-architecture.tex": "a021ec537e7a4b020c476ec792e1957624aec626cefe9277a4bd65a863767df3",
+    "before-diagrams/assistance-architecture.png": "16dbe2f52ddcac741dca35b998ecc3067515f5f45b3897bab8fd22313024cab2",
+    "before-diagrams/assistance-architecture.pdf": "046af88b31e236502dcd7305eb9f206d899e974e30680441a0496c0ea9a0ab2f",
+    "before-diagrams/physical-setup-topdown.tex": "a9e5bc4585c4c192cff930211b6a1c95b94f227eb09ef3cf7630bd4fa1ee58d4",
+    "before-packages/aamas2027-complete-latex-project.zip": "2c96280eddad1b1c9260b41aa3314f1113ffae18b14fc140428cabb428e65860"
+  }
+}

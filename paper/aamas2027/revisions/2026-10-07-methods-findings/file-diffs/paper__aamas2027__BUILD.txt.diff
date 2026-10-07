@@ -1,0 +1,41 @@
+--- before/paper/aamas2027/BUILD.txt
++++ current/paper/aamas2027/BUILD.txt
+@@ -18,7 +18,7 @@
+ The previous author-approved abstract is retained with the condition name updated to constant assistance. The manuscript
+ uses planned N=24 and is visibly marked as a working draft awaiting final
+ results/demographics. The calculations still use 12 complete participants.
+-The separate linked-square-tangram survey has 24 responses. Historical
++The separate linked-square-tangram formative assessment has 24 responses. Historical
+ submitted-abstract.txt is unchanged; the planned experimental target 24 is
+ retained in author notes. Visible drafting reminders remain for missing facts.
+ 
+@@ -28,24 +28,18 @@
+   FONTCONFIG_FILE=/private/tmp/hti-latex-preview/fonts.conf /private/tmp/hti-latex-preview/tectonic --untrusted --only-cached --keep-intermediates --keep-logs --outdir output/pdf paper/aamas2027/main.tex
+ 
+ This writes output/pdf/main.pdf. After checking, copy it to
+-output/pdf/aamas2027-current.pdf. The final preview has 8 pages including
+-references, with main text ending on page 7. It includes 5 figures and
+-3 tables, 15 references and 21 citation occurrences. Both diagrams are imported
+-as TikZ from current editable sources; plots are vector PDFs. Two-panel plots
+-are sized for one column; the grouped assistance-rating bar chart spans both columns. Class margins and body font size remain unchanged.
++output/pdf/aamas2027-current.pdf. The final preview has 9 pages including references, with main text ending on page 8. It includes 5 figures, 3 tables, 20 references and 31 source mentions. Table 2 spans both columns and includes all workload comparisons. The class, margins and body font size are unchanged.
+ 
+-All 8 pages were rendered and visually inspected; the final chart-height adjustment was rechecked on pages 7–8. The final build has no
+-overfull boxes, undefined citations/references, missing characters or fatal
+-errors. Remaining warnings concern underfull spacing, missing CCS concepts,
+-some optional bibliography fields, and the supplied class's balancing/conditional
+-state. These remain submission-cleanup items. The pdfLaTeX route above has not
++All 9 pages were rendered and visually inspected. There are no undefined citations/references, missing characters, overfull horizontal boxes or fatal errors. A small 1.17-point overfull vertical-box warning remains on the final bibliography output; the rendered page shows no clipping. Other warnings concern underfull spacing, optional bibliography fields, font requests, missing CCS concepts and the supplied class's state. These are recorded rather than hidden.
++
++The pdfLaTeX route above has not
+ been run in this environment, so do not claim it independently verified.
+ 
+ The desktop compiler supports standalone documents; this multi-file paper was
+ compiled with the established local Tectonic tool. The open standalone
+ architecture editor is retained and its source now uses constant assistance.
+ 
+-The immediate pre-change paper/PDF is in revisions/2026-10-07-bar-comparison/before/.
++The immediate pre-change paper/PDF is in revisions/2026-10-07-methods-findings/before/. Earlier figure-bar snapshots remain unchanged.
+ The pre-restoration paper/PDF remains in revisions/2026-10-07-working-sample/before/.
+ The pre-protocol paper/PDF remains in revisions/2026-10-07-protocol/before/.
+ The earlier results-revision baseline remains in revisions/2026-10-07/before/. Review

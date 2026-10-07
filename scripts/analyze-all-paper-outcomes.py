@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+"""Audit all testable manuscript outcomes using observed matched participant data.
+
+Preserves the existing exploratory sign-flip method and correction families.
+Also reports Holm across all 31 experiment comparisons as a sensitivity audit.
+Once-per-study final ratings and single-form proportions lack a condition contrast.
+"""
+from pathlib import Path
+import itertools,json,hashlib,csv
+import numpy as np
+ROOT=Path(__file__).resolve().parents[1];PAPER=ROOT/'paper/aamas2027'
+source=PAPER/'analysis/revision-analysis.json';data=json.loads(source.read_text());v=data['participant_condition_averages']
+labels={'completion':'Completion (%)','durationSeconds':'Round duration (s)','tlxMean':'Overall workload','mentalDemand':'Mental demand','physicalDemand':'Physical demand','temporalDemand':'Temporal demand','performance':'Perceived performance','effort':'Effort','frustration':'Frustration','helpfulness':'Helpfulness','timingEffectiveness':'Timing','clarityAndDistraction':'Seamlessness','stressReduction':'Frustration relief'}
+conditions=['control','constant','adaptive'];n=data['experiment_n'];signs=np.array(list(itertools.product([-1,1],repeat=n)))
+def test(x,y,**meta):
+ diff=np.array(y)-np.array(x);null=signs@diff/n;observed=float(diff.mean())
+ return {**meta,'n':n,'mean_difference':observed,'p_raw':float(np.mean(np.abs(null)>=abs(observed)-1e-12)),'higher':int((diff>1e-12).sum()),'equal':int((np.abs(diff)<=1e-12).sum()),'lower':int((diff < -1e-12).sum())}
+def holm(items,field='p_holm'):
+ prev=0
+ for i,item in enumerate(sorted(items,key=lambda x:x['p_raw'])):
+  prev=max(prev,min(1,(len(items)-i)*item['p_raw']));item[field]=prev
+out=[]
+for key in ['completion','durationSeconds','tlxMean','mentalDemand','physicalDemand','temporalDemand','performance','effort','frustration']:
+ family=[test(v[a][key],v[b][key],measure=key,label=labels[key],contrast=f'{b} minus {a}',family=key) for a,b in itertools.combinations(conditions,2)]
+ holm(family);out.extend(family)
+family=[test(v['constant'][key],v['adaptive'][key],measure=key,label=labels[key],contrast='adaptive minus constant',family='assistance_ratings') for key in ['helpfulness','timingEffectiveness','clarityAndDistraction','stressReduction']]
+holm(family);out.extend(family);holm(out,'p_holm_all_31');
+for x in out:x['significant_within_family']=x['p_holm']<.05;x['significant_all_31']=x['p_holm_all_31']<.05
+# Same respondents rate all four formative-assessment options.
+survey=data['survey']['assistance_ratings'];ns=data['survey']['n'];ss=np.array(list(itertools.product([-1,1],repeat=ns)),dtype=np.int8) if ns<=16 else None
+form=[]
+for i,j in itertools.combinations(range(len(survey)),2):
+ diff=np.array(survey[j]['values'])-np.array(survey[i]['values']);obs=abs(float(diff.mean()));total=0;count=0
+ # Exact enumeration in chunks avoids allocating a 2**24 by 24 matrix.
+ for start in range(0,2**ns,65536):
+  integers=np.arange(start,min(start+65536,2**ns),dtype=np.uint32)
+  sign=2*((integers[:,None]>>np.arange(ns,dtype=np.uint32))&1).astype(np.int8)-1
+  total+=int((np.abs(sign@diff/ns)>=obs-1e-12).sum());count+=len(integers)
+ form.append({'first':survey[i]['question'],'second':survey[j]['question'],'n':ns,'mean_difference':float(diff.mean()),'p_raw':total/count})
+holm(form)
+result={'source_sha256':hashlib.sha256(source.read_bytes()).hexdigest(),'observed_experiment_n':n,'method':'Two-sided exhaustive paired sign-flip test of mean differences. Holm per three-contrast endpoint, one four-item assistance family. Global 31-comparison Holm retained as sensitivity, not silently substituted. Formative ratings: exact sign flips and Holm over six comparisons.','experiment':out,'formative_assessment':form,'not_condition_testable':{'final_ratings':'Overall helpfulness, efficacy, trust and reliance are collected once after all sessions. No condition-specific comparison or preregistered midpoint null is available.','correct_piece_count':'Final-photo scores not supplied.','formative_completion_and_time':'Single self-report sample, not randomized condition outcomes.'}}
+(PAPER/'analysis/all-outcomes.json').write_text(json.dumps(result,indent=2)+'\n')
+with (PAPER/'analysis/all-outcomes.csv').open('w',newline='') as f:
+ fields=list(out[0]);w=csv.DictWriter(f,fieldnames=fields);w.writeheader();w.writerows(out)
+lines=['# All testable outcome comparisons','',f'Actual matched records: {n} participants. Draft target N=24 is not used to fabricate analysis rows. Replace these estimates with final exports before submission.','', '| Outcome | Contrast | Mean difference | Raw p | Holm p | Significant | Holm across all 31 |','|---|---|---:|---:|---:|---|---:|']
+for x in out:lines.append(f"| {x['label']} | {x['contrast']} | {x['mean_difference']:.4f} | {x['p_raw']:.6f} | {x['p_holm']:.6f} | {'yes' if x['significant_within_family'] else 'no'} | {x['p_holm_all_31']:.6f} |")
+lines+=['','Formative-assessment rating comparisons (lower = more helpful). Six paired comparisons are corrected together.','']
+for x in form:lines.append(f"- {x['first']} vs {x['second']}: difference {x['mean_difference']:.4f}; raw p={x['p_raw']:.6f}; Holm p={x['p_holm']:.6f}.")
+lines+=['','## Outcomes without a valid condition contrast','']+[f'- {k}: {value}' for k,value in result['not_condition_testable'].items()]
+(PAPER/'analysis/ALL_OUTCOMES.md').write_text('\n'.join(lines)+'\n')
+print('Computed 31 experiment contrasts and six formative rating comparisons.')
+for x in out:
+ print(x['label'],x['contrast'],round(x['p_holm'],6),'global',round(x['p_holm_all_31'],6),x['higher'],x['equal'],x['lower'])

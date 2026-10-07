@@ -1,442 +1,607 @@
 # Manuscript citations mapped to source PDF text
 
-Updated 7 October 2026 for the figure-comparison draft revision on branch `writing` (base commit `3c4ddb9`). Literature claims are unchanged; locations and manuscript hashes identify the new paper. The exact manuscript versions are identified by hashes in the JSON companion. This maps **all 15 references and every in-text citation occurrence**, including repeated citations and both members of the joint tangram citation. It supplements the [reference audit](MANUSCRIPT_REFERENCE_AUDIT.md), rather than replacing its metadata/version history.
+Updated 7 October 2026 against the methods/findings revision, base commit e99b8bb. **20 sources, 31 source mentions, 49 checked PDF-text anchors.** Exact manuscript hashes appear in the JSON companion. All sources have downloaded PDFs, with relevant text read before deriving claims.
 
-For each reference: **our exact wording → source PDF page and short verbatim search anchor → explanation of support → boundary on interpretation**. The surrounding explanations are paraphrases, not quotations. Short anchors normalize PDF line wrapping and typographic ligatures; no wording is invented. Page numbers are one-based **PDF pages**, including repository covers, rather than journal page numbers. Each source’s excerpts total at most 25 words.
-
-All 15 PDF hashes were checked again and the text was freshly extracted from the PDFs for this map. Every quoted anchor was mechanically matched on the stated page. This establishes traceability of the claim; it does not independently replicate the cited experiment. The map is a reading aid, not evidence that every page was exhaustively appraised.
-
-Local PDF links work only in a checkout containing the gitignored `data/writing-reference/literature-pdfs/` cache. Public source links provide a recovery route; access and `#page=` navigation depend on the host/viewer. Twelve papers first appeared in 2024–2026. Older exceptions are Hart, Teo and Yang; Thunberg is a workshop proposal.
+Each entry maps current manuscript wording to exact PDF pages, short verbatim search anchors, explanations and interpretation limits. Page numbers include any repository covers. Normalization and character offsets are recorded in the JSON companion. Source quotations total at most 25 words per paper. PDFs and extracted full text remain in the local ignored data cache; public links provide recovery.
 
 ## Coverage index
 
-| Reference | Manuscript locations | Exact evidence pages |
+| Reference | Current locations | Evidence pages |
 |---|---|---|
-| [1] [Andriella et al. — Bayesian proactive assistance](#ref-1) | Introduction; §2.1 | 1, 16, 23 |
-| [2] [Caiazzo et al. — Assembly workload comparison](#ref-2) | §2.3 | 2 |
-| [3] [Capponi et al. — Assembly complexity and physiological response](#ref-3) | §2.2 | 3, 8 |
-| [4] [De Lazzari et al. — PACE](#ref-4) | Introduction; §2.1 | 3, 7 |
-| [5] [Hart — NASA-TLX: 20 Years Later](#ref-5) | §2.3 | 1, 3 |
-| [6] [Hostettler et al. — Real-time adaptive industrial robots](#ref-6) | §2.2 | 5, 6 |
-| [7] [Karbouj et al. — Adaptive HRC systematic review](#ref-7) | Introduction; §2.1 | 21 |
-| [8] [Korivand et al. — Physiological analysis and Q-learning](#ref-8) | §2.2 | 8, 15, 18 |
-| [9] [Melo et al. — SensCogAR](#ref-9) | Introduction; §2.3 | 8 |
-| [10] [Ojsteršek et al. — Personalized human–robot workplace](#ref-10) | §2.2 | 3, 4 |
-| [11] [Pereira et al. — Physiological workload review](#ref-11) | §2.2 | 14, 18 |
-| [12] [Tabatabaei et al. — Gazing at Failure](#ref-12) | Introduction; §2.3 | 1, 3 |
-| [13] [Teo et al. — Closed-loop human–robot teaming](#ref-13) | §2.2 | 4, 6 |
-| [14] [Thunberg et al. — Experiences of Wizards of Oz](#ref-14) | §2.4 | 1 |
-| [15] [Yang et al. — Workload-adaptive surgical suction](#ref-15) | Introduction; §2.2 | 8, 9 |
-
-## Detailed mapping
+| [1] andriella2025 | 1. Introduction; 2.1. Assistance timing and proactive coordination | 1, 16, 23 |
+| [2] caiazzo2024 | 2.3. Physical tasks and participant experience | 2 |
+| [3] capponi2024 | 2.2. Physiological information in assistance | 3, 8 |
+| [4] delazzari2025 | 1. Introduction; 2.1. Assistance timing and proactive coordination; 6.3. Limitations and future work | 3, 7, 8 |
+| [5] hart2006 | 2.3. Physical tasks and participant experience | 1, 3 |
+| [6] hostettler2025 | 2.2. Physiological information in assistance | 5, 6 |
+| [7] karbouj2026 | 1. Introduction; 2.1. Assistance timing and proactive coordination | 21 |
+| [8] korivand2024 | 2.2. Physiological information in assistance | 8, 15, 18 |
+| [9] melo2026 | 1. Introduction; 2.3. Physical tasks and participant experience | 8 |
+| [10] ojstersek2024 | 2.2. Physiological information in assistance | 3, 4 |
+| [11] pereira2025 | 2.2. Physiological information in assistance | 14, 18 |
+| [12] quigley2024 | 2.2. Physiological information in assistance; 6.2. Assistance timing and physiological feedback | 8, 9, 12 |
+| [13] shukla2026 | 2.2. Physiological information in assistance | 6, 9 |
+| [14] smit2024 | 2.3. Physical tasks and participant experience; 6.3. Limitations and future work | 6, 8 |
+| [15] tabatabaei2025 | 1. Introduction; 2.3. Physical tasks and participant experience | 1, 3 |
+| [16] teo2018 | 2.2. Physiological information in assistance | 4, 6 |
+| [17] thunberg2026 | 2.4. Wizard-of-Oz evaluation | 1 |
+| [18] wei2025 | 2.2. Physiological information in assistance | 1, 5 |
+| [19] yang2024 | 1. Introduction; 2.2. Physiological information in assistance | 8, 9 |
+| [20] zhao2025 | 2.3. Physical tasks and participant experience; 6.3. Limitations and future work | 1, 6 |
 
 <a id="ref-1"></a>
-### [1] Andriella et al. — Bayesian proactive assistance
+## [1] andriella2025
 
-Key: `andriella2025`. [Local PDF](../../../data/writing-reference/literature-pdfs/Andriella_2025_Bayesian_Proactive_Assistance.pdf) · [Public PDF](https://link.springer.com/content/pdf/10.1007/s11257-024-09421-1.pdf). Version: Published journal PDF.
+[Local PDF](../../../data/writing-reference/literature-pdfs/Andriella_2025_Bayesian_Proactive_Assistance.pdf) · [Public PDF](https://link.springer.com/content/pdf/10.1007/s11257-024-09421-1.pdf). Version: Published journal PDF. SHA-256: `5a206e982bd9a40f18fe6cb998eb8c5d0eb0fede84f6fd728c010d93403de127`.
 
-**Where our paper uses it**
+**Current manuscript text**
 
-- **1. Introduction** — [Markdown line 17](../manuscript.md#L17); [LaTeX line 50](../main.tex#L50). Evidence: A1, A2.
-  > Andriella et al. model assistance type, timing, and confidence [1]
+- **1. Introduction**, [Markdown line 17](../manuscript.md#L17); [LaTeX line 50](../main.tex#L50). Evidence: A1, A2.
+> Andriella et al. model assistance type, timing, and confidence [1]
 
-- **2.1. Assistance timing and proactive coordination** — [Markdown line 41](../manuscript.md#L41); [LaTeX line 76](../main.tex#L76). Evidence: A1, A2, A3.
-  > Andriella et al. learn proactive assistance from user profiles and task state in a sequential memory game, jointly addressing assistance type, timing, and confidence [1].
+- **2.1. Assistance timing and proactive coordination**, [Markdown line 42](../manuscript.md#L42); [LaTeX line 77](../main.tex#L77). Evidence: A1, A2, A3.
+> Andriella et al. learn proactive assistance from user profiles and task state in a sequential memory game, jointly addressing assistance type, timing, and confidence [1].
 
 **Supporting PDF text**
 
-- **A1 — [PDF p. 1](https://link.springer.com/content/pdf/10.1007/s11257-024-09421-1.pdf#page=1)**
-  > when to intervene, and with what confidence
+- **A1, [PDF page 1](https://link.springer.com/content/pdf/10.1007/s11257-024-09421-1.pdf#page=1)**
+> when to intervene, and with what confidence
 
-  The abstract identifies assistance selection, intervention timing and confidence in taking control as the learned decisions.
+The abstract identifies assistance selection, intervention timing and confidence in taking control as the learned decisions.
 
-- **A2 — [PDF p. 16](https://link.springer.com/content/pdf/10.1007/s11257-024-09421-1.pdf#page=16)**
-  > the user profile and the game state
+- **A2, [PDF page 16](https://link.springer.com/content/pdf/10.1007/s11257-024-09421-1.pdf#page=16)**
+> the user profile and the game state
 
-  The request-time classifier associates assistance level, user profile and game state with the time of a help request. This supports the user/task information part of our sentence.
+The request-time classifier associates assistance level, user profile and game state with the time of a help request. This supports the user/task information part of our sentence.
 
-- **A3 — [PDF p. 23](https://link.springer.com/content/pdf/10.1007/s11257-024-09421-1.pdf#page=23)**
-  > sequential memory game
+- **A3, [PDF page 23](https://link.springer.com/content/pdf/10.1007/s11257-024-09421-1.pdf#page=23)**
+> sequential memory game
 
-  The evaluation section describes participants playing the game with Furhat and contrasts proactive and non-proactive robot assistance.
+The evaluation section describes participants playing the game with Furhat and contrasts proactive and non-proactive robot assistance.
 
 **Interpretation limit:** Supports the three decision dimensions and this particular game implementation. It does not establish a physiological trigger or validate the present HR-rise threshold.
 
+
 <a id="ref-2"></a>
-### [2] Caiazzo et al. — Assembly workload comparison
+## [2] caiazzo2024
 
-Key: `caiazzo2024`. [Local PDF](../../../data/writing-reference/literature-pdfs/Caiazzo_2024_Comparative_Assembly_Workload.pdf) · [Public PDF](https://scidar.kg.ac.rs/bitstream/123456789/21811/1/comparative-analysis-of-mental-workload-in-adaptive-human-robot-collaboration-during-assembly-tasks.pdf). Version: Conference paper in university repository; PDF includes ResearchGate cover.
+[Local PDF](../../../data/writing-reference/literature-pdfs/Caiazzo_2024_Comparative_Assembly_Workload.pdf) · [Public PDF](https://scidar.kg.ac.rs/bitstream/123456789/21811/1/comparative-analysis-of-mental-workload-in-adaptive-human-robot-collaboration-during-assembly-tasks.pdf). Version: Conference paper in university repository; PDF includes ResearchGate cover. SHA-256: `d1ad3433c37b87ce42e92953c1640c8490255ac54c3dbb37a8a444f839417cf1`.
 
-**Where our paper uses it**
+**Current manuscript text**
 
-- **2.3. Physical tasks and participant experience** — [Markdown line 53](../manuscript.md#L53); [LaTeX line 88](../main.tex#L88). Evidence: C1, C2, C3.
-  > Adjacent assembly work by Caiazzo et al. compares manual, collaborative, and guided collaborative conditions, with EEG used for workload assessment [2].
+- **2.3. Physical tasks and participant experience**, [Markdown line 56](../manuscript.md#L56); [LaTeX line 91](../main.tex#L91). Evidence: C1, C2, C3.
+> Adjacent assembly work by Caiazzo et al. compares manual, collaborative, and guided collaborative conditions, with EEG used for workload assessment [2].
 
 **Supporting PDF text**
 
-- **C1 — [PDF p. 2](https://scidar.kg.ac.rs/bitstream/123456789/21811/1/comparative-analysis-of-mental-workload-in-adaptive-human-robot-collaboration-during-assembly-tasks.pdf#page=2)**
-  > three different scenarios
+- **C1, [PDF page 2](https://scidar.kg.ac.rs/bitstream/123456789/21811/1/comparative-analysis-of-mental-workload-in-adaptive-human-robot-collaboration-during-assembly-tasks.pdf#page=2)**
+> three different scenarios
 
-  The abstract enumerates assembly without the robot, with the robot, and with the robot plus task guidance. Our word “manual” paraphrases the no-robot condition.
+The abstract enumerates assembly without the robot, with the robot, and with the robot plus task guidance. Our word “manual” paraphrases the no-robot condition.
 
-- **C2 — [PDF p. 2](https://scidar.kg.ac.rs/bitstream/123456789/21811/1/comparative-analysis-of-mental-workload-in-adaptive-human-robot-collaboration-during-assembly-tasks.pdf#page=2)**
-  > The analysis was conducted for three participants.
+- **C2, [PDF page 2](https://scidar.kg.ac.rs/bitstream/123456789/21811/1/comparative-analysis-of-mental-workload-in-adaptive-human-robot-collaboration-during-assembly-tasks.pdf#page=2)**
+> The analysis was conducted for three participants.
 
-  This identifies the source study’s sample size, retained here as context for interpreting its scope.
+This identifies the source study’s sample size, retained here as context for interpreting its scope.
 
-- **C3 — [PDF p. 2](https://scidar.kg.ac.rs/bitstream/123456789/21811/1/comparative-analysis-of-mental-workload-in-adaptive-human-robot-collaboration-during-assembly-tasks.pdf#page=2)**
-  > electroencephalogram (EEG) sensor cap
+- **C3, [PDF page 2](https://scidar.kg.ac.rs/bitstream/123456789/21811/1/comparative-analysis-of-mental-workload-in-adaptive-human-robot-collaboration-during-assembly-tasks.pdf#page=2)**
+> electroencephalogram (EEG) sensor cap
 
-  The abstract identifies EEG as the workload measurement; PDF p. 4 describes preprocessing and feature extraction. The scenarios concern collaboration/guidance, not a reported online EEG trigger.
+The abstract identifies EEG as the workload measurement; PDF p. 4 describes preprocessing and feature extraction. The scenarios concern collaboration/guidance, not a reported online EEG trigger.
 
 **Interpretation limit:** The N=3 qualification is essential. This is adjacent assembly evidence, not a test of our timing policy. Unverified DOI and proceedings pagination are omitted from the bibliography.
 
+
 <a id="ref-3"></a>
-### [3] Capponi et al. — Assembly complexity and physiological response
+## [3] capponi2024
 
-Key: `capponi2024`. [Local PDF](../../../data/writing-reference/literature-pdfs/Capponi_2024_Assembly_Complexity.pdf) · [Public PDF](https://www.qualityengineering.polito.it/content/download/1126/6184/file/Assembly%20complexity%20and%20physiological%20response%20in%20human-robot%20collaboration%20_%20Insights%20from%20a%20preliminary%20experimental%20analysis.pdf). Version: Published version; university research-group website.
+[Local PDF](../../../data/writing-reference/literature-pdfs/Capponi_2024_Assembly_Complexity.pdf) · [Public PDF](https://www.qualityengineering.polito.it/content/download/1126/6184/file/Assembly%20complexity%20and%20physiological%20response%20in%20human-robot%20collaboration%20_%20Insights%20from%20a%20preliminary%20experimental%20analysis.pdf). Version: Published version; university research-group website. SHA-256: `7bf33accbe162d3afff2cfb325582ce678d056a14e535875db495a621a5a66c1`.
 
-**Where our paper uses it**
+**Current manuscript text**
 
-- **2.2. Physiological information in assistance** — [Markdown line 49](../manuscript.md#L49); [LaTeX line 84](../main.tex#L84). Evidence: CP1, CP2.
-  > Capponi et al. similarly find no clear RMSSD pattern across their assembly configurations and distinguish cognitive effort from stress [3].
+- **2.2. Physiological information in assistance**, [Markdown line 52](../manuscript.md#L52); [LaTeX line 87](../main.tex#L87). Evidence: CP1, CP2.
+> Capponi et al. similarly find no clear RMSSD pattern across their assembly configurations and distinguish cognitive effort from stress [3].
 
 **Supporting PDF text**
 
-- **CP1 — [PDF p. 8](https://www.qualityengineering.polito.it/content/download/1126/6184/file/Assembly%20complexity%20and%20physiological%20response%20in%20human-robot%20collaboration%20_%20Insights%20from%20a%20preliminary%20experimental%20analysis.pdf#page=8)**
-  > the RMSSD metric provided no significant evidence
+- **CP1, [PDF page 8](https://www.qualityengineering.polito.it/content/download/1126/6184/file/Assembly%20complexity%20and%20physiological%20response%20in%20human-robot%20collaboration%20_%20Insights%20from%20a%20preliminary%20experimental%20analysis.pdf#page=8)**
+> the RMSSD metric provided no significant evidence
 
-  In §4.2.1 the authors describe overlapping distributions without clear trends, and no significant evidence for their hypothesis from RMSSD or its signed-rank tests.
+In §4.2.1 the authors describe overlapping distributions without clear trends, and no significant evidence for their hypothesis from RMSSD or its signed-rank tests.
 
-- **CP2 — [PDF p. 3](https://www.qualityengineering.polito.it/content/download/1126/6184/file/Assembly%20complexity%20and%20physiological%20response%20in%20human-robot%20collaboration%20_%20Insights%20from%20a%20preliminary%20experimental%20analysis.pdf#page=3)**
-  > not all increases in cognitive load lead to stress
+- **CP2, [PDF page 3](https://www.qualityengineering.polito.it/content/download/1126/6184/file/Assembly%20complexity%20and%20physiological%20response%20in%20human-robot%20collaboration%20_%20Insights%20from%20a%20preliminary%20experimental%20analysis.pdf#page=3)**
+> not all increases in cognitive load lead to stress
 
-  The background distinguishes task-related cognitive demand from stress and explains that their relationship depends on the person and situation.
+The background distinguishes task-related cognitive demand from stress and explains that their relationship depends on the person and situation.
 
 **Interpretation limit:** The negative RMSSD finding is specific to these tasks/configurations. It does not mean every cardiac measure is uninformative or that physiological state has no relationship with workload.
 
+
 <a id="ref-4"></a>
-### [4] De Lazzari et al. — PACE
+## [4] delazzari2025
 
-Key: `delazzari2025`. [Local PDF](../../../data/writing-reference/literature-pdfs/PACE_2025.pdf) · [Public PDF](https://www.merl.com/publications/docs/TR2025-064.pdf). Version: ICRA paper hosted by MERL, technical-report cover.
+[Local PDF](../../../data/writing-reference/literature-pdfs/PACE_2025.pdf) · [Public PDF](https://www.merl.com/publications/docs/TR2025-064.pdf). Version: ICRA paper hosted by MERL, technical-report cover. SHA-256: `9f82f2e2a06512a28721e1f180a5ba10432c76cb2232f530bfa2552e3b395626`.
 
-**Where our paper uses it**
+**Current manuscript text**
 
-- **1. Introduction** — [Markdown line 17](../manuscript.md#L17); [LaTeX line 50](../main.tex#L50). Evidence: P1, P2.
-  > PACE uses action-completion estimates to coordinate proactive assistance [4].
+- **1. Introduction**, [Markdown line 17](../manuscript.md#L17); [LaTeX line 50](../main.tex#L50). Evidence: P1, P2.
+> PACE uses action-completion estimates to coordinate proactive assistance [4].
 
-- **2.1. Assistance timing and proactive coordination** — [Markdown line 41](../manuscript.md#L41); [LaTeX line 76](../main.tex#L76). Evidence: P1, P2, P3.
-  > PACE estimates action completion from hand movements and uses a learned policy to coordinate assistance during collaborative assembly [4].
+- **2.1. Assistance timing and proactive coordination**, [Markdown line 42](../manuscript.md#L42); [LaTeX line 77](../main.tex#L77). Evidence: P4.
+> PACE also compares proactive assistance with an explicit-query condition in which participants press a button to request help; participant waiting times were longest under explicit query [4].
+
+- **2.1. Assistance timing and proactive coordination**, [Markdown line 42](../manuscript.md#L42); [LaTeX line 77](../main.tex#L77). Evidence: P1, P2, P3.
+> PACE estimates action completion from hand movements and uses a learned policy to coordinate assistance during collaborative assembly [4].
+
+- **6.3. Limitations and future work**, [Markdown line 236](../manuscript.md#L236); [LaTeX line 307](../main.tex#L307). Evidence: P4.
+> PACE found longer participant waiting times under explicit query than under proactive assistance [4]
 
 **Supporting PDF text**
 
-- **P1 — [PDF p. 3](https://www.merl.com/publications/docs/TR2025-064.pdf#page=3)**
-  > track human task progression from hand movements
+- **P1, [PDF page 3](https://www.merl.com/publications/docs/TR2025-064.pdf#page=3)**
+> track human task progression from hand movements
 
-  The paper describes DTW with correlation analysis to estimate human progress; methods on PDF pp. 4–5 develop the action-completion estimator.
+The paper describes DTW with correlation analysis to estimate human progress; methods on PDF pp. 4–5 develop the action-completion estimator.
 
-- **P2 — [PDF p. 3](https://www.merl.com/publications/docs/TR2025-064.pdf#page=3)**
-  > reinforcement learning policy from limited demonstrations
+- **P2, [PDF page 3](https://www.merl.com/publications/docs/TR2025-064.pdf#page=3)**
+> reinforcement learning policy from limited demonstrations
 
-  The learned policy coordinates robot assistance with estimated progress; the methods explain the policy formulation. This supports “learned policy,” without importing claims of superiority.
+The learned policy coordinates robot assistance with estimated progress; the methods explain the policy formulation. This supports “learned policy,” without importing claims of superiority.
 
-- **P3 — [PDF p. 7](https://www.merl.com/publications/docs/TR2025-064.pdf#page=7)**
-  > robot hands an Allen key to the human
+- **P3, [PDF page 7](https://www.merl.com/publications/docs/TR2025-064.pdf#page=7)**
+> robot hands an Allen key to the human
 
-  The task description and Figure 3 describe collaborative wooden-chair assembly, including joint transport and tool handovers. Right-hand position is recorded with motion capture.
+The task description and Figure 3 describe collaborative wooden-chair assembly, including joint transport and tool handovers. Right-hand position is recorded with motion capture.
 
-**Interpretation limit:** This is hand-motion/task-progress assistance, not physiology-based assistance. PDF p. 1 is a MERL cover and p. 2 is blank; the actual article begins on PDF p. 3.
+- **P4, [PDF page 8](https://www.merl.com/publications/docs/TR2025-064.pdf#page=8)**
+> longest waiting times
+
+Results identify longest participant waiting under explicit query. PDF p.7 defines the button-request comparator. This is task-specific, not a universal disadvantage of requested help.
+
+**Interpretation limit:** This is hand-motion/task-progress assistance, not physiology-based assistance. PDF p. 1 is a MERL cover and p. 2 is blank; the actual article begins on PDF p. 3. Explicit query requests follow completion of each assembly action; it is not necessarily a request for a reasoning hint. No claim that requested help is universally less helpful or a significant query-versus-PACE waiting contrast is imported.
+
 
 <a id="ref-5"></a>
-### [5] Hart — NASA-TLX: 20 Years Later
+## [5] hart2006
 
-Key: `hart2006`. [Local PDF](../../../data/writing-reference/literature-pdfs/Hart_2006_NASA_TLX.pdf) · [Public PDF](https://www.nasa.gov/wp-content/uploads/2026/01/hfes-2006-paper.pdf). Version: NASA-hosted author paper.
+[Local PDF](../../../data/writing-reference/literature-pdfs/Hart_2006_NASA_TLX.pdf) · [Public PDF](https://www.nasa.gov/wp-content/uploads/2026/01/hfes-2006-paper.pdf). Version: NASA-hosted author paper. SHA-256: `0797a7647a2a9edc6fae2a9f7d0b6844f80239dd779e1055e2a71ed13520bbcb`.
 
-**Where our paper uses it**
+**Current manuscript text**
 
-- **2.3. Physical tasks and participant experience** — [Markdown line 55](../manuscript.md#L55); [LaTeX line 90](../main.tex#L90). Evidence: H1, H2.
-  > Hart describes the six NASA-TLX workload dimensions and the use of an unweighted overall score [5].
+- **2.3. Physical tasks and participant experience**, [Markdown line 60](../manuscript.md#L60); [LaTeX line 95](../main.tex#L95). Evidence: H1, H2.
+> Hart describes the six NASA-TLX workload dimensions and the use of an unweighted overall score [5].
 
 **Supporting PDF text**
 
-- **H1 — [PDF p. 1](https://www.nasa.gov/wp-content/uploads/2026/01/hfes-2006-paper.pdf#page=1)**
-  > Mental, Physical, and Temporal Demands, Frustration, Effort, and Performance.
+- **H1, [PDF page 1](https://www.nasa.gov/wp-content/uploads/2026/01/hfes-2006-paper.pdf#page=1)**
+> Mental, Physical, and Temporal Demands, Frustration, Effort, and Performance.
 
-  The background names the six subscales. These are the dimensions referred to in our manuscript.
+The background names the six subscales. These are the dimensions referred to in our manuscript.
 
-- **H2 — [PDF p. 3](https://www.nasa.gov/wp-content/uploads/2026/01/hfes-2006-paper.pdf#page=3)**
-  > ratings are simply averaged or added
+- **H2, [PDF page 3](https://www.nasa.gov/wp-content/uploads/2026/01/hfes-2006-paper.pdf#page=3)**
+> ratings are simply averaged or added
 
-  The modifications discussion explains Raw TLX after removal of the weighting procedure.
+The modifications discussion explains Raw TLX after removal of the weighting procedure.
 
 **Interpretation limit:** Hart supports describing and qualifying an adaptation; it does not validate our particular seven-point items, scoring, or psychometric properties. The paper is from 2006, regardless of its 2026 NASA upload path.
 
+
 <a id="ref-6"></a>
-### [6] Hostettler et al. — Real-time adaptive industrial robots
+## [6] hostettler2025
 
-Key: `hostettler2025`. [Local PDF](../../../data/writing-reference/literature-pdfs/Hostettler_2025_Real_Time_Adaptive_Industrial_Robots.pdf) · [Public PDF](https://alexandria.unisg.ch/bitstreams/b9548afd-a853-40ed-9141-7bb837ce1f77/download). Version: Final CHI 2025 version; university repository.
+[Local PDF](../../../data/writing-reference/literature-pdfs/Hostettler_2025_Real_Time_Adaptive_Industrial_Robots.pdf) · [Public PDF](https://alexandria.unisg.ch/bitstreams/b9548afd-a853-40ed-9141-7bb837ce1f77/download). Version: Final CHI 2025 version; university repository. SHA-256: `a797f374461b6cd6bf393fd3d70c08a4160c7195716f76b53faf96f249a302f1`.
 
-**Where our paper uses it**
+**Current manuscript text**
 
-- **2.2. Physiological information in assistance** — [Markdown line 47](../manuscript.md#L47); [LaTeX line 82](../main.tex#L82). Evidence: HO1, HO2, HO3.
-  > Hostettler et al. adapt robot behavior to user distance while measuring pupil responses; direct pupil-driven adaptation is a future direction [6].
+- **2.2. Physiological information in assistance**, [Markdown line 48](../manuscript.md#L48); [LaTeX line 83](../main.tex#L83). Evidence: HO1, HO2, HO3.
+> Hostettler et al. adapt robot behavior to user distance while measuring pupil responses; direct pupil-driven adaptation is a future direction [6].
 
 **Supporting PDF text**
 
-- **HO1 — [PDF p. 5](https://alexandria.unisg.ch/bitstreams/b9548afd-a853-40ed-9141-7bb837ce1f77/download#page=5)**
-  > distance between the user and the robot only
+- **HO1, [PDF page 5](https://alexandria.unisg.ch/bitstreams/b9548afd-a853-40ed-9141-7bb837ce1f77/download#page=5)**
+> distance between the user and the robot only
 
-  The study design explicitly limits the implemented adaptation input to distance so the authors can examine effects on proximity and pupil responses.
+The study design explicitly limits the implemented adaptation input to distance so the authors can examine effects on proximity and pupil responses.
 
-- **HO2 — [PDF p. 6](https://alexandria.unisg.ch/bitstreams/b9548afd-a853-40ed-9141-7bb837ce1f77/download#page=6)**
-  > recorded pupil dilation data and proximity behavior
+- **HO2, [PDF page 6](https://alexandria.unisg.ch/bitstreams/b9548afd-a853-40ed-9141-7bb837ce1f77/download#page=6)**
+> recorded pupil dilation data and proximity behavior
 
-  The measures section lists these as objective responses, alongside subjective questionnaires.
+The measures section lists these as objective responses, alongside subjective questionnaires.
 
-- **HO3 — [PDF p. 5](https://alexandria.unisg.ch/bitstreams/b9548afd-a853-40ed-9141-7bb837ce1f77/download#page=5)**
-  > future systems
+- **HO3, [PDF page 5](https://alexandria.unisg.ch/bitstreams/b9548afd-a853-40ed-9141-7bb837ce1f77/download#page=5)**
+> future systems
 
-  The surrounding paragraph presents adaptation to workload measured through real-time pupil dilation as a future direction, rather than the implemented control input.
+The surrounding paragraph presents adaptation to workload measured through real-time pupil dilation as a future direction, rather than the implemented control input.
 
 **Interpretation limit:** Do not cite the paper as an implemented pupil-triggered assistance policy. Its table of possible human characteristics includes prior literature; that table alone is not evidence of what its own experiment implemented.
 
+
 <a id="ref-7"></a>
-### [7] Karbouj et al. — Adaptive HRC systematic review
+## [7] karbouj2026
 
-Key: `karbouj2026`. [Local PDF](../../../data/writing-reference/literature-pdfs/Karbouj_2026_Adaptive_HRC_Review.pdf) · [Public PDF](https://publica-rest.fraunhofer.de/server/api/core/bitstreams/e60c03db-8192-404a-a885-43c61307f554/content). Version: Published journal PDF.
+[Local PDF](../../../data/writing-reference/literature-pdfs/Karbouj_2026_Adaptive_HRC_Review.pdf) · [Public PDF](https://publica-rest.fraunhofer.de/server/api/core/bitstreams/e60c03db-8192-404a-a885-43c61307f554/content). Version: Published journal PDF. SHA-256: `1be2b373a6284c3882787ca2e8866a6d013eac3ac52522fcb3e8f330cb60ff1f`.
 
-**Where our paper uses it**
+**Current manuscript text**
 
-- **1. Introduction** — [Markdown line 17](../manuscript.md#L17); [LaTeX line 50](../main.tex#L50). Evidence: K1, K2.
-  > A recent review distinguishes adaptation of robot motion from task-level decisions about timing, sequencing, and role allocation [7].
+- **1. Introduction**, [Markdown line 17](../manuscript.md#L17); [LaTeX line 50](../main.tex#L50). Evidence: K1, K2.
+> A recent review distinguishes adaptation of robot motion from task-level decisions about timing, sequencing, and role allocation [7].
 
-- **2.1. Assistance timing and proactive coordination** — [Markdown line 39](../manuscript.md#L39); [LaTeX line 74](../main.tex#L74). Evidence: K1, K2.
-  > Karbouj et al.'s review of adaptive industrial HRC distinguishes motion, task, and control adaptations and identifies task-level timing and coordination as areas warranting further attention [7].
+- **2.1. Assistance timing and proactive coordination**, [Markdown line 40](../manuscript.md#L40); [LaTeX line 75](../main.tex#L75). Evidence: K1, K2.
+> Karbouj et al.'s review of adaptive industrial HRC distinguishes motion, task, and control adaptations and identifies task-level timing and coordination as areas warranting further attention [7].
 
 **Supporting PDF text**
 
-- **K1 — [PDF p. 21](https://publica-rest.fraunhofer.de/server/api/core/bitstreams/e60c03db-8192-404a-a885-43c61307f554/content#page=21)**
-  > three-layer taxonomy
+- **K1, [PDF page 21](https://publica-rest.fraunhofer.de/server/api/core/bitstreams/e60c03db-8192-404a-a885-43c61307f554/content#page=21)**
+> three-layer taxonomy
 
-  The discussion identifies motion, task and control layers and contrasts how much adaptation research concentrates on each.
+The discussion identifies motion, task and control layers and contrasts how much adaptation research concentrates on each.
 
-- **K2 — [PDF p. 21](https://publica-rest.fraunhofer.de/server/api/core/bitstreams/e60c03db-8192-404a-a885-43c61307f554/content#page=21)**
-  > relative under-representation of task-dependent adaptation
+- **K2, [PDF page 21](https://publica-rest.fraunhofer.de/server/api/core/bitstreams/e60c03db-8192-404a-a885-43c61307f554/content#page=21)**
+> relative under-representation of task-dependent adaptation
 
-  The surrounding passage names timing/synchronization, sequencing and role allocation, and discusses resulting coordination costs.
+The surrounding passage names timing/synchronization, sequencing and role allocation, and discusses resulting coordination costs.
 
 **Interpretation limit:** This supports the taxonomy and the review authors’ emphasis. It does not establish that no earlier study made our particular comparison. First publication was December 2025; the issue/volume is 2026.
 
+
 <a id="ref-8"></a>
-### [8] Korivand et al. — Physiological analysis and Q-learning
+## [8] korivand2024
 
-Key: `korivand2024`. [Local PDF](../../../data/writing-reference/literature-pdfs/Korivand_2024_Physiological_Task_Load_Adjustment.pdf) · [Public PDF](https://mdpi-res.com/d_attachment/sensors/sensors-24-02817/article_deploy/sensors-24-02817.pdf). Version: Published journal PDF.
+[Local PDF](../../../data/writing-reference/literature-pdfs/Korivand_2024_Physiological_Task_Load_Adjustment.pdf) · [Public PDF](https://mdpi-res.com/d_attachment/sensors/sensors-24-02817/article_deploy/sensors-24-02817.pdf). Version: Published journal PDF. SHA-256: `bf037163b4237a6767b83e2f3ae849df806cf78bd9fcb33dc5c01463ede5c5ac`.
 
-**Where our paper uses it**
+**Current manuscript text**
 
-- **2.2. Physiological information in assistance** — [Markdown line 47](../manuscript.md#L47); [LaTeX line 82](../main.tex#L82). Evidence: KO1, KO2, KO3.
-  > Korivand et al. develop physiological task-load prediction and Q-learning-based adjustment, while explicitly reporting that their recorded wristband data could not be integrated directly for real-time use [8].
+- **2.2. Physiological information in assistance**, [Markdown line 48](../manuscript.md#L48); [LaTeX line 83](../main.tex#L83). Evidence: KO1, KO2, KO3.
+> Korivand et al. develop physiological task-load prediction and Q-learning-based adjustment, while explicitly reporting that their recorded wristband data could not be integrated directly for real-time use [8].
 
 **Supporting PDF text**
 
-- **KO1 — [PDF p. 8](https://mdpi-res.com/d_attachment/sensors/sensors-24-02817/article_deploy/sensors-24-02817.pdf#page=8)**
-  > NASA TLX questionnaire
+- **KO1, [PDF page 8](https://mdpi-res.com/d_attachment/sensors/sensors-24-02817/article_deploy/sensors-24-02817.pdf#page=8)**
+> NASA TLX questionnaire
 
-  Data collection uses two robot-speed scenarios, wristband recordings and post-task workload ratings; the preprocessing section describes the physiological records.
+Data collection uses two robot-speed scenarios, wristband recordings and post-task workload ratings; the preprocessing section describes the physiological records.
 
-- **KO2 — [PDF p. 15](https://mdpi-res.com/d_attachment/sensors/sensors-24-02817/article_deploy/sensors-24-02817.pdf#page=15)**
-  > primary adjustable parameter
+- **KO2, [PDF page 15](https://mdpi-res.com/d_attachment/sensors/sensors-24-02817/article_deploy/sensors-24-02817.pdf#page=15)**
+> primary adjustable parameter
 
-  In §5.5 this parameter is robot speed; the section describes physiological prediction followed by Q-learning-based task-load adjustment.
+In §5.5 this parameter is robot speed; the section describes physiological prediction followed by Q-learning-based task-load adjustment.
 
-- **KO3 — [PDF p. 18](https://mdpi-res.com/d_attachment/sensors/sensors-24-02817/article_deploy/sensors-24-02817.pdf#page=18)**
-  > cannot transmit data in real time but only after recording is complete
+- **KO3, [PDF page 18](https://mdpi-res.com/d_attachment/sensors/sensors-24-02817/article_deploy/sensors-24-02817.pdf#page=18)**
+> cannot transmit data in real time but only after recording is complete
 
-  The limitations paragraph explicitly explains why the collected wristband data could not be directly integrated for live application.
+The limitations paragraph explicitly explains why the collected wristband data could not be directly integrated for live application.
 
 **Interpretation limit:** The limitation qualifies the implemented evidence. The framework should not be presented as a demonstrated end-to-end real-time wrist-triggered deployment.
 
+
 <a id="ref-9"></a>
-### [9] Melo et al. — SensCogAR
+## [9] melo2026
 
-Key: `melo2026`. [Local PDF](../../../data/writing-reference/literature-pdfs/SensCogAR_2026_Tangram_Assembly.pdf) · [Public PDF](https://www.jstage.jst.go.jp/article/ijabc/2026/1/2026_147/_pdf). Version: Published journal PDF.
+[Local PDF](../../../data/writing-reference/literature-pdfs/SensCogAR_2026_Tangram_Assembly.pdf) · [Public PDF](https://www.jstage.jst.go.jp/article/ijabc/2026/1/2026_147/_pdf). Version: Published journal PDF. SHA-256: `5b69b42bfc1ab01cdb69d55dc377a2b3eabad142685c61c5ff55f69a07103774`.
 
-**Where our paper uses it**
+**Current manuscript text**
 
-- **1. Introduction** — [Markdown line 21](../manuscript.md#L21); [LaTeX line 54](../main.tex#L54). Evidence: M1.
-  > Recent work uses tangrams for collaborative HRI and as a simplified assembly task [12, 9].
+- **1. Introduction**, [Markdown line 21](../manuscript.md#L21); [LaTeX line 54](../main.tex#L54). Evidence: M1.
+> Recent work uses tangrams for collaborative HRI and as a simplified assembly task [15, 9].
 
-- **2.3. Physical tasks and participant experience** — [Markdown line 53](../manuscript.md#L53); [LaTeX line 88](../main.tex#L88). Evidence: M1, M2.
-  > SensCogAR uses tangrams as a proxy for small-object assembly, manipulating the visibility of piece contours to vary task demand [9].
+- **2.3. Physical tasks and participant experience**, [Markdown line 56](../manuscript.md#L56); [LaTeX line 91](../main.tex#L91). Evidence: M1, M2.
+> SensCogAR uses tangrams as a proxy for small-object assembly, manipulating the visibility of piece contours to vary task demand [9].
 
 **Supporting PDF text**
 
-- **M1 — [PDF p. 8](https://www.jstage.jst.go.jp/article/ijabc/2026/1/2026_147/_pdf#page=8)**
-  > Tangram puzzles as proxies for manual assembly tasks
+- **M1, [PDF page 8](https://www.jstage.jst.go.jp/article/ijabc/2026/1/2026_147/_pdf#page=8)**
+> Tangram puzzles as proxies for manual assembly tasks
 
-  §4.2 explains that participants manipulate similarly sized geometric objects to match a reference image; this supports the assembly-proxy half of the joint introduction citation.
+§4.2 explains that participants manipulate similarly sized geometric objects to match a reference image; this supports the assembly-proxy half of the joint introduction citation.
 
-- **M2 — [PDF p. 8](https://www.jstage.jst.go.jp/article/ijabc/2026/1/2026_147/_pdf#page=8)**
-  > visibility of piece contours
+- **M2, [PDF page 8](https://www.jstage.jst.go.jp/article/ijabc/2026/1/2026_147/_pdf#page=8)**
+> visibility of piece contours
 
-  The following paragraph distinguishes fully visible contours in low-difficulty puzzles from partly obscured contours in high-difficulty puzzles.
+The following paragraph distinguishes fully visible contours in low-difficulty puzzles from partly obscured contours in high-difficulty puzzles.
 
 **Interpretation limit:** Task rationale transfers at the level of spatial manipulation. Neither the validity of all nine current puzzles nor generalization to industrial assembly follows automatically. PDF p. 15 discusses task/context limitations.
 
+
 <a id="ref-10"></a>
-### [10] Ojsteršek et al. — Personalized human–robot workplace
+## [10] ojstersek2024
 
-Key: `ojstersek2024`. [Local PDF](../../../data/writing-reference/literature-pdfs/Ojstersek_2024_Personalizing_Workplace.pdf) · [Public PDF](https://mdpi-res.com/d_attachment/machines/machines-12-00546/article_deploy/machines-12-00546.pdf). Version: Published journal PDF.
+[Local PDF](../../../data/writing-reference/literature-pdfs/Ojstersek_2024_Personalizing_Workplace.pdf) · [Public PDF](https://mdpi-res.com/d_attachment/machines/machines-12-00546/article_deploy/machines-12-00546.pdf). Version: Published journal PDF. SHA-256: `42cf6546c0888db4c975c08a3fd98472db60c755a3d235a90e330f246987a254`.
 
-**Where our paper uses it**
+**Current manuscript text**
 
-- **2.2. Physiological information in assistance** — [Markdown line 47](../manuscript.md#L47); [LaTeX line 82](../main.tex#L82). Evidence: O1, O2.
-  > Ojsteršek et al. personalize robot parameters using a preliminary skills test and analyze ECG recordings after the experiment [10].
+- **2.2. Physiological information in assistance**, [Markdown line 48](../manuscript.md#L48); [LaTeX line 83](../main.tex#L83). Evidence: O1, O2.
+> Ojsteršek et al. personalize robot parameters using a preliminary skills test and analyze ECG recordings after the experiment [10].
 
 **Supporting PDF text**
 
-- **O1 — [PDF p. 3](https://mdpi-res.com/d_attachment/machines/machines-12-00546/article_deploy/machines-12-00546.pdf#page=3)**
-  > Participants began with a skills test
+- **O1, [PDF page 3](https://mdpi-res.com/d_attachment/machines/machines-12-00546/article_deploy/machines-12-00546.pdf#page=3)**
+> Participants began with a skills test
 
-  The experimental sequence uses that test to adjust robot movement parameters to worker utilization before the three scenarios.
+The experimental sequence uses that test to adjust robot movement parameters to worker utilization before the three scenarios.
 
-- **O2 — [PDF p. 4](https://mdpi-res.com/d_attachment/machines/machines-12-00546/article_deploy/machines-12-00546.pdf#page=4)**
-  > At the end of the experiment
+- **O2, [PDF page 4](https://mdpi-res.com/d_attachment/machines/machines-12-00546/article_deploy/machines-12-00546.pdf#page=4)**
+> At the end of the experiment
 
-  The measurement paragraph says ECG data were transferred to KUBIOS HRV Scientific for subsequent analysis. The same paragraph identifies the ECG hardware and electrodes.
+The measurement paragraph says ECG data were transferred to KUBIOS HRV Scientific for subsequent analysis. The same paragraph identifies the ECG hardware and electrodes.
 
 **Interpretation limit:** Personalization and physiological measurement both occur, but the described ECG analysis is not the real-time control input. The PDF extraction repeats some layout text; locators refer to the actual PDF page.
 
+
 <a id="ref-11"></a>
-### [11] Pereira et al. — Physiological workload review
+## [11] pereira2025
 
-Key: `pereira2025`. [Local PDF](../../../data/writing-reference/literature-pdfs/Pereira_2025_Workload_Sensors_Review.pdf) · [Public PDF](https://mdpi-res.com/d_attachment/applsci/applsci-15-03317/article_deploy/applsci-15-03317.pdf). Version: Published journal PDF.
+[Local PDF](../../../data/writing-reference/literature-pdfs/Pereira_2025_Workload_Sensors_Review.pdf) · [Public PDF](https://mdpi-res.com/d_attachment/applsci/applsci-15-03317/article_deploy/applsci-15-03317.pdf). Version: Published journal PDF. SHA-256: `40c2fea287bf724e4dacbcfd03096cc0d4dcfd9c2c448a5535483544928f7633`.
 
-**Where our paper uses it**
+**Current manuscript text**
 
-- **2.2. Physiological information in assistance** — [Markdown line 49](../manuscript.md#L49); [LaTeX line 84](../main.tex#L84). Evidence: PE1, PE2.
-  > Pereira et al.'s review documents heterogeneous workload measures and mixed cardiac findings across HRC studies [11].
+- **2.2. Physiological information in assistance**, [Markdown line 52](../manuscript.md#L52); [LaTeX line 87](../main.tex#L87). Evidence: PE1, PE2.
+> Pereira et al.'s review documents heterogeneous workload measures and mixed cardiac findings across HRC studies [11].
 
 **Supporting PDF text**
 
-- **PE1 — [PDF p. 14](https://mdpi-res.com/d_attachment/applsci/applsci-15-03317/article_deploy/applsci-15-03317.pdf#page=14)**
-  > relationship with task complexity and robotic assistance remains unclear
+- **PE1, [PDF page 14](https://mdpi-res.com/d_attachment/applsci/applsci-15-03317/article_deploy/applsci-15-03317.pdf#page=14)**
+> relationship with task complexity and robotic assistance remains unclear
 
-  The cardiac-measures synthesis contrasts studies with nonsignificant HRV differences and studies with condition-specific RMSSD differences.
+The cardiac-measures synthesis contrasts studies with nonsignificant HRV differences and studies with condition-specific RMSSD differences.
 
-- **PE2 — [PDF p. 18](https://mdpi-res.com/d_attachment/applsci/applsci-15-03317/article_deploy/applsci-15-03317.pdf#page=18)**
-  > challenging to compare among the different studies
+- **PE2, [PDF page 18](https://mdpi-res.com/d_attachment/applsci/applsci-15-03317/article_deploy/applsci-15-03317.pdf#page=18)**
+> challenging to compare among the different studies
 
-  The discussion describes variation in workload measures, tasks, environments and interacting variables.
+The discussion describes variation in workload measures, tasks, environments and interacting variables.
 
 **Interpretation limit:** We cite the review’s synthesis, not independently verified findings from every study it includes. It supplies no validation for our specific sensor, threshold or task.
 
+
 <a id="ref-12"></a>
-### [12] Tabatabaei et al. — Gazing at Failure
+## [12] quigley2024
 
-Key: `tabatabaei2025`. [Local PDF](../../../data/writing-reference/literature-pdfs/Tabatabaei_2025_Gazing_at_Failure.pdf) · [Public PDF](https://arxiv.org/pdf/2502.16899). Version: arXiv v1; accepted HRI full paper.
+[Local PDF](../../../data/writing-reference/literature-pdfs/Quigley_2024_Cardiac_Guidelines.pdf) · [Public PDF](https://knowledge.uchicago.edu/records/fnp5p-m0q24/files/Publication-guidelines-for-human-heart-rate-and-heart-rate-variability-studies-in-psychophysiology.pdf?download=1). Version: Published open-access committee report; university repository PDF. SHA-256: `de52a210ed198f1a14b069b052fee813cc313b1fe87bf526ebd447ed5d57a27e`.
 
-**Where our paper uses it**
+**Current manuscript text**
 
-- **1. Introduction** — [Markdown line 21](../manuscript.md#L21); [LaTeX line 54](../main.tex#L54). Evidence: T1.
-  > Recent work uses tangrams for collaborative HRI and as a simplified assembly task [12, 9].
+- **2.2. Physiological information in assistance**, [Markdown line 52](../manuscript.md#L52); [LaTeX line 87](../main.tex#L87). Evidence: Q1, Q2, Q3.
+> Cardiac measurement guidelines distinguish heart rate from beat-to-beat variability and emphasize signal quality and the influence of physical activity on wearable measurements [12]
 
-- **2.3. Physical tasks and participant experience** — [Markdown line 53](../manuscript.md#L53); [LaTeX line 88](../main.tex#L88). Evidence: T1, T2.
-  > Tabatabaei et al. study gaze around robot failures during collaborative tangram solving [12].
+- **6.2. Assistance timing and physiological feedback**, [Markdown line 230](../manuscript.md#L230); [LaTeX line 301](../main.tex#L301). Evidence: Q2, Q3.
+> Wearable cardiac signals can be affected by movement and sensor contact [12]
 
 **Supporting PDF text**
 
-- **T1 — [PDF p. 3](https://arxiv.org/pdf/2502.16899#page=3)**
-  > one participant and a robot collaboratively solve Tangram puzzles
+- **Q1, [PDF page 12](https://knowledge.uchicago.edu/records/fnp5p-m0q24/files/Publication-guidelines-for-human-heart-rate-and-heart-rate-variability-studies-in-psychophysiology.pdf?download=1#page=12)**
+> variability in the timing of consecutive beats
 
-  §III.A describes seven physical pieces, a division of pieces between robot and participant, and 3D-printed task materials. This supports the collaborative-HRI half of the joint citation.
+HRV is variability in successive heart periods, distinct from a change in median HR across time windows.
 
-- **T2 — [PDF p. 1](https://arxiv.org/pdf/2502.16899#page=1)**
-  > human gaze dynamics can signal a robot’s failure
+- **Q2, [PDF page 8](https://knowledge.uchicago.edu/records/fnp5p-m0q24/files/Publication-guidelines-for-human-heart-rate-and-heart-rate-variability-studies-in-psychophysiology.pdf?download=1#page=8)**
+> movement and physical activity
 
-  The abstract defines the gaze/failure question and describes programmed executional and decisional robot failures; the methods describe the task and failure manipulations.
+The PPG discussion identifies stronger noise during physical activity.
+
+- **Q3, [PDF page 9](https://knowledge.uchicago.edu/records/fnp5p-m0q24/files/Publication-guidelines-for-human-heart-rate-and-heart-rate-variability-studies-in-psychophysiology.pdf?download=1#page=9)**
+> poor electrode contact
+
+The preprocessing discussion identifies contact-related artifacts; the preceding PPG discussion also addresses skin pressure and waveform changes.
+
+**Interpretation limit:** Measurement guidance supports distinguishing HR from HRV and attending to artifacts. It does not validate this device, the three-minute baseline, the 15/60-second windows, the 5-bpm threshold, or inference of frustration from a flag.
+
+
+<a id="ref-13"></a>
+## [13] shukla2026
+
+[Local PDF](../../../data/writing-reference/literature-pdfs/GuideAI_2026.pdf) · [Public PDF](https://arxiv.org/pdf/2601.20402v1). Version: IUI 2026 accepted-paper preprint, arXiv v1. SHA-256: `688c0e9037f80b1723d3a1ba2e77db59d50e289fcee002fa438caa87c726b263`.
+
+**Current manuscript text**
+
+- **2.2. Physiological information in assistance**, [Markdown line 50](../manuscript.md#L50); [LaTeX line 85](../main.tex#L85). Evidence: G1, G2, G3.
+> GuideAI combines cardiac, gaze, and behavioral information to adapt learning content, pacing, and feedback [13]
+
+**Supporting PDF text**
+
+- **G1, [PDF page 6](https://arxiv.org/pdf/2601.20402v1#page=6)**
+> pNN50, RMSSD, and SDNN
+
+The cardiac processor describes interval-derived HRV features.
+
+- **G2, [PDF page 6](https://arxiv.org/pdf/2601.20402v1#page=6)**
+> posture analysis and note-taking behavior
+
+The vision pipeline captures behavior; this page also describes gaze processing.
+
+- **G3, [PDF page 9](https://arxiv.org/pdf/2601.20402v1#page=9)**
+> content, pacing, and tone
+
+The intervention condition dynamically adapts the learning content, pacing, and tone using multimodal analysis.
+
+**Interpretation limit:** A learning system combining multiple signals, not a robotic-assistance timing experiment. Its baseline/threshold text has inconsistencies and it uses interval-derived HRV; neither is imported as validation of our HR-rise detector. Its reported statistical method is not adopted.
+
+
+<a id="ref-14"></a>
+## [14] smit2024
+
+[Local PDF](../../../data/writing-reference/literature-pdfs/Smit_2024_Order_Picking.pdf) · [Public PDF](https://arxiv.org/pdf/2404.08006v1). Version: arXiv v1 preprint; final journal venue not verified or asserted. SHA-256: `ce8836a4336b385262089d53110470ebaa6f1c47a1fc48a213ac39c16d07c563`.
+
+**Current manuscript text**
+
+- **2.3. Physical tasks and participant experience**, [Markdown line 58](../manuscript.md#L58); [LaTeX line 93](../main.tex#L93). Evidence: S1, S2.
+> In supply-chain operations, Smit et al. model collaborative human-robot order picking and jointly optimize picking efficiency and workload fairness through simulation [14]
+
+- **6.3. Limitations and future work**, [Markdown line 242](../manuscript.md#L242); [LaTeX line 313](../main.tex#L313). Evidence: S1, S2.
+> human-robot order-picking research examines efficiency alongside workload fairness [14]
+
+**Supporting PDF text**
+
+- **S1, [PDF page 6](https://arxiv.org/pdf/2404.08006v1#page=6)**
+> standard deviation of the workloads of all pickers
+
+The method defines picker workload as total lifted product mass and fairness as its standard deviation across pickers, distinct from subjective workload.
+
+- **S2, [PDF page 8](https://arxiv.org/pdf/2404.08006v1#page=8)**
+> discrete-event simulation model
+
+The methods build a collaborative-picking simulation using grocery-distribution-center data with stochastic pick times, movement and disruptions.
+
+**Interpretation limit:** Simulation of allocation policies, not a human experiment demonstrating tangram-to-supply-chain transfer. Workload fairness is distribution of picking burden, not NASA-TLX or physiological arousal.
+
+
+<a id="ref-15"></a>
+## [15] tabatabaei2025
+
+[Local PDF](../../../data/writing-reference/literature-pdfs/Tabatabaei_2025_Gazing_at_Failure.pdf) · [Public PDF](https://arxiv.org/pdf/2502.16899). Version: arXiv v1; accepted HRI full paper. SHA-256: `fae5c6acd3e1f7a5ea97f8cfe11ff2edbe5e9c8145a7112f900e922128deabad`.
+
+**Current manuscript text**
+
+- **1. Introduction**, [Markdown line 21](../manuscript.md#L21); [LaTeX line 54](../main.tex#L54). Evidence: T1.
+> Recent work uses tangrams for collaborative HRI and as a simplified assembly task [15, 9].
+
+- **2.3. Physical tasks and participant experience**, [Markdown line 56](../manuscript.md#L56); [LaTeX line 91](../main.tex#L91). Evidence: T1, T2.
+> Tabatabaei et al. study gaze around robot failures during collaborative tangram solving [15].
+
+**Supporting PDF text**
+
+- **T1, [PDF page 3](https://arxiv.org/pdf/2502.16899#page=3)**
+> one participant and a robot collaboratively solve Tangram puzzles
+
+§III.A describes seven physical pieces, a division of pieces between robot and participant, and 3D-printed task materials. This supports the collaborative-HRI half of the joint citation.
+
+- **T2, [PDF page 1](https://arxiv.org/pdf/2502.16899#page=1)**
+> human gaze dynamics can signal a robot’s failure
+
+The abstract defines the gaze/failure question and describes programmed executional and decisional robot failures; the methods describe the task and failure manipulations.
 
 **Interpretation limit:** This is a gaze-and-failure study, not a test of physiological or scheduled help. The local version is arXiv v1 of the accepted HRI paper, so its PDF page numbers differ from proceedings pagination.
 
-<a id="ref-13"></a>
-### [13] Teo et al. — Closed-loop human–robot teaming
 
-Key: `teo2018`. [Local PDF](../../../data/writing-reference/literature-pdfs/Teo_2018_Closed_Loop_Teaming.pdf) · [Public PDF](https://sciences.ucf.edu/psychology/perl/wp-content/uploads/sites/29/2019/08/Enhancing-the-effectiveness-of-human-robot-teaming-with-a-closed-loop-system..pdf). Version: Published version from university research-group website; journal issue 2018; online 2017.
+<a id="ref-16"></a>
+## [16] teo2018
 
-**Where our paper uses it**
+[Local PDF](../../../data/writing-reference/literature-pdfs/Teo_2018_Closed_Loop_Teaming.pdf) · [Public PDF](https://sciences.ucf.edu/psychology/perl/wp-content/uploads/sites/29/2019/08/Enhancing-the-effectiveness-of-human-robot-teaming-with-a-closed-loop-system..pdf). Version: Published version from university research-group website; journal issue 2018; online 2017. SHA-256: `10f208bb988e4c04ff649dfb609b77fc08622c804406d29830fbdc57075bd726`.
 
-- **2.2. Physiological information in assistance** — [Markdown line 45](../manuscript.md#L45); [LaTeX line 80](../main.tex#L80). Evidence: TE1, TE2.
-  > Earlier work by Teo et al. uses individualized physiological workload markers to trigger aid during robot supervision, imposing aid later when it has not been triggered [13].
+**Current manuscript text**
+
+- **2.2. Physiological information in assistance**, [Markdown line 46](../manuscript.md#L46); [LaTeX line 81](../main.tex#L81). Evidence: TE1, TE2.
+> Earlier work by Teo et al. uses individualized physiological workload markers to trigger aid during robot supervision, imposing aid later when it has not been triggered [16].
 
 **Supporting PDF text**
 
-- **TE1 — [PDF p. 6](https://sciences.ucf.edu/psychology/perl/wp-content/uploads/sites/29/2019/08/Enhancing-the-effectiveness-of-human-robot-teaming-with-a-closed-loop-system..pdf#page=6)**
-  > individual's own set of physiological workload markers
+- **TE1, [PDF page 6](https://sciences.ucf.edu/psychology/perl/wp-content/uploads/sites/29/2019/08/Enhancing-the-effectiveness-of-human-robot-teaming-with-a-closed-loop-system..pdf#page=6)**
+> individual's own set of physiological workload markers
 
-  §2.4 constructs markers from individual single-/dual-task baselines, compares the workload index to a threshold, and requires repeated high samples before triggering assistance.
+§2.4 constructs markers from individual single-/dual-task baselines, compares the workload index to a threshold, and requires repeated high samples before triggering assistance.
 
-- **TE2 — [PDF p. 4](https://sciences.ucf.edu/psychology/perl/wp-content/uploads/sites/29/2019/08/Enhancing-the-effectiveness-of-human-robot-teaming-with-a-closed-loop-system..pdf#page=4)**
-  > aid was imposed by the system for the last 5 min
+- **TE2, [PDF page 4](https://sciences.ucf.edu/psychology/perl/wp-content/uploads/sites/29/2019/08/Enhancing-the-effectiveness-of-human-robot-teaming-with-a-closed-loop-system..pdf#page=4)**
+> aid was imposed by the system for the last 5 min
 
-  The experimental design allows a trigger during the first ten minutes; if none occurs, aid is imposed during the last five minutes.
+The experimental design allows a trigger during the first ten minutes; if none occurs, aid is imposed during the last five minutes.
 
 **Interpretation limit:** The study uses personalized multimeasure workload logic in robot supervision. It does not establish our heart-rate-rise threshold or identical assistance mechanics. Online publication was 2017; journal issue 2018.
 
-<a id="ref-14"></a>
-### [14] Thunberg et al. — Experiences of Wizards of Oz
 
-Key: `thunberg2026`. [Local PDF](../../../data/writing-reference/literature-pdfs/Thunberg_2026_Wizards.pdf) · [Public PDF](https://repositum.tuwien.at/bitstream/20.500.12708/227993/1/Thunberg-2026-Unpacking%20Lived%20Experiences%20of%20Wizards%20of%20Oz-vor.pdf). Version: Published HRI Companion workshop proposal.
+<a id="ref-17"></a>
+## [17] thunberg2026
 
-**Where our paper uses it**
+[Local PDF](../../../data/writing-reference/literature-pdfs/Thunberg_2026_Wizards.pdf) · [Public PDF](https://repositum.tuwien.at/bitstream/20.500.12708/227993/1/Thunberg-2026-Unpacking%20Lived%20Experiences%20of%20Wizards%20of%20Oz-vor.pdf). Version: Published HRI Companion workshop proposal. SHA-256: `b9938463ba167c2612cec07061ff1f8b35d4fbfec783ef1891ed7025d3a4adb5`.
 
-- **2.4. Wizard-of-Oz evaluation** — [Markdown line 59](../manuscript.md#L59); [LaTeX line 94](../main.tex#L94). Evidence: TH1.
-  > A recent HRI workshop proposal by Thunberg et al. emphasizes the practical, ethical, and methodological tensions of the wizard's role [14].
+**Current manuscript text**
+
+- **2.4. Wizard-of-Oz evaluation**, [Markdown line 64](../manuscript.md#L64); [LaTeX line 99](../main.tex#L99). Evidence: TH1.
+> A recent HRI workshop proposal by Thunberg et al. emphasizes the practical, ethical, and methodological tensions of the wizard's role [17].
 
 **Supporting PDF text**
 
-- **TH1 — [PDF p. 1](https://repositum.tuwien.at/bitstream/20.500.12708/227993/1/Thunberg-2026-Unpacking%20Lived%20Experiences%20of%20Wizards%20of%20Oz-vor.pdf#page=1)**
-  > ethical, practical, methodological, personal, and philosophical tensions
+- **TH1, [PDF page 1](https://repositum.tuwien.at/bitstream/20.500.12708/227993/1/Thunberg-2026-Unpacking%20Lived%20Experiences%20of%20Wizards%20of%20Oz-vor.pdf#page=1)**
+> ethical, practical, methodological, personal, and philosophical tensions
 
-  The abstract says surfacing these tensions is the workshop’s goal; the subsequent three-page proposal lays out its agenda and planned elicitation of wizard experiences.
+The abstract says surfacing these tensions is the workshop’s goal; the subsequent three-page proposal lays out its agenda and planned elicitation of wizard experiences.
 
 **Interpretation limit:** Supports identifying a methodological concern and research agenda. It is explicitly a workshop proposal, not completed empirical evidence or a validated operator protocol.
 
-<a id="ref-15"></a>
-### [15] Yang et al. — Workload-adaptive surgical suction
 
-Key: `yang2024`. [Local PDF](../../../data/writing-reference/literature-pdfs/Yang_2024_Adaptive_Surgical_Assistance.pdf) · [Public PDF](https://scholarworks.indianapolis.iu.edu/bitstreams/5eb42ad8-e6eb-4495-9c1d-f520e3877a06/download). Version: Author manuscript; published Human Factors 66(4), 1081–1102 (2024); first online 2022-11-11.
+<a id="ref-18"></a>
+## [18] wei2025
 
-**Where our paper uses it**
+[Local PDF](../../../data/writing-reference/literature-pdfs/Shimomura_2025_Surgical_Workload.pdf) · [Public PDF](https://www.frontiersin.org/journals/human-neuroscience/articles/10.3389/fnhum.2025.1611524/pdf). Version: Published Frontiers article, 18 June 2025; local filename names the corresponding author, first author is Wei. SHA-256: `d26df27fd47600204c820ba9480a9089bd6bca8e8543130b84eb6d27cdee591f`.
 
-- **1. Introduction** — [Markdown line 19](../manuscript.md#L19); [LaTeX line 52](../main.tex#L52). Evidence: Y1, Y2, Y3.
-  > Yang et al. compared workload-adaptive robotic suction with periodic support during surgical training [15].
+**Current manuscript text**
 
-- **2.2. Physiological information in assistance** — [Markdown line 45](../manuscript.md#L45); [LaTeX line 80](../main.tex#L80). Evidence: Y1, Y2, Y3.
-  > Yang et al.'s surgical system uses EEG and eye tracking to inform adaptive suction, with a periodic comparator selected to approximate earlier observed assistance frequency [15].
+- **2.2. Physiological information in assistance**, [Markdown line 50](../manuscript.md#L50); [LaTeX line 85](../main.tex#L85). Evidence: W1, W2, W3.
+> In a single-surgeon simulation study, Wei et al. identify subjective workload and mean heart rate among the influential features in a task-performance prediction model [18]
 
 **Supporting PDF text**
 
-- **Y1 — [PDF p. 8](https://scholarworks.indianapolis.iu.edu/bitstreams/5eb42ad8-e6eb-4495-9c1d-f520e3877a06/download#page=8)**
-  > EEG and eye-tracking data were synchronized
+- **W1, [PDF page 1](https://www.frontiersin.org/journals/human-neuroscience/articles/10.3389/fnhum.2025.1611524/pdf#page=1)**
+> A single expert surgeon
 
-  Experiment 2’s algorithm description combines the physiological/eye-tracking streams in the workload-adaptive suction system and evaluates it with surgical trainees.
+The study concerns repeated simulation tasks performed by one expert surgeon.
 
-- **Y2 — [PDF p. 9](https://scholarworks.indianapolis.iu.edu/bitstreams/5eb42ad8-e6eb-4495-9c1d-f520e3877a06/download#page=9)**
-  > two conditions as follows
+- **W2, [PDF page 5](https://www.frontiersin.org/journals/human-neuroscience/articles/10.3389/fnhum.2025.1611524/pdf#page=5)**
+> NASA-TLX and SURG-TLX
 
-  The experimental design explicitly contrasts workload-adaptive automation with periodic automation that does not consider current workload.
+The feature-importance analysis ranks subjective workload highly.
 
-- **Y3 — [PDF p. 9](https://scholarworks.indianapolis.iu.edu/bitstreams/5eb42ad8-e6eb-4495-9c1d-f520e3877a06/download#page=9)**
-  > activated every 150 seconds
+- **W3, [PDF page 5](https://www.frontiersin.org/journals/human-neuroscience/articles/10.3389/fnhum.2025.1611524/pdf#page=5)**
+> mean HR
 
-  The next sentences explain that the periodic interval was estimated from prior observed suction frequency under the adaptive system.
+Mean HR is discussed as an influential autonomic feature in the prediction model; the same passage cautions against causal interpretation.
+
+**Interpretation limit:** One expert surgeon and model-derived associations. Does not establish causation, population-wide prediction, assistance timing effectiveness, or validation of a heart-rate-rise trigger. SDHR is explicitly cautioned as an inadequate HRV proxy on p.5.
+
+
+<a id="ref-19"></a>
+## [19] yang2024
+
+[Local PDF](../../../data/writing-reference/literature-pdfs/Yang_2024_Adaptive_Surgical_Assistance.pdf) · [Public PDF](https://scholarworks.indianapolis.iu.edu/bitstreams/5eb42ad8-e6eb-4495-9c1d-f520e3877a06/download). Version: Author manuscript; published Human Factors 66(4), 1081–1102 (2024); first online 2022-11-11. SHA-256: `f6d37101df4cb79a3e5551f7db8739184d87ed581d3b4be2f6582cd4fb31186a`.
+
+**Current manuscript text**
+
+- **1. Introduction**, [Markdown line 19](../manuscript.md#L19); [LaTeX line 52](../main.tex#L52). Evidence: Y1, Y2, Y3.
+> Yang et al. compared workload-adaptive robotic suction with periodic support during surgical training [19].
+
+- **2.2. Physiological information in assistance**, [Markdown line 46](../manuscript.md#L46); [LaTeX line 81](../main.tex#L81). Evidence: Y1, Y2, Y3.
+> Yang et al.'s surgical system uses EEG and eye tracking to inform adaptive suction, with a periodic comparator selected to approximate earlier observed assistance frequency [19].
+
+**Supporting PDF text**
+
+- **Y1, [PDF page 8](https://scholarworks.indianapolis.iu.edu/bitstreams/5eb42ad8-e6eb-4495-9c1d-f520e3877a06/download#page=8)**
+> EEG and eye-tracking data were synchronized
+
+Experiment 2’s algorithm description combines the physiological/eye-tracking streams in the workload-adaptive suction system and evaluates it with surgical trainees.
+
+- **Y2, [PDF page 9](https://scholarworks.indianapolis.iu.edu/bitstreams/5eb42ad8-e6eb-4495-9c1d-f520e3877a06/download#page=9)**
+> two conditions as follows
+
+The experimental design explicitly contrasts workload-adaptive automation with periodic automation that does not consider current workload.
+
+- **Y3, [PDF page 9](https://scholarworks.indianapolis.iu.edu/bitstreams/5eb42ad8-e6eb-4495-9c1d-f520e3877a06/download#page=9)**
+> activated every 150 seconds
+
+The next sentences explain that the periodic interval was estimated from prior observed suction frequency under the adaptive system.
 
 **Interpretation limit:** This is the direct precedent that prevents a claim that the comparison itself is new. “Closest” is our assessment within the reviewed set, not proof from an exhaustive review. Online publication was 2022 despite the 2024 issue; the cached PDF is an author manuscript.
 
-## What this map does not source from the literature
 
-The participant counts, outcome percentages, workload scores and intervention counts in §5 come from our study exports and [analysis summary](../analysis/interim-summary.json), not these papers. Implementation descriptions come from the code and team-supplied protocol information; see [evidence-map.md](../evidence-map.md). The research questions, study-specific interpretation and future comparisons are author synthesis, not findings established by a cited PDF.
+<a id="ref-20"></a>
+## [20] zhao2025
 
-The sources support the cited comparisons and methodological distinctions. They do **not** validate the present 5-bpm threshold, establish a completed N=24 study, supply the pending task-profile survey or photograph scores, or establish significance of our interim findings.
+[Local PDF](../../../data/writing-reference/literature-pdfs/Zhao_2025_MRChaos.pdf) · [Public PDF](https://arxiv.org/pdf/2505.11818v1). Version: ICRA 2025 accepted-paper preprint, arXiv v1. SHA-256: `7a83713f30c553b28b687a26a6aa719168a926fad1726329cc79664e9740bcbd`.
 
-The paper follows the approved 5 October structure; see [the current section-by-section structure](../structure-review.md#current-structure-in-the-compiled-paper).
+**Current manuscript text**
+
+- **2.3. Physical tasks and participant experience**, [Markdown line 56](../manuscript.md#L56); [LaTeX line 91](../main.tex#L91). Evidence: Z1, Z2.
+> MRChaos uses tangrams to investigate robotic reasoning, planning, and manipulation from silhouette targets and extends its assembly approach to cutlery and soda-can arrangements [20]
+
+- **6.3. Limitations and future work**, [Markdown line 242](../manuscript.md#L242); [LaTeX line 313](../main.tex#L313). Evidence: Z1, Z2.
+> MRChaos demonstrates related spatial assembly tasks [20]
+
+**Supporting PDF text**
+
+- **Z1, [PDF page 1](https://arxiv.org/pdf/2505.11818v1#page=1)**
+> reasoning, planning, and manipulation
+
+The abstract and introduction identify robotic spatial reasoning, planning, and physical manipulation from silhouettes.
+
+- **Z2, [PDF page 6](https://arxiv.org/pdf/2505.11818v1#page=6)**
+> cutlery combination and b) soda combination
+
+The extensive-applications section substitutes objects and trains models for new configurations; it does not demonstrate human policy transfer.
+
+**Interpretation limit:** Autonomous robotic assembly with fixed piece sequence; not a human assistance-policy comparison. Cutlery/can experiments involve task-specific training with substituted objects, not unchanged tangram policy transfer, and no supply-chain user experiment.

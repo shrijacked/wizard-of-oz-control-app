@@ -1,5 +1,7 @@
 # Author checks and decisions
 
+Current methods/findings revision: [change log](revisions/2026-10-07-methods-findings/CHANGELOG.md), [highlighted review](revisions/2026-10-07-methods-findings/highlighted-review.html), [frozen pre-change source](revisions/2026-10-07-methods-findings/before/main.tex), [full p-value audit](analysis/ALL_OUTCOMES.md), and [current structure](structure-review.md). §3 is the formative assessment; §4 combines the system and experimental method; §5 contains findings only. Twenty downloaded-PDF-verified references now support 31 source mentions and 49 anchors. Statistics use the observed 12 matched participants, not fabricated N=24 data. All numerical results remain provisional in this internal documentation and must be refreshed from the final export. The original abstract, anonymous format and submission ID 2613 are unchanged.
+
 Updated 7 October 2026. Internal material, excluded from the paper. The earlier version is frozen in the revision baseline.
 
 ## Confirmed scope and metadata
@@ -16,9 +18,9 @@ The planned experimental sample is 24. The new export supports 12 complete parti
 
 §4 now contains the submitted architecture and current setup schematic, operator roles, pickup/drop/assembly arrangement, and concise 15-second/60-second/5-bpm processing. The author confirmed use of this arousal method throughout, repeated assistance and a 15-second wait for rapid/sustained flags. The author confirmed the stated three-minute pre-task baseline procedure on 7 October. The detector identifies an HR-rise cue, not a validated psychological stress label.
 
-§5 now has new participant demographics, all updated tables/ratings, paired-condition workload graphs, constant/adaptive assistance-rating bars and exploratory paired sign-flip tests with specified Holm families. Higher adaptive ratings do not establish a statistically significant adaptive-constant difference. The paper quotes source-checked P101/P103 excerpts about hint clarity, timing and robot contribution, with all quotations italicized. No formal coding or claimed qualitative themes were invented.
+§5 now has the outcome findings, with experimental demographics pending final reconciliation, all updated tables/ratings, paired-condition workload graphs, constant/adaptive assistance-rating bars and exploratory paired sign-flip tests with specified Holm families. Higher adaptive ratings do not establish a statistically significant adaptive-constant difference. The paper quotes source-checked P101/P103 excerpts about hint clarity, timing and robot contribution, with all quotations italicized. No formal coding or claimed qualitative themes were invented.
 
-§6 and the conclusion match the numerical findings, include a verbatim robot-motion comment, and retain direct placement as future work. The AI disclosure remains brief. Literature claims and references are unchanged; the source map has refreshed locations/hashes and verified anchors.
+§6 and the conclusion match the numerical findings, include a verbatim robot-motion comment, and retain direct placement as future work. The AI disclosure remains brief. The expanded current literature claims and references are traced in the refreshed source map.
 
 ## Confirmed protocol and remaining factual checks
 
@@ -56,3 +58,9 @@ The current paper is anonymous, using the original template behavior and submiss
 ## Figure comparison decisions
 
 The former performance plot and within-condition heatmaps are removed; their data remain archived. Six figures remain. Matched cross-condition Spearman correlations use participant averages and average tied ranks; they do not estimate condition effects. Assistance differences use exact adaptive-minus-constant participant values and existing mean/bootstrap intervals. These intervals are unadjusted, unlike the Holm-adjusted p-values; do not use them to claim a corrected significant assisted-policy difference. Existing primary results and working abstract are unchanged.
+
+## Current interpretation and final update
+
+Waiting for help is an author-confirmed researcher observation, not a participant quote or a systematically coded behavioral variable. Its condition distribution and frequency are unknown. Do not claim adaptive-only waiting or a causal relation to frustration. The paired averages show increased adaptive-versus-constant frustration for four participants and decreases for eight; adaptive versus control has two increases and ten decreases. The paper states heterogeneity without imposing a prevalence claim. The original planned N=24 abstract is unchanged.
+
+The analysis now tests all 31 available condition contrasts and six formative rating pairs. Once-per-study final ratings have no condition contrast; no arbitrary midpoint test is invented. Correct-piece scores remain absent. Holm correction is per endpoint and the four-item assistance family; this is exploratory and was not preregistered. A global 31-test Holm sensitivity retains only constant-control completion, both assistance-control overall workload contrasts, and both assistance-control perceived-performance contrasts. Recheck all estimates, coding and families with final data. See analysis/ALL_OUTCOMES.md and method-checks/AAMAS_AI_FIGURE_POLICY.md.

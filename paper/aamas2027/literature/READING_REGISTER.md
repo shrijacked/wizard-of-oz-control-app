@@ -1,5 +1,7 @@
 # Reading register: publication dates and exploration extent
 
+Current expansion: see [7 October downloaded-PDF reading record](NEW_SOURCE_REVIEW_2026-10-07.md) and [current reference text map](REFERENCE_TEXT_MAP.md). The historical counts below describe the 5 October review. Five additional sources are now cited; AdaptAI was read only for presentation.
+
 Prepared 5 October 2026. This targeted exploration includes **18 actively examined papers and 22 discovery-only leads**. Fourteen PDFs were downloaded and their relevant text reviewed; one paper was read through publisher HTML, one was selectively used online for reference tracing, and two were checked at abstract/metadata level. Only the 14 downloaded and reviewed papers have [derived findings](DERIVED_FINDINGS.md).
 
 Publication events are labelled explicitly: first online, journal issue, proceedings or preprint posting. Unknown dates remain unverified. Page references count from the first page of the exact reviewed PDF, including covers. [Download provenance](download_provenance.json) identifies versions and hashes; public URLs provide access. “Targeted review” does not mean every page received exhaustive appraisal.

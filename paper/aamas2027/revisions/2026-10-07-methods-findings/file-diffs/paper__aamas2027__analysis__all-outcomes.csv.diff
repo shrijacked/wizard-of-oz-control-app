@@ -1,0 +1,35 @@
+--- before/paper/aamas2027/analysis/all-outcomes.csv
++++ current/paper/aamas2027/analysis/all-outcomes.csv
+@@ -0,0 +1,32 @@
++measure,label,contrast,family,n,mean_difference,p_raw,higher,equal,lower,p_holm,p_holm_all_31,significant_within_family,significant_all_31
++completion,Completion (%),constant minus control,completion,12,52.77777777777778,0.00048828125,12,0,0,0.00146484375,0.01513671875,True,True
++completion,Completion (%),adaptive minus control,completion,12,36.11111111111111,0.0078125,8,4,0,0.015625,0.171875,True,False
++completion,Completion (%),adaptive minus constant,completion,12,-16.666666666666664,0.15625,1,6,5,0.15625,1,False,False
++durationSeconds,Round duration (s),constant minus control,durationSeconds,12,-50.55555555555555,0.00390625,2,0,10,0.01171875,0.09765625,True,False
++durationSeconds,Round duration (s),adaptive minus control,durationSeconds,12,-20.805555555555554,0.06591796875,3,0,9,0.1318359375,1,False,False
++durationSeconds,Round duration (s),adaptive minus constant,durationSeconds,12,29.749999999999996,0.10546875,7,0,5,0.1318359375,1,False,False
++tlxMean,Overall workload,constant minus control,tlxMean,12,-1.0277777777777777,0.0009765625,0,1,11,0.001953125,0.02734375,True,True
++tlxMean,Overall workload,adaptive minus control,tlxMean,12,-0.9814814814814814,0.00048828125,0,0,12,0.00146484375,0.01513671875,True,True
++tlxMean,Overall workload,adaptive minus constant,tlxMean,12,0.046296296296296245,0.8818359375,7,1,4,0.8818359375,1,False,False
++mentalDemand,Mental demand,constant minus control,mentalDemand,12,-1.138888888888889,0.001953125,1,0,11,0.005859375,0.05078125,True,False
++mentalDemand,Mental demand,adaptive minus control,mentalDemand,12,-1.027777777777778,0.005859375,2,1,9,0.01171875,0.134765625,True,False
++mentalDemand,Mental demand,adaptive minus constant,mentalDemand,12,0.11111111111111112,0.826171875,8,0,4,0.826171875,1,False,False
++physicalDemand,Physical demand,constant minus control,physicalDemand,12,-0.5277777777777777,0.0703125,2,4,6,0.2109375,1,False,False
++physicalDemand,Physical demand,adaptive minus control,physicalDemand,12,-0.361111111111111,0.28125,2,6,4,0.5625,1,False,False
++physicalDemand,Physical demand,adaptive minus constant,physicalDemand,12,0.16666666666666666,0.65234375,5,3,4,0.65234375,1,False,False
++temporalDemand,Temporal demand,constant minus control,temporalDemand,12,-0.6111111111111112,0.029296875,2,2,8,0.087890625,0.556640625,False,False
++temporalDemand,Temporal demand,adaptive minus control,temporalDemand,12,-0.5,0.0654296875,3,1,8,0.130859375,1,False,False
++temporalDemand,Temporal demand,adaptive minus constant,temporalDemand,12,0.11111111111111106,0.80126953125,7,0,5,0.80126953125,1,False,False
++performance,Perceived performance,constant minus control,performance,12,1.9444444444444449,0.0009765625,11,1,0,0.001953125,0.02734375,True,True
++performance,Perceived performance,adaptive minus control,performance,12,1.972222222222222,0.00048828125,12,0,0,0.00146484375,0.01513671875,True,True
++performance,Perceived performance,adaptive minus constant,performance,12,0.027777777777777568,1.0,6,0,6,1,1,False,False
++effort,Effort,constant minus control,effort,12,-0.9444444444444443,0.0048828125,1,1,10,0.0146484375,0.1171875,True,False
++effort,Effort,adaptive minus control,effort,12,-0.7499999999999997,0.0185546875,2,0,10,0.037109375,0.37109375,True,False
++effort,Effort,adaptive minus constant,effort,12,0.19444444444444442,0.47265625,6,3,3,0.47265625,1,False,False
++frustration,Frustration,constant minus control,frustration,12,-1.0,0.0341796875,2,1,9,0.068359375,0.615234375,False,False
++frustration,Frustration,adaptive minus control,frustration,12,-1.277777777777778,0.01025390625,2,0,10,0.03076171875,0.21533203125,True,False
++frustration,Frustration,adaptive minus constant,frustration,12,-0.2777777777777778,0.4697265625,4,0,8,0.4697265625,1,False,False
++helpfulness,Helpfulness,adaptive minus constant,assistance_ratings,12,0.2222222222222221,0.40625,6,4,2,1,1,False,False
++timingEffectiveness,Timing,adaptive minus constant,assistance_ratings,12,0.38888888888888884,0.1796875,7,2,3,0.71875,1,False,False
++clarityAndDistraction,Seamlessness,adaptive minus constant,assistance_ratings,12,0.11111111111111116,0.8408203125,7,1,4,1,1,False,False
++stressReduction,Frustration relief,adaptive minus constant,assistance_ratings,12,0.24999999999999992,0.46875,5,4,3,1,1,False,False
