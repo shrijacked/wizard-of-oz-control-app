@@ -33,13 +33,23 @@ Our contributions are:
 
 ## 2. Related Work
 
-**FIND AND INSERT MORE REFERENCES**
-
 ### 2.1. Assistance timing and proactive coordination
 
 Karbouj et al.'s review of adaptive industrial HRC distinguishes motion, task, and control adaptations and identifies task-level timing and coordination as areas warranting further attention [7]. Assistance timing is thus part of a broader design space in which robots adapt their motion, task contributions, and coordination with people.
 
-Andriella et al. learn proactive assistance from user profiles and task state in a sequential memory game, jointly addressing assistance type, timing, and confidence [1]. PACE estimates action completion from hand movements and uses a learned policy to coordinate assistance during collaborative assembly [4]. PACE also compares proactive assistance with an explicit-query condition in which participants press a button to request help; participant waiting times were longest under explicit query [4]. These approaches connect robot behavior to unfolding human activity. Our study examines fixed-interval and arousal-triggered assistance in a physical reasoning task, considering both task outcomes and the experience of the intervention.
+Andriella et al. learn proactive assistance from user profiles and task state in a sequential memory game, jointly addressing assistance type, timing, and confidence [1]. PACE estimates action completion from hand movements and uses a learned policy to coordinate assistance during collaborative assembly [4]. PACE also compares proactive assistance with an explicit-query condition in which participants press a button to request help; participant waiting times were longest under explicit query [4]. These approaches connect robot behavior to unfolding human activity.
+
+Ramnauth et al. model the appropriateness of robot assistance through its utility and costs to the recipient, relative human and robot skills, and task parallelizability. Their online study with 215 participants evaluates judgments about assistance in task vignettes rather than the effects of live interventions [21].
+
+Lavit Nicora et al. analyze gaze during collaborative assembly with 37 participants and implement gaze-based initiation in a subsequent pilot with 10 volunteers. They treat gaze as a cue of readiness for joint activity [22]. This provides a behavioral approach to coordination alongside physiological triggering.
+
+Tanneberg et al.'s Attentive Support combines scene information and dialogue with large language model reasoning to decide whether to assist a group or remain silent. Evaluation uses constructed scenarios and a robot demonstration rather than a comparative participant study [23].
+
+In a separate memory-game study, Andriella et al. combine Q-learning with a heuristic mentalising layer that uses the player's history to select and explain hints. Their exploratory study with 56 participants reports better performance and greater acceptance, but explanations also differ between conditions and intervention timing remains fixed [24].
+
+Vitry et al. compare proactive and reactive robot interaction in an escape-room task with 56 analyzed participants working in 28 pairs. Proactivity increases interaction but does not produce a significant overall task-performance difference; scheduled hints are provided in both conditions [25]. This distinction motivates evaluating intervention experience alongside completion and duration.
+
+Our study examines fixed-interval and arousal-triggered assistance in a physical reasoning task, considering both task outcomes and the experience of the intervention.
 
 ### 2.2. Physiological information in assistance
 
@@ -49,11 +59,19 @@ Other work integrates physiological measurement with broader adaptation strategi
 
 Recent systems extend physiological adaptation beyond robotic task execution. GuideAI combines cardiac, gaze, and behavioral information to adapt learning content, pacing, and feedback [13]. In a single-surgeon simulation study, Wei et al. identify subjective workload and mean heart rate among the influential features in a task-performance prediction model [18]. These findings motivate examining physiology alongside reported experience, while their tasks and inference methods differ from our assistance policy.
 
+Prajod et al. examine ECG-derived heart-rate variability and facial-expression estimates under different robot pacing conditions in collaborative assembly. Their perceived-challenge classifier is evaluated offline, and the adaptive condition uses Wizard-of-Oz judgments of task progress rather than physiological triggers [26].
+
 Pereira et al.'s review documents heterogeneous workload measures and mixed cardiac findings across HRC studies [11]. Capponi et al. similarly find no clear RMSSD pattern across their assembly configurations and distinguish cognitive effort from stress [3]. Cardiac measurement guidelines distinguish heart rate from beat-to-beat variability and emphasize signal quality and the influence of physical activity on wearable measurements [12]. We therefore evaluate arousal-triggered assistance through its effects on task performance and participant experience, alongside the physiological signal used to initiate it.
 
 ### 2.3. Physical tasks and participant experience
 
 Tabatabaei et al. study gaze around robot failures during collaborative tangram solving [15]. SensCogAR uses tangrams as a proxy for small-object assembly, manipulating the visibility of piece contours to vary task demand [9]. Adjacent assembly work by Caiazzo et al. compares manual, collaborative, and guided collaborative conditions, with EEG used for workload assessment [2]. MRChaos uses tangrams to investigate robotic reasoning, planning, and manipulation from silhouette targets and extends its assembly approach to cutlery and soda-can arrangements [20]. These task settings combine spatial interpretation, manipulation, and interaction with robot assistance.
+
+Cavicchi et al.'s narrative review of humanoid robots in cognitive-conflict tasks cautions that social cues can distract as well as support performance and recommends delegating parts of the main task to enable cognitive offloading [27]. This perspective motivates distinguishing the informational and physical contributions of assistance.
+
+In an assembly study with 20 participants, van Dijk et al. report lower scores on five workload dimensions under human-led collaboration and lower mental and temporal demand with slower robot pacing. Pacing changes action onset while robot movement speed remains constant [28].
+
+Varrasi et al. compare human and robot guidance in a modified Trail Making Test with 60 younger and older adults. Older adults report greater workload under robot than human assistance, whereas the corresponding difference in younger adults is not significant [29]. This highlights the importance of participant population when evaluating guidance.
 
 In supply-chain operations, Smit et al. model collaborative human-robot order picking and jointly optimize picking efficiency and workload fairness through simulation [14]. This work highlights the importance of evaluating human demands alongside system performance when extending assistance to logistics.
 
@@ -61,7 +79,11 @@ Hart describes the six NASA-TLX workload dimensions and the use of an unweighted
 
 ### 2.4. Wizard-of-Oz evaluation
 
-Wizard-of-Oz methods support the study of robot interactions through human-operated delivery. A recent HRI workshop proposal by Thunberg et al. emphasizes the practical, ethical, and methodological tensions of the wizard's role [17]. In our setup, the condition determines when assistance is offered: every 30 seconds or when arousal is flagged. The researcher delivers a task-relevant hint or robot cue, and the robot operator executes the corresponding program. This arrangement supports the comparison of timing policies using a common assistance interface.
+Wizard-of-Oz methods support the study of robot interactions through human-operated delivery. A recent HRI workshop proposal by Thunberg et al. emphasizes the practical, ethical, and methodological tensions of the wizard's role [17].
+
+Bejarano et al.'s interviews with six HRI researchers identify challenges involving operator response processing, robot delays, unpredictable participants, and control precision [30]. These findings make operator delivery and interface constraints relevant to interpreting Wizard-of-Oz interactions.
+
+In our setup, the condition determines when assistance is offered: every 30 seconds or when arousal is flagged. The researcher delivers a task-relevant hint or robot cue, and the robot operator executes the corresponding program. This arrangement supports the comparison of timing policies using a common assistance interface.
 
 ## 3. Formative Assessment of Tangram Solving
 
@@ -298,3 +320,23 @@ AI-assisted tools were used in preparing this manuscript. The authors are respon
 [19] Jing Yang, Juan Antonio Barragan, Jason Michael Farrow, Chandru P. Sundaram, Juan P. Wachs, Denny Yu. 2024. [An Adaptive Human-Robotic Interaction Architecture for Augmenting Surgery Performance Using Real-Time Workload Sensing—Demonstration of a Semi-autonomous Suction Tool](https://doi.org/10.1177/00187208221129940). *Human Factors: The Journal of the Human Factors and Ergonomics Society 66(4), 1081–1102*. First published online 11 November 2022; journal issue April 2024.
 
 [20] Chao Zhao, Chunli Jiang, Lifan Luo, Guanlan Zhang, Hongyu Yu, Michael Yu Wang, Qifeng Chen. 2025. [Master Rules from Chaos: Learning to Reason, Plan, and Interact from Chaos for Tangram Assembly](https://arxiv.org/abs/2505.11818). *ICRA 2025; reviewed accepted-paper preprint, arXiv v1*.
+
+[21] Ramnauth, Rebecca; Brščić, Dražen; Scassellati, Brian. 2026. [To Help or Not to Help?: An Expanded Framework for Deciding Socially Appropriate Robot Assistance](https://doi.org/10.1145/3797264). *ACM Transactions on Human-Robot Interaction*.
+
+[22] Lavit Nicora, Matteo; Prajod, Pooja; Mondellini, Marta; Tauro, Giovanni; Vertechy, Rocco; André, Elisabeth; Malosio, Matteo. 2024. [Gaze detection as a social cue to initiate natural human-robot collaboration in an assembly task](https://doi.org/10.3389/frobt.2024.1394379). *Frontiers in Robotics and AI*.
+
+[23] Tanneberg, Daniel; Ocker, Felix; Hasler, Stephan; Deigmoeller, Joerg; Belardinelli, Anna; Wang, Chao; Wersing, Heiko; Sendhoff, Bernhard; Gienger, Michael. 2024. [To Help or Not to Help: LLM-based Attentive Support for Human-Robot Group Interactions](https://doi.org/10.1109/IROS58592.2024.10801517). *2024 IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)*.
+
+[24] Andriella, Antonio; Falcone, Giovanni; Rossi, Silvia. 2025. [Enhancing Robot Assistive Behaviour by Mentalising User Intent and Beliefs with Reinforcement Learning](https://doi.org/10.1007/s12369-025-01280-z). *International Journal of Social Robotics*.
+
+[25] Vitry, Thomas; Maeder, Vanessa; Edgeworth, Kieran; Hazaiti, Asihati; Ates, Doga Deniz; Gäde, Connor; Habekost, Jan-Gerrit; Becker, Dennis; Wermter, Stefan. 2026. [When May I Help You? On The Effect of Proactivity on Group Human-Robot Collaboration](https://ras.papercept.net/conferences/conferences/ROMAN26/program/ROMAN26_ContentListWeb_2.html). *2026 IEEE 35th International Conference on Robot and Human Interactive Communication (RO-MAN)*. Accessible conference author manuscript; IEEE archival DOI not yet verified.
+
+[26] Prajod, Pooja; Lavit Nicora, Matteo; Mondellini, Marta; Meregalli Falerni, Matteo; Vertechy, Rocco; Malosio, Matteo; André, Elisabeth. 2024. [Flow in human-robot collaboration—multimodal analysis and perceived challenge detection in industrial scenarios](https://doi.org/10.3389/frobt.2024.1393795). *Frontiers in Robotics and AI*.
+
+[27] Cavicchi, Shari; Abubshait, Abdulaziz; Siri, Giulia; Mustile, Magda; Ciardo, Francesca. 2025. [Can humanoid robots be used as a cognitive offloading tool?](https://doi.org/10.1186/s41235-025-00616-7). *Cognitive Research: Principles and Implications*.
+
+[28] van Dijk, Wietse; Baltrusch, Saskia J.; Dessers, Ezra; de Looze, Michiel P.. 2023. [The effect of human autonomy and robot work pace on perceived workload in human-robot collaborative assembly work](https://doi.org/10.3389/frobt.2023.1244656). *Frontiers in Robotics and AI*.
+
+[29] Varrasi, Simone; Vagnetti, Roberto; Camp, Nicola; Hough, John; Di Nuovo, Alessandro; Castellano, Sabrina; Magistro, Daniele. 2026. [Human and Robot Assistance for Cognitive Load in Younger and Older Adults: Multimodal Within-Subject Experimental Study](https://doi.org/10.2196/94738). *Journal of Medical Internet Research*.
+
+[30] Bejarano, Alexandra; Elbeleidy, Saad; Mott, Terran; Negrete-Alamillo, Sebastian; Armenta, Luis Angel; Williams, Tom. 2024. [Hardships in the Land of Oz: Robot Control Challenges Faced by HRI Researchers and Real-World Teleoperators](https://doi.org/10.1109/RO-MAN60168.2024.10731251). *2024 IEEE 33rd International Conference on Robot and Human Interactive Communication (RO-MAN)*.
