@@ -1,0 +1,10 @@
+--- before/paper/aamas2027/structure-review.md
++++ current/paper/aamas2027/structure-review.md
+@@ -170,3 +170,7 @@
+ ## Revised comparison figures
+ 
+ The section order remains unchanged. Remove the performance plot (Table 1 already reports those outcomes) and the three heatmaps. Retain workload/frustration as Figure 4. Add constant-versus-adaptive matched scatterplots for eight measures as Figure 5 and an assistance-rating difference plot as Figure 6. Correlation discussion now belongs to §5.4 alongside the assisted-condition comparison. The full pre-change paper and figure assets are preserved in revisions/2026-10-07-figures/before/.
++
++## Grouped-bar comparison revision
++
++The author requested replacement of Figures 5 and 6 with a bar chart. Current Figure 5 compares constant and adaptive assistance for the four assistance ratings using means and sample SDs. The paper now has five figures. Section 5.4 retains the paired tests and no-significant-difference result; cross-condition correlation prose and its methods sentence are removed. Objective outcomes remain in Table 1 and workload in Table 2/Figure 4. Earlier plots remain in revisions/2026-10-07-bar-comparison/before/.

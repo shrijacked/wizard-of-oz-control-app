@@ -1,0 +1,42 @@
+--- before/main.tex
++++ current/main.tex
+@@ -178,7 +178,7 @@
+ 
+ We measure puzzle completion and pause-adjusted round duration, including both solved and unsolved attempts. After each puzzle, participants rate the six NASA-TLX dimensions on seven-point scales: mental demand, physical demand, temporal demand, performance, effort, and frustration. An overall workload score averages the six items after aligning their direction so that higher values indicate greater workload. After assisted puzzles, participants also rate helpfulness, timing, seamlessness, and frustration relief. The final questionnaire assesses overall helpfulness, efficacy, trust, and reliance on the robot's guidance.
+ 
+-We average ratings and durations across each participant's three trials per condition, then report means and standard deviations across participants. Completion is reported as the proportion of puzzles solved. Exploratory pairwise comparisons use two-sided paired sign-flip tests on participant-condition averages. Holm correction is applied to the three comparisons for each outcome and to the four assistance-rating comparisons; reported $p$ values are adjusted. Spearman correlations compare each participant’s constant and adaptive averages for the same measure.
++We average ratings and durations across each participant's three trials per condition, then report means and standard deviations across participants. Completion is reported as the proportion of puzzles solved. Exploratory pairwise comparisons use two-sided paired sign-flip tests on participant-condition averages. Holm correction is applied to the three comparisons for each outcome and to the four assistance-rating comparisons; reported $p$ values are adjusted.
+ 
+ \textbf{UPDATE WITH FINAL RESULTS}
+ 
+@@ -263,25 +263,15 @@
+ \end{tabular}
+ \end{table}
+ 
+-Figure~\ref{fig:correlations} compares participants’ constant and adaptive averages. Cross-condition correlations were .39 for completion, .10 for duration, .23 for workload, and $-.07$ for frustration. Assistance-rating correlations ranged from .50 for helpfulness to .64 for timing. These coefficients describe consistency across conditions, rather than the size or direction of their differences.
++These ratings describe the combined experience of text hints and robotic-arm assistance. The higher adaptive averages alongside lower completion than constant assistance motivate examining both task progress and the experience of receiving help.
+ 
+ \begin{figure*}[t]
+ \centering
+-\includegraphics[width=.98\textwidth]{figures/constant-adaptive-correlations.pdf}
+-\caption{Constant versus adaptive participant averages for the same measure. Each point represents a matched pair; larger points indicate coincident pairs. Dashed diagonals indicate equal scores, and $\rho$ denotes Spearman correlation.}
+-\label{fig:correlations}
+-\Description{Eight scatterplots compare constant scores on the horizontal axis with adaptive scores on the vertical axis for completion, duration, workload, frustration and four assistance ratings.}
++\includegraphics[width=.98\textwidth]{figures/assistance-comparison-bars.pdf}
++\caption{Assistance ratings for constant and adaptive assistance. Bars show means across participant-condition averages; error bars show one standard deviation. Labels give the mean ratings on the seven-point scale. Higher ratings indicate a more favorable experience.}
++\label{fig:assistance}
++\Description{Four pairs of bars compare constant and adaptive assistance on helpfulness, timing, seamlessness and frustration relief. Adaptive assistance has a slightly higher mean on each measure; error bars show variability across participants.}
+ \end{figure*}
+-
+-These ratings describe the combined experience of text hints and robotic-arm assistance. The higher adaptive averages alongside lower completion than constant assistance motivate examining both task progress and the experience of receiving help.
+-
+-\begin{figure}[t]
+-\centering
+-\includegraphics[width=\columnwidth]{figures/assistance-differences.pdf}
+-\caption{Paired differences in assistance ratings, adaptive minus constant. Gray points show individual differences; diamonds show means with unadjusted 95\% bootstrap intervals. Positive values favor adaptive assistance; negative values favor constant assistance.}
+-\label{fig:assistance}
+-\Description{A horizontal difference plot compares four assistance ratings. Individual points lie on both sides of zero, while all four mean differences are positive.}
+-\end{figure}
+ 
+ \subsection{Overall experience}
+ 

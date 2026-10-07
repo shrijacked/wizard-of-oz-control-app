@@ -1,0 +1,327 @@
+% Working paper, 7 October 2026. Main source for subsequent editing.
+% Evidence and revision history: README.md and revisions/2026-10-07-figures/.
+% Based on the supplied AAMAS 2027 template; class and layout unmodified.
+\documentclass[sigconf,anonymous]{aamas}
+\usepackage{balance}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning}
+% Allow paragraph line breaks to absorb long compounds without changing margins.
+\emergencystretch=2em
+\makeatletter
+\gdef\@copyrightpermission{
+  \begin{minipage}{0.2\columnwidth}
+   \href{https://creativecommons.org/licenses/by/4.0/}{\includegraphics[width=0.90\textwidth]{by}}
+  \end{minipage}\hfill
+  \begin{minipage}{0.8\columnwidth}
+   \href{https://creativecommons.org/licenses/by/4.0/}{This work is licensed under a Creative Commons Attribution International 4.0 License.}
+  \end{minipage}
+  \vspace{5pt}
+}
+\makeatother
+\setcopyright{ifaamas}
+\acmConference[AAMAS 2027]{Proc.\@ of the 26th International Conference
+on Autonomous Agents and Multiagent Systems (AAMAS 2027)}{3--7 May 2027}{Hanoi, Vietnam}{M.~Baldoni, F.~Fang, W.~Yeoh, N.~Yorke-Smith (eds.)}
+\copyrightyear{2027}
+\acmYear{2027}
+\acmDOI{}
+\acmISBN{}
+\acmSubmissionID{2613}
+\submissionType{Research Paper Track}
+\title{When to Intervene: Trade-offs Between Constant and Physiology-Triggered Robotic Assistance}
+% Anonymous review copy; the class displays submission ID2613.
+\author{Anonymous Author(s)}
+\keywords{Human--robot interaction, adaptive assistance, intervention timing, physiological sensing, Wizard-of-Oz, tangram}
+% Outstanding factual checks and refresh instructions are outside the paper in author-notes.md and README.md.
+\citestyle{acmnumeric}
+
+\begin{abstract}
+In human–robot interaction (HRI), deciding when to provide assistance requires understanding how different intervention strategies affect both task performance and the user experience. Previous work has compared physiology-triggered robotic assistance with periodic support in surgical training. We extend this work to physical spatial problem solving by conducting an experiment to compare three conditions: no assistance, constant assistance, and adaptive assistance based on physiological signals. Twenty-four participants (N = 24) solve nine physical tangram puzzles across three sessions. The order of the conditions is varied across participants, and puzzles are randomly assigned to the sessions. Tangrams combine spatial reasoning with physical manipulation, providing a simple task for studying informational and physical assistance. Participants receive on-screen hints and robotic-arm interventions through a Wizard-of-Oz setup, with assistance offered every 30 seconds or adapted using heart-rate signals and task progress. We evaluate puzzle completion, completion time, workload, helpfulness, intervention timing, frustration, and trust. Both assistance conditions improve completion rates compared with no assistance; constant assistance achieves the highest completion and shortest duration, while adaptive assistance receives higher helpfulness and timing ratings and lower frustration. Together, these findings highlight distinct trade-offs between assistance strategies in task performance and user experience, providing insights for designing HRI systems that adapt assistance to the needs of the user.
+\end{abstract}
+
+\begin{document}
+\maketitle
+
+\noindent\textbf{WORKING DRAFT: N = 24 IS THE PLANNED SAMPLE. RESULTS AND DEMOGRAPHICS AWAIT FINAL UPDATE.}
+
+\section{Introduction}
+
+A person solving a physical puzzle may pause to mentally rotate a piece, reconsider an arrangement, or decide what to try next. These moments can look similar to an observer but call for different responses. A hint may help someone resume work; the same hint during a productive pause may interrupt a solution they were about to reach. For an assistive robot, deciding when to act is therefore part of deciding how to help.
+
+Recent human-robot collaboration research makes assistance contingent on the person's activity. Andriella et al. model assistance type, timing, and confidence \cite{andriella2025}, while PACE uses action-completion estimates to coordinate proactive assistance \cite{delazzari2025}. A recent review distinguishes adaptation of robot motion from task-level decisions about timing, sequencing, and role allocation \cite{karbouj2026}. These approaches raise an evaluation question: does a strategy that supports task execution also provide help that people experience as appropriate?
+
+Physiological signals offer another basis for assistance timing. Yang et al. compared workload-adaptive robotic suction with periodic support during surgical training \cite{yang2024}. We extend this comparison to physical spatial problem solving, where a hint can change a person's understanding of an arrangement and robotic assistance can change the availability of a piece. Our focus is the relationship between task performance and the experience of receiving these interventions.
+
+We use seven-piece tangram puzzles to study this relationship. Recent work uses tangrams for collaborative HRI and as a simplified assembly task \cite{tabatabaei2025,melo2026}. They support repeated attempts with common materials, observable completion outcomes, and both informational and physical assistance. We compare assistance offered at regular intervals with assistance offered when physiological monitoring flags arousal, allowing the timing policy to respond to changes during the task.
+
+Each participant experiences no assistance, constant assistance, and adaptive assistance, with three different puzzles per condition. Constant assistance is offered every 30 seconds; adaptive assistance is offered whenever arousal is flagged. A Wizard-of-Oz setup delivers the corresponding hints and robot actions. We assess both puzzle performance and participant experience to understand how the two assistance policies support progress and how their interventions are received.
+
+We address two research questions. \textbf{RQ1:} How do the three assistance conditions differ in puzzle completion and round duration? \textbf{RQ2:} How do they differ in perceived workload and frustration, and how do the assisted conditions compare in helpfulness and intervention timing?
+
+Our contributions are:
+
+\begin{enumerate}
+\item A comparison of unassisted, constant, and physiology-informed assistance in physical spatial problem solving.
+\item A Wizard-of-Oz platform coordinating text hints, robotic-arm assistance, physiological monitoring, and study measures.
+\item An evaluation connecting objective task performance with workload and the experience of receiving assistance.
+\end{enumerate}
+
+\section{Related Work}
+
+\textbf{FIND AND INSERT MORE REFERENCES}
+
+\subsection{Assistance timing and proactive coordination}
+
+Karbouj et al.'s review of adaptive industrial HRC distinguishes motion, task, and control adaptations and identifies task-level timing and coordination as areas warranting further attention \cite{karbouj2026}. Assistance timing is thus part of a broader design space in which robots adapt their motion, task contributions, and coordination with people.
+
+Andriella et al. learn proactive assistance from user profiles and task state in a sequential memory game, jointly addressing assistance type, timing, and confidence \cite{andriella2025}. PACE estimates action completion from hand movements and uses a learned policy to coordinate assistance during collaborative assembly \cite{delazzari2025}. These approaches connect robot behavior to unfolding human activity. Our study examines fixed-interval and arousal-triggered assistance in a physical reasoning task, considering both task outcomes and the experience of the intervention.
+
+\subsection{Physiological information in assistance}
+
+Yang et al.'s surgical system uses EEG and eye tracking to inform adaptive suction, with a periodic comparator selected to approximate earlier observed assistance frequency \cite{yang2024}. Earlier work by Teo et al. uses individualized physiological workload markers to trigger aid during robot supervision, imposing aid later when it has not been triggered \cite{teo2018}. These studies establish approaches to physiological assistance timing across tasks with different demands, sensors, and forms of support.
+
+Other work integrates physiological measurement with broader adaptation strategies. Hostettler et al. adapt robot behavior to user distance while measuring pupil responses; direct pupil-driven adaptation is a future direction \cite{hostettler2025}. Ojsteršek et al. personalize robot parameters using a preliminary skills test and analyze ECG recordings after the experiment \cite{ojstersek2024}. Korivand et al. develop physiological task-load prediction and Q-learning-based adjustment, while explicitly reporting that their recorded wristband data could not be integrated directly for real-time use \cite{korivand2024}. Together, these studies illustrate how physiological measurements can support evaluation, personalization, and intervention timing.
+
+Pereira et al.'s review documents heterogeneous workload measures and mixed cardiac findings across HRC studies \cite{pereira2025}. Capponi et al. similarly find no clear RMSSD pattern across their assembly configurations and distinguish cognitive effort from stress \cite{capponi2024}. We therefore evaluate arousal-triggered assistance through its effects on task performance and participant experience, alongside the physiological signal used to initiate it.
+
+\subsection{Physical tasks and participant experience}
+
+Tabatabaei et al. study gaze around robot failures during collaborative tangram solving \cite{tabatabaei2025}. SensCogAR uses tangrams as a proxy for small-object assembly, manipulating the visibility of piece contours to vary task demand \cite{melo2026}. Adjacent assembly work by Caiazzo et al. compares manual, collaborative, and guided collaborative conditions, with EEG used for workload assessment \cite{caiazzo2024}. These task settings combine spatial interpretation, manipulation, and interaction with robot assistance.
+
+Hart describes the six NASA-TLX workload dimensions and the use of an unweighted overall score \cite{hart2006}. We assess these dimensions alongside helpfulness, timing, seamlessness, and frustration relief. This combination connects the demands of solving a puzzle with the participant's experience of the assistance itself.
+
+\subsection{Wizard-of-Oz evaluation}
+
+Wizard-of-Oz methods support the study of robot interactions through human-operated delivery. A recent HRI workshop proposal by Thunberg et al. emphasizes the practical, ethical, and methodological tensions of the wizard's role \cite{thunberg2026}. In our setup, the condition determines when assistance is offered: every 30 seconds or when arousal is flagged. The researcher delivers a task-relevant hint or robot cue, and the robot operator executes the corresponding program. This arrangement supports the comparison of timing policies using a common assistance interface.
+
+\section{Tangram Task Profiling and Assistance Expectations}
+
+\subsection{Survey and task experience}
+
+A task-profile survey collected responses from 24 people: 22 undergraduate students, one graduate student, and one faculty member. Respondents were aged 18--30 years ($M=20.17$, $SD=2.24$); 14 identified as men, nine as women, and one preferred not to disclose gender. Respondents were recruited through forms shared on college mailing groups. A Google Form linked to an online square tangram with a timer; respondents attempted the puzzle and reported their familiarity, completion, solving time, and moments of uncertainty. They also rated the assistance they would find helpful if stuck. Some survey respondents also participated in the robot experiment.
+
+Twelve respondents had previously solved tangrams, including two who solved them regularly. Seven had heard of tangrams without solving them, and five were unfamiliar with them. Fifteen respondents reported completing the puzzle (62.5\%), eight reported partial completion (33.3\%), and one did not solve it (4.2\%). Seventeen respondents (70.8\%) reported feeling stuck at least once. Twelve selected a solving time below one minute, eight selected one to five minutes, and two selected five to ten minutes; two selected the option for not attempting or solving the puzzle.
+
+\subsection{Assistance expectations and task rationale}
+
+Respondents independently rated four hypothetical forms of assistance on scales from 1 (most helpful) to 5 (least helpful). A simpler puzzle received a mean rating of 2.04 ($SD=1.16$), a step-by-step video tutorial 2.58 ($SD=1.28$), a text hint 2.71 ($SD=1.23$), and a robot physically showing where to place a piece 3.04 ($SD=1.43$; Figure~\ref{fig:survey}). Written responses requested help with the first piece, visual guidance about piece placement, and hints at moments of difficulty. These expectations contextualize the main experiment's comparison of informational and physical assistance.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=.88\textwidth]{figures/task-profile-survey.pdf}
+\caption{Task-profile survey ($N=24$). Left: self-reported puzzle outcomes. Right: expected helpfulness of four independently rated assistance options; diamonds show means, bars show SD, and gray dots show individual ratings. Lower ratings indicate greater expected helpfulness.}
+\label{fig:survey}
+\Description{Fifteen respondents completed the linked square puzzle, eight partially completed it, and one did not solve it. Mean expected-helpfulness ratings were 3.04 for robot placement, 2.58 for a video tutorial, 2.71 for a text hint, and 2.04 for a simpler puzzle, with lower values indicating greater helpfulness.}
+\end{figure*}
+
+Each experimental tangram requires all seven pieces to reproduce a target shape: two large triangles, one medium triangle, two small triangles, a square, and a parallelogram. The seven colored pieces together form a $10\times10$-inch square. Their colors provide consistent references for hints and robot actions. We use nine targets, each with a solution available to the researcher.
+
+Tangrams combine spatial reasoning with physical manipulation. Participants interpret the target, identify useful piece relationships, and test arrangements by moving and rotating the pieces. Informational assistance can address orientation or adjacency, while the arm can bring a relevant piece into the workspace. Different targets retain common materials and instructions, supporting repeated comparisons across conditions. Participants can revisit placements and work on different regions of the target rather than following a single prescribed sequence. The current arrangement guides assistance content, while the assigned condition determines its timing.
+
+\section{System and Assistance Design}
+
+\subsection{Architecture and apparatus}
+
+Our system coordinates three browser interfaces through a local server (Figure~\ref{fig:architecture}). The researcher dashboard displays the puzzle solution, workspace camera view, timer, physiological feedback, and assistance controls. The participant laptop presents instructions, text hints, the timer, and questionnaires. The robot-operator display identifies the piece-specific program to execute. The server synchronizes the interfaces and records task outcomes, interventions, and questionnaire responses.
+
+\begin{figure*}[t]
+\centering
+\begingroup
+\resizebox{.96\textwidth}{!}{\input{figures/assistance-architecture.tikz.tex}}
+\endgroup
+\caption{Assistance architecture. Cardiac measurements pass through signal-quality checks and a heart-rate-rise detector. The assigned condition determines assistance timing; task context guides the researcher’s selection of hints and robot actions. The local server synchronizes interfaces and records study measures.}
+\label{fig:architecture}
+\Description{Four modules show physiological processing, assistance timing, Wizard-of-Oz delivery and participant interaction. Current and reference heart-rate windows feed an arousal flag. Constant and adaptive triggers lead to hints or piece retrieval, coordinated through a local server.}
+\end{figure*}
+
+The setup combines an Orangewood robotic arm, a Maxim H Band wrist sensor, and a Logitech C270 workspace camera. An opaque partition separates the participant from two researchers, who administer the task and operate the arm (Figure~\ref{fig:setup}). The camera is mounted on top of the partition and covers the participant table. The participant faces a workspace with a puzzle assembly area in front of and to their left, a drop spot to their right, and a laptop for hints and questionnaires. Unused pieces occupy fixed, labeled pickup positions. The arm retrieves a selected piece using one of seven piece-specific programs and delivers it to the drop spot; the participant places it in the target arrangement. Preset text hints describe piece location, orientation, or adjacency, providing consistent assistance content across participants. Hints are accompanied by an audible notification. The researcher selects either a hint alone or a robot action paired with a hint, based on the current arrangement.
+
+\begin{figure*}[t]
+\centering
+\begingroup
+\resizebox{.83\textwidth}{!}{\input{figures/physical-setup-topdown.tikz.tex}}
+\endgroup
+\caption{Top-down view of the Wizard-of-Oz setup. An opaque partition separates the researchers from the participant; a camera mounted on the partition observes the participant table. The table contains fixed piece pickup positions, the robot drop spot, the assembly area, and the participant laptop. Schematic not to scale.}
+\label{fig:setup}
+\Description{The researchers and their controls occupy the left side of an opaque partition. On the right, the participant faces the table, with pickup positions near the robot, a drop spot to the participant's right, and an assembly area in front of and to the participant's left.}
+\end{figure*}
+
+\textbf{NEED TO ADD SETUP PHOTO HERE / ROBOT AND PIECE MATERIAL DETAILS}
+
+\subsection{Physiological monitoring}
+
+After receiving the study information, participants wore the wrist sensor during a three-minute pre-task baseline window. The sensor streams cardiac measurements over Bluetooth to a Python collector. To detect a short-term rise in heart rate, the collector compares median heart rate over the latest 15 seconds with median heart rate over the preceding 60 seconds. The arousal flag is raised when the difference is at least 5 beats per minute. A calibrated baseline provides the reference while the rolling reference is being established. Signal-quality checks exclude out-of-range readings and readings with poor sensor contact, and the detector requires sufficient usable samples before raising a flag.
+
+The dashboard displays the flag alongside the workspace view. In the adaptive condition, the flag initiates assistance, while the puzzle arrangement determines the content of the hint or robot action. The flag is a heart-rate-rise cue for assistance timing; participant workload and frustration are assessed through questionnaires.
+
+\textbf{CONFIRM ACTUAL BASELINE PROCEDURE}
+
+\subsection{Assistance conditions}
+
+\textbf{No assistance.} Participants solve the puzzle without text hints or robotic-arm assistance.
+
+\textbf{Constant assistance.} Assistance is offered every 30 seconds during the puzzle. At each interval, the researcher delivers a preset text hint or a robotic-arm intervention accompanied by a hint, relevant to the current arrangement.
+
+\textbf{Physiology-informed adaptive assistance.} Assistance is offered whenever physiological monitoring flags arousal. The researcher delivers a preset text hint or a robotic-arm intervention accompanied by a hint, relevant to the current arrangement. Repeated flags prompt additional assistance. When a flag recurs rapidly or remains raised, the researcher waits 15 seconds before the next intervention. The arousal flag determines when help is offered; the task state guides the researcher’s choice of assistance content.
+
+\section{Study Design and Findings}
+
+\subsection{Participants, procedure, and analysis}
+
+The study targets twenty-four participants ($N=24$). Participants volunteered through forms shared in college groups and received coupons as compensation. Each completed three sessions of three puzzles, with one assistance condition per session. Condition order varied across participants, and puzzles were randomly assigned to sessions. Participants provided consent and background information before beginning the task. A puzzle was judged solved when the arrangement resembled the target shape using all seven pieces. Unsolved attempts were stopped at five minutes. Each puzzle was followed by a questionnaire, with five-minute breaks between sessions and an overall questionnaire after the ninth puzzle.
+
+\textbf{INSERT FINAL DEMOGRAPHICS / ADD ELIGIBILITY AND PRACTICE DETAILS}
+
+We measure puzzle completion and pause-adjusted round duration, including both solved and unsolved attempts. After each puzzle, participants rate the six NASA-TLX dimensions on seven-point scales: mental demand, physical demand, temporal demand, performance, effort, and frustration. An overall workload score averages the six items after aligning their direction so that higher values indicate greater workload. After assisted puzzles, participants also rate helpfulness, timing, seamlessness, and frustration relief. The final questionnaire assesses overall helpfulness, efficacy, trust, and reliance on the robot's guidance.
+
+We average ratings and durations across each participant's three trials per condition, then report means and standard deviations across participants. Completion is reported as the proportion of puzzles solved. Exploratory pairwise comparisons use two-sided paired sign-flip tests on participant-condition averages. Holm correction is applied to the three comparisons for each outcome and to the four assistance-rating comparisons; reported $p$ values are adjusted. Spearman correlations compare each participant’s constant and adaptive averages for the same measure.
+
+\textbf{UPDATE WITH FINAL RESULTS}
+
+\subsection{Objective task performance}
+
+For photograph-based partial-progress scoring, we count correctly placed pieces against the target arrangement. If a partial solution admits two possible orientations, we retain the orientation with more correctly placed pieces.
+
+\textbf{INSERT CORRECT PIECE COUNT / CONFIRM PLACEMENT TOLERANCE AND SCORERS}
+
+Participants solved 47 of 108 puzzles. Completion rates were 13.9\% without assistance, 66.7\% with constant assistance, and 50.0\% with adaptive assistance (Table~\ref{tab:performance}). Compared with control, completion was 52.8 percentage points higher with constant assistance ($p=.0015$) and 36.1 points higher with adaptive assistance ($p=.016$). The difference between the two assisted conditions was not statistically significant ($p=.156$).
+
+\begin{table}[t]
+\centering
+\caption{Puzzle completion and round duration. Duration includes all attempts; values are mean (SD) across participant-condition averages.}
+\label{tab:performance}
+\begin{tabular}{lrrr}
+\toprule
+Condition & Solved & Rate & Duration (s) \\
+\midrule
+Control & 5/36 & 13.9\% & 289.58 (25.59) \\
+Constant & 24/36 & 66.7\% & 239.03 (51.42) \\
+Adaptive & 18/36 & 50.0\% & 268.78 (30.30) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Constant assistance also had the shortest mean round duration. Its mean was 50.56 seconds below control ($p=.012$). The adaptive-control and adaptive-constant duration differences were not statistically significant (both $p=.132$). These durations summarize time spent across all attempts, rather than time to successful completion alone.
+
+
+\subsection{Subjective workload}
+
+Overall workload averaged 4.72 in control, 3.69 with constant assistance, and 3.74 with adaptive assistance (Table~\ref{tab:workload}; Figure~\ref{fig:workload}). Both assisted conditions had lower workload than control: the mean reductions were 1.03 points for constant assistance ($p=.0020$) and 0.98 points for adaptive assistance ($p=.0015$). Their overall workload scores did not differ significantly ($p=.882$).
+
+\begin{table}[t]
+\centering
+\caption{NASA-TLX dimension ratings and overall workload on seven-point scales, mean (SD). Higher performance ratings indicate greater success; higher workload ratings indicate greater demand.}
+\label{tab:workload}
+\begingroup\small\setlength{\tabcolsep}{4pt}
+\begin{tabular}{lrrr}
+\toprule
+Measure & Control & Constant & Adaptive \\
+\midrule
+Mental demand & 5.83 (0.96) & 4.69 (0.90) & 4.81 (1.40) \\
+Physical demand & 3.64 (1.63) & 3.11 (1.28) & 3.28 (1.50) \\
+Temporal demand & 3.94 (1.27) & 3.33 (0.88) & 3.44 (1.34) \\
+Perceived performance & 3.08 (1.51) & 5.03 (1.05) & 5.06 (1.25) \\
+Effort & 5.56 (0.67) & 4.61 (0.91) & 4.81 (1.08) \\
+Frustration & 4.44 (1.26) & 3.44 (0.91) & 3.17 (0.81) \\
+Overall workload & 4.72 (0.62) & 3.69 (0.54) & 3.74 (0.81) \\
+\bottomrule
+\end{tabular}
+\endgroup
+\end{table}
+
+Mental demand averaged 4.69 with constant assistance and 4.81 with adaptive assistance, while frustration averaged 3.44 and 3.17, respectively. Adaptive assistance reduced frustration relative to control ($p=.031$). The constant-control and adaptive-constant frustration differences were not statistically significant ($p=.068$ and $p=.470$). Perceived performance averaged 5.03 and 5.06 in the assisted conditions.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/workload.pdf}
+\caption{Overall workload and frustration. Lines connect each participant's condition averages; diamonds show condition means. Higher values indicate greater burden.}
+\label{fig:workload}
+\Description{Paired plots show lower mean workload and frustration in the assisted conditions than in control.}
+\end{figure}
+
+\subsection{Intervention experience}
+
+Adaptive assistance received higher mean ratings on all four assistance-specific items (Table~\ref{tab:assistance}; Figure~\ref{fig:assistance}). Helpfulness averaged 5.06 with adaptive assistance and 4.83 with constant assistance; timing averaged 5.56 and 5.17, respectively. Mean seamlessness was 4.22 versus 4.11, and frustration relief was 5.14 versus 4.89. None of these paired differences was statistically significant after correction (timing $p=.719$; other items $p=1.000$).
+
+\begin{table}[t]
+\centering
+\caption{Intervention experience in the two assisted conditions, mean (SD). Higher ratings indicate a more favorable experience.}
+\label{tab:assistance}
+\begin{tabular}{lrr}
+\toprule
+Measure & Constant & Adaptive \\
+\midrule
+Helpfulness & 4.83 (0.63) & 5.06 (0.87) \\
+Timing & 5.17 (1.11) & 5.56 (0.95) \\
+Seamlessness & 4.11 (1.37) & 4.22 (1.24) \\
+Frustration relief & 4.89 (0.90) & 5.14 (1.28) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Figure~\ref{fig:correlations} compares participants’ constant and adaptive averages. Cross-condition correlations were .39 for completion, .10 for duration, .23 for workload, and $-.07$ for frustration. Assistance-rating correlations ranged from .50 for helpfulness to .64 for timing. These coefficients describe consistency across conditions, rather than the size or direction of their differences.
+
+\begin{figure*}[t]
+\centering
+\includegraphics[width=.98\textwidth]{figures/constant-adaptive-correlations.pdf}
+\caption{Constant versus adaptive participant averages for the same measure. Each point represents a matched pair; larger points indicate coincident pairs. Dashed diagonals indicate equal scores, and $\rho$ denotes Spearman correlation.}
+\label{fig:correlations}
+\Description{Eight scatterplots compare constant scores on the horizontal axis with adaptive scores on the vertical axis for completion, duration, workload, frustration and four assistance ratings.}
+\end{figure*}
+
+These ratings describe the combined experience of text hints and robotic-arm assistance. The higher adaptive averages alongside lower completion than constant assistance motivate examining both task progress and the experience of receiving help.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=\columnwidth]{figures/assistance-differences.pdf}
+\caption{Paired differences in assistance ratings, adaptive minus constant. Gray points show individual differences; diamonds show means with unadjusted 95\% bootstrap intervals. Positive values favor adaptive assistance; negative values favor constant assistance.}
+\label{fig:assistance}
+\Description{A horizontal difference plot compares four assistance ratings. Individual points lie on both sides of zero, while all four mean differences are positive.}
+\end{figure}
+
+\subsection{Overall experience}
+
+Overall helpfulness averaged 5.08 ($SD=1.24$), efficacy 4.92 ($SD=1.51$), and trust 4.75 ($SD=1.60$). Agreement with following the robot's guidance even when uncertain averaged 5.08 ($SD=1.31$). These end-of-study ratings summarize participants' experience across all three conditions.
+
+Six participants left written comments. Their remarks illustrate variation in hint usefulness and the contribution of physical assistance. P101 wrote, ``some of the hints were really nice, some were meh.'' P103 described the hints as ``helpful and overall well timed,'' but felt the arm added little to solving the puzzle. Two participants described the puzzles as fun. These comments provide individual perspectives alongside the ratings.
+
+\section{Discussion, Limitations, and Future Work}
+
+\subsection{Task progress and the experience of assistance}
+
+Both assistance conditions increased completion and reduced overall workload relative to control. Constant assistance had the highest completion rate and shortest mean round duration. Adaptive assistance received higher average helpfulness and timing ratings and lower average frustration, but these differences between the assisted conditions were not statistically significant. The findings support considering performance and participant experience together without establishing that either assisted policy is consistently preferable.
+
+Regular assistance may provide opportunities to reconsider an arrangement and advance the puzzle. Arousal-triggered assistance may concentrate help at moments when participants are receptive to it. The task-profile survey similarly showed that respondents could feel stuck despite completing the puzzle and requested guidance about specific placements. These interpretations motivate testing how assistance matches the stage of a solution process.
+
+\subsection{Assistance timing and physiological feedback}
+
+The adaptive policy links intervention timing to arousal events, while constant assistance provides predictable assistance opportunities. In a spatial reasoning task, participants alternate between manipulation and reflection, so usefulness can depend on when help arrives. Future work could relate arousal events and intervention times to observed puzzle progress and evaluate which assistance content is most useful at different stages. Comparisons across tasks and sensors would help establish how broadly the timing policy applies.
+
+\subsection{Limitations and future work}
+
+Participant feedback suggested that hints were more important for solving the puzzle than robot retrieval. P103 noted that ``the arm took time in moving the piece which cut into solving time.'' Although retrieval makes a piece available, the participant still determines its placement. Future work could have the robot place pieces directly in the target arrangement and examine whether this increases the value of physical assistance.
+
+Experience ratings combined text and robotic-arm assistance. Future comparisons should examine each modality separately. Correct-piece scoring from final photographs would provide a finer measure of partial progress alongside binary completion. The task-profile survey measured anticipated helpfulness, whereas the experiment measured experience after receiving assistance; these ratings address different questions.
+
+The seven-point workload ratings and overall trust item capture participants' reported experience. Trust was measured after all conditions, so condition-specific changes require further study. Tangrams provide a controlled spatial task.
+
+\textbf{TANGRAM TO ASSEMBLY LINE?}
+
+\section{Ethical Considerations}
+
+Participants consented through the volunteer form and again before the experiment. The interface required consent and acknowledgement of instructions before the task began. Participation was voluntary, with the option to pause or stop without penalty. Participants consented to workspace recording and live viewing; the camera showed only the table and hands, excluding faces. Cardiac measurements and questionnaire responses were also collected.
+
+The concealed human operation in the Wizard-of-Oz setup was not disclosed during or after the task. Participant codes link the records; data release must respect consent coverage and protect identifying information.
+
+\textbf{ADD ETHICS APPROVAL OR EXEMPTION DETAILS}
+
+\section{Conclusion}
+
+We compared unassisted, constant, and physiology-informed adaptive assistance for physical tangram solving. Both assisted conditions improved completion and reduced workload relative to control. Constant assistance had the highest observed completion rate and shortest mean round duration. Adaptive assistance received higher average intervention ratings and lower frustration, with no statistically significant differences between the assisted conditions. These findings motivate systems that consider both task progress and the experience of receiving help, alongside further study of the content and physical role of assistance.
+
+\section*{AI Assistance Disclosure}
+
+AI-assisted tools were used in preparing this manuscript. The authors are responsible for the accuracy, originality, and integrity of the work, including its citations.
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}
+\end{document}

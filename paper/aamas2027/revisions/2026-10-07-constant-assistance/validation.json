@@ -1,0 +1,16 @@
+{
+  "date": "2026-10-07",
+  "base_commit": "547d7ff9ba5270efb4ad9dfed18989084be35096",
+  "current_tex_sha256": "3659ed17c727b9c0aa25a9538609a8feb5e24d1deaf3b478f216435cdcc2dc36",
+  "current_pdf_sha256": "a934a7d5709c92051c93fff56c6e7cf87200b1ccc9429493a0ef44d656d1416f",
+  "paper_pages": 8,
+  "standalone_native_compile": "success",
+  "pdf_visual_review": "All 8 manuscript pages and standalone architecture checked. Labels fit; no clipping or overlaps.",
+  "terminology_check": "No scheduled terminology in extracted current paper PDF or canonical paper/diagram sources.",
+  "analysis_unchanged": true,
+  "references": "15 PDF hashes and 35 text anchors checked; 21 citation occurrences unchanged.",
+  "baseline_verified_files": 50,
+  "package_sha256": "9107d9caa17245cefa23f7d63c48cb59b911feb8230bb0474276c89f0b4cd386",
+  "package_manifest_verified": true,
+  "status": "local changes, not pushed"
+}

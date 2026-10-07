@@ -1,0 +1,71 @@
+#!/usr/bin/env python3
+"""Plot matched constant/adaptive averages from the existing paper analysis.
+
+No participant records, outcome estimates, tests or sample size are changed.
+Spearman ranks average ties. Differences are adaptive minus constant; their
+95% percentile bootstrap intervals are those already computed in the analysis.
+"""
+from pathlib import Path
+import hashlib,json
+import numpy as np
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+ROOT=Path(__file__).resolve().parents[1]
+SOURCE=ROOT/'paper/aamas2027/analysis/revision-analysis.json'
+FIG=ROOT/'paper/aamas2027/figures'
+data=json.loads(SOURCE.read_text());v=data['participant_condition_averages']
+keys=['completion','durationSeconds','tlxMean','frustration','helpfulness','timingEffectiveness','clarityAndDistraction','stressReduction']
+titles=['Completion (%)','Round duration (s)','Overall workload','Frustration','Helpfulness','Timing','Seamlessness','Frustration relief']
+def ranks(x):
+ x=np.round(x,12);order=np.argsort(x);r=np.empty(len(x));i=0
+ while i<len(x):
+  j=i+1
+  while j<len(x) and x[order[j]]==x[order[i]]:j+=1
+  r[order[i:j]]=(i+j-1)/2+1;i=j
+ return r
+plt.rcParams.update({'font.size':8,'font.family':'DejaVu Sans','axes.spines.top':False,'axes.spines.right':False,'pdf.fonttype':42})
+def save(fig,name):
+ fig.savefig(FIG/(name+'.pdf'),bbox_inches='tight')
+ fig.savefig(FIG/(name+'.png'),bbox_inches='tight',dpi=200)
+ plt.close(fig)
+summary={'source_analysis_sha256':hashlib.sha256(SOURCE.read_bytes()).hexdigest(),'actual_matched_participants':data['experiment_n'],'correlation_definition':'Constant versus adaptive averages for the same measure and participant, Spearman rank correlation with average ties.','correlations':[],'assistance_differences':[]}
+fig,axs=plt.subplots(2,4,figsize=(6.9,3.65),layout='constrained')
+for ax,key,title in zip(axs.flat,keys,titles):
+ x=np.array(v['constant'][key]);y=np.array(v['adaptive'][key]);assert len(x)==len(y)==data['experiment_n']
+ rho=float(np.corrcoef(ranks(x),ranks(y))[0,1]);summary['correlations'].append({'measure':key,'spearman_rho':rho})
+ if key=='completion':lo,hi,ticks=-5,105,[0,50,100]
+ elif key=='durationSeconds':
+  lo=20*np.floor(min(x.min(),y.min())/20)-10;hi=20*np.ceil(max(x.max(),y.max())/20)+10;ticks=[150,225,300]
+ else:lo,hi,ticks=.7,7.3,[1,3,5,7]
+ ax.plot([lo,hi],[lo,hi],ls='--',lw=.8,color='#aaaaaa',zorder=1)
+ # Exact coordinates; size records overlapping participant pairs, without jitter.
+ xy,counts=np.unique(np.column_stack([x,y]),axis=0,return_counts=True)
+ ax.scatter(xy[:,0],xy[:,1],s=19+11*(counts-1),color='#397797',alpha=.8,edgecolor='white',lw=.4,zorder=2)
+ ax.set(xlim=(lo,hi),ylim=(lo,hi),xticks=ticks,yticks=ticks,title=title)
+ ax.set_aspect('equal',adjustable='box');ax.grid(alpha=.12)
+ ax.text(.04,.94,rf'$\rho = {rho:.2f}$',transform=ax.transAxes,va='top',fontsize=8)
+ ax.tick_params(labelsize=7)
+fig.supxlabel('Constant assistance',fontsize=9);fig.supylabel('Adaptive assistance',fontsize=9)
+save(fig,'constant-adaptive-correlations')
+fig,ax=plt.subplots(figsize=(3.35,2.55),layout='constrained')
+for row,key in enumerate(keys[4:]):
+ x=np.array(v['constant'][key]);y=np.array(v['adaptive'][key]);diff=y-x
+ result=next(z for z in data['paired_comparisons'] if z['measure']==key and z['contrast']=='adaptive minus constant')
+ assert abs(diff.mean()-result['mean_difference'])<1e-10
+ mid=result['mean_difference'];low,high=result['ci95_percentile'];summary['assistance_differences'].append({'measure':key,**result})
+ # Deterministic vertical offsets separate participants; x values remain exact.
+ offsets=np.linspace(-.16,.16,len(diff))
+ ax.scatter(diff,row+offsets,s=17,color='#aaaaaa',alpha=.65,zorder=2)
+ ax.errorbar(mid,row,xerr=np.array([[mid-low],[high-mid]]),fmt='D',markersize=5,color='#397797',capsize=3,lw=1.7,zorder=3)
+ax.axvline(0,color='#666666',ls='--',lw=.8,zorder=1)
+ax.set_yticks(range(4),['Helpfulness','Timing','Seamlessness','Frustration relief']);ax.invert_yaxis()
+ax.set_xlim(-3.35,3.35);ax.set_xticks([-3,-2,-1,0,1,2,3]);ax.set_xlabel('Adaptive minus constant (rating points)')
+ax.grid(axis='x',alpha=.12)
+ax.text(.01,1.03,'Constant higher',transform=ax.transAxes,color='#555555',fontsize=7)
+ax.text(.99,1.03,'Adaptive higher',transform=ax.transAxes,ha='right',color='#555555',fontsize=7)
+save(fig,'assistance-differences')
+(ROOT/'paper/aamas2027/analysis/assisted-comparison.json').write_text(json.dumps(summary,indent=2)+'\n')
+print('Constant/adaptive Spearman coefficients:',[(x['measure'],round(x['spearman_rho'],3)) for x in summary['correlations']])
+print('Wrote two vector figures and the matched-comparison audit.')

@@ -25,7 +25,7 @@ data=json.loads(SOURCE.read_text())
 people=[p for p in data['participants'] if p['cohort']=='complete']
 ids=[p['id'] for p in people]
 conditions=['control','constant','adaptive']
-names=['Control','Scheduled','Adaptive']; colors=['#666666','#397797','#AE6B32']
+names=['Control','Constant','Adaptive']; colors=['#666666','#397797','#AE6B32']
 work=['mentalDemand','physicalDemand','temporalDemand','performance','effort','frustration']
 assistance=['helpfulness','timingEffectiveness','clarityAndDistraction','stressReduction']
 rows=[r for r in data['rounds'] if r['cohort']=='complete']
@@ -95,7 +95,7 @@ def save(fig,name):
  fig.savefig(FIG/(name+'.png'),bbox_inches='tight',dpi=180)
  plt.close(fig)
 
-def paired_panel(ax,key,labels=['Control','Sched.','Adapt.'],conds=conditions):
+def paired_panel(ax,key,labels=['Control','Const.','Adapt.'],conds=conditions):
  for i in range(len(ids)):
   jitter=(i-(len(ids)-1)/2)*.008
   ax.plot(np.arange(len(conds))+jitter,[values[c][key][i] for c in conds],color='#bbbbbb',alpha=.6,lw=.7,zorder=1)
@@ -122,7 +122,7 @@ axs[1].set_yticks(range(4),labels);axs[1].invert_yaxis();axs[1].set_xlim(.7,5.3)
 save(fig,'task-profile-survey')
 import runpy
 runpy.run_path(str(ROOT/'scripts/plot-assisted-comparison.py'),run_name='__main__')
-print('Wrote revision-analysis.json and four current result/survey figures.')
+print('Wrote revision-analysis.json and three current result/survey figures.')
 for x in comparisons:print(x['measure'],x['contrast'],f"difference={x['mean_difference']:.4f} adjusted p={x['p_holm']:.6f}")
 print('Survey ratings:',[(x['mean'],x['sd']) for x in survey_ratings])
 print('Age:',summary['experiment_age'],survey_summary['age'])

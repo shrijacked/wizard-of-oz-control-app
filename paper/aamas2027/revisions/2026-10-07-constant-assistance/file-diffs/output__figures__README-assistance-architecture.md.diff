@@ -1,0 +1,20 @@
+--- before/output/figures/README-assistance-architecture.md
++++ current/output/figures/README-assistance-architecture.md
+@@ -4,7 +4,7 @@
+ 
+ The four modules show physiological processing, assistance timing, Wizard-of-Oz delivery, and participant interaction. Workspace camera observations and the puzzle solution provide task context through a separate route above the modules. The local study server supports the interfaces and records the study data. Solid arrows show signal processing and assistance delivery; dashed arrows show task context and questionnaire responses.
+ 
+-Scheduled assistance is offered every 30 seconds. Adaptive assistance uses the existing arousal flag from a heart-rate rise. The researcher chooses assistance content based on the puzzle context, and the robot operator executes the selected piece-specific program. No-assistance trials disable hints and robot actions.
++Constant assistance is offered every 30 seconds. Adaptive assistance uses the existing arousal flag from a heart-rate rise. The researcher chooses assistance content based on the puzzle context, and the robot operator executes the selected piece-specific program. No-assistance trials disable hints and robot actions.
+ 
+ ## Arousal derivation
+ 
+@@ -22,7 +22,7 @@
+ 
+ Suggested caption:
+ 
+-> Architecture of the assistance system. After signal-quality checks, median heart rate over the latest 15 seconds is compared with the preceding 60-second reference, using a calibrated baseline while the reference builds. A rise of at least 5 bpm raises the arousal flag. The assigned condition determines assistance timing: every 30 seconds for scheduled assistance or whenever arousal is flagged for adaptive assistance. Workspace observations and the puzzle solution inform assistance content. The researcher selects hints and/or robotic assistance, and the robot operator executes the selected piece-specific program. A local server synchronizes the interfaces and records study data.
++> Architecture of the assistance system. After signal-quality checks, median heart rate over the latest 15 seconds is compared with the preceding 60-second reference, using a calibrated baseline while the reference builds. A rise of at least 5 bpm raises the arousal flag. The assigned condition determines assistance timing: every 30 seconds for constant assistance or whenever arousal is flagged for adaptive assistance. Workspace observations and the puzzle solution inform assistance content. The researcher selects hints and/or robotic assistance, and the robot operator executes the selected piece-specific program. A local server synchronizes the interfaces and records study data.
+ 
+ Current placement: Section 4.1 as Figure 2. The manuscript imports the TikZ copy in paper/aamas2027/figures/assistance-architecture.tikz.tex. See paper/aamas2027/VERSIONS.md for version history.
+ 

@@ -1,0 +1,28 @@
+--- before/paper/aamas2027/BUILD.txt
++++ current/paper/aamas2027/BUILD.txt
+@@ -29,13 +29,12 @@
+ 
+ This writes output/pdf/main.pdf. After checking, copy it to
+ output/pdf/aamas2027-current.pdf. The final preview has 8 pages including
+-references, with main text continuing onto page 8. It includes 6 figures and
++references, with main text ending on page 7. It includes 5 figures and
+ 3 tables, 15 references and 21 citation occurrences. Both diagrams are imported
+ as TikZ from current editable sources; plots are vector PDFs. Two-panel plots
+-are sized for one column; the eight-panel constant/adaptive correlation figure spans both
+-columns; assistance differences use one column. Class margins and body font size remain unchanged.
++are sized for one column; the grouped assistance-rating bar chart spans both columns. Class margins and body font size remain unchanged.
+ 
+-All 8 pages were rendered and visually inspected. The final build has no
++All 8 pages were rendered and visually inspected; the final chart-height adjustment was rechecked on pages 7–8. The final build has no
+ overfull boxes, undefined citations/references, missing characters or fatal
+ errors. Remaining warnings concern underfull spacing, missing CCS concepts,
+ some optional bibliography fields, and the supplied class's balancing/conditional
+@@ -46,7 +45,7 @@
+ compiled with the established local Tectonic tool. The open standalone
+ architecture editor is retained and its source now uses constant assistance.
+ 
+-The immediate pre-change paper/PDF is in revisions/2026-10-07-photo-tables-comments/before/.
++The immediate pre-change paper/PDF is in revisions/2026-10-07-bar-comparison/before/.
+ The pre-restoration paper/PDF remains in revisions/2026-10-07-working-sample/before/.
+ The pre-protocol paper/PDF remains in revisions/2026-10-07-protocol/before/.
+ The earlier results-revision baseline remains in revisions/2026-10-07/before/. Review

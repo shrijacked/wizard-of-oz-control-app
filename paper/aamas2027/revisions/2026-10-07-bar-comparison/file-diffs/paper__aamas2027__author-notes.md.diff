@@ -1,0 +1,20 @@
+--- before/paper/aamas2027/author-notes.md
++++ current/paper/aamas2027/author-notes.md
+@@ -16,7 +16,7 @@
+ 
+ §4 now contains the submitted architecture and current setup schematic, operator roles, pickup/drop/assembly arrangement, and concise 15-second/60-second/5-bpm processing. The author confirmed use of this arousal method throughout, repeated assistance and a 15-second wait for rapid/sustained flags. The author confirmed the stated three-minute pre-task baseline procedure on 7 October. The detector identifies an HR-rise cue, not a validated psychological stress label.
+ 
+-§5 now has new participant demographics, all updated tables/ratings, paired-condition workload graphs, constant/adaptive Spearman scatterplots and exploratory paired sign-flip tests with specified Holm families. Higher adaptive ratings do not establish a statistically significant adaptive-constant difference. The paper quotes source-checked P101/P103 excerpts about hint clarity, timing and robot contribution, with all quotations italicized. No formal coding or claimed qualitative themes were invented.
++§5 now has new participant demographics, all updated tables/ratings, paired-condition workload graphs, constant/adaptive assistance-rating bars and exploratory paired sign-flip tests with specified Holm families. Higher adaptive ratings do not establish a statistically significant adaptive-constant difference. The paper quotes source-checked P101/P103 excerpts about hint clarity, timing and robot contribution, with all quotations italicized. No formal coding or claimed qualitative themes were invented.
+ 
+ §6 and the conclusion match the numerical findings, include a verbatim robot-motion comment, and retain direct placement as future work. The AI disclosure remains brief. Literature claims and references are unchanged; the source map has refreshed locations/hashes and verified anchors.
+ 
+@@ -41,7 +41,7 @@
+ 
+ P101 completion labels are reconstructed in the supplied coding: two constant successes; adaptive R9 remains ambiguous and is coded unsolved. Primary counts are 5/36, 24/36 and 18/36 (control, constant, adaptive). Recorded-only counts excluding P101 are 5/33, 22/33 and 18/33. Counting R9 solved gives 19/36 adaptive. Resolve these labels against original evidence before the final analysis. The paper does not narrate this audit; the exact sensitivity is in supplementary analysis notes.
+ 
+-Round duration includes failures and some records exceed the intended 300 seconds. Do not truncate without an agreed rule. Commands do not prove movement execution. Final trust/reliance are once per participant and cannot be separated by condition. Frustration is part of the workload composite. The replacement correlations compare constant and adaptive scores for the same measure, not relationships between different measures. Tests were chosen during revision, not preregistered, and use sign-flip symmetry assumptions; review a final model with the team. Preserve allocation/exposure audits internally as requested.
++Round duration includes failures and some records exceed the intended 300 seconds. Do not truncate without an agreed rule. Commands do not prove movement execution. Final trust/reliance are once per participant and cannot be separated by condition. Frustration is part of the workload composite. The grouped bar chart compares the assisted conditions using mean ratings and sample standard deviations. Tests were chosen during revision, not preregistered, and use sign-flip symmetry assumptions; review a final model with the team. Preserve allocation/exposure audits internally as requested.
+ 
+ ## Correct-piece scoring
+ 

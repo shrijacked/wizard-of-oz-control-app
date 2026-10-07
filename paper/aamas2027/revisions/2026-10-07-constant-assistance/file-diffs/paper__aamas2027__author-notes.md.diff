@@ -1,0 +1,38 @@
+--- before/paper/aamas2027/author-notes.md
++++ current/paper/aamas2027/author-notes.md
+@@ -6,7 +6,7 @@
+ 
+ Use the 5 October approved outline. Title, author order and submission ID 2613 remain as supplied from OpenReview. Affiliations and emails have not been inferred. The current source and PDF use the template’s anonymous mode and retain submission ID 2613. The previous named source is preserved in the revision archive. The historical submitted abstract is unchanged.
+ 
+-Scheduled assistance is offered every 30 seconds; adaptive assistance is offered when the existing heart-rate-rise arousal flag is raised. The author confirmed this policy and the physical layout: opaque partition, camera mounted on it covering the table, fixed labeled pickup positions, participant laptop for forms, assembly area in front of/left of the participant and drop spot to their right. These details are now in §4 with both current diagrams.
++Constant assistance is offered every 30 seconds; adaptive assistance is offered when the existing heart-rate-rise arousal flag is raised. The author confirmed this policy and the physical layout: opaque partition, camera mounted on it covering the table, fixed labeled pickup positions, participant laptop for forms, assembly area in front of/left of the participant and drop spot to their right. These details are now in §4 with both current diagrams.
+ 
+ The planned experimental sample is 24. The new export supports 12 complete participants / 108 rounds. At the author’s request, the exact earlier abstract is restored, using N=24. The procedure describes 24 as planned and the document has a visible working-draft notice. Numerical results, tests and graphs remain based on the existing 12 complete participants; no unobserved outcomes were manufactured. Experimental demographics are removed pending the final sample. The survey has 24 responses and is written as the supplied survey result, without interim wording. The author confirmed both input archives identified in README.
+ 
+@@ -16,7 +16,7 @@
+ 
+ §4 now contains the submitted architecture and current setup schematic, operator roles, pickup/drop/assembly arrangement, and concise 15-second/60-second/5-bpm processing. The author confirmed use of this arousal method throughout, repeated assistance and a 15-second wait for rapid/sustained flags. The three-minute baseline window is provisional pending an actual-procedure check. The detector identifies an HR-rise cue, not a validated psychological stress label.
+ 
+-§5 now has new participant demographics, all updated tables/ratings, paired-condition workload graphs, scheduled/adaptive Spearman scatterplots and exploratory paired sign-flip tests with specified Holm families. Higher adaptive ratings do not establish a statistically significant adaptive-scheduled difference. Six participants left comments; the paper quotes three excerpts from two people and paraphrases the two “fun” responses. No formal coding or claimed qualitative themes were invented.
++§5 now has new participant demographics, all updated tables/ratings, paired-condition workload graphs, constant/adaptive Spearman scatterplots and exploratory paired sign-flip tests with specified Holm families. Higher adaptive ratings do not establish a statistically significant adaptive-constant difference. Six participants left comments; the paper quotes three excerpts from two people and paraphrases the two “fun” responses. No formal coding or claimed qualitative themes were invented.
+ 
+ §6 and the conclusion match the numerical findings, include a verbatim robot-motion comment, and retain direct placement as future work. The AI disclosure remains brief. Literature claims and references are unchanged; the source map has refreshed locations/hashes and verified anchors.
+ 
+@@ -39,9 +39,9 @@
+ 
+ The primary cohort is P101, P103–P110, P115, P116 and P118. P111 has five finished rounds; R6 is unfinished and later rounds unstarted. P119 is setup-only. P118 reuses an older setup session ID; count its final metadata and October rounds once. P108–P110 retain provisional-source status. These checks belong here, rather than in the paper's voice.
+ 
+-P101 completion labels are reconstructed in the supplied coding: two scheduled successes; adaptive R9 remains ambiguous and is coded unsolved. Primary counts are 5/36, 24/36 and 18/36 (control, scheduled, adaptive). Recorded-only counts excluding P101 are 5/33, 22/33 and 18/33. Counting R9 solved gives 19/36 adaptive. Resolve these labels against original evidence before the final analysis. The paper does not narrate this audit; the exact sensitivity is in supplementary analysis notes.
++P101 completion labels are reconstructed in the supplied coding: two constant successes; adaptive R9 remains ambiguous and is coded unsolved. Primary counts are 5/36, 24/36 and 18/36 (control, constant, adaptive). Recorded-only counts excluding P101 are 5/33, 22/33 and 18/33. Counting R9 solved gives 19/36 adaptive. Resolve these labels against original evidence before the final analysis. The paper does not narrate this audit; the exact sensitivity is in supplementary analysis notes.
+ 
+-Round duration includes failures and some records exceed the intended 300 seconds. Do not truncate without an agreed rule. Commands do not prove movement execution. Final trust/reliance are once per participant and cannot be separated by condition. Frustration is part of the workload composite. The replacement correlations compare scheduled and adaptive scores for the same measure, not relationships between different measures. Tests were chosen during revision, not preregistered, and use sign-flip symmetry assumptions; review a final model with the team. Preserve allocation/exposure audits internally as requested.
++Round duration includes failures and some records exceed the intended 300 seconds. Do not truncate without an agreed rule. Commands do not prove movement execution. Final trust/reliance are once per participant and cannot be separated by condition. Frustration is part of the workload composite. The replacement correlations compare constant and adaptive scores for the same measure, not relationships between different measures. Tests were chosen during revision, not preregistered, and use sign-flip symmetry assumptions; review a final model with the team. Preserve allocation/exposure audits internally as requested.
+ 
+ ## Correct-piece scoring
+ 
+@@ -55,4 +55,4 @@
+ 
+ ## Figure comparison decisions
+ 
+-The former performance plot and within-condition heatmaps are removed; their data remain archived. Six figures remain. Matched cross-condition Spearman correlations use participant averages and average tied ranks; they do not estimate condition effects. Assistance differences use exact adaptive-minus-scheduled participant values and existing mean/bootstrap intervals. These intervals are unadjusted, unlike the Holm-adjusted p-values; do not use them to claim a corrected significant assisted-policy difference. Existing primary results and working abstract are unchanged.
++The former performance plot and within-condition heatmaps are removed; their data remain archived. Six figures remain. Matched cross-condition Spearman correlations use participant averages and average tied ranks; they do not estimate condition effects. Assistance differences use exact adaptive-minus-constant participant values and existing mean/bootstrap intervals. These intervals are unadjusted, unlike the Holm-adjusted p-values; do not use them to claim a corrected significant assisted-policy difference. Existing primary results and working abstract are unchanged.

@@ -1,0 +1,29 @@
+--- before/paper/aamas2027/README.md
++++ current/paper/aamas2027/README.md
+@@ -15,6 +15,8 @@
+ The architecture TeX was pushed separately in commit `3c4ddb9`. The paper and preserved review versions are versioned together on branch writing. Do not include raw participant records or survey usernames in commits.
+ 
+ Latest terminology revision: [change log](revisions/2026-10-07-constant-assistance/CHANGELOG.md), [highlighted review](revisions/2026-10-07-constant-assistance/highlighted-review.html), and [pre-change paper](revisions/2026-10-07-constant-assistance/before/main.tex). The current condition name is constant assistance throughout the paper and figures; the 30-second interval is unchanged. Earlier reviews retain the wording from their own dates.
++
++Latest presentation revision: [change log](revisions/2026-10-07-photo-tables-comments/CHANGELOG.md) and [highlighted review](revisions/2026-10-07-photo-tables-comments/highlighted-review.html). Tables 1–3 emphasize favorable means, Figure 3 includes the supplied setup photo, and participant quotations are italicized. The confirmed baseline reminder has been removed.
+ 
+ ## Author decisions and writing voice
+ 
+@@ -51,7 +53,7 @@
+ ```sh
+ python3 scripts/summarize-writing-results.py --source data/writing-reference/hti-results-2026-10-06/relevant-files/consolidated-data.json --output paper/aamas2027/analysis/results-summary-2026-10-07.json
+ python3 scripts/update-paper-analysis.py
+-python3 scripts/review-paper-revision.py --revision 2026-10-07-constant-assistance
++python3 scripts/review-paper-revision.py --revision 2026-10-07-photo-tables-comments
+ ```
+ 
+ The first script uses the standard library. The graph/test script requires NumPy and Matplotlib. It uses the source's complete-cohort classification and existing `analysisSolved` labels; it does not adjudicate missing outcomes or merge new exports. Paths are at the top of the script. Retain source hashes, freeze a new pre-change snapshot, review participants/outcomes, regenerate analyses, update both manuscripts and evidence notes, build and inspect every PDF page, then regenerate the review package. Keep previous snapshots unchanged.
+@@ -60,7 +62,7 @@
+ 
+ ## Remaining work
+ 
+-The author confirmed the digital square-tangram survey, college-group recruitment and some overlap with the experiment. Exact overlap, task link and chronology remain unprovided. Preset hints, paired robot-plus-hint delivery, coupon compensation, five-minute breaks, success/timeout rules and the orientation-maximizing scoring rule are now documented. Add the setup photograph, robot model/piece material, actual baseline procedure, signal-loss behavior, eligibility/practice/ethics facts, and scored final photographs. The baseline window is provisional; the code’s 60-second calibration must be reconciled. Concealed operation was not disclosed afterward, per the author; the enacted instruction version and institutional review status remain open. Review the exploratory statistical model with the team before final submission, including coding adjudication and source checks. Add further relevant PDF-verified references. Keep the current anonymous author block and ID 2613. Resolve CCS/bibliography/build checks; affiliations belong only in a future named version. See [author notes](author-notes.md) for specifics.
++The author confirmed the digital square-tangram survey, college-group recruitment and some overlap with the experiment. Exact overlap, task link and chronology remain unprovided. Preset hints, paired robot-plus-hint delivery, coupon compensation, five-minute breaks, success/timeout rules and the orientation-maximizing scoring rule are now documented. The setup photograph is inserted and the three-minute baseline procedure is confirmed. Add robot model/piece material, signal-loss behavior, eligibility/practice/ethics facts, and scored final photographs. The baseline window is provisional; the code’s 60-second calibration must be reconciled. Concealed operation was not disclosed afterward, per the author; the enacted instruction version and institutional review status remain open. Review the exploratory statistical model with the team before final submission, including coding adjudication and source checks. Add further relevant PDF-verified references. Keep the current anonymous author block and ID 2613. Resolve CCS/bibliography/build checks; affiliations belong only in a future named version. See [author notes](author-notes.md) for specifics.
+ 
+ The bibliography and 21 citation occurrences remain unchanged in content. All 15 PDF hashes and 35 source anchors are rechecked for this revision; the map's locations and manuscript hashes identify the updated text. Twelve sources first appeared in 2024–2026; older exceptions are retained for the measure or closest comparison. Downloaded PDFs and full extracted text stay in gitignored `data/`, and are not redistributed by pushing the branch.
+ 

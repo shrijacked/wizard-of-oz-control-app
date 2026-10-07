@@ -1,0 +1,22 @@
+--- before/paper/aamas2027/figures/assistance-architecture.tikz.tex
++++ current/paper/aamas2027/figures/assistance-architecture.tikz.tex
+@@ -62,8 +62,8 @@
+ 
+ % Condition-specific timing; inactive assistance controls in the control condition.
+ \node[note,text=policy] at (7.05,8.32) {Assigned condition};
+-\node[card=policy,text width=2.25cm] (scheduled) at (7.05,7.25)
+-  {\textbf{Scheduled}\\Assistance every 30 s};
++\node[card=policy,text width=2.25cm] (constant) at (7.05,7.25)
++  {\textbf{Constant}\\Assistance every 30 s};
+ \node[card=policy,text width=2.25cm,minimum height=1.35cm] (adaptive) at (7.05,5.35)
+   {\textbf{Adaptive}\\Assistance whenever\\arousal is flagged};
+ \node[card=policy,text width=2.25cm,minimum height=1.3cm] at (7.05,2.5)
+@@ -86,7 +86,7 @@
+ 
+ \draw[feedback] (4.85,10.35) -- (12.9,10.35) -- (12.9,8.2) -- (10.85,8.2) -- (researcher.north);
+ \node[note,text=context] at (8.7,10.35) {Task context};
+-\draw[flow,draw=policy] (scheduled.east) -- (researcher.west |- scheduled.east);
++\draw[flow,draw=policy] (constant.east) -- (researcher.west |- constant.east);
+ \draw[flow,draw=policy] (adaptive.east) -- (8.8,5.35) -- (8.8,6.65) -- (researcher.west |- 0,6.65);
+ \draw[flow,draw=delivery] (researcher.south) -- (hint.north);
+ \draw[flow,draw=delivery] (researcher.east) -- (12.45,7) -- (12.45,3.55) -- (10.85,3.55) -- (operator.north);

@@ -1,0 +1,88 @@
+{
+  "base_commit": "547d7ff",
+  "baseline_verified_files": 50,
+  "changes": [
+    {
+      "path": "paper/aamas2027/BUILD.txt",
+      "status": "modified",
+      "before_sha256": "67a6925533d953628aecf9153f19e901f586796746e75f6f35fa3b542c450867",
+      "after_sha256": "6105d092045ce67ce3013cd5dca1b4114b2eb33be84d72601e031a13f9b772e6",
+      "diff_path": "file-diffs/paper__aamas2027__BUILD.txt.diff"
+    },
+    {
+      "path": "paper/aamas2027/README.md",
+      "status": "modified",
+      "before_sha256": "f02a02e2946438f898a44611182da73f1e857d8b277d0529ea2c0e2768f06d00",
+      "after_sha256": "b0f2c78906c1bdde7630917266bc8e09d068ead41b58ae8d1efd2131cfe35ff7",
+      "diff_path": "file-diffs/paper__aamas2027__README.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/VERSIONS.md",
+      "status": "modified",
+      "before_sha256": "8db0368b7880012449f9f5046f15311697ffd7a65fc003d4a899e798f6e2b6d9",
+      "after_sha256": "53077115b595743f0a9ea9383cab8788645ca1df09bf2487033e61d692fac464",
+      "diff_path": "file-diffs/paper__aamas2027__VERSIONS.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/author-notes.md",
+      "status": "modified",
+      "before_sha256": "ac2d5d3e4a9bfb0bd0ffe2ac3f43f2e2a62daaf462435b0a0168da071ba2d6a5",
+      "after_sha256": "4d54e8ad2ed585db061ce5c7c2226de4cb36d4e9a25081a72f709df1008d4b6b",
+      "diff_path": "file-diffs/paper__aamas2027__author-notes.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/evidence-map.md",
+      "status": "modified",
+      "before_sha256": "389cd095a27c822f6e833b545ccaac61cc2f029b4175a76277eae27347d5942f",
+      "after_sha256": "491d78b40bd21389e3aa42ec8b6741ba0259219fd4bc7b7b759954fbfdc08664",
+      "diff_path": "file-diffs/paper__aamas2027__evidence-map.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/figures/setup-photo.jpg",
+      "status": "added",
+      "before_sha256": null,
+      "after_sha256": "534ba4cd674aa4466e03023c2de2e25627e15c678db38f1d2e164ca581ee1a24"
+    },
+    {
+      "path": "paper/aamas2027/literature/reference-text-map.json",
+      "status": "modified",
+      "before_sha256": "9e08947b90d5b4465a8d0edb1cc84286627aa36d96f97f9954d83250fad117a3",
+      "after_sha256": "7ec4e4963274fbc69a2f8f03edd1d85f46041fe7344e66c8a480d843470d3383",
+      "diff_path": "file-diffs/paper__aamas2027__literature__reference-text-map.json.diff"
+    },
+    {
+      "path": "paper/aamas2027/main.tex",
+      "status": "modified",
+      "before_sha256": "3659ed17c727b9c0aa25a9538609a8feb5e24d1deaf3b478f216435cdcc2dc36",
+      "after_sha256": "affeb5edf1de67f8e501f4140a725fcb90687212b9c9b65cdda5d745bdc1596d",
+      "diff_path": "file-diffs/paper__aamas2027__main.tex.diff"
+    },
+    {
+      "path": "paper/aamas2027/manuscript.md",
+      "status": "modified",
+      "before_sha256": "d6eefda92e42ec79de09892b94f08b8048820924a67b107106b5a8fd523f19b5",
+      "after_sha256": "f2f3f9d858a6ce156de398b2e5c1122dda83254c91b9e7af40af5ad0c870f2a1",
+      "diff_path": "file-diffs/paper__aamas2027__manuscript.md.diff"
+    },
+    {
+      "path": "paper/aamas2027/method-checks/baseline-recording.md",
+      "status": "modified",
+      "before_sha256": "98c621fa9e36221ab7cf232be70951029aa867b56ee92918b9b3858fd592fe16",
+      "after_sha256": "a84e36470a0ec92a5efe9efe69050f05f06f86bcfddcaa44b2b28a339e1cd82e",
+      "diff_path": "file-diffs/paper__aamas2027__method-checks__baseline-recording.md.diff"
+    },
+    {
+      "path": "output/pdf/aamas2027-current.pdf",
+      "status": "modified",
+      "before_sha256": "a934a7d5709c92051c93fff56c6e7cf87200b1ccc9429493a0ef44d656d1416f",
+      "after_sha256": "808d3b788373c50ebbf6a0c01bffeee8a8fbaae67f03499a747d89d1b34f323e"
+    },
+    {
+      "path": "output/packages/aamas2027-complete-latex-project.zip",
+      "status": "modified",
+      "after_sha256": "38bdc74b9870657fb55f927aaf9eb5468e552d59578fc7e899bd4b556a5f2f80",
+      "note": "Updated clean project includes current source/PDF and setup photograph."
+    }
+  ],
+  "baseline_state": "Immediately after the uncommitted constant-assistance terminology revision."
+}

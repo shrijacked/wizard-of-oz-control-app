@@ -1,0 +1,362 @@
+{
+  "prepared": "2026-10-05",
+  "scope": "18 tracked papers and 22 additional discovery-only leads; not a systematic literature review or a census of every search result.",
+  "papers": [
+    {
+      "title": "Gazing at Failure: Investigating Human Gaze in Response to Robot Failure in Collaborative Tasks",
+      "authors": "Ramtin Tabatabaei; Vassilis Kostakos; Wafa Johal",
+      "date": "4 March 2025 (proceedings date)",
+      "venue": "HRI 2025",
+      "url": "https://doi.org/10.1109/hri61500.2025.10973935",
+      "status": "Downloaded PDF; targeted full-text review",
+      "scope": "Initial audit: main text and limitations; key PDF pp. 3, 8.",
+      "pdf_url": "https://arxiv.org/pdf/2502.16899",
+      "version": "arXiv v1; accepted HRI full paper",
+      "date_evidence": "Original audit metadata: tabatabaei_crossref.json",
+      "downloaded": "2026-09-30"
+    },
+    {
+      "title": "Real-Time Adaptive Industrial Robots: Improving Safety And Comfort In Human-Robot Collaboration",
+      "authors": "Damian Hostettler; Simon Mayer; Jan Liam Albert; Kay Erik Jenss; Christian Hildebrand",
+      "date": "25 April 2025 (online); 26 April 2025 (proceedings)",
+      "venue": "CHI 2025",
+      "url": "https://doi.org/10.1145/3706598.3713889",
+      "status": "Downloaded PDF; targeted full-text review",
+      "scope": "Initial audit: main text and limitations; key PDF pp. 5-7, 12.",
+      "pdf_url": "https://alexandria.unisg.ch/bitstreams/b9548afd-a853-40ed-9141-7bb837ce1f77/download",
+      "version": "Final CHI 2025 version; university repository",
+      "date_evidence": "Original audit metadata: hostettler_crossref.json",
+      "downloaded": "2026-09-30"
+    },
+    {
+      "title": "Assembly complexity and physiological response in human-robot collaboration: Insights from a preliminary experimental analysis",
+      "authors": "Matteo Capponi; Riccardo Gervasi; Luca Mastrogiacomo; Fiorenzo Franceschini",
+      "date": "October 2024 (issue); exact first-online date unverified",
+      "venue": "Robotics and Computer-Integrated Manufacturing 89, 102789",
+      "url": "https://doi.org/10.1016/j.rcim.2024.102789",
+      "status": "Downloaded PDF; targeted full-text review",
+      "scope": "Initial audit: main text and limitations; key PDF pp. 3-8, 11-14.",
+      "pdf_url": "https://www.qualityengineering.polito.it/content/download/1126/6184/file/Assembly%20complexity%20and%20physiological%20response%20in%20human-robot%20collaboration%20_%20Insights%20from%20a%20preliminary%20experimental%20analysis.pdf",
+      "version": "Published version; university research-group website",
+      "date_evidence": "Original audit metadata: capponi_crossref.json",
+      "downloaded": "2026-09-30"
+    },
+    {
+      "title": "A Bayesian framework for learning proactive robot behaviour in assistive tasks",
+      "authors": "Antonio Andriella; Ilenia Cucciniello; Antonio Origlia; Silvia Rossi",
+      "date": "26 December 2024 (online); March 2025 (issue)",
+      "venue": "User Modeling and User-Adapted Interaction 35, article 1",
+      "url": "https://doi.org/10.1007/s11257-024-09421-1",
+      "status": "Downloaded PDF; targeted full-text review",
+      "scope": "PDF pp. 8-12, 16-17, 23-26, 29-35: task, inputs, timing model, final comparison, results and discussion.",
+      "pdf_url": "https://link.springer.com/content/pdf/10.1007/s11257-024-09421-1.pdf",
+      "version": "Published journal PDF",
+      "date_evidence": "Original audit metadata: Andriella_2025_Bayesian_Proactive_Assistance_crossref.json",
+      "downloaded": "2026-09-30"
+    },
+    {
+      "title": "Adaptive Robotic Behavior in Industrial Human–Robot Collaboration: A Systematic Review of Taxonomies, Enabling Mechanisms, and Research Frontiers",
+      "authors": "Bsher Karbouj; Rajwinder Garha; Konstantin KeßLer; Jörg Krüger",
+      "date": "30 December 2025 (first publication); 5 January 2026 (current version); 2026 volume",
+      "venue": "IEEE Access 14, 1398–1422",
+      "url": "https://doi.org/10.1109/ACCESS.2025.3649702",
+      "status": "Downloaded PDF; targeted full-text review",
+      "scope": "PDF pp. 1-4, 13-16, 21: review scope, adaptation taxonomy, gaps and limitations.",
+      "pdf_url": "https://publica-rest.fraunhofer.de/server/api/core/bitstreams/e60c03db-8192-404a-a885-43c61307f554/content",
+      "version": "Published journal PDF",
+      "date_evidence": "Original audit metadata: Karbouj_2026_Adaptive_HRC_Review_crossref.json",
+      "downloaded": "2026-09-30"
+    },
+    {
+      "title": "Capturing Mental Workload Through Physiological Sensors in Human–Robot Collaboration: A Systematic Literature Review",
+      "authors": "Eduarda Pereira; Luis Sigcha; Emanuel Silva; Adriana Sampaio; Nuno Costa; Nélson Costa",
+      "date": "18 March 2025",
+      "venue": "Applied Sciences 15(6), 3317",
+      "url": "https://doi.org/10.3390/app15063317",
+      "status": "Downloaded PDF; targeted full-text review",
+      "scope": "PDF pp. 13-15, 18-21: cardiac evidence, synthesis and limitations.",
+      "pdf_url": "https://mdpi-res.com/d_attachment/applsci/applsci-15-03317/article_deploy/applsci-15-03317.pdf",
+      "version": "Published journal PDF",
+      "date_evidence": "Original audit metadata: Pereira_2025_Workload_Sensors_Review_crossref.json",
+      "downloaded": "2026-09-30"
+    },
+    {
+      "title": "Optimizing Human–Robot Teaming Performance through Q-Learning-Based Task Load Adjustment and Physiological Data Analysis",
+      "authors": "Soroush Korivand; Gustavo Galvani; Arash Ajoudani; Jiaqi Gong; Nader Jalili",
+      "date": "28 April 2024",
+      "venue": "Sensors 24(9), 2817",
+      "url": "https://doi.org/10.3390/s24092817",
+      "status": "Downloaded PDF; targeted full-text review",
+      "scope": "PDF pp. 1-8, 15-19: study conditions, offline modelling and explicit real-time limitation. Page 18 visually checked.",
+      "pdf_url": "https://mdpi-res.com/d_attachment/sensors/sensors-24-02817/article_deploy/sensors-24-02817.pdf",
+      "version": "Published journal PDF",
+      "date_evidence": "Original audit metadata: Korivand_2024_Physiological_Task_Load_Adjustment_crossref.json",
+      "downloaded": "2026-09-30"
+    },
+    {
+      "title": "Personalizing Human–Robot Workplace Parameters in Human-Centered Manufacturing",
+      "authors": "Robert Ojsteršek; Borut Buchmeister; Aljaž Javernik",
+      "date": "11 August 2024",
+      "venue": "Machines 12(8), 546",
+      "url": "https://doi.org/10.3390/machines12080546",
+      "status": "Downloaded PDF; targeted full-text review",
+      "scope": "PDF pp. 3-9: skills-test-based personalization, post-session ECG processing and three-scenario comparison.",
+      "pdf_url": "https://mdpi-res.com/d_attachment/machines/machines-12-00546/article_deploy/machines-12-00546.pdf",
+      "version": "Published journal PDF",
+      "date_evidence": "Original audit metadata: Ojstersek_2024_Personalizing_Workplace_crossref.json",
+      "downloaded": "2026-09-30"
+    },
+    {
+      "title": "Neuroadaptation in Physical Human-Robot Collaboration",
+      "authors": "Avinash Singh; Dikai Liu; Chin-Teng Lin",
+      "date": "30 September 2023 (arXiv posting)",
+      "venue": "arXiv:2310.00351; peer-reviewed publication not verified",
+      "url": "https://doi.org/10.48550/arXiv.2310.00351",
+      "status": "Downloaded PDF; targeted full-text review",
+      "scope": "PDF pp. 1-4, 8-9: online EEG adaptation, experiment, discussion and limitations.",
+      "pdf_url": "https://arxiv.org/pdf/2310.00351",
+      "version": "arXiv preprint; peer-reviewed publication not verified",
+      "date_evidence": "PDF / publisher or repository record",
+      "downloaded": "2026-09-30"
+    },
+    {
+      "title": "SensCogAR: Cognitive Load Estimation Via Movement Data in Assembly Tasks",
+      "authors": "Javier Melo; Leyla Akinci; Ko Watanabe; Nicolas Großmann; Shoya Ishimaru; Andreas Dengel",
+      "date": "2026 publication; released on J-STAGE 13 April 2026",
+      "venue": "International Journal of Activity and Behavior Computing 2026(1), 1–20",
+      "url": "https://doi.org/10.60401/ijabc.147",
+      "status": "Downloaded PDF; targeted full-text review",
+      "scope": "PDF pp. 1-8, 9-16: assembly rationale, methods, results and transfer limitations. Page 8 visually checked.",
+      "pdf_url": "https://www.jstage.jst.go.jp/article/ijabc/2026/1/2026_147/_pdf",
+      "version": "Published journal PDF",
+      "date_evidence": "PDF / publisher or repository record",
+      "downloaded": "2026-09-30"
+    },
+    {
+      "title": "Enhancing the effectiveness of human-robot teaming with a closed-loop system",
+      "authors": "Grace Teo; Lauren Reinerman-Jones; Gerald Matthews; James Szalma; Florian Jentsch; Peter Hancock",
+      "date": "3 October 2017 (online); February 2018 (issue)",
+      "venue": "Applied Ergonomics 67, 91–103",
+      "url": "https://doi.org/10.1016/j.apergo.2017.07.007",
+      "status": "Downloaded PDF; targeted full-text review",
+      "scope": "Sections 2.1–2.5, pp. 4–6, and Discussion/Conclusion pp. 11–12. Physiological triggering versus imposed aid; assignment follows workload threshold.",
+      "pdf_url": "https://sciences.ucf.edu/psychology/perl/wp-content/uploads/sites/29/2019/08/Enhancing-the-effectiveness-of-human-robot-teaming-with-a-closed-loop-system..pdf",
+      "version": "Published version from university research-group website; journal issue 2018; online 2017",
+      "date_evidence": "Original audit metadata: Teo_2018_Closed_Loop_Teaming_crossref.json",
+      "downloaded": "2026-09-30"
+    },
+    {
+      "title": "An Adaptive Human-Robotic Interaction Architecture for Augmenting Surgery Performance Using Real-Time Workload Sensing—Demonstration of a Semi-autonomous Suction Tool",
+      "authors": "Jing Yang; Juan Antonio Barragan; Jason Michael Farrow; Chandru P. Sundaram; Juan P. Wachs; Denny Yu",
+      "date": "11 November 2022 (online); April 2024 (issue)",
+      "venue": "Human Factors 66(4), 1081–1102",
+      "url": "https://doi.org/10.1177/00187208221129940",
+      "status": "Downloaded PDF; targeted full-text review",
+      "scope": "Experiment 2, PDF pp. 8–11, and General Discussion pp. 12–14. Physiology-triggered versus periodic suction verified; page 9 visually checked.",
+      "pdf_url": "https://scholarworks.indianapolis.iu.edu/bitstreams/5eb42ad8-e6eb-4495-9c1d-f520e3877a06/download",
+      "version": "Author manuscript; published Human Factors 66(4), 1081–1102 (2024); first online 2022-11-11",
+      "date_evidence": "Original audit metadata: Yang_2024_Adaptive_Surgical_Assistance_crossref.json",
+      "downloaded": "2026-09-30"
+    },
+    {
+      "title": "Comparative Analysis Of Mental Workload In Adaptive Human-Robot Collaboration During Assembly Tasks",
+      "authors": "Carlo Caiazzo; Marija Savkovic; Milos Pusica; Nastasija Nikolic; Ivan Macuzic; Marko Djapan",
+      "date": "2024 (conference paper); exact publication day unverified",
+      "venue": "ESREL 2024, Advances in Reliability, Safety and Security, Part 5",
+      "url": "https://scidar.kg.ac.rs/handle/123456789/21811",
+      "status": "Downloaded PDF; targeted full-text review",
+      "scope": "Section 2, PDF pp. 4–7; Results/Conclusion pp. 7–9. Guidance is instructions/labels, EEG evaluates workload.",
+      "pdf_url": "https://scidar.kg.ac.rs/bitstream/123456789/21811/1/comparative-analysis-of-mental-workload-in-adaptive-human-robot-collaboration-during-assembly-tasks.pdf",
+      "version": "Conference paper in university repository; PDF includes ResearchGate cover",
+      "date_evidence": "PDF / publisher or repository record",
+      "downloaded": "2026-09-30"
+    },
+    {
+      "title": "BARI: An Affordable Brain-Augmented Reality Interface to Support Human–Robot Collaboration in Assembly Tasks",
+      "authors": "Andrea Sanna; Federico Manuri; Jacopo Fiorenza; Francesco De Pace",
+      "date": "28 September 2022",
+      "venue": "Information 13(10), 460",
+      "url": "https://doi.org/10.3390/info13100460",
+      "status": "Downloaded PDF; targeted full-text review",
+      "scope": "PDF pp. 4–5, 8–11. EEG-based intentional command selection; usability study, no scheduled policy comparison.",
+      "pdf_url": "https://mdpi-res.com/d_attachment/information/information-13-00460/article_deploy/information-13-00460.pdf",
+      "version": "Published journal PDF",
+      "date_evidence": "Original audit metadata: Sanna_2022_BARI_Assembly_Assistance_crossref.json",
+      "downloaded": "2026-09-30"
+    },
+    {
+      "title": "Workload Intensity in Human–Robot Collaboration: A Personalized Approach to Sustainable Efficiency and Well-Being",
+      "authors": "Aljaz Javernik; Robert Ojstersek; Katja Kerman",
+      "date": "11 February 2026 (online); July 2026 (issue)",
+      "venue": "Human Factors 68(7), 913–929",
+      "url": "https://journals.sagepub.com/doi/10.1177/00187208261423621",
+      "status": "Publisher HTML read; PDF download returned HTTP 403",
+      "scope": "Publisher HTML: Methods, Experiments 1 and 2, Results, and General Discussion. Excluded from derived findings because the PDF was not downloaded.",
+      "date_evidence": "Original audit metadata: Javernik_2026_Personalized_Workload_crossref.json"
+    },
+    {
+      "title": "Collaborative Robots Adapting Their Behavior Based on Workers’ Psychological States: A Systematic Scoping Review",
+      "authors": "Sofia Morandini; Francesco Currò; Oronzo Parlangeli; Luca Pietrantoni",
+      "date": "22 July 2025 (online); 2025 volume",
+      "venue": "Human Behavior and Emerging Technologies 2025, article 6361777",
+      "url": "https://onlinelibrary.wiley.com/doi/10.1155/hbe2/6361777",
+      "status": "Online review used for discovery and reference tracing; PDF downloads returned HTTP 403",
+      "scope": "Selective online reading for discovery and reference tracing; no comprehensive full-text audit. Excluded from derived findings.",
+      "date_evidence": "Original audit metadata: Morandini_2025_Psychological_State_Adaptation_Review_crossref.json"
+    },
+    {
+      "title": "Toward Industry 5.0: A Neuroergonomic Workstation for a Human-Centered, Collaborative Robot-Supported Manual Assembly Process",
+      "authors": "Nikola Knežević; Andrej Savić; Zaviša Gordić; Arash Ajoudani; Kosta Jovanović",
+      "date": "2025 (journal issue); exact first-online date unverified",
+      "venue": "IEEE Robotics & Automation Magazine 32(3), 103–113",
+      "url": "https://doi.org/10.1109/MRA.2024.3487323",
+      "status": "Institutional abstract and metadata checked; full text not retrieved",
+      "scope": "Institutional abstract and bibliographic record only; full text not retrieved. Excluded from derived findings.",
+      "date_evidence": "https://dsp.tecnalia.com/items/9b9f54f1-ac9f-4ea0-9692-feab60c5833e"
+    },
+    {
+      "title": "Reading the Human Before Assistance: Adapting Robot Support via Physiology and Behavior During Collaborative Assembly",
+      "authors": "Authorship requires verification against the manuscript",
+      "date": "24 September 2026 (SSRN posting, indexed record)",
+      "venue": "SSRN working-paper/proposal record; peer review not verified",
+      "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=7519002",
+      "status": "Indexed abstract screened; full text not verified",
+      "scope": "Indexed abstract only; full text and manuscript authorship unverified. Excluded from derived findings.",
+      "date_evidence": "SSRN indexed posting record"
+    }
+  ],
+  "discovery_only": [
+    {
+      "title": "Adaptive aiding with an individualized workload model based on psychophysiological measures",
+      "date": "28 November 2019 (online); 2020 (volume)",
+      "url": "https://doi.org/10.1007/s42454-019-00005-8",
+      "status": "Search lead; publisher metadata/date checked. No structured full-text review or saved PDF."
+    },
+    {
+      "title": "Adaptive Aiding of Human-Robot Teaming: Effects of Imperfect Automation on Performance, Trust, and Workload",
+      "date": "2011; exact day unverified",
+      "url": "https://doi.org/10.1177/1555343411410160",
+      "status": "Search/reference lead only."
+    },
+    {
+      "title": "Adaptive vs. Static Robot-to-Human Handover: A Study on Orientation and Approach Direction",
+      "date": "24 April 2026 (arXiv posting)",
+      "url": "https://arxiv.org/abs/2604.22378",
+      "status": "Search/abstract screening only; preprint."
+    },
+    {
+      "title": "Mental Workload and Human-Robot Interaction in Collaborative Tasks: A Scoping Review",
+      "date": "20 September 2023 (online); 2024 (issue)",
+      "url": "https://doi.org/10.1080/10447318.2023.2254639",
+      "status": "Search/abstract and metadata screening only."
+    },
+    {
+      "title": "Human and Robot Assistance for Cognitive Load in Younger and Older Adults: Multimodal Within-Subject Experimental Study",
+      "date": "2026; exact day unverified",
+      "url": "https://shura.shu.ac.uk/37555/",
+      "status": "Search lead; repository PDF link found, but PDF not saved or reviewed."
+    },
+    {
+      "title": "Learning performance and physiological feedback-based evaluation for human–robot collaboration",
+      "date": "Publication date not verified",
+      "url": "https://www.sciencedirect.com/science/article/pii/S0003687024002023",
+      "status": "Search lead only."
+    },
+    {
+      "title": "Understanding workers’ psychological states and physiological responses during human–robot collaboration",
+      "date": "2025 in search record; exact date unverified",
+      "url": "https://www.sciencedirect.com/science/article/pii/S1071581925000734",
+      "status": "Search lead only."
+    },
+    {
+      "title": "Evaluating the Effect of Speed and Acceleration on Human Factors during an Assembly Task in Human–Robot Interaction (HRI)",
+      "date": "2025 in search record; exact date unverified",
+      "url": "https://doi.org/10.1007/s12369-025-01224-7",
+      "status": "Search lead only."
+    },
+    {
+      "title": "Analyzing psychophysical state and cognitive performance in human-robot collaboration for repetitive assembly processes",
+      "date": "Publication date not verified",
+      "url": "https://doi.org/10.1007/s11740-023-01230-6",
+      "status": "Search lead only; DOI year is not used as a publication date."
+    },
+    {
+      "title": "A Vision Based Framework Integrating Attention and Action Cues for Interpretable Cognitive Workload Assessment in Human-Robot Collaborative Assembly",
+      "date": "September 2026 (arXiv); exact day unverified",
+      "url": "https://arxiv.org/abs/2609.15232",
+      "status": "Search lead only; preprint."
+    },
+    {
+      "title": "Human Robot Collaboration for Enhancing Work Activities",
+      "date": "2024 issue / 2022 online in search record; exact dates unverified",
+      "url": "https://doi.org/10.1177/00187208221077722",
+      "status": "Search lead only."
+    },
+    {
+      "title": "Effect of Cognitive Fatigue, Operator Sex, and Robot Assistance on Task Performance Metrics, Workload, and Situation Awareness in Human-Robot Collaboration",
+      "date": "1 March 2021 (online); April 2021 (issue)",
+      "url": "https://doi.org/10.1109/LRA.2021.3062787",
+      "status": "Search/metadata only."
+    },
+    {
+      "title": "Design of an Interactive Virtual Reality System, InViRS, for Joint Attention Practice in Autistic Children",
+      "date": "2021; exact day unverified",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8482411/",
+      "status": "Search lead only."
+    },
+    {
+      "title": "Oops, I Did It Again (But I Know It) [abbreviated title in search notes]",
+      "date": "2026; exact day unverified",
+      "url": "https://doi.org/10.1145/3772318.3790336",
+      "status": "Search lead only; complete title requires checking."
+    },
+    {
+      "title": "Short-Term Human-Robot Interaction Adaptability in Real-world Environments",
+      "date": "Publication date not verified",
+      "url": "https://www.iri.upc.edu/files/scidoc/2243-Short-Term-Human-Robot-Interaction-Adaptability-in-Real-world-Environments.pdf",
+      "status": "PDF link found in search; not saved or reviewed."
+    },
+    {
+      "title": "Dynamic velocity scaling for industrial collaborative robots: a gaze-driven approach",
+      "date": "9 March 2026",
+      "url": "https://doi.org/10.1038/s41598-025-34142-9",
+      "status": "Search lead; publisher date checked, no structured full-text review."
+    },
+    {
+      "title": "Trajectories of short-term operator adaptation in cobot-assisted disassembly: a within-subject multimodal analysis",
+      "date": "2026 in search record; exact date unverified",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/42578464/",
+      "status": "Search lead only."
+    },
+    {
+      "title": "Multimodal Evaluation of Mental Workload and Engagement in Upper-Limb Robot-Assisted Motor Tasks",
+      "date": "2026 in search record; exact date unverified",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12899765/",
+      "status": "Search lead only."
+    },
+    {
+      "title": "Human in the collaborative loop: a strategy for integrating human activity recognition and non-invasive brain-machine interfaces to control collaborative robots",
+      "date": "2024; exact day unverified",
+      "url": "https://doi.org/10.3389/fnbot.2024.1383089",
+      "status": "Search lead only."
+    },
+    {
+      "title": "Helping People Through Space and Time: Assistance as a Perspective on Human-Robot Interaction",
+      "date": "2022; exact day unverified",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8829116/",
+      "status": "Search lead only."
+    },
+    {
+      "title": "Assistance Without Interruption… [incomplete title in search notes]",
+      "date": "May 2026 (arXiv); exact day unverified",
+      "url": "https://arxiv.org/abs/2605.01368",
+      "status": "Unresolved search lead; full title and relevance require verification."
+    },
+    {
+      "title": "PulseRide: A Robotic Wheelchair for Personalized Exertion… [incomplete title in search notes]",
+      "date": "2025 in search notes; publication date unverified",
+      "url": null,
+      "status": "Unresolved search lead; complete title, publication venue and stable URL not retained. Not citation-ready."
+    }
+  ]
+}

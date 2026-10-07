@@ -1,0 +1,23 @@
+--- before/paper/aamas2027/VERSIONS.md
++++ current/paper/aamas2027/VERSIONS.md
+@@ -1,6 +1,8 @@
+ # Paper versions and collaborator handoff
+ 
+ 7 October 2026. Branch: writing. This publishing commit keeps the current draft, old source/PDF snapshots and cumulative highlighted review together. Find the publishing commit with `git log -- paper/aamas2027/VERSIONS.md`. The manuscript itself is unchanged by packaging/documentation.
++
++Latest local revision: [constant assistance terminology](revisions/2026-10-07-constant-assistance/CHANGELOG.md), with [highlighted changes](revisions/2026-10-07-constant-assistance/highlighted-review.html). The source, current PDF, plots and clean ZIP now use the new name. The earlier cumulative review remains a historical review of the preceding rounds.
+ 
+ ## Pick the version you need
+ 
+@@ -23,9 +25,9 @@
+ 
+ ## What the current draft contains
+ 
+-The exact earlier abstract is restored. The working sample is planned N=24, and the visible draft notice identifies pending final results/demographics. Anonymous authors and submission ID 2613 are retained. The current data calculations have not been inflated to the planned sample. Survey and protocol details have been added; final photographs and correct-piece scores remain pending.
++The earlier abstract is retained with the condition name updated to constant assistance. The working sample is planned N=24, and the visible draft notice identifies pending final results/demographics. Anonymous authors and submission ID 2613 are retained. The current data calculations have not been inflated to the planned sample. Survey and protocol details have been added; final photographs and correct-piece scores remain pending.
+ 
+-Six figures remain: task-profile survey, assistance architecture, physical setup, workload/frustration, matched scheduled/adaptive correlations, and adaptive-minus-scheduled assistance differences. The redundant performance plot and heatmaps are archived. The current PDF is eight pages; the cumulative review is nine pages with added/deleted text and replaced figures visible.
++Six figures remain: task-profile survey, assistance architecture, physical setup, workload/frustration, matched constant/adaptive correlations, and adaptive-minus-constant assistance differences. The redundant performance plot and heatmaps are archived. The current PDF is eight pages; the cumulative review is nine pages with added/deleted text and replaced figures visible.
+ 
+ ## Continue the work
+ 

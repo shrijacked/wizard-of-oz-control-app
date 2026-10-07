@@ -1,0 +1,20 @@
+--- before/paper/aamas2027/VERSIONS.md
++++ current/paper/aamas2027/VERSIONS.md
+@@ -3,6 +3,8 @@
+ 7 October 2026. Branch: writing. This publishing commit keeps the current draft, old source/PDF snapshots and cumulative highlighted review together. Find the publishing commit with `git log -- paper/aamas2027/VERSIONS.md`. The manuscript itself is unchanged by packaging/documentation.
+ 
+ Latest local revision: [constant assistance terminology](revisions/2026-10-07-constant-assistance/CHANGELOG.md), with [highlighted changes](revisions/2026-10-07-constant-assistance/highlighted-review.html). The source, current PDF, plots and clean ZIP now use the new name. The earlier cumulative review remains a historical review of the preceding rounds.
++
++Latest presentation revision: [baseline, tables, setup photograph and comments](revisions/2026-10-07-photo-tables-comments/CHANGELOG.md), with [highlighted changes](revisions/2026-10-07-photo-tables-comments/highlighted-review.html). It builds on the constant-assistance revision.
+ 
+ ## Pick the version you need
+ 
+@@ -33,7 +35,7 @@
+ 
+ 1. Read [README](README.md), [author notes](author-notes.md), [structure review](structure-review.md) and the [cumulative change log](revisions/2026-10-07-cumulative/CHANGELOG.md).
+ 2. Preserve a new pre-change source/PDF snapshot and hash manifest before the next manuscript revision. Keep older snapshots intact.
+-3. Resolve the remaining protocol facts: actual baseline procedure, enacted participant instructions, institutional review status, eligibility/practice, robot/material/safety/data details and exact survey overlap. Add a setup photograph and scored final photos.
++3. Resolve the remaining protocol facts: enacted participant instructions, institutional review status, eligibility/practice, robot/material/safety/data details and exact survey overlap. The supplied setup photograph is now in Figure 3; add scored final photos.
+ 4. Analyze the final export, reconcile inclusion/outcome/timing decisions, then replace all draft numerical claims, tables/graphs and demographics. Keep N=24 as a planned target until the observed sample is reconciled. Remove the draft notice only when the analysis is final.
+ 5. Use scripts/update-paper-analysis.py for the full analysis and scripts/plot-assisted-comparison.py for the two comparison plots. Both require NumPy/Matplotlib; input paths are in the scripts. Existing raw input archives and literature PDFs are local, ignored data files; teammates need authorized copies to rerun source analysis. The plot-only helper can use the tracked analysis JSON.
+ 6. Edit canonical main.tex and synchronize manuscript.md. Maintain [evidence-map](evidence-map.md) and the [reference text map](literature/REFERENCE_TEXT_MAP.md) when claims/citation locations change. Fifteen sources, 21 citation occurrences and 35 PDF-text anchors are documented; every new reference requires downloaded-PDF checks.

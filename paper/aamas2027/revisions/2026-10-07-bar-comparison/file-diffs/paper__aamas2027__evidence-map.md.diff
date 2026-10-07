@@ -1,0 +1,10 @@
+--- before/paper/aamas2027/evidence-map.md
++++ current/paper/aamas2027/evidence-map.md
+@@ -28,6 +28,6 @@
+ 
+ The author confirmed the three-minute baseline procedure on 7 October; watch.py uses a 60-second calibration. The participant-instruction source mentions researcher-controlled programs, so enacted instruction delivery remains to be reconciled. Institutional review/exemption is unconfirmed. Current source/PDF use the class's anonymous mode with ID 2613. Outcome/graph/reference content is unchanged; citation-map hashes/locations identify the anonymous protocol revision.
+ 
+-The performance plot/heatmaps are removed. Figure 6 displays participant differences and existing bootstrap intervals rather than four connected-rating panels. Previous assets remain in the new immutable figure-revision baseline.
++The performance plot, heatmaps, matched correlations and paired-difference figure are archived. Figure 5 now compares constant/adaptive assistance ratings using grouped bars with sample SDs.
+ 
+ 7 October presentation revision: the author confirmed the three-minute pre-task baseline procedure. Figure 3 now includes the supplied IMG_1687.HEIC, converted to figures/setup-photo.jpg. Tables 1–3 bold favorable cells without changing numbers or tests. The P101/P103 excerpts remain verbatim and are italicized; §5.5 no longer counts commenters.

@@ -1,0 +1,48 @@
+--- before/scripts/plot-assisted-comparison.py
++++ current/scripts/plot-assisted-comparison.py
+@@ -1,8 +1,8 @@
+ #!/usr/bin/env python3
+-"""Plot matched scheduled/adaptive averages from the existing paper analysis.
++"""Plot matched constant/adaptive averages from the existing paper analysis.
+ 
+ No participant records, outcome estimates, tests or sample size are changed.
+-Spearman ranks average ties. Differences are adaptive minus scheduled; their
++Spearman ranks average ties. Differences are adaptive minus constant; their
+ 95% percentile bootstrap intervals are those already computed in the analysis.
+ """
+ from pathlib import Path
+@@ -30,7 +30,7 @@
+  fig.savefig(FIG/(name+'.pdf'),bbox_inches='tight')
+  fig.savefig(FIG/(name+'.png'),bbox_inches='tight',dpi=200)
+  plt.close(fig)
+-summary={'source_analysis_sha256':hashlib.sha256(SOURCE.read_bytes()).hexdigest(),'actual_matched_participants':data['experiment_n'],'correlation_definition':'Scheduled versus adaptive averages for the same measure and participant, Spearman rank correlation with average ties.','correlations':[],'assistance_differences':[]}
++summary={'source_analysis_sha256':hashlib.sha256(SOURCE.read_bytes()).hexdigest(),'actual_matched_participants':data['experiment_n'],'correlation_definition':'Constant versus adaptive averages for the same measure and participant, Spearman rank correlation with average ties.','correlations':[],'assistance_differences':[]}
+ fig,axs=plt.subplots(2,4,figsize=(6.9,3.65),layout='constrained')
+ for ax,key,title in zip(axs.flat,keys,titles):
+  x=np.array(v['constant'][key]);y=np.array(v['adaptive'][key]);assert len(x)==len(y)==data['experiment_n']
+@@ -47,8 +47,8 @@
+  ax.set_aspect('equal',adjustable='box');ax.grid(alpha=.12)
+  ax.text(.04,.94,rf'$\rho = {rho:.2f}$',transform=ax.transAxes,va='top',fontsize=8)
+  ax.tick_params(labelsize=7)
+-fig.supxlabel('Scheduled assistance',fontsize=9);fig.supylabel('Adaptive assistance',fontsize=9)
+-save(fig,'scheduled-adaptive-correlations')
++fig.supxlabel('Constant assistance',fontsize=9);fig.supylabel('Adaptive assistance',fontsize=9)
++save(fig,'constant-adaptive-correlations')
+ fig,ax=plt.subplots(figsize=(3.35,2.55),layout='constrained')
+ for row,key in enumerate(keys[4:]):
+  x=np.array(v['constant'][key]);y=np.array(v['adaptive'][key]);diff=y-x
+@@ -61,11 +61,11 @@
+  ax.errorbar(mid,row,xerr=np.array([[mid-low],[high-mid]]),fmt='D',markersize=5,color='#397797',capsize=3,lw=1.7,zorder=3)
+ ax.axvline(0,color='#666666',ls='--',lw=.8,zorder=1)
+ ax.set_yticks(range(4),['Helpfulness','Timing','Seamlessness','Frustration relief']);ax.invert_yaxis()
+-ax.set_xlim(-3.35,3.35);ax.set_xticks([-3,-2,-1,0,1,2,3]);ax.set_xlabel('Adaptive minus scheduled (rating points)')
++ax.set_xlim(-3.35,3.35);ax.set_xticks([-3,-2,-1,0,1,2,3]);ax.set_xlabel('Adaptive minus constant (rating points)')
+ ax.grid(axis='x',alpha=.12)
+-ax.text(.01,1.03,'Scheduled higher',transform=ax.transAxes,color='#555555',fontsize=7)
++ax.text(.01,1.03,'Constant higher',transform=ax.transAxes,color='#555555',fontsize=7)
+ ax.text(.99,1.03,'Adaptive higher',transform=ax.transAxes,ha='right',color='#555555',fontsize=7)
+ save(fig,'assistance-differences')
+ (ROOT/'paper/aamas2027/analysis/assisted-comparison.json').write_text(json.dumps(summary,indent=2)+'\n')
+-print('Scheduled/adaptive Spearman coefficients:',[(x['measure'],round(x['spearman_rho'],3)) for x in summary['correlations']])
++print('Constant/adaptive Spearman coefficients:',[(x['measure'],round(x['spearman_rho'],3)) for x in summary['correlations']])
+ print('Wrote two vector figures and the matched-comparison audit.')

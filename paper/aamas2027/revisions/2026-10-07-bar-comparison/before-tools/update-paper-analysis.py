@@ -1,0 +1,128 @@
+#!/usr/bin/env python3
+"""Reproduce the paper revision from untouched experiment and survey exports.
+
+Paired tests are exploratory, selected during this revision. All 2**n sign flips
+are enumerated for the absolute paired mean difference. Holm adjustment is
+within each three-contrast endpoint, and across the four assistance ratings.
+Correlations use participant-condition averages separately in each condition.
+"""
+import csv, hashlib, itertools, json, re
+from collections import Counter
+from pathlib import Path
+from statistics import mean, stdev
+import numpy as np
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+ROOT=Path(__file__).resolve().parents[1]
+SOURCE=ROOT/'data/writing-reference/hti-results-2026-10-06/relevant-files/consolidated-data.json'
+SURVEY=ROOT/'data/writing-reference/task-profile-survey-2026-10-05/Puzzle Solving and Tangram Research Survey.csv'
+OUT=ROOT/'paper/aamas2027/analysis'
+FIG=ROOT/'paper/aamas2027/figures'
+OUT.mkdir(exist_ok=True); FIG.mkdir(exist_ok=True)
+data=json.loads(SOURCE.read_text())
+people=[p for p in data['participants'] if p['cohort']=='complete']
+ids=[p['id'] for p in people]
+conditions=['control','constant','adaptive']
+names=['Control','Constant','Adaptive']; colors=['#666666','#397797','#AE6B32']
+work=['mentalDemand','physicalDemand','temporalDemand','performance','effort','frustration']
+assistance=['helpfulness','timingEffectiveness','clarityAndDistraction','stressReduction']
+rows=[r for r in data['rounds'] if r['cohort']=='complete']
+assert len(rows)==9*len(people)
+values={}
+for c in conditions:
+ values[c]={}
+ for key in ['completion','durationSeconds','tlxMean']+work+([] if c=='control' else assistance):
+  result=[]
+  for pid in ids:
+   group=[r for r in rows if r['participant']==pid and r['condition']==c]
+   assert len(group)==3 and all(r['status']=='completed' for r in group)
+   for r in group:
+    assert all(1<=r['survey'][k]<=7 for k in work)
+    assert abs((sum(r['survey'][k] for k in work)+8-2*r['survey']['performance'])/6-r['tlxMean'])<1e-9
+   if key=='completion': v=100*mean(r['analysisSolved'] for r in group)
+   elif key in ['durationSeconds','tlxMean']:v=mean(r[key] for r in group)
+   else:v=mean(r['survey'][key] for r in group)
+   result.append(v)
+  values[c][key]=np.array(result)
+
+def holm(items):
+ largest=0
+ for rank,item in enumerate(sorted(items,key=lambda x:x['p_raw'])):
+  largest=max(largest,min(1,(len(items)-rank)*item['p_raw']))
+  item['p_holm']=largest
+
+def paired(a,b,key):
+ diff=values[b][key]-values[a][key]
+ signs=np.array(list(itertools.product([-1,1],repeat=len(diff))))
+ dist=(signs@diff)/len(diff)
+ p=float(np.mean(np.abs(dist)>=abs(float(diff.mean()))-1e-12))
+ rng=np.random.default_rng(2613)
+ samples=rng.choice(diff,size=(20000,len(diff)),replace=True).mean(axis=1)
+ return {'measure':key,'contrast':f'{b} minus {a}','n':len(diff),'mean_difference':float(diff.mean()),'ci95_percentile':np.quantile(samples,[.025,.975]).tolist(),'p_raw':p}
+comparisons=[]
+for key in ['completion','durationSeconds','tlxMean','frustration']:
+ family=[paired(a,b,key) for a,b in [('control','constant'),('control','adaptive'),('constant','adaptive')]]
+ holm(family);comparisons.extend(family)
+family=[paired('constant','adaptive',key) for key in assistance];holm(family);comparisons.extend(family)
+
+def ranks(x):
+ x=np.round(x,12) # Equal rational rating averages may differ at floating-point precision.
+ order=np.argsort(x);r=np.empty(len(x));i=0
+ while i<len(x):
+  j=i+1
+  while j<len(x) and x[order[j]]==x[order[i]]:j+=1
+  r[order[i:j]]=(i+j-1)/2+1;i=j
+ return r
+corr_keys=['completion','durationSeconds','tlxMean','frustration']
+corr={c:np.corrcoef([ranks(values[c][k]) for k in corr_keys]).tolist() for c in conditions}
+with SURVEY.open(encoding='utf-8-sig',newline='') as f: survey=list(csv.DictReader(f))
+assert len({r['Username'].strip().lower() for r in survey})==len(survey)
+headers=list(survey[0]);rating_headers=[h for h in headers if h.startswith('Imagine you are stuck')]
+survey_ratings=[]
+for h in rating_headers:
+ vals=[int(re.match(r'\d+',r[h]).group()) for r in survey]
+ assert all(1<=x<=5 for x in vals)
+ survey_ratings.append({'question':h,'n':len(vals),'mean':mean(vals),'sd':stdev(vals),'values':vals})
+survey_summary={'n':len(survey),'age':{'mean':mean(int(r['What is your age?']) for r in survey),'sd':stdev(int(r['What is your age?']) for r in survey)},'counts':{h:dict(Counter(r[h] for r in survey)) for h in headers if h not in ['Timestamp','Username'] and h not in rating_headers},'assistance_ratings':survey_ratings}
+summary={'experiment_n':len(people),'experiment_age':{'mean':mean(p['profile']['age'] for p in people),'sd':stdev(p['profile']['age'] for p in people)},'experiment_gender':dict(Counter(p['profile']['gender'] for p in people)),'sources':{str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in [SOURCE,SURVEY]},'participant_condition_averages':{c:{k:v.tolist() for k,v in m.items()} for c,m in values.items()},'paired_comparisons':comparisons,'correlation_keys':corr_keys,'spearman_correlations':corr,'survey':survey_summary,'method':{'tests':'Two-sided exhaustive paired sign-flip tests of mean differences; no Monte Carlo p-values.','multiplicity':'Holm within the three contrasts for each endpoint, and across four assistance-rating contrasts.','uncertainty':'Percentile bootstrap of paired participant differences, 20000 replicates, seed 2613.','status':'Exploratory analysis chosen after reviewing results. No preregistration or confirmatory status asserted.','correlations':'Spearman coefficients in each condition across the same 12 participant averages; no correlation significance claims.'}}
+(OUT/'revision-analysis.json').write_text(json.dumps(summary,indent=2,ensure_ascii=False)+'\n')
+plt.rcParams.update({'font.size':8,'font.family':'DejaVu Sans','axes.spines.top':False,'axes.spines.right':False,'pdf.fonttype':42})
+
+def save(fig,name):
+ fig.savefig(FIG/(name+'.pdf'),bbox_inches='tight')
+ fig.savefig(FIG/(name+'.png'),bbox_inches='tight',dpi=180)
+ plt.close(fig)
+
+def paired_panel(ax,key,labels=['Control','Const.','Adapt.'],conds=conditions):
+ for i in range(len(ids)):
+  jitter=(i-(len(ids)-1)/2)*.008
+  ax.plot(np.arange(len(conds))+jitter,[values[c][key][i] for c in conds],color='#bbbbbb',alpha=.6,lw=.7,zorder=1)
+ for x,c in enumerate(conds):
+  v=values[c][key]
+  ax.scatter(x+(np.arange(len(v))-(len(v)-1)/2)*.008,v,s=13,color=colors[conditions.index(c)],alpha=.55,zorder=2)
+  ax.plot(x,float(v.mean()),marker='D',ms=6,color=colors[conditions.index(c)],zorder=3)
+ ax.set_xticks(range(len(conds)),labels,fontsize=6.5);ax.grid(axis='y',alpha=.18)
+fig,axs=plt.subplots(1,2,figsize=(3.35,2.15),layout='constrained')
+for ax,k,title in zip(axs,['tlxMean','frustration'],['(a) Workload','(b) Frustration']):
+ paired_panel(ax,k);ax.set_ylim(.75,7.25);ax.set_ylabel('Rating (1-7)');ax.set_title(title)
+save(fig,'workload')
+fig,axs=plt.subplots(1,2,figsize=(6.9,2.55),layout='constrained')
+outcome_counts=Counter(r['Did you successfully solve the linked Tangram puzzle?'] for r in survey)
+counts=[outcome_counts[k] for k in ['Yes, I solved it completely.','I partially solved it, but ran out of time/patience.','No, I did not solve it.']]
+axs[0].bar(['Complete','Partial','Unsolved'],counts,color=['#3A7E66','#397797','#888888'])
+for i,v in enumerate(counts):axs[0].text(i,v+.25,str(v),ha='center')
+axs[0].set_ylabel('Respondents');axs[0].set_yticks([0,5,10,15]);axs[0].set_ylim(0,18);axs[0].set_title('(a) Self-reported completion')
+labels=['Robot placement','Video tutorial','Text hint','Simpler puzzle']
+for y,entry in enumerate(survey_ratings):
+ axs[1].plot(entry['values'],[y]*len(survey),'.',color='#aaaaaa',alpha=.35)
+ axs[1].errorbar(entry['mean'],y,xerr=entry['sd'],fmt='D',color='#397797',capsize=3)
+axs[1].set_yticks(range(4),labels);axs[1].invert_yaxis();axs[1].set_xlim(.7,5.3);axs[1].set_xticks(range(1,6));axs[1].set_xlabel('1 = most helpful; 5 = least helpful');axs[1].set_title('(b) Expected assistance helpfulness')
+save(fig,'task-profile-survey')
+import runpy
+runpy.run_path(str(ROOT/'scripts/plot-assisted-comparison.py'),run_name='__main__')
+print('Wrote revision-analysis.json and four current result/survey figures.')
+for x in comparisons:print(x['measure'],x['contrast'],f"difference={x['mean_difference']:.4f} adjusted p={x['p_holm']:.6f}")
+print('Survey ratings:',[(x['mean'],x['sd']) for x in survey_ratings])
+print('Age:',summary['experiment_age'],survey_summary['age'])

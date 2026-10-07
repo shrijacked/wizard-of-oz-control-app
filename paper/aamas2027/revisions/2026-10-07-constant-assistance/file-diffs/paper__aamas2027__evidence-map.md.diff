@@ -1,0 +1,17 @@
+--- before/paper/aamas2027/evidence-map.md
++++ current/paper/aamas2027/evidence-map.md
+@@ -9,11 +9,11 @@
+ | §3 assistance expectations | Four explicitly anchored 1–5 survey columns | Independent hypothetical ratings, lower helpfulness scores better; not measured robot performance. |
+ | §4 apparatus/layout | Project documentation and author's confirmed sketch/layout | Opaque wall, top-mounted camera, pickup/drop/assembly positions and laptop confirmed; 10×10-inch piece set confirmed; robot model, piece material and photo pending. |
+ | §4 signal processing | `integrations/watch/watch_core.py:live_arousal_assessment`, `watch.py` | 15s current/60s preceding median, 5bpm threshold, quality and baseline fallback; historical overrides/practice still internal checks. |
+-| §4 timing and delivery | Explicit author clarification; dashboards and operator code | Scheduled 30 s and adaptive existing flag; content based on arrangement; rapid/sustained repeated flags use a 15-second wait; preset hints and paired robot-plus-hint delivery confirmed. |
++| §4 timing and delivery | Explicit author clarification; dashboards and operator code | Constant 30 s and adaptive existing flag; content based on arrangement; rapid/sustained repeated flags use a 15-second wait; preset hints and paired robot-plus-hint delivery confirmed. |
+ | Table1, §5.2 | Results summary `primary`; revision-analysis participant averages/tests | Completion coding includes P101 reconstruction; sensitivity in analysis notes. Duration includes failures. |
+ | Table2, Figure4, §5.3 | Per-round survey fields/composite; checked scoring and participant averaging | NASA-TLX dimensions, seven-point ratings; mean composite reverses performance. |
+-| Figure5 and cross-condition correlation paragraph | assisted-comparison.json; matched scheduled/adaptive averages | Actual matched records, average tied ranks; correlations compare the same measure across conditions, without significance or causal claims. |
+-| Table3, Figure6, §5.4 | Assistance-only per-round questionnaire fields | Hints/arm rated together; no significant adaptive-scheduled difference. |
++| Figure5 and cross-condition correlation paragraph | assisted-comparison.json; matched constant/adaptive averages | Actual matched records, average tied ranks; correlations compare the same measure across conditions, without significance or causal claims. |
++| Table3, Figure6, §5.4 | Assistance-only per-round questionnaire fields | Hints/arm rated together; no significant adaptive-constant difference. |
+ | §5.5 final ratings and quotations; §6 robot-motion quote | Participant final forms; summary `overall`, `nonempty_comments` | Once/person;6 nonempty comments; verbatim excerpts from P101/P103, no formal coding. |
+ | §6 direct placement future work | Author suggestion and P103 comment about arm movement | Proposed future action, not an executed procedure. |
+ | Ethics and missing correct-piece outcome | Existing procedure documentation and author requests | Consent twice and no disclosure afterward confirmed; approval remains unknown. Orientation-maximizing rule supplied; image-derived scores still pending. |

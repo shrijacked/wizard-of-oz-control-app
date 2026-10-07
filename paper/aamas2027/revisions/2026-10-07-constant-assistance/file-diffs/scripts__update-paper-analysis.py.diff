@@ -1,0 +1,20 @@
+--- before/scripts/update-paper-analysis.py
++++ current/scripts/update-paper-analysis.py
+@@ -25,7 +25,7 @@
+ people=[p for p in data['participants'] if p['cohort']=='complete']
+ ids=[p['id'] for p in people]
+ conditions=['control','constant','adaptive']
+-names=['Control','Scheduled','Adaptive']; colors=['#666666','#397797','#AE6B32']
++names=['Control','Constant','Adaptive']; colors=['#666666','#397797','#AE6B32']
+ work=['mentalDemand','physicalDemand','temporalDemand','performance','effort','frustration']
+ assistance=['helpfulness','timingEffectiveness','clarityAndDistraction','stressReduction']
+ rows=[r for r in data['rounds'] if r['cohort']=='complete']
+@@ -95,7 +95,7 @@
+  fig.savefig(FIG/(name+'.png'),bbox_inches='tight',dpi=180)
+  plt.close(fig)
+ 
+-def paired_panel(ax,key,labels=['Control','Sched.','Adapt.'],conds=conditions):
++def paired_panel(ax,key,labels=['Control','Const.','Adapt.'],conds=conditions):
+  for i in range(len(ids)):
+   jitter=(i-(len(ids)-1)/2)*.008
+   ax.plot(np.arange(len(conds))+jitter,[values[c][key][i] for c in conds],color='#bbbbbb',alpha=.6,lw=.7,zorder=1)

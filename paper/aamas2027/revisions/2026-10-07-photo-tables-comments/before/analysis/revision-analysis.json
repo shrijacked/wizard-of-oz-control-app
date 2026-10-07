@@ -1,0 +1,1024 @@
+{
+  "experiment_n": 12,
+  "experiment_age": {
+    "mean": 21.5,
+    "sd": 2.0225995873897262
+  },
+  "experiment_gender": {
+    "man": 7,
+    "woman": 5
+  },
+  "sources": {
+    "data/writing-reference/hti-results-2026-10-06/relevant-files/consolidated-data.json": "d5c57286af539ef0628489c89a23bc304bfafe494b424f4a83640f88c3409019",
+    "data/writing-reference/task-profile-survey-2026-10-05/Puzzle Solving and Tangram Research Survey.csv": "4c82ba49a14643596ee97732eb3374de123b61ece0b5f780dc501a02c48da166"
+  },
+  "participant_condition_averages": {
+    "control": {
+      "completion": [
+        0.0,
+        33.33333333333333,
+        0.0,
+        0.0,
+        33.33333333333333,
+        0.0,
+        0.0,
+        0.0,
+        66.66666666666666,
+        0.0,
+        0.0,
+        33.33333333333333
+      ],
+      "durationSeconds": [
+        305.3333333333333,
+        284.6666666666667,
+        302.6666666666667,
+        303.6666666666667,
+        226.0,
+        306.0,
+        304.0,
+        304.0,
+        272.0,
+        305.0,
+        304.6666666666667,
+        257.0
+      ],
+      "tlxMean": [
+        4.555555555555555,
+        3.9444444444444446,
+        4.555555555555555,
+        5.277777777777778,
+        5.666666666666667,
+        4.388888888888889,
+        5.111111111111111,
+        5.333333333333333,
+        4.0,
+        4.944444444444445,
+        5.166666666666667,
+        3.7222222222222223
+      ],
+      "mentalDemand": [
+        4.666666666666667,
+        5.666666666666667,
+        5.0,
+        7.0,
+        6.0,
+        7.0,
+        6.0,
+        6.666666666666667,
+        4.333333333333333,
+        4.666666666666667,
+        6.666666666666667,
+        6.333333333333333
+      ],
+      "physicalDemand": [
+        2.6666666666666665,
+        2.0,
+        3.6666666666666665,
+        4.666666666666667,
+        6.0,
+        2.3333333333333335,
+        5.0,
+        5.333333333333333,
+        3.6666666666666665,
+        5.333333333333333,
+        2.0,
+        1.0
+      ],
+      "temporalDemand": [
+        4.333333333333333,
+        3.6666666666666665,
+        4.666666666666667,
+        4.333333333333333,
+        6.333333333333333,
+        2.6666666666666665,
+        3.6666666666666665,
+        4.666666666666667,
+        3.6666666666666665,
+        4.333333333333333,
+        4.0,
+        1.0
+      ],
+      "performance": [
+        1.0,
+        5.0,
+        3.6666666666666665,
+        2.0,
+        4.666666666666667,
+        3.0,
+        3.3333333333333335,
+        4.333333333333333,
+        5.0,
+        1.3333333333333333,
+        1.0,
+        2.6666666666666665
+      ],
+      "effort": [
+        4.666666666666667,
+        5.0,
+        5.0,
+        5.333333333333333,
+        6.0,
+        7.0,
+        5.333333333333333,
+        5.666666666666667,
+        5.333333333333333,
+        5.0,
+        6.333333333333333,
+        6.0
+      ],
+      "frustration": [
+        4.0,
+        4.333333333333333,
+        4.666666666666667,
+        4.333333333333333,
+        6.333333333333333,
+        2.3333333333333335,
+        6.0,
+        6.0,
+        4.0,
+        3.6666666666666665,
+        5.0,
+        2.6666666666666665
+      ]
+    },
+    "constant": {
+      "completion": [
+        66.66666666666666,
+        100.0,
+        66.66666666666666,
+        33.33333333333333,
+        66.66666666666666,
+        66.66666666666666,
+        33.33333333333333,
+        100.0,
+        100.0,
+        66.66666666666666,
+        33.33333333333333,
+        66.66666666666666
+      ],
+      "durationSeconds": [
+        251.33333333333334,
+        179.33333333333334,
+        222.0,
+        286.0,
+        243.33333333333334,
+        269.6666666666667,
+        312.6666666666667,
+        118.66666666666667,
+        224.0,
+        236.0,
+        280.6666666666667,
+        244.66666666666666
+      ],
+      "tlxMean": [
+        3.2222222222222223,
+        3.0,
+        4.222222222222222,
+        4.388888888888889,
+        4.444444444444445,
+        3.9444444444444446,
+        3.7222222222222223,
+        2.7222222222222223,
+        4.0,
+        3.7222222222222223,
+        3.5,
+        3.444444444444444
+      ],
+      "mentalDemand": [
+        3.3333333333333335,
+        4.333333333333333,
+        4.666666666666667,
+        5.666666666666667,
+        5.333333333333333,
+        6.0,
+        4.0,
+        4.0,
+        3.6666666666666665,
+        5.0,
+        4.333333333333333,
+        6.0
+      ],
+      "physicalDemand": [
+        2.0,
+        2.0,
+        4.0,
+        5.0,
+        4.666666666666667,
+        2.3333333333333335,
+        4.333333333333333,
+        2.6666666666666665,
+        3.3333333333333335,
+        4.0,
+        2.0,
+        1.0
+      ],
+      "temporalDemand": [
+        3.0,
+        3.0,
+        3.6666666666666665,
+        3.6666666666666665,
+        4.666666666666667,
+        2.6666666666666665,
+        3.6666666666666665,
+        3.0,
+        4.333333333333333,
+        4.0,
+        3.0,
+        1.3333333333333333
+      ],
+      "performance": [
+        4.0,
+        6.666666666666667,
+        4.666666666666667,
+        4.0,
+        5.666666666666667,
+        4.333333333333333,
+        5.0,
+        7.0,
+        5.0,
+        5.666666666666667,
+        3.6666666666666665,
+        4.666666666666667
+      ],
+      "effort": [
+        4.0,
+        4.333333333333333,
+        5.0,
+        4.333333333333333,
+        5.0,
+        5.666666666666667,
+        3.6666666666666665,
+        3.3333333333333335,
+        4.666666666666667,
+        4.0,
+        4.666666666666667,
+        6.666666666666667
+      ],
+      "frustration": [
+        3.0,
+        3.0,
+        4.666666666666667,
+        3.6666666666666665,
+        4.666666666666667,
+        3.3333333333333335,
+        3.6666666666666665,
+        2.3333333333333335,
+        5.0,
+        3.0,
+        2.6666666666666665,
+        2.3333333333333335
+      ],
+      "helpfulness": [
+        4.333333333333333,
+        4.0,
+        4.333333333333333,
+        5.666666666666667,
+        5.333333333333333,
+        4.666666666666667,
+        4.666666666666667,
+        5.0,
+        4.0,
+        5.666666666666667,
+        4.666666666666667,
+        5.666666666666667
+      ],
+      "timingEffectiveness": [
+        5.0,
+        3.0,
+        3.6666666666666665,
+        5.666666666666667,
+        6.666666666666667,
+        5.333333333333333,
+        5.333333333333333,
+        5.0,
+        5.0,
+        5.666666666666667,
+        4.666666666666667,
+        7.0
+      ],
+      "clarityAndDistraction": [
+        3.6666666666666665,
+        3.6666666666666665,
+        3.0,
+        5.666666666666667,
+        6.0,
+        4.333333333333333,
+        4.333333333333333,
+        1.0,
+        5.333333333333333,
+        4.666666666666667,
+        4.666666666666667,
+        3.0
+      ],
+      "stressReduction": [
+        4.333333333333333,
+        4.0,
+        5.0,
+        4.666666666666667,
+        6.333333333333333,
+        4.333333333333333,
+        4.666666666666667,
+        5.0,
+        4.666666666666667,
+        4.666666666666667,
+        4.0,
+        7.0
+      ]
+    },
+    "adaptive": {
+      "completion": [
+        0.0,
+        33.33333333333333,
+        66.66666666666666,
+        0.0,
+        33.33333333333333,
+        66.66666666666666,
+        66.66666666666666,
+        66.66666666666666,
+        100.0,
+        66.66666666666666,
+        33.33333333333333,
+        66.66666666666666
+      ],
+      "durationSeconds": [
+        302.6666666666667,
+        227.66666666666666,
+        295.6666666666667,
+        307.6666666666667,
+        269.6666666666667,
+        244.0,
+        258.0,
+        299.6666666666667,
+        283.3333333333333,
+        226.33333333333334,
+        277.3333333333333,
+        233.33333333333334
+      ],
+      "tlxMean": [
+        4.388888888888889,
+        3.5,
+        4.222222222222222,
+        4.444444444444445,
+        5.111111111111111,
+        3.4444444444444446,
+        2.888888888888889,
+        4.055555555555555,
+        2.5555555555555554,
+        2.5,
+        4.222222222222222,
+        3.555555555555556
+      ],
+      "mentalDemand": [
+        5.0,
+        5.0,
+        5.0,
+        6.0,
+        6.333333333333333,
+        6.333333333333333,
+        2.6666666666666665,
+        5.666666666666667,
+        2.6666666666666665,
+        2.6666666666666665,
+        5.666666666666667,
+        4.666666666666667
+      ],
+      "physicalDemand": [
+        2.6666666666666665,
+        2.0,
+        4.333333333333333,
+        4.666666666666667,
+        6.0,
+        2.3333333333333335,
+        3.6666666666666665,
+        4.666666666666667,
+        1.3333333333333333,
+        3.6666666666666665,
+        3.0,
+        1.0
+      ],
+      "temporalDemand": [
+        3.6666666666666665,
+        4.0,
+        5.333333333333333,
+        3.3333333333333335,
+        6.0,
+        3.0,
+        3.0,
+        3.6666666666666665,
+        2.6666666666666665,
+        2.0,
+        3.6666666666666665,
+        1.0
+      ],
+      "performance": [
+        2.3333333333333335,
+        5.333333333333333,
+        5.333333333333333,
+        3.6666666666666665,
+        5.333333333333333,
+        6.666666666666667,
+        6.333333333333333,
+        5.333333333333333,
+        6.0,
+        6.0,
+        4.333333333333333,
+        4.0
+      ],
+      "effort": [
+        5.0,
+        4.666666666666667,
+        4.333333333333333,
+        5.0,
+        5.666666666666667,
+        5.666666666666667,
+        3.6666666666666665,
+        4.333333333333333,
+        3.6666666666666665,
+        3.0,
+        6.0,
+        6.666666666666667
+      ],
+      "frustration": [
+        4.333333333333333,
+        2.6666666666666665,
+        3.6666666666666665,
+        3.3333333333333335,
+        4.0,
+        2.0,
+        2.6666666666666665,
+        3.3333333333333335,
+        3.0,
+        1.6666666666666667,
+        3.3333333333333335,
+        4.0
+      ],
+      "helpfulness": [
+        4.333333333333333,
+        4.0,
+        4.333333333333333,
+        5.333333333333333,
+        6.333333333333333,
+        5.666666666666667,
+        5.666666666666667,
+        5.666666666666667,
+        4.333333333333333,
+        4.0,
+        4.666666666666667,
+        6.333333333333333
+      ],
+      "timingEffectiveness": [
+        4.0,
+        5.0,
+        4.0,
+        5.0,
+        6.333333333333333,
+        6.666666666666667,
+        5.333333333333333,
+        6.0,
+        5.666666666666667,
+        6.0,
+        5.666666666666667,
+        7.0
+      ],
+      "clarityAndDistraction": [
+        4.0,
+        4.666666666666667,
+        3.6666666666666665,
+        4.0,
+        6.0,
+        4.666666666666667,
+        5.333333333333333,
+        4.0,
+        4.0,
+        5.333333333333333,
+        4.0,
+        1.0
+      ],
+      "stressReduction": [
+        2.6666666666666665,
+        4.0,
+        4.333333333333333,
+        5.666666666666667,
+        6.333333333333333,
+        6.0,
+        5.666666666666667,
+        6.333333333333333,
+        3.6666666666666665,
+        4.666666666666667,
+        5.333333333333333,
+        7.0
+      ]
+    }
+  },
+  "paired_comparisons": [
+    {
+      "measure": "completion",
+      "contrast": "constant minus control",
+      "n": 12,
+      "mean_difference": 52.77777777777778,
+      "ci95_percentile": [
+        41.66666666666666,
+        63.88888888888889
+      ],
+      "p_raw": 0.00048828125,
+      "p_holm": 0.00146484375
+    },
+    {
+      "measure": "completion",
+      "contrast": "adaptive minus control",
+      "n": 12,
+      "mean_difference": 36.11111111111111,
+      "ci95_percentile": [
+        19.444444444444443,
+        52.77777777777777
+      ],
+      "p_raw": 0.0078125,
+      "p_holm": 0.015625
+    },
+    {
+      "measure": "completion",
+      "contrast": "adaptive minus constant",
+      "n": 12,
+      "mean_difference": -16.666666666666664,
+      "ci95_percentile": [
+        -33.333333333333336,
+        -1.1842378929335002e-15
+      ],
+      "p_raw": 0.15625,
+      "p_holm": 0.15625
+    },
+    {
+      "measure": "durationSeconds",
+      "contrast": "constant minus control",
+      "n": 12,
+      "mean_difference": -50.55555555555555,
+      "ci95_percentile": [
+        -82.66666666666664,
+        -22.944444444444443
+      ],
+      "p_raw": 0.00390625,
+      "p_holm": 0.01171875
+    },
+    {
+      "measure": "durationSeconds",
+      "contrast": "adaptive minus control",
+      "n": 12,
+      "mean_difference": -20.805555555555554,
+      "ci95_percentile": [
+        -39.75,
+        -1.4999999999999953
+      ],
+      "p_raw": 0.06591796875,
+      "p_holm": 0.1318359375
+    },
+    {
+      "measure": "durationSeconds",
+      "contrast": "adaptive minus constant",
+      "n": 12,
+      "mean_difference": 29.749999999999996,
+      "ci95_percentile": [
+        -0.2222222222222216,
+        65.52916666666654
+      ],
+      "p_raw": 0.10546875,
+      "p_holm": 0.1318359375
+    },
+    {
+      "measure": "tlxMean",
+      "contrast": "constant minus control",
+      "n": 12,
+      "mean_difference": -1.0277777777777777,
+      "ci95_percentile": [
+        -1.435185185185185,
+        -0.6574074074074073
+      ],
+      "p_raw": 0.0009765625,
+      "p_holm": 0.001953125
+    },
+    {
+      "measure": "tlxMean",
+      "contrast": "adaptive minus control",
+      "n": 12,
+      "mean_difference": -0.9814814814814814,
+      "ci95_percentile": [
+        -1.4074074074074074,
+        -0.6018518518518517
+      ],
+      "p_raw": 0.00048828125,
+      "p_holm": 0.00146484375
+    },
+    {
+      "measure": "tlxMean",
+      "contrast": "adaptive minus constant",
+      "n": 12,
+      "mean_difference": 0.046296296296296245,
+      "ci95_percentile": [
+        -0.4444444444444444,
+        0.523148148148148
+      ],
+      "p_raw": 0.8818359375,
+      "p_holm": 0.8818359375
+    },
+    {
+      "measure": "frustration",
+      "contrast": "constant minus control",
+      "n": 12,
+      "mean_difference": -1.0,
+      "ci95_percentile": [
+        -1.75,
+        -0.2777777777777777
+      ],
+      "p_raw": 0.0341796875,
+      "p_holm": 0.068359375
+    },
+    {
+      "measure": "frustration",
+      "contrast": "adaptive minus control",
+      "n": 12,
+      "mean_difference": -1.277777777777778,
+      "ci95_percentile": [
+        -1.972222222222222,
+        -0.5555555555555555
+      ],
+      "p_raw": 0.01025390625,
+      "p_holm": 0.03076171875
+    },
+    {
+      "measure": "frustration",
+      "contrast": "adaptive minus constant",
+      "n": 12,
+      "mean_difference": -0.2777777777777778,
+      "ci95_percentile": [
+        -0.888888888888889,
+        0.3611111111111111
+      ],
+      "p_raw": 0.4697265625,
+      "p_holm": 0.4697265625
+    },
+    {
+      "measure": "helpfulness",
+      "contrast": "adaptive minus constant",
+      "n": 12,
+      "mean_difference": 0.2222222222222221,
+      "ci95_percentile": [
+        -0.22222222222222232,
+        0.5833333333333334
+      ],
+      "p_raw": 0.40625,
+      "p_holm": 1
+    },
+    {
+      "measure": "timingEffectiveness",
+      "contrast": "adaptive minus constant",
+      "n": 12,
+      "mean_difference": 0.38888888888888884,
+      "ci95_percentile": [
+        -0.05555555555555584,
+        0.8611111111111112
+      ],
+      "p_raw": 0.1796875,
+      "p_holm": 0.71875
+    },
+    {
+      "measure": "clarityAndDistraction",
+      "contrast": "adaptive minus constant",
+      "n": 12,
+      "mean_difference": 0.11111111111111116,
+      "ci95_percentile": [
+        -0.6388888888888887,
+        0.8888888888888888
+      ],
+      "p_raw": 0.8408203125,
+      "p_holm": 1
+    },
+    {
+      "measure": "stressReduction",
+      "contrast": "adaptive minus constant",
+      "n": 12,
+      "mean_difference": 0.24999999999999992,
+      "ci95_percentile": [
+        -0.30555555555555564,
+        0.8055555555555554
+      ],
+      "p_raw": 0.46875,
+      "p_holm": 1
+    }
+  ],
+  "correlation_keys": [
+    "completion",
+    "durationSeconds",
+    "tlxMean",
+    "frustration"
+  ],
+  "spearman_correlations": {
+    "control": [
+      [
+        1.0,
+        -0.7998316321143093,
+        -0.42938329724031343,
+        -0.08026529164728524
+      ],
+      [
+        -0.7998316321143094,
+        1.0,
+        0.09473684210526317,
+        -0.29929763004957943
+      ],
+      [
+        -0.4293832972403134,
+        0.09473684210526317,
+        1.0,
+        0.7376806293574928
+      ],
+      [
+        -0.08026529164728523,
+        -0.29929763004957943,
+        0.7376806293574928,
+        1.0
+      ]
+    ],
+    "constant": [
+      [
+        1.0,
+        -0.8876253645985946,
+        -0.359092423229804,
+        -0.05184758473652127
+      ],
+      [
+        -0.8876253645985946,
+        1.0,
+        0.2907184843604137,
+        0.07788208374744975
+      ],
+      [
+        -0.359092423229804,
+        0.29071848436041375,
+        1.0,
+        0.828061042957196
+      ],
+      [
+        -0.05184758473652127,
+        0.07788208374744975,
+        0.8280610429571958,
+        1.0
+      ]
+    ],
+    "adaptive": [
+      [
+        1.0,
+        -0.3355362423072106,
+        -0.7458940046750887,
+        -0.4115069611732913
+      ],
+      [
+        -0.3355362423072106,
+        1.0,
+        0.6234685568211282,
+        0.5442001894099691
+      ],
+      [
+        -0.7458940046750887,
+        0.6234685568211282,
+        1.0,
+        0.7858714811993156
+      ],
+      [
+        -0.41150696117329133,
+        0.5442001894099691,
+        0.7858714811993155,
+        1.0
+      ]
+    ]
+  },
+  "survey": {
+    "n": 24,
+    "age": {
+      "mean": 20.166666666666668,
+      "sd": 2.239306310807699
+    },
+    "counts": {
+      "Which of the following best describes your current primary role?": {
+        "Undergraduate Student": 22,
+        "Professor / Faculty Member": 1,
+        "Postgraduate/Graduate Student": 1
+      },
+      "What is your age?": {
+        "21": 1,
+        "20": 13,
+        "18": 1,
+        "22": 1,
+        "30": 1,
+        "19": 7
+      },
+      "How would you describe your gender identity?": {
+        "Woman": 9,
+        "Man": 14,
+        "Prefer not to say": 1
+      },
+      "Prior to this survey, how familiar were you with Tangram puzzles specifically?": {
+        "Moderately familiar (Have solved them before)": 10,
+        "Not at all familiar": 5,
+        "Slightly familiar (Heard of them but never solved)": 7,
+        "Very familiar (Solve them regularly)": 2
+      },
+      "Did you successfully solve the linked Tangram puzzle?": {
+        "Yes, I solved it completely.": 15,
+        "I partially solved it, but ran out of time/patience.": 8,
+        "No, I did not solve it.": 1
+      },
+      "How difficult did you find the puzzle overall?": {
+        "2": 9,
+        "1": 5,
+        "3": 6,
+        "5": 2,
+        "4": 2
+      },
+      "If you solved the puzzle (either completely or partially), approximately how long did it take you?": {
+        "1 - 3 minutes": 2,
+        "Less than 1 minute": 12,
+        "5 - 10 minutes": 2,
+        "3 - 5 minutes": 6,
+        "I did not attempt or solve the puzzle.": 2
+      },
+      "At any point, did you feel stuck or unsure about what to do next? ": {
+        "Once or twice": 11,
+        "Never": 7,
+        "Several times": 5,
+        "Always": 1
+      },
+      "If you struggled or didn't solve the puzzle, what kind of assistance do you feel you would have required?": {
+        "No assistance needed/I solved it easily": 11,
+        "Mainly at that point where I need assistance not on first or each and every step": 1,
+        "bro lowk just give me a hint on whether the piece is in the interior or exterior.": 1,
+        "A hint about the position of the first piece": 5,
+        "A visual representation of where a specific piece is supposed to go": 3,
+        "No assistance needed/I solved it easily;A hint about the position of the first piece;Step-by-step instructions (tutorial);A visual representation of where a specific piece is supposed to go": 1,
+        "Step-by-step instructions (tutorial)": 1,
+        "No assistance needed/I solved it easily;A visual representation of where a specific piece is supposed to go": 1
+      },
+      "For solving complex spatial puzzles like Tangrams, how much more helpful would a physical robot assistant be compared to a digital tutorial video?": {
+        "2": 10,
+        "3": 2,
+        "1": 3,
+        "4": 7,
+        "5": 2
+      },
+      "Please share any additional comments or insights about your experience with the Tangram puzzle or your general puzzle-solving approach. Also mention any ideas that you might have regarding external factors/support that could make such tasks easier.": {
+        "-": 5,
+        "O gues video or text form will be more helpful ": 1,
+        "NA": 1,
+        "With puzzle solving I look forward patterns rather than straight answers which is easier done with a video then a robotic arm which would only be able to tell me the exact position of the tile.": 1,
+        "figuring out the exterior pieces is relatively easy. once you arrange the bigger pieces it highkey be getting confusing ": 1,
+        "get more complex puzzles": 1,
+        "na": 2,
+        ".": 2,
+        "i really like the robot idea, v cool": 1,
+        "None": 1,
+        " ": 1,
+        "Na": 2,
+        "I think maybe not getting any help, because it seems to be mostly trial and error to me": 1,
+        "   ": 1,
+        "No additional commenta": 1,
+        "Show me the puzzle ": 1,
+        "I think a combination of video demos and text hints work best for online puzzles ": 1
+      }
+    },
+    "assistance_ratings": [
+      {
+        "question": "Imagine you are stuck on a difficult puzzle. Rate the following options based on how helpful you would find them (1 = Most Helpful, 5 = Least Helpful). [A robotic arm physically showing where to place the next piece]",
+        "n": 24,
+        "mean": 3.0416666666666665,
+        "sd": 1.4288690166235205,
+        "values": [
+          4,
+          2,
+          4,
+          4,
+          1,
+          2,
+          4,
+          5,
+          2,
+          1,
+          4,
+          1,
+          5,
+          4,
+          4,
+          2,
+          4,
+          3,
+          4,
+          1,
+          1,
+          2,
+          5,
+          4
+        ]
+      },
+      {
+        "question": "Imagine you are stuck on a difficult puzzle. Rate the following options based on how helpful you would find them (1 = Most Helpful, 5 = Least Helpful). [A detailed, step-by-step video tutorial]",
+        "n": 24,
+        "mean": 2.5833333333333335,
+        "sd": 1.282547284209001,
+        "values": [
+          3,
+          3,
+          3,
+          1,
+          3,
+          1,
+          4,
+          1,
+          2,
+          2,
+          2,
+          4,
+          4,
+          2,
+          4,
+          3,
+          1,
+          5,
+          3,
+          1,
+          2,
+          2,
+          5,
+          1
+        ]
+      },
+      {
+        "question": "Imagine you are stuck on a difficult puzzle. Rate the following options based on how helpful you would find them (1 = Most Helpful, 5 = Least Helpful). [A text-based hint that describes the next move]",
+        "n": 24,
+        "mean": 2.7083333333333335,
+        "sd": 1.2328534123049195,
+        "values": [
+          1,
+          3,
+          2,
+          4,
+          4,
+          4,
+          2,
+          1,
+          4,
+          2,
+          2,
+          4,
+          2,
+          2,
+          2,
+          2,
+          3,
+          1,
+          2,
+          4,
+          5,
+          2,
+          5,
+          2
+        ]
+      },
+      {
+        "question": "Imagine you are stuck on a difficult puzzle. Rate the following options based on how helpful you would find them (1 = Most Helpful, 5 = Least Helpful). [A similar simpler puzzle assigned before the actual puzzle]",
+        "n": 24,
+        "mean": 2.0416666666666665,
+        "sd": 1.1601786469133204,
+        "values": [
+          1,
+          2,
+          1,
+          2,
+          2,
+          3,
+          1,
+          1,
+          3,
+          1,
+          1,
+          5,
+          1,
+          2,
+          2,
+          1,
+          2,
+          3,
+          3,
+          2,
+          1,
+          2,
+          5,
+          2
+        ]
+      }
+    ]
+  },
+  "method": {
+    "tests": "Two-sided exhaustive paired sign-flip tests of mean differences; no Monte Carlo p-values.",
+    "multiplicity": "Holm within the three contrasts for each endpoint, and across four assistance-rating contrasts.",
+    "uncertainty": "Percentile bootstrap of paired participant differences, 20000 replicates, seed 2613.",
+    "status": "Exploratory analysis chosen after reviewing results. No preregistration or confirmatory status asserted.",
+    "correlations": "Spearman coefficients in each condition across the same 12 participant averages; no correlation significance claims."
+  }
+}

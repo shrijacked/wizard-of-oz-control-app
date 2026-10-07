@@ -1,0 +1,106 @@
+--- before/paper/aamas2027/manuscript.md
++++ current/paper/aamas2027/manuscript.md
+@@ -95,20 +95,20 @@
+ The setup combines an Orangewood robotic arm, a Maxim H Band wrist sensor, and a Logitech C270 workspace camera. An opaque partition separates the participant from two researchers, who administer the task and operate the arm (Figure 3). The camera is mounted on top of the partition and covers the participant table. The participant faces a workspace with a puzzle assembly area in front of and to their left, a drop spot to their right, and a laptop for hints and questionnaires. Unused pieces occupy fixed, labeled pickup positions. The arm retrieves a selected piece using one of seven piece-specific programs and delivers it to the drop spot; the participant places it in the target arrangement. Preset text hints describe piece location, orientation, or adjacency, providing consistent assistance content across participants. Hints are accompanied by an audible notification. The researcher selects either a hint alone or a robot action paired with a hint, based on the current arrangement.
+ 
+ 
+-![Figure 3](figures/physical-setup-topdown.png)
+-
+-*Figure 3. Top-down view of the Wizard-of-Oz setup. An opaque partition separates the researchers from the participant; a camera mounted on the partition observes the participant table. The table contains fixed piece pickup positions, the robot drop spot, the assembly area, and the participant laptop. Schematic not to scale.*
+-
+-
+-**NEED TO ADD SETUP PHOTO HERE / ROBOT AND PIECE MATERIAL DETAILS**
++![Figure 3 schematic](figures/physical-setup-topdown.png)
++
++![Figure 3 setup photograph](figures/setup-photo.jpg)
++
++*Figure 3. Wizard-of-Oz setup, with a top-down schematic and a photograph of the apparatus at upper right. An opaque partition separates the researchers from the participant; a camera mounted on the partition observes the participant table. The table contains fixed piece pickup positions, the robot drop spot, the assembly area, and the participant laptop. Schematic not to scale.*
++
++
++**ADD ROBOT AND PIECE MATERIAL DETAILS**
+ 
+ ### 4.2. Physiological monitoring
+ 
+ After receiving the study information, participants wore the wrist sensor during a three-minute pre-task baseline window. The sensor streams cardiac measurements over Bluetooth to a Python collector. To detect a short-term rise in heart rate, the collector compares median heart rate over the latest 15 seconds with median heart rate over the preceding 60 seconds. The arousal flag is raised when the difference is at least 5 beats per minute. A calibrated baseline provides the reference while the rolling reference is being established. Signal-quality checks exclude out-of-range readings and readings with poor sensor contact, and the detector requires sufficient usable samples before raising a flag.
+ 
+ The dashboard displays the flag alongside the workspace view. In the adaptive condition, the flag initiates assistance, while the puzzle arrangement determines the content of the hint or robot action. The flag is a heart-rate-rise cue for assistance timing; participant workload and frustration are assessed through questionnaires.
+-
+-**CONFIRM ACTUAL BASELINE PROCEDURE**
+ 
+ ### 4.3. Assistance conditions
+ 
+@@ -144,10 +144,10 @@
+ | Condition | Solved | Rate | Duration (s) |
+ | –- | –- | –- | –- |
+ | Control | 5/36 | 13.9% | 289.58 (25.59) |
+-| Constant | 24/36 | 66.7% | 239.03 (51.42) |
++| Constant | **24/36** | **66.7%** | **239.03 (51.42)** |
+ | Adaptive | 18/36 | 50.0% | 268.78 (30.30) |
+ 
+-*Table 1. Puzzle completion and round duration. Duration includes all attempts; values are mean (SD) across participant-condition averages.*
++*Table 1. Puzzle completion and round duration. Duration includes all attempts; values are mean (SD) across participant-condition averages. Bold marks the highest completion and shortest duration.*
+ 
+ 
+ Constant assistance also had the shortest mean round duration. Its mean was 50.56 seconds below control (p=.012). The adaptive-control and adaptive-constant duration differences were not statistically significant (both p=.132). These durations summarize time spent across all attempts, rather than time to successful completion alone.
+@@ -160,15 +160,15 @@
+ 
+ | Measure | Control | Constant | Adaptive |
+ | –- | –- | –- | –- |
+-| Mental demand | 5.83 (0.96) | 4.69 (0.90) | 4.81 (1.40) |
+-| Physical demand | 3.64 (1.63) | 3.11 (1.28) | 3.28 (1.50) |
+-| Temporal demand | 3.94 (1.27) | 3.33 (0.88) | 3.44 (1.34) |
+-| Perceived performance | 3.08 (1.51) | 5.03 (1.05) | 5.06 (1.25) |
+-| Effort | 5.56 (0.67) | 4.61 (0.91) | 4.81 (1.08) |
+-| Frustration | 4.44 (1.26) | 3.44 (0.91) | 3.17 (0.81) |
+-| Overall workload | 4.72 (0.62) | 3.69 (0.54) | 3.74 (0.81) |
+-
+-*Table 2. NASA-TLX dimension ratings and overall workload on seven-point scales, mean (SD). Higher performance ratings indicate greater success; higher workload ratings indicate greater demand.*
++| Mental demand | 5.83 (0.96) | **4.69 (0.90)** | 4.81 (1.40) |
++| Physical demand | 3.64 (1.63) | **3.11 (1.28)** | 3.28 (1.50) |
++| Temporal demand | 3.94 (1.27) | **3.33 (0.88)** | 3.44 (1.34) |
++| Perceived performance | 3.08 (1.51) | 5.03 (1.05) | **5.06 (1.25)** |
++| Effort | 5.56 (0.67) | **4.61 (0.91)** | 4.81 (1.08) |
++| Frustration | 4.44 (1.26) | 3.44 (0.91) | **3.17 (0.81)** |
++| Overall workload | 4.72 (0.62) | **3.69 (0.54)** | 3.74 (0.81) |
++
++*Table 2. NASA-TLX dimension ratings and overall workload on seven-point scales, mean (SD). Higher performance ratings indicate greater success; higher workload ratings indicate greater demand. Bold marks the most favorable mean in each row.*
+ 
+ 
+ Mental demand averaged 4.69 with constant assistance and 4.81 with adaptive assistance, while frustration averaged 3.44 and 3.17, respectively. Adaptive assistance reduced frustration relative to control (p=.031). The constant-control and adaptive-constant frustration differences were not statistically significant (p=.068 and p=.470). Perceived performance averaged 5.03 and 5.06 in the assisted conditions.
+@@ -186,12 +186,12 @@
+ 
+ | Measure | Constant | Adaptive |
+ | –- | –- | –- |
+-| Helpfulness | 4.83 (0.63) | 5.06 (0.87) |
+-| Timing | 5.17 (1.11) | 5.56 (0.95) |
+-| Seamlessness | 4.11 (1.37) | 4.22 (1.24) |
+-| Frustration relief | 4.89 (0.90) | 5.14 (1.28) |
+-
+-*Table 3. Intervention experience in the two assisted conditions, mean (SD). Higher ratings indicate a more favorable experience.*
++| Helpfulness | 4.83 (0.63) | **5.06 (0.87)** |
++| Timing | 5.17 (1.11) | **5.56 (0.95)** |
++| Seamlessness | 4.11 (1.37) | **4.22 (1.24)** |
++| Frustration relief | 4.89 (0.90) | **5.14 (1.28)** |
++
++*Table 3. Intervention experience in the two assisted conditions, mean (SD). Higher ratings indicate a more favorable experience; bold marks the highest mean in each row.*
+ 
+ 
+ Figure 5 compares participants’ constant and adaptive averages. Cross-condition correlations were .39 for completion, .10 for duration, .23 for workload, and -.07 for frustration. Assistance-rating correlations ranged from .50 for helpfulness to .64 for timing. These coefficients describe consistency across conditions, rather than the size or direction of their differences.
+@@ -214,7 +214,7 @@
+ 
+ Overall helpfulness averaged 5.08 (SD=1.24), efficacy 4.92 (SD=1.51), and trust 4.75 (SD=1.60). Agreement with following the robot's guidance even when uncertain averaged 5.08 (SD=1.31). These end-of-study ratings summarize participants' experience across all three conditions.
+ 
+-Six participants left written comments. Their remarks illustrate variation in hint usefulness and the contribution of physical assistance. P101 wrote, “some of the hints were really nice, some were meh.” P103 described the hints as “helpful and overall well timed,” but felt the arm added little to solving the puzzle. Two participants described the puzzles as fun. These comments provide individual perspectives alongside the ratings.
++Participant comments highlighted the importance of clear, timely hints and the role of physical assistance. P101 requested *“need better worded hints”* while noting that the task *“has the potential to be fun and challenging.”* P103 wrote, *“The hints were helpful and overall well timed, but the actual robot arm moving the pieces were not adding anything more”*. These remarks suggest that participants valued guidance for solving the puzzle while questioning the additional benefit of piece retrieval.
+ 
+ ## 6. Discussion, Limitations, and Future Work
+ 
+@@ -230,7 +230,7 @@
+ 
+ ### 6.3. Limitations and future work
+ 
+-Participant feedback suggested that hints were more important for solving the puzzle than robot retrieval. P103 noted that “the arm took time in moving the piece which cut into solving time.” Although retrieval makes a piece available, the participant still determines its placement. Future work could have the robot place pieces directly in the target arrangement and examine whether this increases the value of physical assistance.
++Participant feedback suggested that hints were more important for solving the puzzle than robot retrieval. P103 noted that *“the arm took time in moving the piece which cut into solving time”*. Although retrieval makes a piece available, the participant still determines its placement. Future work could have the robot place pieces directly in the target arrangement and examine whether this increases the value of physical assistance.
+ 
+ Experience ratings combined text and robotic-arm assistance. Future comparisons should examine each modality separately. Correct-piece scoring from final photographs would provide a finer measure of partial progress alongside binary completion. The task-profile survey measured anticipated helpfulness, whereas the experiment measured experience after receiving assistance; these ratings address different questions.
+ 

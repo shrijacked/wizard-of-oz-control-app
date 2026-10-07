@@ -2,6 +2,10 @@
 
 7 October 2026. Branch: writing. This publishing commit keeps the current draft, old source/PDF snapshots and cumulative highlighted review together. Find the publishing commit with `git log -- paper/aamas2027/VERSIONS.md`. The manuscript itself is unchanged by packaging/documentation.
 
+Terminology revision: [constant assistance terminology](revisions/2026-10-07-constant-assistance/CHANGELOG.md), with [highlighted changes](revisions/2026-10-07-constant-assistance/highlighted-review.html). The source, current PDF, plots and clean ZIP now use the new name. The earlier cumulative review remains a historical review of the preceding rounds.
+
+Presentation revision: [baseline, tables, setup photograph and comments](revisions/2026-10-07-photo-tables-comments/CHANGELOG.md), with [highlighted changes](revisions/2026-10-07-photo-tables-comments/highlighted-review.html). It builds on the constant-assistance revision.
+
 ## Pick the version you need
 
 | Version | Source | PDF or review |
@@ -23,17 +27,17 @@ These are writing/review packages. Internal notes, historical author identities 
 
 ## What the current draft contains
 
-The exact earlier abstract is restored. The working sample is planned N=24, and the visible draft notice identifies pending final results/demographics. Anonymous authors and submission ID 2613 are retained. The current data calculations have not been inflated to the planned sample. Survey and protocol details have been added; final photographs and correct-piece scores remain pending.
+The earlier abstract is retained with the condition name updated to constant assistance. The working sample is planned N=24, and the visible draft notice identifies pending final results/demographics. Anonymous authors and submission ID 2613 are retained. The current data calculations have not been inflated to the planned sample. Survey and protocol details have been added; final photographs and correct-piece scores remain pending.
 
-Six figures remain: task-profile survey, assistance architecture, physical setup, workload/frustration, matched scheduled/adaptive correlations, and adaptive-minus-scheduled assistance differences. The redundant performance plot and heatmaps are archived. The current PDF is eight pages; the cumulative review is nine pages with added/deleted text and replaced figures visible.
+Five figures remain: task-profile survey, assistance architecture, physical setup, workload/frustration, and grouped constant/adaptive assistance-rating bars. The redundant performance plot and heatmaps are archived. The current PDF is eight pages; the cumulative review is nine pages with added/deleted text and replaced figures visible.
 
 ## Continue the work
 
 1. Read [README](README.md), [author notes](author-notes.md), [structure review](structure-review.md) and the [cumulative change log](revisions/2026-10-07-cumulative/CHANGELOG.md).
 2. Preserve a new pre-change source/PDF snapshot and hash manifest before the next manuscript revision. Keep older snapshots intact.
-3. Resolve the remaining protocol facts: actual baseline procedure, enacted participant instructions, institutional review status, eligibility/practice, robot/material/safety/data details and exact survey overlap. Add a setup photograph and scored final photos.
+3. Resolve the remaining protocol facts: enacted participant instructions, institutional review status, eligibility/practice, robot/material/safety/data details and exact survey overlap. The supplied setup photograph is now in Figure 3; add scored final photos.
 4. Analyze the final export, reconcile inclusion/outcome/timing decisions, then replace all draft numerical claims, tables/graphs and demographics. Keep N=24 as a planned target until the observed sample is reconciled. Remove the draft notice only when the analysis is final.
-5. Use scripts/update-paper-analysis.py for the full analysis and scripts/plot-assisted-comparison.py for the two comparison plots. Both require NumPy/Matplotlib; input paths are in the scripts. Existing raw input archives and literature PDFs are local, ignored data files; teammates need authorized copies to rerun source analysis. The plot-only helper can use the tracked analysis JSON.
+5. Use scripts/update-paper-analysis.py for the full analysis and scripts/plot-assisted-comparison.py for the grouped comparison bar chart. Both require NumPy/Matplotlib; input paths are in the scripts. Existing raw input archives and literature PDFs are local, ignored data files; teammates need authorized copies to rerun source analysis. The plot-only helper can use the tracked analysis JSON.
 6. Edit canonical main.tex and synchronize manuscript.md. Maintain [evidence-map](evidence-map.md) and the [reference text map](literature/REFERENCE_TEXT_MAP.md) when claims/citation locations change. Fifteen sources, 21 citation occurrences and 35 PDF-text anchors are documented; every new reference requires downloaded-PDF checks.
 7. Follow [BUILD.txt](BUILD.txt), compile the whole project, and inspect each PDF page. Keep output/pdf/aamas2027-current.pdf synchronized with the source. The standalone diagrams are output/figures/*.tex; their manuscript copies are figures/*.tikz.tex.
 8. Generate review files against the new frozen baseline with scripts/review-paper-revision.py --revision <new-folder>. Repackage downloadable projects after final source/PDF changes.
@@ -41,3 +45,7 @@ Six figures remain: task-profile survey, assistance architecture, physical setup
 ## Publication checks
 
 Before this commit, all frozen baseline hashes, the cumulative review, the highlighted-package manifest and current source/PDF hashes were checked. ZIP entries were verified against their manifests. Both source and highlighted PDFs were already compiled and visually checked; no manuscript or result edits were introduced during publishing. See publication-validation.json for the exact hashes/package checks.
+
+Current figure revision: [bar-chart change log](revisions/2026-10-07-bar-comparison/CHANGELOG.md) and [highlighted review](revisions/2026-10-07-bar-comparison/highlighted-review.html). Figure 5 replaces the previous Figures 5 and 6; these older figures remain in the preserved baseline.
+
+The current publishing update includes all three recent rounds: constant-assistance terminology, baseline/photo/table/comment edits, and the grouped-bar replacement. Historical review packages remain tied to their own baselines; generation-time local-status fields are historical. Find the publishing commit with git log -- paper/aamas2027/VERSIONS.md.

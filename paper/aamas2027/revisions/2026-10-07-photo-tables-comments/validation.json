@@ -1,0 +1,49 @@
+{
+  "date": "2026-10-07",
+  "status": "local, not pushed",
+  "source_tex_sha256": "affeb5edf1de67f8e501f4140a725fcb90687212b9c9b65cdda5d745bdc1596d",
+  "current_pdf_sha256": "808d3b788373c50ebbf6a0c01bffeee8a8fbaae67f03499a747d89d1b34f323e",
+  "pages": 8,
+  "all_pages_visually_checked": true,
+  "no_overfull_boxes_or_undefined_references": true,
+  "unchanged_checks": [
+    "abstract",
+    "all table values",
+    "analysis/revision-analysis.json",
+    "references.bib"
+  ],
+  "baseline_procedure": "Three-minute pre-task window confirmed by author; reminder removed.",
+  "quotes_verified": [
+    {
+      "quote": "need better worded hints",
+      "participant": [
+        "P101"
+      ]
+    },
+    {
+      "quote": "has the potential to be fun and challenging.",
+      "participant": [
+        "P101"
+      ]
+    },
+    {
+      "quote": "The hints were helpful and overall well timed, but the actual robot arm moving the pieces were not adding anything more",
+      "participant": [
+        "P103"
+      ]
+    },
+    {
+      "quote": "the arm took time in moving the piece which cut into solving time",
+      "participant": [
+        "P103"
+      ]
+    }
+  ],
+  "photo_source": "/Users/rishit/Downloads/IMG_1687.HEIC",
+  "photo_source_sha256": "ad1222b095e432f4b17041500e30f2b71c62984bcde2de365988401adc6f8177",
+  "photo_asset_sha256": "534ba4cd674aa4466e03023c2de2e25627e15c678db38f1d2e164ca581ee1a24",
+  "photo_exif_removed": true,
+  "references": "15 PDF hashes and 35 anchors verified; 21 citation occurrences.",
+  "clean_package_sha256": "38bdc74b9870657fb55f927aaf9eb5468e552d59578fc7e899bd4b556a5f2f80",
+  "clean_package_manifest_verified": true
+}

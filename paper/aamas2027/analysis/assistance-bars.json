@@ -1,0 +1,47 @@
+{
+  "source_analysis_sha256": "063b624a40fca20be22ca66b0fc33f528fb59188294dbb047ca6cfa44483b34a",
+  "actual_matched_participants": 12,
+  "error_bars": "Sample standard deviation across participant-condition averages (ddof=1).",
+  "measures": {
+    "helpfulness": {
+      "constant": {
+        "mean": 4.833333333333333,
+        "sd": 0.6276459144608479
+      },
+      "adaptive": {
+        "mean": 5.055555555555556,
+        "sd": 0.8742481137010044
+      }
+    },
+    "timingEffectiveness": {
+      "constant": {
+        "mean": 5.166666666666667,
+        "sd": 1.1055415967851334
+      },
+      "adaptive": {
+        "mean": 5.5555555555555545,
+        "sd": 0.9463735497270068
+      }
+    },
+    "clarityAndDistraction": {
+      "constant": {
+        "mean": 4.111111111111111,
+        "sd": 1.373143068118499
+      },
+      "adaptive": {
+        "mean": 4.222222222222222,
+        "sd": 1.241808174432566
+      }
+    },
+    "stressReduction": {
+      "constant": {
+        "mean": 4.888888888888888,
+        "sd": 0.90267093384844
+      },
+      "adaptive": {
+        "mean": 5.138888888888888,
+        "sd": 1.2828183408506817
+      }
+    }
+  }
+}

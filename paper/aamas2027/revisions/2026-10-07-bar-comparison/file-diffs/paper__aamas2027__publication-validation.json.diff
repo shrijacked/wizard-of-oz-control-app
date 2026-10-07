@@ -1,0 +1,70 @@
+--- before/paper/aamas2027/publication-validation.json
++++ current/paper/aamas2027/publication-validation.json
+@@ -1,41 +1,34 @@
+ {
+-  "branch": "writing",
+-  "base_commit": "3c4ddb943e8d52f4d3c990654aa745a1a271b9d7",
+-  "baseline_hashes_verified": {
++  "date": "2026-10-07",
++  "source_tex_sha256": "83a62cd88ebedb5c5fff662650e90e525e4443abc6a88afc241caf1e62b8ca63",
++  "current_pdf_sha256": "360d52ff3431f4fb23c6c672f725f92f99ecbdcbd5082b0758d88a14a9199248",
++  "pages": 8,
++  "figures": 5,
++  "all_pages_visually_checked": true,
++  "final_chart_height_rechecked_pages": [
++    7,
++    8
++  ],
++  "no_overfull_boxes_or_undefined_references": true,
++  "unchanged_checks": [
++    "abstract",
++    "tables including bold formatting",
++    "analysis/revision-analysis.json",
++    "references.bib"
++  ],
++  "bar_means_and_sample_sds_match_table_3": true,
++  "baseline_hash_checks": {
+     "2026-10-07": 32,
++    "2026-10-07-bar-comparison": 51,
++    "2026-10-07-constant-assistance": 50,
+     "2026-10-07-cumulative": 48,
+     "2026-10-07-figures": 49,
++    "2026-10-07-photo-tables-comments": 50,
+     "2026-10-07-protocol": 48,
+     "2026-10-07-working-sample": 49
+   },
+-  "current_tex_sha256": "dce42496d0c633b919f42d0b5740052abbf8378ae80454fd821bd3a0670216b4",
+-  "current_pdf_sha256": "3bfd8e37a41b67e767ac277a7959aa664603216e8df14f93ff20a044f5c5e52d",
+-  "highlighted_tex_sha256": "d5748a9a0b7c3b5fe97fd94182c04e47df267d0ffa91dc24b48f642cf98c6b8e",
+-  "highlighted_pdf_sha256": "801f1b22af8431a3c1e8d033632cb868c1536007aef36e20daaea9bc7bf1c0ef",
+-  "current_pdf_pages": 8,
+-  "highlighted_pdf_pages": 9,
+-  "manuscript_and_result_edits_during_publication": false,
+-  "reference_map_current_hashes": true,
+-  "review_package_manifest_verified": true,
+-  "packages": {
+-    "output/packages/aamas2027-complete-latex-project.zip": {
+-      "sha256": "6be186020c8893501c75ec14f430b867b16c56cc9cdc4ba4284cd7fecb3a941e",
+-      "bytes": 855344
+-    },
+-    "output/packages/aamas2027-before-protocol-latex-project.zip": {
+-      "sha256": "89231bc980b6a5b7e1a097d24279c970f715703a47ce7207db560b66fedb0c84",
+-      "bytes": 889154
+-    },
+-    "paper/aamas2027/revisions/2026-10-07-cumulative/aamas2027-cumulative-highlighted-tex.zip": {
+-      "sha256": "5374659a98631ed0fb76078a12ce3d684ea732a8bb23bee630d8a20fdda6a626",
+-      "bytes": 958228
+-    }
+-  },
+-  "documentation_changes": [
+-    "VERSIONS.md added; current/old/review files and workflow indexed",
+-    "README links cumulative review and version index",
+-    "BUILD points to clean dependency ZIP",
+-    "Standalone figure READMEs reflect current manuscript placement"
+-  ],
+-  "prior_review_status_fields": "Historical generation status retained; current publishing state is established by Git history."
++  "references": "15 PDF hashes and 35 text anchors checked; 21 citation occurrences.",
++  "clean_package_sha256": "2c96280eddad1b1c9260b41aa3314f1113ffae18b14fc140428cabb428e65860",
++  "clean_package_manifest_verified": true,
++  "publication": "Prepared for commit and push to writing; see git history for resulting commit."
+ }

@@ -1,0 +1,11 @@
+--- before/paper/aamas2027/analysis/assisted-comparison.json
++++ current/paper/aamas2027/analysis/assisted-comparison.json
+@@ -1,7 +1,7 @@
+ {
+   "source_analysis_sha256": "063b624a40fca20be22ca66b0fc33f528fb59188294dbb047ca6cfa44483b34a",
+   "actual_matched_participants": 12,
+-  "correlation_definition": "Scheduled versus adaptive averages for the same measure and participant, Spearman rank correlation with average ties.",
++  "correlation_definition": "Constant versus adaptive averages for the same measure and participant, Spearman rank correlation with average ties.",
+   "correlations": [
+     {
+       "measure": "completion",

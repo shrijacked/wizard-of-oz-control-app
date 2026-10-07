@@ -1,0 +1,11 @@
+--- before/paper/aamas2027/method-checks/baseline-recording.md
++++ current/paper/aamas2027/method-checks/baseline-recording.md
+@@ -2,7 +2,7 @@
+ 
+ Checked 7 October 2026. Internal guidance review, not a claim about the enacted procedure or an added manuscript reference.
+ 
+-The author temporarily describes a three-minute pre-task window after study information. The current collector instead sets BASELINE_DURATION=60.0 and computes baseline HR over that window. A three-minute preparatory/recording period and the actual software reference interval are distinct. Confirm actual instructions, posture/settling, timestamps and selected baseline interval before finalizing the method. The manuscript includes the temporary account with a short confirmation note; no actual settings were changed.
++The author confirmed on 7 October that the three-minute pre-task window after study information is the actual procedure. The current collector instead sets BASELINE_DURATION=60.0 and computes baseline HR over that window. A three-minute preparatory/recording period and the actual software reference interval are distinct. The manuscript retains that confirmed procedure and removes the confirmation reminder. The software reference interval remains a separate implementation detail; no software settings were changed.
+ 
+ [Laborde, Mosley and Thayer 2017](https://doi.org/10.3389/fpsyg.2017.00213) was downloaded as a PDF and the relevant duration/baseline text on PDF pages 8–9 read directly. PDF page 8 recommends five-minute recordings when possible for comparable HRV estimates, with shorter recordings depending on the measure and research question. PDF page 9 recommends consistent baseline posture/instructions and an acclimatization period, illustrating that recording length alone does not establish a suitable baseline. These HRV recommendations do not validate this study's HR-rise detector or its 5-bpm threshold.
+ 

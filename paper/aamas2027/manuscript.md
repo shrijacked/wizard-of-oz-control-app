@@ -1,4 +1,4 @@
-# When to Intervene: Trade-offs Between Scheduled and Physiology-Triggered Robotic Assistance
+# When to Intervene: Trade-offs Between Constant and Physiology-Triggered Robotic Assistance
 
 Anonymous Author(s)
 
@@ -8,7 +8,7 @@ Submission number: 2613
 
 ## Abstract
 
-In human–robot interaction (HRI), deciding when to provide assistance requires understanding how different intervention strategies affect both task performance and the user experience. Previous work has compared physiology-triggered robotic assistance with periodic support in surgical training. We extend this work to physical spatial problem solving by conducting an experiment to compare three conditions: no assistance, scheduled assistance, and adaptive assistance based on physiological signals. Twenty-four participants (N = 24) solve nine physical tangram puzzles across three sessions. The order of the conditions is varied across participants, and puzzles are randomly assigned to the sessions. Tangrams combine spatial reasoning with physical manipulation, providing a simple task for studying informational and physical assistance. Participants receive on-screen hints and robotic-arm interventions through a Wizard-of-Oz setup, with assistance either scheduled or adapted using heart-rate signals and task progress. We evaluate puzzle completion, completion time, workload, helpfulness, intervention timing, frustration, and trust. Both assistance conditions improve completion rates compared with no assistance; scheduled assistance achieves the highest completion and shortest duration, while adaptive assistance receives higher helpfulness and timing ratings and lower frustration. Together, these findings highlight distinct trade-offs between assistance strategies in task performance and user experience, providing insights for designing HRI systems that adapt assistance to the needs of the user.
+In human–robot interaction (HRI), deciding when to provide assistance requires understanding how different intervention strategies affect both task performance and the user experience. Previous work has compared physiology-triggered robotic assistance with periodic support in surgical training. We extend this work to physical spatial problem solving by conducting an experiment to compare three conditions: no assistance, constant assistance, and adaptive assistance based on physiological signals. Twenty-four participants (N = 24) solve nine physical tangram puzzles across three sessions. The order of the conditions is varied across participants, and puzzles are randomly assigned to the sessions. Tangrams combine spatial reasoning with physical manipulation, providing a simple task for studying informational and physical assistance. Participants receive on-screen hints and robotic-arm interventions through a Wizard-of-Oz setup, with assistance offered every 30 seconds or adapted using heart-rate signals and task progress. We evaluate puzzle completion, completion time, workload, helpfulness, intervention timing, frustration, and trust. Both assistance conditions improve completion rates compared with no assistance; constant assistance achieves the highest completion and shortest duration, while adaptive assistance receives higher helpfulness and timing ratings and lower frustration. Together, these findings highlight distinct trade-offs between assistance strategies in task performance and user experience, providing insights for designing HRI systems that adapt assistance to the needs of the user.
 
 ## 1. Introduction
 
@@ -20,13 +20,13 @@ Physiological signals offer another basis for assistance timing. Yang et al. com
 
 We use seven-piece tangram puzzles to study this relationship. Recent work uses tangrams for collaborative HRI and as a simplified assembly task [12, 9]. They support repeated attempts with common materials, observable completion outcomes, and both informational and physical assistance. We compare assistance offered at regular intervals with assistance offered when physiological monitoring flags arousal, allowing the timing policy to respond to changes during the task.
 
-Each participant experiences no assistance, scheduled assistance, and adaptive assistance, with three different puzzles per condition. Scheduled assistance is offered every 30 seconds; adaptive assistance is offered whenever arousal is flagged. A Wizard-of-Oz setup delivers the corresponding hints and robot actions. We assess both puzzle performance and participant experience to understand how the two assistance policies support progress and how their interventions are received.
+Each participant experiences no assistance, constant assistance, and adaptive assistance, with three different puzzles per condition. Constant assistance is offered every 30 seconds; adaptive assistance is offered whenever arousal is flagged. A Wizard-of-Oz setup delivers the corresponding hints and robot actions. We assess both puzzle performance and participant experience to understand how the two assistance policies support progress and how their interventions are received.
 
 We address two research questions. **RQ1:** How do the three assistance conditions differ in puzzle completion and round duration? **RQ2:** How do they differ in perceived workload and frustration, and how do the assisted conditions compare in helpfulness and intervention timing?
 
 Our contributions are:
 
-1. A comparison of unassisted, scheduled, and physiology-informed assistance in physical spatial problem solving.
+1. A comparison of unassisted, constant, and physiology-informed assistance in physical spatial problem solving.
 2. A Wizard-of-Oz platform coordinating text hints, robotic-arm assistance, physiological monitoring, and study measures.
 3. An evaluation connecting objective task performance with workload and the experience of receiving assistance.
 
@@ -95,12 +95,14 @@ Our system coordinates three browser interfaces through a local server (Figure 2
 The setup combines an Orangewood robotic arm, a Maxim H Band wrist sensor, and a Logitech C270 workspace camera. An opaque partition separates the participant from two researchers, who administer the task and operate the arm (Figure 3). The camera is mounted on top of the partition and covers the participant table. The participant faces a workspace with a puzzle assembly area in front of and to their left, a drop spot to their right, and a laptop for hints and questionnaires. Unused pieces occupy fixed, labeled pickup positions. The arm retrieves a selected piece using one of seven piece-specific programs and delivers it to the drop spot; the participant places it in the target arrangement. Preset text hints describe piece location, orientation, or adjacency, providing consistent assistance content across participants. Hints are accompanied by an audible notification. The researcher selects either a hint alone or a robot action paired with a hint, based on the current arrangement.
 
 
-![Figure 3](figures/physical-setup-topdown.png)
+![Figure 3 schematic](figures/physical-setup-topdown.png)
 
-*Figure 3. Top-down view of the Wizard-of-Oz setup. An opaque partition separates the researchers from the participant; a camera mounted on the partition observes the participant table. The table contains fixed piece pickup positions, the robot drop spot, the assembly area, and the participant laptop. Schematic not to scale.*
+![Figure 3 setup photograph](figures/setup-photo.jpg)
+
+*Figure 3. Wizard-of-Oz setup, with a top-down schematic and a photograph of the apparatus at upper right. An opaque partition separates the researchers from the participant; a camera mounted on the partition observes the participant table. The table contains fixed piece pickup positions, the robot drop spot, the assembly area, and the participant laptop. Schematic not to scale.*
 
 
-**NEED TO ADD SETUP PHOTO HERE / ROBOT AND PIECE MATERIAL DETAILS**
+**ADD ROBOT AND PIECE MATERIAL DETAILS**
 
 ### 4.2. Physiological monitoring
 
@@ -108,13 +110,11 @@ After receiving the study information, participants wore the wrist sensor during
 
 The dashboard displays the flag alongside the workspace view. In the adaptive condition, the flag initiates assistance, while the puzzle arrangement determines the content of the hint or robot action. The flag is a heart-rate-rise cue for assistance timing; participant workload and frustration are assessed through questionnaires.
 
-**CONFIRM ACTUAL BASELINE PROCEDURE**
-
 ### 4.3. Assistance conditions
 
 **No assistance.** Participants solve the puzzle without text hints or robotic-arm assistance.
 
-**Scheduled assistance.** Assistance is offered every 30 seconds during the puzzle. At each interval, the researcher delivers a preset text hint or a robotic-arm intervention accompanied by a hint, relevant to the current arrangement.
+**Constant assistance.** Assistance is offered every 30 seconds during the puzzle. At each interval, the researcher delivers a preset text hint or a robotic-arm intervention accompanied by a hint, relevant to the current arrangement.
 
 **Physiology-informed adaptive assistance.** Assistance is offered whenever physiological monitoring flags arousal. The researcher delivers a preset text hint or a robotic-arm intervention accompanied by a hint, relevant to the current arrangement. Repeated flags prompt additional assistance. When a flag recurs rapidly or remains raised, the researcher waits 15 seconds before the next intervention. The arousal flag determines when help is offered; the task state guides the researcher’s choice of assistance content.
 
@@ -128,7 +128,7 @@ The study targets twenty-four participants (N=24). Participants volunteered thro
 
 We measure puzzle completion and pause-adjusted round duration, including both solved and unsolved attempts. After each puzzle, participants rate the six NASA-TLX dimensions on seven-point scales: mental demand, physical demand, temporal demand, performance, effort, and frustration. An overall workload score averages the six items after aligning their direction so that higher values indicate greater workload. After assisted puzzles, participants also rate helpfulness, timing, seamlessness, and frustration relief. The final questionnaire assesses overall helpfulness, efficacy, trust, and reliance on the robot's guidance.
 
-We average ratings and durations across each participant's three trials per condition, then report means and standard deviations across participants. Completion is reported as the proportion of puzzles solved. Exploratory pairwise comparisons use two-sided paired sign-flip tests on participant-condition averages. Holm correction is applied to the three comparisons for each outcome and to the four assistance-rating comparisons; reported p values are adjusted. Spearman correlations compare each participant’s scheduled and adaptive averages for the same measure.
+We average ratings and durations across each participant's three trials per condition, then report means and standard deviations across participants. Completion is reported as the proportion of puzzles solved. Exploratory pairwise comparisons use two-sided paired sign-flip tests on participant-condition averages. Holm correction is applied to the three comparisons for each outcome and to the four assistance-rating comparisons; reported p values are adjusted.
 
 **UPDATE WITH FINAL RESULTS**
 
@@ -138,40 +138,40 @@ For photograph-based partial-progress scoring, we count correctly placed pieces 
 
 **INSERT CORRECT PIECE COUNT / CONFIRM PLACEMENT TOLERANCE AND SCORERS**
 
-Participants solved 47 of 108 puzzles. Completion rates were 13.9% without assistance, 66.7% with scheduled assistance, and 50.0% with adaptive assistance (Table 1). Compared with control, completion was 52.8 percentage points higher with scheduled assistance (p=.0015) and 36.1 points higher with adaptive assistance (p=.016). The difference between the two assisted conditions was not statistically significant (p=.156).
+Participants solved 47 of 108 puzzles. Completion rates were 13.9% without assistance, 66.7% with constant assistance, and 50.0% with adaptive assistance (Table 1). Compared with control, completion was 52.8 percentage points higher with constant assistance (p=.0015) and 36.1 points higher with adaptive assistance (p=.016). The difference between the two assisted conditions was not statistically significant (p=.156).
 
 
 | Condition | Solved | Rate | Duration (s) |
 | –- | –- | –- | –- |
 | Control | 5/36 | 13.9% | 289.58 (25.59) |
-| Scheduled | 24/36 | 66.7% | 239.03 (51.42) |
+| Constant | **24/36** | **66.7%** | **239.03 (51.42)** |
 | Adaptive | 18/36 | 50.0% | 268.78 (30.30) |
 
-*Table 1. Puzzle completion and round duration. Duration includes all attempts; values are mean (SD) across participant-condition averages.*
+*Table 1. Puzzle completion and round duration. Duration includes all attempts; values are mean (SD) across participant-condition averages. Bold marks the highest completion and shortest duration.*
 
 
-Scheduled assistance also had the shortest mean round duration. Its mean was 50.56 seconds below control (p=.012). The adaptive-control and adaptive-scheduled duration differences were not statistically significant (both p=.132). These durations summarize time spent across all attempts, rather than time to successful completion alone.
+Constant assistance also had the shortest mean round duration. Its mean was 50.56 seconds below control (p=.012). The adaptive-control and adaptive-constant duration differences were not statistically significant (both p=.132). These durations summarize time spent across all attempts, rather than time to successful completion alone.
 
 
 ### 5.3. Subjective workload
 
-Overall workload averaged 4.72 in control, 3.69 with scheduled assistance, and 3.74 with adaptive assistance (Table 2; Figure 4). Both assisted conditions had lower workload than control: the mean reductions were 1.03 points for scheduled assistance (p=.0020) and 0.98 points for adaptive assistance (p=.0015). Their overall workload scores did not differ significantly (p=.882).
+Overall workload averaged 4.72 in control, 3.69 with constant assistance, and 3.74 with adaptive assistance (Table 2; Figure 4). Both assisted conditions had lower workload than control: the mean reductions were 1.03 points for constant assistance (p=.0020) and 0.98 points for adaptive assistance (p=.0015). Their overall workload scores did not differ significantly (p=.882).
 
 
-| Measure | Control | Scheduled | Adaptive |
+| Measure | Control | Constant | Adaptive |
 | –- | –- | –- | –- |
-| Mental demand | 5.83 (0.96) | 4.69 (0.90) | 4.81 (1.40) |
-| Physical demand | 3.64 (1.63) | 3.11 (1.28) | 3.28 (1.50) |
-| Temporal demand | 3.94 (1.27) | 3.33 (0.88) | 3.44 (1.34) |
-| Perceived performance | 3.08 (1.51) | 5.03 (1.05) | 5.06 (1.25) |
-| Effort | 5.56 (0.67) | 4.61 (0.91) | 4.81 (1.08) |
-| Frustration | 4.44 (1.26) | 3.44 (0.91) | 3.17 (0.81) |
-| Overall workload | 4.72 (0.62) | 3.69 (0.54) | 3.74 (0.81) |
+| Mental demand | 5.83 (0.96) | **4.69 (0.90)** | 4.81 (1.40) |
+| Physical demand | 3.64 (1.63) | **3.11 (1.28)** | 3.28 (1.50) |
+| Temporal demand | 3.94 (1.27) | **3.33 (0.88)** | 3.44 (1.34) |
+| Perceived performance | 3.08 (1.51) | 5.03 (1.05) | **5.06 (1.25)** |
+| Effort | 5.56 (0.67) | **4.61 (0.91)** | 4.81 (1.08) |
+| Frustration | 4.44 (1.26) | 3.44 (0.91) | **3.17 (0.81)** |
+| Overall workload | 4.72 (0.62) | **3.69 (0.54)** | 3.74 (0.81) |
 
-*Table 2. NASA-TLX dimension ratings and overall workload on seven-point scales, mean (SD). Higher performance ratings indicate greater success; higher workload ratings indicate greater demand.*
+*Table 2. NASA-TLX dimension ratings and overall workload on seven-point scales, mean (SD). Higher performance ratings indicate greater success; higher workload ratings indicate greater demand. Bold marks the most favorable mean in each row.*
 
 
-Mental demand averaged 4.69 with scheduled assistance and 4.81 with adaptive assistance, while frustration averaged 3.44 and 3.17, respectively. Adaptive assistance reduced frustration relative to control (p=.031). The scheduled-control and adaptive-scheduled frustration differences were not statistically significant (p=.068 and p=.470). Perceived performance averaged 5.03 and 5.06 in the assisted conditions.
+Mental demand averaged 4.69 with constant assistance and 4.81 with adaptive assistance, while frustration averaged 3.44 and 3.17, respectively. Adaptive assistance reduced frustration relative to control (p=.031). The constant-control and adaptive-constant frustration differences were not statistically significant (p=.068 and p=.470). Perceived performance averaged 5.03 and 5.06 in the assisted conditions.
 
 
 ![Figure 4](figures/workload.png)
@@ -181,56 +181,48 @@ Mental demand averaged 4.69 with scheduled assistance and 4.81 with adaptive ass
 
 ### 5.4. Intervention experience
 
-Adaptive assistance received higher mean ratings on all four assistance-specific items (Table 3; Figure 6). Helpfulness averaged 5.06 with adaptive assistance and 4.83 with scheduled assistance; timing averaged 5.56 and 5.17, respectively. Mean seamlessness was 4.22 versus 4.11, and frustration relief was 5.14 versus 4.89. None of these paired differences was statistically significant after correction (timing p=.719; other items p=1.000).
+Adaptive assistance received higher mean ratings on all four assistance-specific items (Table 3; Figure 5). Helpfulness averaged 5.06 with adaptive assistance and 4.83 with constant assistance; timing averaged 5.56 and 5.17, respectively. Mean seamlessness was 4.22 versus 4.11, and frustration relief was 5.14 versus 4.89. None of these paired differences was statistically significant after correction (timing p=.719; other items p=1.000).
 
 
-| Measure | Scheduled | Adaptive |
+| Measure | Constant | Adaptive |
 | –- | –- | –- |
-| Helpfulness | 4.83 (0.63) | 5.06 (0.87) |
-| Timing | 5.17 (1.11) | 5.56 (0.95) |
-| Seamlessness | 4.11 (1.37) | 4.22 (1.24) |
-| Frustration relief | 4.89 (0.90) | 5.14 (1.28) |
+| Helpfulness | 4.83 (0.63) | **5.06 (0.87)** |
+| Timing | 5.17 (1.11) | **5.56 (0.95)** |
+| Seamlessness | 4.11 (1.37) | **4.22 (1.24)** |
+| Frustration relief | 4.89 (0.90) | **5.14 (1.28)** |
 
-*Table 3. Intervention experience in the two assisted conditions, mean (SD). Higher ratings indicate a more favorable experience.*
-
-
-Figure 5 compares participants’ scheduled and adaptive averages. Cross-condition correlations were .39 for completion, .10 for duration, .23 for workload, and -.07 for frustration. Assistance-rating correlations ranged from .50 for helpfulness to .64 for timing. These coefficients describe consistency across conditions, rather than the size or direction of their differences.
+*Table 3. Intervention experience in the two assisted conditions, mean (SD). Higher ratings indicate a more favorable experience; bold marks the highest mean in each row.*
 
 
-![Figure 5](figures/scheduled-adaptive-correlations.png)
-
-*Figure 5. Scheduled versus adaptive participant averages for the same measure. Each point represents a matched pair; larger points indicate coincident pairs. Dashed diagonals indicate equal scores, and ρ denotes Spearman correlation.*
+These ratings describe the combined experience of text hints and robotic-arm assistance. The higher adaptive averages alongside lower completion than constant assistance motivate examining both task progress and the experience of receiving help.
 
 
-These ratings describe the combined experience of text hints and robotic-arm assistance. The higher adaptive averages alongside lower completion than scheduled assistance motivate examining both task progress and the experience of receiving help.
+![Figure 5](figures/assistance-comparison-bars.png)
 
-
-![Figure 6](figures/assistance-differences.png)
-
-*Figure 6. Paired differences in assistance ratings, adaptive minus scheduled. Gray points show individual differences; diamonds show means with unadjusted 95% bootstrap intervals. Positive values favor adaptive assistance; negative values favor scheduled assistance.*
+*Figure 5. Assistance ratings for constant and adaptive assistance. Bars show means across participant-condition averages; error bars show one standard deviation. Labels give the mean ratings on the seven-point scale. Higher ratings indicate a more favorable experience.*
 
 
 ### 5.5. Overall experience
 
 Overall helpfulness averaged 5.08 (SD=1.24), efficacy 4.92 (SD=1.51), and trust 4.75 (SD=1.60). Agreement with following the robot's guidance even when uncertain averaged 5.08 (SD=1.31). These end-of-study ratings summarize participants' experience across all three conditions.
 
-Six participants left written comments. Their remarks illustrate variation in hint usefulness and the contribution of physical assistance. P101 wrote, “some of the hints were really nice, some were meh.” P103 described the hints as “helpful and overall well timed,” but felt the arm added little to solving the puzzle. Two participants described the puzzles as fun. These comments provide individual perspectives alongside the ratings.
+Participant comments highlighted the importance of clear, timely hints and the role of physical assistance. P101 requested *“need better worded hints”* while noting that the task *“has the potential to be fun and challenging.”* P103 wrote, *“The hints were helpful and overall well timed, but the actual robot arm moving the pieces were not adding anything more”*. These remarks suggest that participants valued guidance for solving the puzzle while questioning the additional benefit of piece retrieval.
 
 ## 6. Discussion, Limitations, and Future Work
 
 ### 6.1. Task progress and the experience of assistance
 
-Both assistance conditions increased completion and reduced overall workload relative to control. Scheduled assistance had the highest completion rate and shortest mean round duration. Adaptive assistance received higher average helpfulness and timing ratings and lower average frustration, but these differences between the assisted conditions were not statistically significant. The findings support considering performance and participant experience together without establishing that either assisted policy is consistently preferable.
+Both assistance conditions increased completion and reduced overall workload relative to control. Constant assistance had the highest completion rate and shortest mean round duration. Adaptive assistance received higher average helpfulness and timing ratings and lower average frustration, but these differences between the assisted conditions were not statistically significant. The findings support considering performance and participant experience together without establishing that either assisted policy is consistently preferable.
 
 Regular assistance may provide opportunities to reconsider an arrangement and advance the puzzle. Arousal-triggered assistance may concentrate help at moments when participants are receptive to it. The task-profile survey similarly showed that respondents could feel stuck despite completing the puzzle and requested guidance about specific placements. These interpretations motivate testing how assistance matches the stage of a solution process.
 
 ### 6.2. Assistance timing and physiological feedback
 
-The adaptive policy links intervention timing to arousal events, while scheduled assistance provides predictable assistance opportunities. In a spatial reasoning task, participants alternate between manipulation and reflection, so usefulness can depend on when help arrives. Future work could relate arousal events and intervention times to observed puzzle progress and evaluate which assistance content is most useful at different stages. Comparisons across tasks and sensors would help establish how broadly the timing policy applies.
+The adaptive policy links intervention timing to arousal events, while constant assistance provides predictable assistance opportunities. In a spatial reasoning task, participants alternate between manipulation and reflection, so usefulness can depend on when help arrives. Future work could relate arousal events and intervention times to observed puzzle progress and evaluate which assistance content is most useful at different stages. Comparisons across tasks and sensors would help establish how broadly the timing policy applies.
 
 ### 6.3. Limitations and future work
 
-Participant feedback suggested that hints were more important for solving the puzzle than robot retrieval. P103 noted that “the arm took time in moving the piece which cut into solving time.” Although retrieval makes a piece available, the participant still determines its placement. Future work could have the robot place pieces directly in the target arrangement and examine whether this increases the value of physical assistance.
+Participant feedback suggested that hints were more important for solving the puzzle than robot retrieval. P103 noted that *“the arm took time in moving the piece which cut into solving time”*. Although retrieval makes a piece available, the participant still determines its placement. Future work could have the robot place pieces directly in the target arrangement and examine whether this increases the value of physical assistance.
 
 Experience ratings combined text and robotic-arm assistance. Future comparisons should examine each modality separately. Correct-piece scoring from final photographs would provide a finer measure of partial progress alongside binary completion. The task-profile survey measured anticipated helpfulness, whereas the experiment measured experience after receiving assistance; these ratings address different questions.
 
@@ -248,7 +240,7 @@ The concealed human operation in the Wizard-of-Oz setup was not disclosed during
 
 ## 8. Conclusion
 
-We compared unassisted, scheduled, and physiology-informed adaptive assistance for physical tangram solving. Both assisted conditions improved completion and reduced workload relative to control. Scheduled assistance had the highest observed completion rate and shortest mean round duration. Adaptive assistance received higher average intervention ratings and lower frustration, with no statistically significant differences between the assisted conditions. These findings motivate systems that consider both task progress and the experience of receiving help, alongside further study of the content and physical role of assistance.
+We compared unassisted, constant, and physiology-informed adaptive assistance for physical tangram solving. Both assisted conditions improved completion and reduced workload relative to control. Constant assistance had the highest observed completion rate and shortest mean round duration. Adaptive assistance received higher average intervention ratings and lower frustration, with no statistically significant differences between the assisted conditions. These findings motivate systems that consider both task progress and the experience of receiving help, alongside further study of the content and physical role of assistance.
 
 ## AI Assistance Disclosure
 

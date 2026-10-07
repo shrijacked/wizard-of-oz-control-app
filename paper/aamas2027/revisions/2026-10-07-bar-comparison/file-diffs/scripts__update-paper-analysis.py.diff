@@ -1,0 +1,11 @@
+--- before/scripts/update-paper-analysis.py
++++ current/scripts/update-paper-analysis.py
+@@ -122,7 +122,7 @@
+ save(fig,'task-profile-survey')
+ import runpy
+ runpy.run_path(str(ROOT/'scripts/plot-assisted-comparison.py'),run_name='__main__')
+-print('Wrote revision-analysis.json and four current result/survey figures.')
++print('Wrote revision-analysis.json and three current result/survey figures.')
+ for x in comparisons:print(x['measure'],x['contrast'],f"difference={x['mean_difference']:.4f} adjusted p={x['p_holm']:.6f}")
+ print('Survey ratings:',[(x['mean'],x['sd']) for x in survey_ratings])
+ print('Age:',summary['experiment_age'],survey_summary['age'])

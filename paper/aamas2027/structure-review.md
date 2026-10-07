@@ -122,11 +122,11 @@ Separate Methods and Results into top-level sections if readability warrants it;
 | Fig. 1 | System diagram, optionally with setup photo | Verify actual information flow, operator roles, and hardware |
 | Fig. 2 | Completion and time in separate panels; correct-piece panel after annotation | Verify timing/denominators; score unfinished-puzzle photographs under a stated rule and define treatment of solved trials |
 | Fig. 3 | Six workload dimensions, three condition estimates per dimension | Confirm scale anchors and actual allocation; identify each tested contrast explicitly |
-| Table 1 | Assistance-specific question summaries and comparisons | Scheduled vs. adaptive only where control was not asked those questions |
+| Table 1 | Assistance-specific question summaries and comparisons | Constant vs. adaptive only where control was not asked those questions |
 | Compact table/text | End-of-study overall items | One overall response per participant, not three condition-specific responses |
 | Short quotations | Themes explaining experience | Traceable participant comments and a stated analysis process |
 
-The notes emphasize control–adaptive and control–scheduled contrasts. Scheduled–adaptive also matters directly to the paper's timing question. Report whichever contrasts the analysis supports; no significance is established by the notes. Define error bars, give effect sizes/uncertainty where appropriate, and explain any bolding or significance symbols. Repeated puzzles from the same person require an analysis reflecting that dependency; do not copy a reference paper's test merely to reproduce its table.
+The notes emphasize control–adaptive and control–constant contrasts. Constant–adaptive also matters directly to the paper's timing question. Report whichever contrasts the analysis supports; no significance is established by the notes. Define error bars, give effect sizes/uncertainty where appropriate, and explain any bolding or significance symbols. Repeated puzzles from the same person require an analysis reflecting that dependency; do not copy a reference paper's test merely to reproduce its table.
 
 Supplementary candidates: full questionnaires, full hint inventory/operator protocol, sensor-processing details, additional plots, and reproducibility materials. Essential condition rules, outcomes, and methods remain in the main paper.
 
@@ -169,4 +169,8 @@ The exact earlier abstract is restored at the author’s request. The study targ
 
 ## Revised comparison figures
 
-The section order remains unchanged. Remove the performance plot (Table 1 already reports those outcomes) and the three heatmaps. Retain workload/frustration as Figure 4. Add scheduled-versus-adaptive matched scatterplots for eight measures as Figure 5 and an assistance-rating difference plot as Figure 6. Correlation discussion now belongs to §5.4 alongside the assisted-condition comparison. The full pre-change paper and figure assets are preserved in revisions/2026-10-07-figures/before/.
+The section order remains unchanged. Remove the performance plot (Table 1 already reports those outcomes) and the three heatmaps. Retain workload/frustration as Figure 4. Add constant-versus-adaptive matched scatterplots for eight measures as Figure 5 and an assistance-rating difference plot as Figure 6. Correlation discussion now belongs to §5.4 alongside the assisted-condition comparison. The full pre-change paper and figure assets are preserved in revisions/2026-10-07-figures/before/.
+
+## Grouped-bar comparison revision
+
+The author requested replacement of Figures 5 and 6 with a bar chart. Current Figure 5 compares constant and adaptive assistance for the four assistance ratings using means and sample SDs. The paper now has five figures. Section 5.4 retains the paired tests and no-significant-difference result; cross-condition correlation prose and its methods sentence are removed. Objective outcomes remain in Table 1 and workload in Table 2/Figure 4. Earlier plots remain in revisions/2026-10-07-bar-comparison/before/.
