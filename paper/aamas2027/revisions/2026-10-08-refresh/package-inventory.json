@@ -1,0 +1,138 @@
+{
+  "files": [
+    {
+      "file": "main.tex",
+      "bytes": 36961,
+      "sha256": "d7c330097e0d6b7153e23cb793aa5f447d6c5b4182ac5142040696ed1cff307b"
+    },
+    {
+      "file": "references.bib",
+      "bytes": 16131,
+      "sha256": "654effa542f02a6efb49a74664c8856577c71f896f39bdd9511775474f2848a4"
+    },
+    {
+      "file": "aamas.cls",
+      "bytes": 122209,
+      "sha256": "e88c8e3e5fd1e39f93a2a4fa5b664e125b67487996b4236668206acf5c70ca7e"
+    },
+    {
+      "file": "ACM-Reference-Format.bst",
+      "bytes": 93560,
+      "sha256": "8ec002c927068bfc5b3cfe71b66aa4767b9e485530ac3c67ba5c064df4c2e6ac"
+    },
+    {
+      "file": "by.pdf",
+      "bytes": 5004,
+      "sha256": "19b7b19350bb937afead8e45e4ad006187e14803bef783902dbd88e370fc9917"
+    },
+    {
+      "file": "README.md",
+      "bytes": 3858,
+      "sha256": "3fec13f67b462c2c7365e66e250768c39106cfdc0f7404827a900769ab177b54"
+    },
+    {
+      "file": "BUILD.txt",
+      "bytes": 2099,
+      "sha256": "113ae3cef7e43a1fa7e9a9600ffc12a41996e2119ecca44ff559bbade7ed028c"
+    },
+    {
+      "file": "author-notes.md",
+      "bytes": 3554,
+      "sha256": "1d128e224b7ba6a82063a803a583f822e41966d9274cda6e1ea32dcb304a5817"
+    },
+    {
+      "file": "figures/study-system-diagram.tikz.tex",
+      "bytes": 10817,
+      "sha256": "c27e7491006c7805731beec47ef7029fed78c0473b070d5c1db956ef3a51fa3e"
+    },
+    {
+      "file": "figures/physical-setup-topdown.tikz.tex",
+      "bytes": 7587,
+      "sha256": "0cc1851f9ec2bf837a3b969e6a867071f60f90cfe544275619440786341daa14"
+    },
+    {
+      "file": "figures/condition-order-tree.tikz.tex",
+      "bytes": 3901,
+      "sha256": "f83c9582f1d17bfa9e8286f8a847b40a5ea57101e8abdb50ac1df5144800d477"
+    },
+    {
+      "file": "figures/setup-topdown-photo.png",
+      "bytes": 940038,
+      "sha256": "1a124aa4ee7d82794aff7427f002e801dc22ecb0a397254e57083daf44f11e31"
+    },
+    {
+      "file": "figures/operator-dashboard.png",
+      "bytes": 2851437,
+      "sha256": "e4849ea7ae25908b1237476eb77e88ed4a44a85a4d90e884478985938df1397f"
+    },
+    {
+      "file": "figures/formative-helpfulness.pdf",
+      "bytes": 2238,
+      "sha256": "9f92d6295b9a61939ec7ea97ca4ec28e5cb1e75feff9696475073b2d28a7d012"
+    },
+    {
+      "file": "figures/performance-tests.pdf",
+      "bytes": 3465,
+      "sha256": "a465d8506623661fec228992978d1859b5d1ca55dd05340bddad6d7202d912ca"
+    },
+    {
+      "file": "figures/frustration-tests.pdf",
+      "bytes": 2113,
+      "sha256": "b2985f0652f1359186638e9e775dd4d36499fef3835ed3ef9f65832ea4f294aa"
+    },
+    {
+      "file": "figures/assistance-tests.pdf",
+      "bytes": 2695,
+      "sha256": "986e9cd7651af4acf32ff7a31d45d00bbcce52e84beb87630a7d280212b9b142"
+    },
+    {
+      "file": "review/CHANGELOG.md",
+      "bytes": 20302,
+      "sha256": "badd5dcc024b86422fd9289b496e830a8d52ce27621bee6bb96c44f490034217"
+    },
+    {
+      "file": "review/ALL_SOURCE_AUDIT.md",
+      "bytes": 21223,
+      "sha256": "4e4c787f6576ccd70d323fe088f44419274075e7162af4d9b713435a937ec964"
+    },
+    {
+      "file": "review/all-source-downloads.json",
+      "bytes": 25868,
+      "sha256": "ea2ad92adac5caa848894cf43812f18fb1c618dd1727834c2c59df926699e5f3"
+    },
+    {
+      "file": "review/ANALYSIS.md",
+      "bytes": 21423,
+      "sha256": "f0eb3025cbea264e2ce0a86dd27a7691f8ab9433e0971ccd78a866a44835d5b2"
+    },
+    {
+      "file": "review/HOLM_EXPLAINED.md",
+      "bytes": 3220,
+      "sha256": "8e50f49ad42fb53921b5d44505ab46d38261147adeadf7f02960ddb94388ea8b"
+    },
+    {
+      "file": "review/paired-tests.csv",
+      "bytes": 10578,
+      "sha256": "8f4c496fe46fec7baf9cc179c95ea11258d86b3918b4e0295e29bb210cf329fa"
+    },
+    {
+      "file": "review/REFERENCE_AND_POLICY_STATUS.md",
+      "bytes": 4598,
+      "sha256": "9383000e6933e6e6bbbe9c1dfdfb4ce1aa05bf925fe467e65b6aef84eecc304b"
+    },
+    {
+      "file": "review/FINAL_DRAFT_REVIEW.md",
+      "bytes": 8532,
+      "sha256": "07c8fbaed860b1976e6e96931df96c4ed8e39e1e6a7f50a5426881b0f6ac4b0c"
+    }
+  ],
+  "excludes": [
+    "Compiled preview (supplied separately)",
+    "Raw participant files",
+    "Full reference PDFs",
+    "Recordings",
+    "Puzzle/solution PDFs",
+    "Historical notes and plots",
+    "Compiler intermediates"
+  ]
+}

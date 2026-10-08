@@ -1,0 +1,3939 @@
+{
+  "analysisDate": "2026-10-08",
+  "participants": 24,
+  "rounds": 216,
+  "experimentalDemographics": {
+    "exportedAge": {
+      "min": 20,
+      "max": 27,
+      "mean": 21.958333333333332,
+      "sd": 2.01038968030247
+    },
+    "exportedGender": {
+      "man": 18,
+      "woman": 6
+    },
+    "exportedGenderByDevice": {
+      "original-laptops": {
+        "man": 10,
+        "woman": 5
+      },
+      "third-laptop": {
+        "man": 8,
+        "woman": 1
+      }
+    },
+    "researcherConfirmedGender": {
+      "man": 14,
+      "woman": 10,
+      "source": "Researcher confirmation in chat, 8 October 2026: 10 girls and 14 guys.",
+      "scope": "Aggregate only; do not assign corrected genders to participant IDs.",
+      "ratioMenToWomen": "7:5",
+      "percentMen": 58.333333333333336,
+      "percentWomen": 41.666666666666664
+    },
+    "participantTypes": {
+      "source": "Researcher confirmation in chat, 8 October 2026",
+      "description": "Mostly undergraduates, with faculty and graduate students/researchers also participating.",
+      "individualRolesAvailable": false,
+      "exactRoleCountsAvailable": false
+    },
+    "genderStatus": "Aggregate confirmed by researcher: 14 men and 10 women. Individual exported gender fields remain uncorrected and cannot support subgroup analysis.",
+    "conclusion": "All 24 imported age/gender profiles match source forms; both form roles agree. No importer recoding found. Raw files code 18 men/six women. Researcher subsequently confirmed the correct aggregate as 14 men/10 women; use that aggregate for descriptive reporting without guessing corrected individual IDs."
+  },
+  "conditionOrders": {
+    "control \u2192 constant \u2192 adaptive": 4,
+    "constant \u2192 control \u2192 adaptive": 4,
+    "control \u2192 adaptive \u2192 constant": 4,
+    "constant \u2192 adaptive \u2192 control": 4,
+    "adaptive \u2192 control \u2192 constant": 4,
+    "adaptive \u2192 constant \u2192 control": 4
+  },
+  "completionDefinition": "All24 confirmed binary outcomes: recorded exports plus researcher-confirmed P111 missing outcomes and all P101 previously inferred outcomes confirmed with P101 on8October. Raw exports unchanged. Count-derived and earlier23-person analyses retained as sensitivities.",
+  "scoringMethod": "Researcher-confirmed: correct pieces noted and photographed; retain highest correct-piece count across admissible orientations. Per-round photo references and independent reliability unavailable.",
+  "descriptive": {
+    "correctPieces": {
+      "control": {
+        "n": 24,
+        "mean": 3.430555555555556,
+        "sd": 1.3986852579782445,
+        "median": 3.3333333333333335
+      },
+      "constant": {
+        "n": 24,
+        "mean": 5.6805555555555545,
+        "sd": 1.0470993597759268,
+        "median": 6.0
+      },
+      "adaptive": {
+        "n": 24,
+        "mean": 5.4305555555555545,
+        "sd": 1.1270892212781636,
+        "median": 5.833333333333334
+      }
+    },
+    "success": {
+      "control": {
+        "n": 24,
+        "mean": 0.15277777777777776,
+        "sd": 0.21933511004669282,
+        "median": 0.0
+      },
+      "constant": {
+        "n": 24,
+        "mean": 0.5972222222222222,
+        "sd": 0.31051098087371437,
+        "median": 0.6666666666666666
+      },
+      "adaptive": {
+        "n": 24,
+        "mean": 0.5,
+        "sd": 0.29488391230979427,
+        "median": 0.6666666666666666
+      }
+    },
+    "tlx100": {
+      "control": {
+        "n": 24,
+        "mean": 62.461419753086425,
+        "sd": 11.257685812417064,
+        "median": 63.425925925925924
+      },
+      "constant": {
+        "n": 24,
+        "mean": 49.49845679012346,
+        "sd": 12.928350289496654,
+        "median": 48.14814814814815
+      },
+      "adaptive": {
+        "n": 24,
+        "mean": 46.06481481481482,
+        "sd": 15.283571340866414,
+        "median": 44.90740740740741
+      }
+    },
+    "durationSeconds": {
+      "control": {
+        "n": 24,
+        "mean": 292.40277777777777,
+        "sd": 22.49830464179987,
+        "median": 304.0
+      },
+      "constant": {
+        "n": 24,
+        "mean": 248.19444444444446,
+        "sd": 53.308048052030124,
+        "median": 252.0
+      },
+      "adaptive": {
+        "n": 24,
+        "mean": 265.36111111111114,
+        "sd": 29.11710765395569,
+        "median": 265.5
+      }
+    },
+    "frustration": {
+      "control": {
+        "n": 24,
+        "mean": 4.694444444444444,
+        "sd": 1.3221146385818194,
+        "median": 4.5
+      },
+      "constant": {
+        "n": 24,
+        "mean": 3.930555555555556,
+        "sd": 1.2315465579163543,
+        "median": 3.6666666666666665
+      },
+      "adaptive": {
+        "n": 24,
+        "mean": 3.5138888888888893,
+        "sd": 1.0631244021110273,
+        "median": 3.3333333333333335
+      }
+    },
+    "mentalDemand": {
+      "control": {
+        "n": 24,
+        "mean": 5.708333333333333,
+        "sd": 0.9392797117001913,
+        "median": 5.833333333333334
+      },
+      "constant": {
+        "n": 24,
+        "mean": 4.819444444444444,
+        "sd": 0.9779163823587722,
+        "median": 4.666666666666667
+      },
+      "adaptive": {
+        "n": 24,
+        "mean": 4.625,
+        "sd": 1.458980187804412,
+        "median": 5.0
+      }
+    },
+    "physicalDemand": {
+      "control": {
+        "n": 24,
+        "mean": 3.652777777777778,
+        "sd": 1.6810370811725042,
+        "median": 3.6666666666666665
+      },
+      "constant": {
+        "n": 24,
+        "mean": 3.2777777777777772,
+        "sd": 1.367909179496006,
+        "median": 3.166666666666667
+      },
+      "adaptive": {
+        "n": 24,
+        "mean": 3.055555555555556,
+        "sd": 1.5960902310849772,
+        "median": 2.833333333333333
+      }
+    },
+    "temporalDemand": {
+      "control": {
+        "n": 24,
+        "mean": 3.9166666666666665,
+        "sd": 1.3840010611260627,
+        "median": 4.0
+      },
+      "constant": {
+        "n": 24,
+        "mean": 3.625,
+        "sd": 1.2522925836144865,
+        "median": 3.6666666666666665
+      },
+      "adaptive": {
+        "n": 24,
+        "mean": 3.5555555555555554,
+        "sd": 1.4501929462386896,
+        "median": 3.6666666666666665
+      }
+    },
+    "performance": {
+      "control": {
+        "n": 24,
+        "mean": 2.9305555555555554,
+        "sd": 1.3865439141133957,
+        "median": 3.166666666666667
+      },
+      "constant": {
+        "n": 24,
+        "mean": 4.541666666666667,
+        "sd": 1.4705235848250005,
+        "median": 4.666666666666667
+      },
+      "adaptive": {
+        "n": 24,
+        "mean": 4.944444444444444,
+        "sd": 1.230320121205909,
+        "median": 5.333333333333333
+      }
+    },
+    "effort": {
+      "control": {
+        "n": 24,
+        "mean": 5.4444444444444455,
+        "sd": 0.685718119765372,
+        "median": 5.333333333333333
+      },
+      "constant": {
+        "n": 24,
+        "mean": 4.708333333333333,
+        "sd": 0.954584665735822,
+        "median": 4.666666666666667
+      },
+      "adaptive": {
+        "n": 24,
+        "mean": 4.777777777777778,
+        "sd": 1.1863420280034793,
+        "median": 4.833333333333334
+      }
+    }
+  },
+  "assistanceDescriptive": {
+    "helpfulness": {
+      "constant": {
+        "n": 24,
+        "mean": 4.583333333333333,
+        "sd": 1.2597446256043843
+      },
+      "adaptive": {
+        "n": 24,
+        "mean": 4.833333333333333,
+        "sd": 1.3513278493843526
+      }
+    },
+    "timingEffectiveness": {
+      "constant": {
+        "n": 24,
+        "mean": 4.680555555555555,
+        "sd": 1.482520267856556
+      },
+      "adaptive": {
+        "n": 24,
+        "mean": 5.236111111111111,
+        "sd": 1.3952270837167964
+      }
+    },
+    "clarityAndDistraction": {
+      "constant": {
+        "n": 24,
+        "mean": 4.013888888888889,
+        "sd": 1.3882848928225402
+      },
+      "adaptive": {
+        "n": 24,
+        "mean": 4.097222222222222,
+        "sd": 1.3882848928225402
+      }
+    },
+    "stressReduction": {
+      "constant": {
+        "n": 24,
+        "mean": 4.416666666666667,
+        "sd": 1.345057152674693
+      },
+      "adaptive": {
+        "n": 24,
+        "mean": 4.819444444444444,
+        "sd": 1.464488391209407
+      }
+    }
+  },
+  "finalDescriptive": {
+    "overallHelpfulness": {
+      "n": 15,
+      "mean": 4.933333333333334,
+      "sd": 1.6242214252050853
+    },
+    "overallEfficacy": {
+      "n": 15,
+      "mean": 4.866666666666666,
+      "sd": 1.8073922282301278
+    },
+    "trust": {
+      "n": 15,
+      "mean": 4.6,
+      "sd": 1.7647338933351153
+    },
+    "automationBias": {
+      "n": 15,
+      "mean": 4.933333333333334,
+      "sd": 1.667618775665584
+    }
+  },
+  "core_tests": [
+    {
+      "metric": "success",
+      "a": "constant",
+      "b": "control",
+      "contrast": "constant minus control",
+      "unit": "percentage points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 59.72222222222222,
+      "mean_b": 15.277777777777777,
+      "mean_difference": 44.444444444444436,
+      "paired_sd": 28.9371577427477,
+      "t": 7.524319545007682,
+      "p": 1.207759884173079e-07,
+      "ci95": [
+        32.225354373788434,
+        56.66353451510044
+      ],
+      "bonferroni_six_ci": [
+        27.395940644246366,
+        61.492948244642506
+      ],
+      "cohens_dz": 1.535895295576609,
+      "nonzero_pairs": 20,
+      "positive_pairs": 20,
+      "negative_pairs": 0,
+      "sign_p": 1.9073486328125e-06,
+      "signflip_p": 1.9073486328125e-06,
+      "wilcoxon_p": 1.9073486328125e-06,
+      "wilcoxon_statistic": 0.0,
+      "holm_p": 7.246559305038474e-07,
+      "holm_signflip_p": 9.5367431640625e-06,
+      "holm_wilcoxon_p": 9.5367431640625e-06,
+      "holm_all_34_p": 3.985607617771161e-06,
+      "holm_nine_p": 9.662079073384633e-07
+    },
+    {
+      "metric": "success",
+      "a": "adaptive",
+      "b": "control",
+      "contrast": "adaptive minus control",
+      "unit": "percentage points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 50.0,
+      "mean_b": 15.277777777777777,
+      "mean_difference": 34.72222222222222,
+      "paired_sd": 30.26320395608503,
+      "t": 5.620801241229456,
+      "p": 1.0138902235828702e-05,
+      "ci95": [
+        21.943191943800585,
+        47.50125250064386
+      ],
+      "bonferroni_six_ci": [
+        16.892470169922213,
+        52.55197427452223
+      ],
+      "cohens_dz": 1.1473412488845425,
+      "nonzero_pairs": 18,
+      "positive_pairs": 17,
+      "negative_pairs": 1,
+      "sign_p": 0.00014495849609375,
+      "signflip_p": 7.62939453125e-05,
+      "wilcoxon_p": 7.62939453125e-05,
+      "wilcoxon_statistic": 5.0,
+      "holm_p": 3.0416706707486105e-05,
+      "holm_signflip_p": 0.0002288818359375,
+      "holm_wilcoxon_p": 0.0002288818359375,
+      "holm_all_34_p": 0.00027375036036737495,
+      "holm_nine_p": 4.055560894331481e-05
+    },
+    {
+      "metric": "success",
+      "a": "adaptive",
+      "b": "constant",
+      "contrast": "adaptive minus constant",
+      "unit": "percentage points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 50.0,
+      "mean_b": 59.72222222222222,
+      "mean_difference": -9.722222222222221,
+      "paired_sd": 31.819488857860733,
+      "t": -1.4968489102243292,
+      "p": 0.1480306710719006,
+      "ci95": [
+        -23.158413979993547,
+        3.7139695355491043
+      ],
+      "bonferroni_six_ci": [
+        -28.468869060734036,
+        9.024424616289593
+      ],
+      "cohens_dz": -0.3055430043408893,
+      "nonzero_pairs": 11,
+      "positive_pairs": 4,
+      "negative_pairs": 7,
+      "sign_p": 0.548828125,
+      "signflip_p": 0.2158203125,
+      "wilcoxon_p": 0.1279296875,
+      "wilcoxon_statistic": 16.0,
+      "holm_p": 0.2960613421438012,
+      "holm_signflip_p": 0.431640625,
+      "holm_wilcoxon_p": 0.255859375,
+      "holm_all_34_p": 1.0,
+      "holm_nine_p": 0.4440920132157018
+    },
+    {
+      "metric": "tlx100",
+      "a": "constant",
+      "b": "control",
+      "contrast": "constant minus control",
+      "unit": "adapted TLX points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 49.49845679012346,
+      "mean_b": 62.461419753086425,
+      "mean_difference": -12.962962962962964,
+      "paired_sd": 10.518269031538065,
+      "t": -6.037617923376675,
+      "p": 3.7074442379250626e-06,
+      "ci95": [
+        -17.404438446710714,
+        -8.521487479215214
+      ],
+      "bonferroni_six_ci": [
+        -19.15986561490445,
+        -6.766060311021476
+      ],
+      "cohens_dz": -1.232423597846253,
+      "nonzero_pairs": 23,
+      "positive_pairs": 1,
+      "negative_pairs": 22,
+      "sign_p": 5.7220458984375e-06,
+      "signflip_p": 9.5367431640625e-07,
+      "wilcoxon_p": 9.5367431640625e-07,
+      "wilcoxon_statistic": 2.0,
+      "holm_p": 1.584649481282072e-05,
+      "holm_signflip_p": 5.7220458984375e-06,
+      "holm_wilcoxon_p": 5.7220458984375e-06,
+      "holm_all_34_p": 0.00010751588289982682,
+      "holm_nine_p": 1.9015793775384866e-05
+    },
+    {
+      "metric": "tlx100",
+      "a": "adaptive",
+      "b": "control",
+      "contrast": "adaptive minus control",
+      "unit": "adapted TLX points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 46.06481481481482,
+      "mean_b": 62.461419753086425,
+      "mean_difference": -16.396604938271608,
+      "paired_sd": 13.161237181656062,
+      "t": -6.103273584149573,
+      "p": 3.169298962564144e-06,
+      "ci95": [
+        -21.95410799346461,
+        -10.839101883078607
+      ],
+      "bonferroni_six_ci": [
+        -24.150628470973466,
+        -8.642581405569748
+      ],
+      "cohens_dz": -1.2458255034811585,
+      "nonzero_pairs": 24,
+      "positive_pairs": 2,
+      "negative_pairs": 22,
+      "sign_p": 3.5881996154785156e-05,
+      "signflip_p": 4.0531158447265625e-06,
+      "wilcoxon_p": 5.0067901611328125e-06,
+      "wilcoxon_statistic": 10.0,
+      "holm_p": 1.584649481282072e-05,
+      "holm_signflip_p": 1.621246337890625e-05,
+      "holm_wilcoxon_p": 2.002716064453125e-05,
+      "holm_all_34_p": 9.507896887692431e-05,
+      "holm_nine_p": 1.9015793775384866e-05
+    },
+    {
+      "metric": "tlx100",
+      "a": "adaptive",
+      "b": "constant",
+      "contrast": "adaptive minus constant",
+      "unit": "adapted TLX points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 46.06481481481482,
+      "mean_b": 49.49845679012346,
+      "mean_difference": -3.433641975308644,
+      "paired_sd": 14.755515294483397,
+      "t": -1.1400036706346361,
+      "p": 0.266017898675995,
+      "ci95": [
+        -9.664349635857018,
+        2.797065685239731
+      ],
+      "bonferroni_six_ci": [
+        -12.126944227321538,
+        5.259660276704249
+      ],
+      "cohens_dz": -0.2327022748295595,
+      "nonzero_pairs": 22,
+      "positive_pairs": 12,
+      "negative_pairs": 10,
+      "sign_p": 0.8318119049072266,
+      "signflip_p": 0.26888036727905273,
+      "wilcoxon_p": 0.2862100601196289,
+      "wilcoxon_statistic": 93.0,
+      "holm_p": 0.2960613421438012,
+      "holm_signflip_p": 0.431640625,
+      "holm_wilcoxon_p": 0.2862100601196289,
+      "holm_all_34_p": 1.0,
+      "holm_nine_p": 0.53203579735199
+    }
+  ],
+  "piece_tests": [
+    {
+      "metric": "correctPieces",
+      "a": "constant",
+      "b": "control",
+      "contrast": "constant minus control",
+      "unit": "pieces out of seven",
+      "n": 24,
+      "df": 23,
+      "mean_a": 5.6805555555555545,
+      "mean_b": 3.430555555555556,
+      "mean_difference": 2.25,
+      "paired_sd": 1.526734382397978,
+      "t": 7.219791451353444,
+      "p": 2.3805138255243968e-07,
+      "ci95": [
+        1.6053166106244938,
+        2.894683389375506
+      ],
+      "bonferroni_six_ci": [
+        1.3505150833540893,
+        3.1494849166459105
+      ],
+      "cohens_dz": 1.4737337587603279,
+      "nonzero_pairs": 24,
+      "positive_pairs": 23,
+      "negative_pairs": 1,
+      "sign_p": 2.9802322387695312e-06,
+      "signflip_p": 1.430511474609375e-06,
+      "wilcoxon_p": 2.6226043701171875e-06,
+      "wilcoxon_statistic": 7.5,
+      "holm_p": 4.7610276510487936e-07,
+      "holm_signflip_p": 2.86102294921875e-06,
+      "holm_wilcoxon_p": 5.245208740234375e-06,
+      "holm_all_34_p": 7.61764424167807e-06,
+      "holm_nine_p": 1.6663596778670778e-06
+    },
+    {
+      "metric": "correctPieces",
+      "a": "adaptive",
+      "b": "control",
+      "contrast": "adaptive minus control",
+      "unit": "pieces out of seven",
+      "n": 24,
+      "df": 23,
+      "mean_a": 5.4305555555555545,
+      "mean_b": 3.430555555555556,
+      "mean_difference": 2.0,
+      "paired_sd": 1.2816052735903853,
+      "t": 7.645067614058714,
+      "p": 9.259989738592624e-08,
+      "ci95": [
+        1.4588255552861475,
+        2.5411744447138522
+      ],
+      "bonferroni_six_ci": [
+        1.2449343998673976,
+        2.7550656001326024
+      ],
+      "cohens_dz": 1.560542891960057,
+      "nonzero_pairs": 23,
+      "positive_pairs": 22,
+      "negative_pairs": 1,
+      "sign_p": 5.7220458984375e-06,
+      "signflip_p": 4.76837158203125e-07,
+      "wilcoxon_p": 4.76837158203125e-07,
+      "wilcoxon_statistic": 1.0,
+      "holm_p": 2.7779969215777874e-07,
+      "holm_signflip_p": 1.430511474609375e-06,
+      "holm_wilcoxon_p": 1.430511474609375e-06,
+      "holm_all_34_p": 3.1483965111214924e-06,
+      "holm_nine_p": 8.333990764733362e-07
+    },
+    {
+      "metric": "correctPieces",
+      "a": "adaptive",
+      "b": "constant",
+      "contrast": "adaptive minus constant",
+      "unit": "pieces out of seven",
+      "n": 24,
+      "df": 23,
+      "mean_a": 5.4305555555555545,
+      "mean_b": 5.6805555555555545,
+      "mean_difference": -0.24999999999999997,
+      "paired_sd": 1.091247568628974,
+      "t": -1.1223345706330772,
+      "p": 0.2733004786244806,
+      "ci95": [
+        -0.7107934355198935,
+        0.21079343551989352
+      ],
+      "bonferroni_six_ci": [
+        -0.8929151918139085,
+        0.39291519181390855
+      ],
+      "cohens_dz": -0.22909558489472373,
+      "nonzero_pairs": 22,
+      "positive_pairs": 8,
+      "negative_pairs": 14,
+      "sign_p": 0.28627872467041016,
+      "signflip_p": 0.2987804412841797,
+      "wilcoxon_p": 0.3212580680847168,
+      "wilcoxon_statistic": 95.5,
+      "holm_p": 0.2733004786244806,
+      "holm_signflip_p": 0.2987804412841797,
+      "holm_wilcoxon_p": 0.3212580680847168,
+      "holm_all_34_p": 1.0,
+      "holm_nine_p": 0.53203579735199
+    }
+  ],
+  "secondary_tests": [
+    {
+      "metric": "durationSeconds",
+      "a": "constant",
+      "b": "control",
+      "contrast": "constant minus control",
+      "unit": "seconds",
+      "n": 24,
+      "df": 23,
+      "mean_a": 248.19444444444446,
+      "mean_b": 292.40277777777777,
+      "mean_difference": -44.20833333333332,
+      "paired_sd": 51.4711881790229,
+      "t": -4.207707763376343,
+      "p": 0.0003355288637630129,
+      "ci95": [
+        -65.94270994330945,
+        -22.473956723357194
+      ],
+      "bonferroni_six_ci": [
+        -74.53289924515667,
+        -13.883767421509976
+      ],
+      "cohens_dz": -0.8588947505849581,
+      "nonzero_pairs": 24,
+      "positive_pairs": 5,
+      "negative_pairs": 19,
+      "sign_p": 0.006610751152038574,
+      "signflip_p": 6.794929504394531e-05,
+      "wilcoxon_p": 0.00010693073272705078,
+      "wilcoxon_statistic": 25.0,
+      "holm_p": 0.0063750484114972455,
+      "holm_signflip_p": 0.0014269351959228516,
+      "holm_wilcoxon_p": 0.0022455453872680664,
+      "holm_all_34_p": 0.007381635002786284
+    },
+    {
+      "metric": "durationSeconds",
+      "a": "adaptive",
+      "b": "control",
+      "contrast": "adaptive minus control",
+      "unit": "seconds",
+      "n": 24,
+      "df": 23,
+      "mean_a": 265.36111111111114,
+      "mean_b": 292.40277777777777,
+      "mean_difference": -27.041666666666668,
+      "paired_sd": 31.55936243791885,
+      "t": -4.197694757494587,
+      "p": 0.0003440045759714936,
+      "ci95": [
+        -40.36801667068718,
+        -13.715316662646151
+      ],
+      "bonferroni_six_ci": [
+        -45.63505843091251,
+        -8.448274902420831
+      ],
+      "cohens_dz": -0.8568508543181427,
+      "nonzero_pairs": 24,
+      "positive_pairs": 4,
+      "negative_pairs": 20,
+      "sign_p": 0.001543879508972168,
+      "signflip_p": 0.00048804283142089844,
+      "wilcoxon_p": 0.0004286766052246094,
+      "wilcoxon_statistic": 34.0,
+      "holm_p": 0.0063750484114972455,
+      "holm_signflip_p": 0.008784770965576172,
+      "holm_wilcoxon_p": 0.008144855499267578,
+      "holm_all_34_p": 0.007381635002786284
+    },
+    {
+      "metric": "durationSeconds",
+      "a": "adaptive",
+      "b": "constant",
+      "contrast": "adaptive minus constant",
+      "unit": "seconds",
+      "n": 24,
+      "df": 23,
+      "mean_a": 265.36111111111114,
+      "mean_b": 248.19444444444446,
+      "mean_difference": 17.166666666666664,
+      "paired_sd": 61.446728823362015,
+      "t": 1.3686513415109791,
+      "p": 0.18432901102998686,
+      "ci95": [
+        -8.78001132827248,
+        43.11334466160581
+      ],
+      "bonferroni_six_ci": [
+        -19.035050142143746,
+        53.368383475477074
+      ],
+      "cohens_dz": 0.27937478520646497,
+      "nonzero_pairs": 23,
+      "positive_pairs": 12,
+      "negative_pairs": 11,
+      "sign_p": 1.0,
+      "signflip_p": 0.19408893585205078,
+      "wilcoxon_p": 0.3446848392486572,
+      "wilcoxon_statistic": 106.0,
+      "holm_p": 1.0,
+      "holm_signflip_p": 1.0,
+      "holm_wilcoxon_p": 1.0,
+      "holm_all_34_p": 1.0
+    },
+    {
+      "metric": "helpfulness",
+      "a": "adaptive",
+      "b": "constant",
+      "contrast": "adaptive minus constant",
+      "unit": "points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 4.833333333333333,
+      "mean_b": 4.583333333333333,
+      "mean_difference": 0.24999999999999997,
+      "paired_sd": 0.9643400286316316,
+      "t": 1.2700342566194869,
+      "p": 0.21677134402010775,
+      "ci95": [
+        -0.15720508120885043,
+        0.6572050812088504
+      ],
+      "bonferroni_six_ci": [
+        -0.3181468369826286,
+        0.8181468369826286
+      ],
+      "cohens_dz": 0.2592446570477243,
+      "nonzero_pairs": 18,
+      "positive_pairs": 14,
+      "negative_pairs": 4,
+      "sign_p": 0.0308837890625,
+      "signflip_p": 0.2507476806640625,
+      "wilcoxon_p": 0.046600341796875,
+      "wilcoxon_statistic": 40.5,
+      "holm_p": 1.0,
+      "holm_signflip_p": 1.0,
+      "holm_wilcoxon_p": 0.5592041015625,
+      "holm_all_34_p": 1.0
+    },
+    {
+      "metric": "timingEffectiveness",
+      "a": "adaptive",
+      "b": "constant",
+      "contrast": "adaptive minus constant",
+      "unit": "points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 5.236111111111111,
+      "mean_b": 4.680555555555555,
+      "mean_difference": 0.5555555555555557,
+      "paired_sd": 0.9359521575507118,
+      "t": 2.9078999901889993,
+      "p": 0.007924856942167898,
+      "ci95": [
+        0.1603376210020765,
+        0.9507734901090349
+      ],
+      "bonferroni_six_ci": [
+        0.004133606770486353,
+        1.106977504340625
+      ],
+      "cohens_dz": 0.5935725999172715,
+      "nonzero_pairs": 21,
+      "positive_pairs": 16,
+      "negative_pairs": 5,
+      "sign_p": 0.02660369873046875,
+      "signflip_p": 0.007760047912597656,
+      "wilcoxon_p": 0.007801055908203125,
+      "wilcoxon_statistic": 41.5,
+      "holm_p": 0.11887285413251848,
+      "holm_signflip_p": 0.11640071868896484,
+      "holm_wilcoxon_p": 0.12351465225219727,
+      "holm_all_34_p": 0.14264742495902216
+    },
+    {
+      "metric": "clarityAndDistraction",
+      "a": "adaptive",
+      "b": "constant",
+      "contrast": "adaptive minus constant",
+      "unit": "points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 4.097222222222222,
+      "mean_b": 4.013888888888889,
+      "mean_difference": 0.08333333333333336,
+      "paired_sd": 1.2520514567067704,
+      "t": 0.32606350823444996,
+      "p": 0.7473245134192276,
+      "ci95": [
+        -0.4453616289917185,
+        0.6120282956583852
+      ],
+      "bonferroni_six_ci": [
+        -0.6543204544875728,
+        0.8209871211542396
+      ],
+      "cohens_dz": 0.06655743490968197,
+      "nonzero_pairs": 22,
+      "positive_pairs": 14,
+      "negative_pairs": 8,
+      "sign_p": 0.28627872467041016,
+      "signflip_p": 0.7887215614318848,
+      "wilcoxon_p": 0.6018118858337402,
+      "wilcoxon_statistic": 110.0,
+      "holm_p": 1.0,
+      "holm_signflip_p": 1.0,
+      "holm_wilcoxon_p": 1.0,
+      "holm_all_34_p": 1.0
+    },
+    {
+      "metric": "stressReduction",
+      "a": "adaptive",
+      "b": "constant",
+      "contrast": "adaptive minus constant",
+      "unit": "points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 4.819444444444444,
+      "mean_b": 4.416666666666667,
+      "mean_difference": 0.4027777777777777,
+      "paired_sd": 1.007120382763859,
+      "t": 1.959249464458507,
+      "p": 0.06231391566996213,
+      "ci95": [
+        -0.02249186267505232,
+        0.8280474182306077
+      ],
+      "bonferroni_six_ci": [
+        -0.19057336698383065,
+        0.996128922539386
+      ],
+      "cohens_dz": 0.3999301222287123,
+      "nonzero_pairs": 20,
+      "positive_pairs": 14,
+      "negative_pairs": 6,
+      "sign_p": 0.11531829833984375,
+      "signflip_p": 0.072784423828125,
+      "wilcoxon_p": 0.06942558288574219,
+      "wilcoxon_statistic": 56.5,
+      "holm_p": 0.7477669880395456,
+      "holm_signflip_p": 0.8734130859375,
+      "holm_wilcoxon_p": 0.7636814117431641,
+      "holm_all_34_p": 0.934708735049432
+    },
+    {
+      "metric": "mentalDemand",
+      "a": "constant",
+      "b": "control",
+      "contrast": "constant minus control",
+      "unit": "points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 4.819444444444444,
+      "mean_b": 5.708333333333333,
+      "mean_difference": -0.888888888888889,
+      "paired_sd": 0.8204315270022203,
+      "t": -5.307753649504445,
+      "p": 2.1811584854776074e-05,
+      "ci95": [
+        -1.2353267392945129,
+        -0.542451038483265
+      ],
+      "bonferroni_six_ci": [
+        -1.3722511503191825,
+        -0.4055266274585953
+      ],
+      "cohens_dz": -1.0834406768067597,
+      "nonzero_pairs": 20,
+      "positive_pairs": 2,
+      "negative_pairs": 18,
+      "sign_p": 0.0004024505615234375,
+      "signflip_p": 2.86102294921875e-05,
+      "wilcoxon_p": 2.09808349609375e-05,
+      "wilcoxon_statistic": 5.0,
+      "holm_p": 0.0004798548668050736,
+      "holm_signflip_p": 0.000629425048828125,
+      "holm_wilcoxon_p": 0.000461578369140625,
+      "holm_all_34_p": 0.0005452896213694019
+    },
+    {
+      "metric": "mentalDemand",
+      "a": "adaptive",
+      "b": "control",
+      "contrast": "adaptive minus control",
+      "unit": "points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 4.625,
+      "mean_b": 5.708333333333333,
+      "mean_difference": -1.0833333333333333,
+      "paired_sd": 0.9792533880807524,
+      "t": -5.419667514688821,
+      "p": 1.6571065262744754e-05,
+      "ci95": [
+        -1.4968357739437146,
+        -0.6698308927229519
+      ],
+      "bonferroni_six_ci": [
+        -1.6602664674188892,
+        -0.5064001992477773
+      ],
+      "cohens_dz": -1.1062849988771222,
+      "nonzero_pairs": 22,
+      "positive_pairs": 2,
+      "negative_pairs": 20,
+      "sign_p": 0.00012111663818359375,
+      "signflip_p": 6.198883056640625e-06,
+      "wilcoxon_p": 3.337860107421875e-06,
+      "wilcoxon_statistic": 4.0,
+      "holm_p": 0.00038113450104312934,
+      "holm_signflip_p": 0.00014257431030273438,
+      "holm_wilcoxon_p": 8.0108642578125e-05,
+      "holm_all_34_p": 0.0004308476968313636
+    },
+    {
+      "metric": "mentalDemand",
+      "a": "adaptive",
+      "b": "constant",
+      "contrast": "adaptive minus constant",
+      "unit": "points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 4.625,
+      "mean_b": 4.819444444444444,
+      "mean_difference": -0.19444444444444442,
+      "paired_sd": 1.2075313847219735,
+      "t": -0.7888650816599733,
+      "p": 0.43824731341873313,
+      "ci95": [
+        -0.7043402291042102,
+        0.3154513402153214
+      ],
+      "bonferroni_six_ci": [
+        -0.9058689590531905,
+        0.5169800701643017
+      ],
+      "cohens_dz": -0.1610264104971599,
+      "nonzero_pairs": 22,
+      "positive_pairs": 11,
+      "negative_pairs": 11,
+      "sign_p": 1.0,
+      "signflip_p": 0.47060060501098633,
+      "wilcoxon_p": 0.5373916625976562,
+      "wilcoxon_statistic": 107.0,
+      "holm_p": 1.0,
+      "holm_signflip_p": 1.0,
+      "holm_wilcoxon_p": 1.0,
+      "holm_all_34_p": 1.0
+    },
+    {
+      "metric": "physicalDemand",
+      "a": "constant",
+      "b": "control",
+      "contrast": "constant minus control",
+      "unit": "points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 3.2777777777777772,
+      "mean_b": 3.652777777777778,
+      "mean_difference": -0.375,
+      "paired_sd": 0.7759208336529045,
+      "t": -2.367660755335754,
+      "p": 0.026689329878280214,
+      "ci95": [
+        -0.7026426329907779,
+        -0.04735736700922211
+      ],
+      "bonferroni_six_ci": [
+        -0.8321385136986961,
+        0.08213851369869601
+      ],
+      "cohens_dz": -0.48329672788210004,
+      "nonzero_pairs": 16,
+      "positive_pairs": 5,
+      "negative_pairs": 11,
+      "sign_p": 0.210113525390625,
+      "signflip_p": 0.02850341796875,
+      "wilcoxon_p": 0.02392578125,
+      "wilcoxon_statistic": 25.0,
+      "holm_p": 0.373650618295923,
+      "holm_signflip_p": 0.3990478515625,
+      "holm_wilcoxon_p": 0.3349609375,
+      "holm_all_34_p": 0.45371860793076363
+    },
+    {
+      "metric": "physicalDemand",
+      "a": "adaptive",
+      "b": "control",
+      "contrast": "adaptive minus control",
+      "unit": "points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 3.055555555555556,
+      "mean_b": 3.652777777777778,
+      "mean_difference": -0.5972222222222222,
+      "paired_sd": 1.2548617209909516,
+      "t": -2.3315552351701028,
+      "p": 0.028845555464162606,
+      "ci95": [
+        -1.1271038550805734,
+        -0.06734058936387088
+      ],
+      "bonferroni_six_ci": [
+        -1.3365316944664,
+        0.14208725002195566
+      ],
+      "cohens_dz": -0.4759267194401323,
+      "nonzero_pairs": 16,
+      "positive_pairs": 4,
+      "negative_pairs": 12,
+      "sign_p": 0.076812744140625,
+      "signflip_p": 0.03204345703125,
+      "wilcoxon_p": 0.033355712890625,
+      "wilcoxon_statistic": 27.5,
+      "holm_p": 0.3749922210341139,
+      "holm_signflip_p": 0.41656494140625,
+      "holm_wilcoxon_p": 0.433624267578125,
+      "holm_all_34_p": 0.4615288874266017
+    },
+    {
+      "metric": "physicalDemand",
+      "a": "adaptive",
+      "b": "constant",
+      "contrast": "adaptive minus constant",
+      "unit": "points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 3.055555555555556,
+      "mean_b": 3.2777777777777772,
+      "mean_difference": -0.22222222222222218,
+      "paired_sd": 1.09750118755415,
+      "t": -0.991946177598027,
+      "p": 0.3315455335065567,
+      "ci95": [
+        -0.685656329420848,
+        0.24121188497640364
+      ],
+      "bonferroni_six_ci": [
+        -0.8688217719457314,
+        0.424377327501287
+      ],
+      "cohens_dz": -0.202480165618279,
+      "nonzero_pairs": 19,
+      "positive_pairs": 7,
+      "negative_pairs": 12,
+      "sign_p": 0.359283447265625,
+      "signflip_p": 0.3613853454589844,
+      "wilcoxon_p": 0.37888336181640625,
+      "wilcoxon_statistic": 72.5,
+      "holm_p": 1.0,
+      "holm_signflip_p": 1.0,
+      "holm_wilcoxon_p": 1.0,
+      "holm_all_34_p": 1.0
+    },
+    {
+      "metric": "temporalDemand",
+      "a": "constant",
+      "b": "control",
+      "contrast": "constant minus control",
+      "unit": "points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 3.625,
+      "mean_b": 3.9166666666666665,
+      "mean_difference": -0.29166666666666663,
+      "paired_sd": 0.8242255917447339,
+      "t": -1.7335897246272927,
+      "p": 0.09637822609332763,
+      "ci95": [
+        -0.6397066101055737,
+        0.05637327677224052
+      ],
+      "bonferroni_six_ci": [
+        -0.777264224588619,
+        0.19393089125528573
+      ],
+      "cohens_dz": -0.3538675207224056,
+      "nonzero_pairs": 19,
+      "positive_pairs": 7,
+      "negative_pairs": 12,
+      "sign_p": 0.359283447265625,
+      "signflip_p": 0.11387252807617188,
+      "wilcoxon_p": 0.09812545776367188,
+      "wilcoxon_statistic": 53.5,
+      "holm_p": 0.997035319510571,
+      "holm_signflip_p": 1.0,
+      "holm_wilcoxon_p": 0.9812545776367188,
+      "holm_all_34_p": 1.0
+    },
+    {
+      "metric": "temporalDemand",
+      "a": "adaptive",
+      "b": "control",
+      "contrast": "adaptive minus control",
+      "unit": "points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 3.5555555555555554,
+      "mean_b": 3.9166666666666665,
+      "mean_difference": -0.36111111111111116,
+      "paired_sd": 1.128962871781669,
+      "t": -1.5669921213188749,
+      "p": 0.1307728652665889,
+      "ci95": [
+        -0.8378303224228713,
+        0.11560810020064893
+      ],
+      "bonferroni_six_ci": [
+        -1.0262465048826737,
+        0.30402428266045134
+      ],
+      "cohens_dz": -0.3198609273493865,
+      "nonzero_pairs": 21,
+      "positive_pairs": 9,
+      "negative_pairs": 12,
+      "sign_p": 0.6636238098144531,
+      "signflip_p": 0.1474752426147461,
+      "wilcoxon_p": 0.20361614227294922,
+      "wilcoxon_statistic": 78.5,
+      "holm_p": 1.0,
+      "holm_signflip_p": 1.0,
+      "holm_wilcoxon_p": 1.0,
+      "holm_all_34_p": 1.0
+    },
+    {
+      "metric": "temporalDemand",
+      "a": "adaptive",
+      "b": "constant",
+      "contrast": "adaptive minus constant",
+      "unit": "points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 3.5555555555555554,
+      "mean_b": 3.625,
+      "mean_difference": -0.06944444444444449,
+      "paired_sd": 1.3934947783405864,
+      "t": -0.24413934950299146,
+      "p": 0.8092875876627633,
+      "ci95": [
+        -0.6578656833548158,
+        0.5189767944659267
+      ],
+      "bonferroni_six_ci": [
+        -0.8904304319175815,
+        0.7515415430286925
+      ],
+      "cohens_dz": -0.049834736034777914,
+      "nonzero_pairs": 21,
+      "positive_pairs": 12,
+      "negative_pairs": 9,
+      "sign_p": 0.6636238098144531,
+      "signflip_p": 0.8464527130126953,
+      "wilcoxon_p": 0.9911537170410156,
+      "wilcoxon_statistic": 115.0,
+      "holm_p": 1.0,
+      "holm_signflip_p": 1.0,
+      "holm_wilcoxon_p": 1.0,
+      "holm_all_34_p": 1.0
+    },
+    {
+      "metric": "performance",
+      "a": "constant",
+      "b": "control",
+      "contrast": "constant minus control",
+      "unit": "points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 4.541666666666667,
+      "mean_b": 2.9305555555555554,
+      "mean_difference": 1.611111111111111,
+      "paired_sd": 1.3175393060043201,
+      "t": 5.990561531130117,
+      "p": 4.149686913479122e-06,
+      "ci95": [
+        1.054763055271688,
+        2.167459166950534
+      ],
+      "bonferroni_six_ci": [
+        0.8348747555915549,
+        2.387347466630667
+      ],
+      "cohens_dz": 1.2228182520012258,
+      "nonzero_pairs": 21,
+      "positive_pairs": 19,
+      "negative_pairs": 2,
+      "sign_p": 0.00022125244140625,
+      "signflip_p": 5.7220458984375e-06,
+      "wilcoxon_p": 3.814697265625e-06,
+      "wilcoxon_statistic": 3.0,
+      "holm_p": 9.959248592349894e-05,
+      "holm_signflip_p": 0.0001373291015625,
+      "holm_wilcoxon_p": 8.7738037109375e-05,
+      "holm_all_34_p": 0.00011619123357741542
+    },
+    {
+      "metric": "performance",
+      "a": "adaptive",
+      "b": "control",
+      "contrast": "adaptive minus control",
+      "unit": "points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 4.944444444444444,
+      "mean_b": 2.9305555555555554,
+      "mean_difference": 2.013888888888889,
+      "paired_sd": 1.405576082033005,
+      "t": 7.019186281689319,
+      "p": 3.7469716187910486e-07,
+      "ci95": [
+        1.4203661628421174,
+        2.6074116149356605
+      ],
+      "bonferroni_six_ci": [
+        1.1857851273156617,
+        2.841992650462116
+      ],
+      "cohens_dz": 1.4327853999735318,
+      "nonzero_pairs": 24,
+      "positive_pairs": 23,
+      "negative_pairs": 1,
+      "sign_p": 2.9802322387695312e-06,
+      "signflip_p": 1.5497207641601562e-06,
+      "wilcoxon_p": 1.5497207641601562e-06,
+      "wilcoxon_statistic": 6.0,
+      "holm_p": 9.367429046977622e-06,
+      "holm_signflip_p": 3.8743019104003906e-05,
+      "holm_wilcoxon_p": 3.8743019104003906e-05,
+      "holm_all_34_p": 1.1615612018252251e-05
+    },
+    {
+      "metric": "performance",
+      "a": "adaptive",
+      "b": "constant",
+      "contrast": "adaptive minus constant",
+      "unit": "points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 4.944444444444444,
+      "mean_b": 4.541666666666667,
+      "mean_difference": 0.4027777777777777,
+      "paired_sd": 1.3725365870423005,
+      "t": 1.4376302163481234,
+      "p": 0.16400613950456103,
+      "ci95": [
+        -0.1767935931024145,
+        0.9823491486579699
+      ],
+      "bonferroni_six_ci": [
+        -0.4058605628680323,
+        1.2114161184235877
+      ],
+      "cohens_dz": 0.29345503907165743,
+      "nonzero_pairs": 23,
+      "positive_pairs": 14,
+      "negative_pairs": 9,
+      "sign_p": 0.4048728942871094,
+      "signflip_p": 0.17801308631896973,
+      "wilcoxon_p": 0.1855180263519287,
+      "wilcoxon_statistic": 94.0,
+      "holm_p": 1.0,
+      "holm_signflip_p": 1.0,
+      "holm_wilcoxon_p": 1.0,
+      "holm_all_34_p": 1.0
+    },
+    {
+      "metric": "effort",
+      "a": "constant",
+      "b": "control",
+      "contrast": "constant minus control",
+      "unit": "points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 4.708333333333333,
+      "mean_b": 5.4444444444444455,
+      "mean_difference": -0.7361111111111112,
+      "paired_sd": 0.816373308249296,
+      "t": -4.417333585004432,
+      "p": 0.0001989407050264849,
+      "ci95": [
+        -1.080835326027402,
+        -0.3913868961948205
+      ],
+      "bonferroni_six_ci": [
+        -1.2170824480958757,
+        -0.2551397741263466
+      ],
+      "cohens_dz": -0.9016844422433332,
+      "nonzero_pairs": 21,
+      "positive_pairs": 3,
+      "negative_pairs": 18,
+      "sign_p": 0.0014896392822265625,
+      "signflip_p": 0.0004520416259765625,
+      "wilcoxon_p": 0.000453948974609375,
+      "wilcoxon_statistic": 22.0,
+      "holm_p": 0.003978814100529698,
+      "holm_signflip_p": 0.008588790893554688,
+      "holm_wilcoxon_p": 0.00817108154296875,
+      "holm_all_34_p": 0.004575636215609153
+    },
+    {
+      "metric": "effort",
+      "a": "adaptive",
+      "b": "control",
+      "contrast": "adaptive minus control",
+      "unit": "points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 4.777777777777778,
+      "mean_b": 5.4444444444444455,
+      "mean_difference": -0.6666666666666666,
+      "paired_sd": 1.040252663473992,
+      "t": -3.139608710833701,
+      "p": 0.004594661609490601,
+      "ci95": [
+        -1.105926842259211,
+        -0.2274064910741222
+      ],
+      "bonferroni_six_ci": [
+        -1.2795378976308494,
+        -0.05379543570248391
+      ],
+      "cohens_dz": -0.6408699444616557,
+      "nonzero_pairs": 23,
+      "positive_pairs": 5,
+      "negative_pairs": 18,
+      "sign_p": 0.010622024536132812,
+      "signflip_p": 0.0061604976654052734,
+      "wilcoxon_p": 0.007265567779541016,
+      "wilcoxon_statistic": 52.5,
+      "holm_p": 0.07810924736134021,
+      "holm_signflip_p": 0.09889602661132812,
+      "holm_wilcoxon_p": 0.12351465225219727,
+      "holm_all_34_p": 0.09189323218981202
+    },
+    {
+      "metric": "effort",
+      "a": "adaptive",
+      "b": "constant",
+      "contrast": "adaptive minus constant",
+      "unit": "points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 4.777777777777778,
+      "mean_b": 4.708333333333333,
+      "mean_difference": 0.0694444444444444,
+      "paired_sd": 0.8104341692408509,
+      "t": 0.4197835205277241,
+      "p": 0.6785389958087253,
+      "ci95": [
+        -0.2727718920156587,
+        0.41166078090454755
+      ],
+      "bonferroni_six_ci": [
+        -0.4080278124006766,
+        0.5469167012895654
+      ],
+      "cohens_dz": 0.08568795231017264,
+      "nonzero_pairs": 19,
+      "positive_pairs": 10,
+      "negative_pairs": 9,
+      "sign_p": 1.0,
+      "signflip_p": 0.7385635375976562,
+      "wilcoxon_p": 0.6566886901855469,
+      "wilcoxon_statistic": 83.0,
+      "holm_p": 1.0,
+      "holm_signflip_p": 1.0,
+      "holm_wilcoxon_p": 1.0,
+      "holm_all_34_p": 1.0
+    },
+    {
+      "metric": "frustration",
+      "a": "constant",
+      "b": "control",
+      "contrast": "constant minus control",
+      "unit": "points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 3.930555555555556,
+      "mean_b": 4.694444444444444,
+      "mean_difference": -0.7638888888888888,
+      "paired_sd": 1.2177399144295333,
+      "t": -3.0731324083040046,
+      "p": 0.005378975944296895,
+      "ci95": [
+        -1.2780953575866163,
+        -0.24968242019116138
+      ],
+      "bonferroni_six_ci": [
+        -1.4813278213288883,
+        -0.046449956448889496
+      ],
+      "cohens_dz": -0.6273005260296021,
+      "nonzero_pairs": 19,
+      "positive_pairs": 4,
+      "negative_pairs": 15,
+      "sign_p": 0.0192108154296875,
+      "signflip_p": 0.005817413330078125,
+      "wilcoxon_p": 0.00760650634765625,
+      "wilcoxon_statistic": 31.0,
+      "holm_p": 0.08606361510875032,
+      "holm_signflip_p": 0.09889602661132812,
+      "holm_wilcoxon_p": 0.12351465225219727,
+      "holm_all_34_p": 0.102200542941641
+    },
+    {
+      "metric": "frustration",
+      "a": "adaptive",
+      "b": "control",
+      "contrast": "adaptive minus control",
+      "unit": "points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 3.5138888888888893,
+      "mean_b": 4.694444444444444,
+      "mean_difference": -1.1805555555555554,
+      "paired_sd": 1.2236761225169164,
+      "t": -4.726346573096679,
+      "p": 9.207340459462878e-05,
+      "ci95": [
+        -1.6972686650900481,
+        -0.6638424460210626
+      ],
+      "bonferroni_six_ci": [
+        -1.901491841365095,
+        -0.45961926974601575
+      ],
+      "cohens_dz": -0.9647614543032281,
+      "nonzero_pairs": 24,
+      "positive_pairs": 4,
+      "negative_pairs": 20,
+      "sign_p": 0.001543879508972168,
+      "signflip_p": 0.0002416372299194336,
+      "wilcoxon_p": 0.0002429485321044922,
+      "wilcoxon_statistic": 30.5,
+      "holm_p": 0.0019335414964872044,
+      "holm_signflip_p": 0.004832744598388672,
+      "holm_wilcoxon_p": 0.004858970642089844,
+      "holm_all_34_p": 0.002209761710271091
+    },
+    {
+      "metric": "frustration",
+      "a": "adaptive",
+      "b": "constant",
+      "contrast": "adaptive minus constant",
+      "unit": "points",
+      "n": 24,
+      "df": 23,
+      "mean_a": 3.5138888888888893,
+      "mean_b": 3.930555555555556,
+      "mean_difference": -0.4166666666666667,
+      "paired_sd": 1.1557459895109008,
+      "t": -1.766167887100475,
+      "p": 0.090639574500961,
+      "ci95": [
+        -0.9046953967230065,
+        0.07136206338967316
+      ],
+      "bonferroni_six_ci": [
+        -1.0975814983653145,
+        0.26424816503198106
+      ],
+      "cohens_dz": -0.3605175102904709,
+      "nonzero_pairs": 22,
+      "positive_pairs": 6,
+      "negative_pairs": 16,
+      "sign_p": 0.052478790283203125,
+      "signflip_p": 0.10231304168701172,
+      "wilcoxon_p": 0.10673809051513672,
+      "wilcoxon_statistic": 76.5,
+      "holm_p": 0.997035319510571,
+      "holm_signflip_p": 1.0,
+      "holm_wilcoxon_p": 0.9812545776367188,
+      "holm_all_34_p": 1.0
+    }
+  ],
+  "sensitivities": {
+    "unadjudicated_entered_counts": [
+      {
+        "metric": "enteredCorrectPieces",
+        "a": "constant",
+        "b": "control",
+        "contrast": "constant minus control",
+        "unit": "pieces out of seven",
+        "n": 24,
+        "df": 23,
+        "mean_a": 5.625,
+        "mean_b": 3.430555555555556,
+        "mean_difference": 2.1944444444444446,
+        "paired_sd": 1.5785906594837498,
+        "t": 6.810212800235475,
+        "p": 6.043707504314124e-07,
+        "ci95": [
+          1.527864069674831,
+          2.8610248192140584
+        ],
+        "bonferroni_six_ci": [
+          1.264408084397619,
+          3.12448080449127
+        ],
+        "cohens_dz": 1.3901288666956253,
+        "nonzero_pairs": 24,
+        "positive_pairs": 22,
+        "negative_pairs": 2,
+        "sign_p": 3.5881996154785156e-05,
+        "signflip_p": 3.0994415283203125e-06,
+        "wilcoxon_p": 3.5762786865234375e-06,
+        "wilcoxon_statistic": 8.5,
+        "holm_p": 1.8131122512942371e-06
+      },
+      {
+        "metric": "enteredCorrectPieces",
+        "a": "adaptive",
+        "b": "control",
+        "contrast": "adaptive minus control",
+        "unit": "pieces out of seven",
+        "n": 24,
+        "df": 23,
+        "mean_a": 5.263888888888888,
+        "mean_b": 3.430555555555556,
+        "mean_difference": 1.8333333333333333,
+        "paired_sd": 1.3584589165739698,
+        "t": 6.6115082912159115,
+        "p": 9.57068829998138e-07,
+        "ci95": [
+          1.2597064413465686,
+          2.406960225320098
+        ],
+        "bonferroni_six_ci": [
+          1.0329889385066293,
+          2.633677728160037
+        ],
+        "cohens_dz": 1.3495684786382762,
+        "nonzero_pairs": 22,
+        "positive_pairs": 20,
+        "negative_pairs": 2,
+        "sign_p": 0.00012111663818359375,
+        "signflip_p": 5.245208740234375e-06,
+        "wilcoxon_p": 3.814697265625e-06,
+        "wilcoxon_statistic": 4.0,
+        "holm_p": 1.914137659996276e-06
+      },
+      {
+        "metric": "enteredCorrectPieces",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "pieces out of seven",
+        "n": 24,
+        "df": 23,
+        "mean_a": 5.263888888888888,
+        "mean_b": 5.625,
+        "mean_difference": -0.361111111111111,
+        "paired_sd": 1.133233868894813,
+        "t": -1.5610863511065889,
+        "p": 0.1321588337383836,
+        "ci95": [
+          -0.8396338063337986,
+          0.1174115841115766
+        ],
+        "bonferroni_six_ci": [
+          -1.028762789002952,
+          0.30654056678073
+        ],
+        "cohens_dz": -0.3186554170528673,
+        "nonzero_pairs": 21,
+        "positive_pairs": 7,
+        "negative_pairs": 14,
+        "sign_p": 0.18924713134765625,
+        "signflip_p": 0.14894580841064453,
+        "wilcoxon_p": 0.165435791015625,
+        "wilcoxon_statistic": 75.0,
+        "holm_p": 0.1321588337383836
+      }
+    ],
+    "original_immediate_rating_cohort_core_family": [
+      {
+        "metric": "success",
+        "a": "constant",
+        "b": "control",
+        "contrast": "constant minus control",
+        "unit": "percentage points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 59.72222222222222,
+        "mean_b": 15.277777777777777,
+        "mean_difference": 44.444444444444436,
+        "paired_sd": 28.9371577427477,
+        "t": 7.524319545007682,
+        "p": 1.207759884173079e-07,
+        "ci95": [
+          32.225354373788434,
+          56.66353451510044
+        ],
+        "bonferroni_six_ci": [
+          27.395940644246366,
+          61.492948244642506
+        ],
+        "cohens_dz": 1.535895295576609,
+        "nonzero_pairs": 20,
+        "positive_pairs": 20,
+        "negative_pairs": 0,
+        "sign_p": 1.9073486328125e-06,
+        "signflip_p": 1.9073486328125e-06,
+        "wilcoxon_p": 1.9073486328125e-06,
+        "wilcoxon_statistic": 0.0,
+        "holm_p": 7.246559305038474e-07
+      },
+      {
+        "metric": "success",
+        "a": "adaptive",
+        "b": "control",
+        "contrast": "adaptive minus control",
+        "unit": "percentage points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 50.0,
+        "mean_b": 15.277777777777777,
+        "mean_difference": 34.72222222222222,
+        "paired_sd": 30.26320395608503,
+        "t": 5.620801241229456,
+        "p": 1.0138902235828702e-05,
+        "ci95": [
+          21.943191943800585,
+          47.50125250064386
+        ],
+        "bonferroni_six_ci": [
+          16.892470169922213,
+          52.55197427452223
+        ],
+        "cohens_dz": 1.1473412488845425,
+        "nonzero_pairs": 18,
+        "positive_pairs": 17,
+        "negative_pairs": 1,
+        "sign_p": 0.00014495849609375,
+        "signflip_p": 7.62939453125e-05,
+        "wilcoxon_p": 7.62939453125e-05,
+        "wilcoxon_statistic": 5.0,
+        "holm_p": 3.717204270745189e-05
+      },
+      {
+        "metric": "success",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "percentage points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 50.0,
+        "mean_b": 59.72222222222222,
+        "mean_difference": -9.722222222222221,
+        "paired_sd": 31.819488857860733,
+        "t": -1.4968489102243292,
+        "p": 0.1480306710719006,
+        "ci95": [
+          -23.158413979993547,
+          3.7139695355491043
+        ],
+        "bonferroni_six_ci": [
+          -28.468869060734036,
+          9.024424616289593
+        ],
+        "cohens_dz": -0.3055430043408893,
+        "nonzero_pairs": 11,
+        "positive_pairs": 4,
+        "negative_pairs": 7,
+        "sign_p": 0.548828125,
+        "signflip_p": 0.2158203125,
+        "wilcoxon_p": 0.1279296875,
+        "wilcoxon_statistic": 16.0,
+        "holm_p": 0.2960613421438012
+      },
+      {
+        "metric": "tlx100",
+        "a": "constant",
+        "b": "control",
+        "contrast": "constant minus control",
+        "unit": "adapted TLX points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 49.597423510466996,
+        "mean_b": 62.399355877616756,
+        "mean_difference": -12.801932367149762,
+        "paired_sd": 10.724372810473985,
+        "t": -5.724895235433421,
+        "p": 9.293010676862972e-06,
+        "ci95": [
+          -17.439498935885506,
+          -8.164365798414018
+        ],
+        "bonferroni_six_ci": [
+          -19.283600971436023,
+          -6.3202637628635
+        ],
+        "cohens_dz": -1.193723175554539,
+        "nonzero_pairs": 22,
+        "positive_pairs": 1,
+        "negative_pairs": 21,
+        "sign_p": 1.0967254638671875e-05,
+        "signflip_p": 1.9073486328125e-06,
+        "wilcoxon_p": 1.9073486328125e-06,
+        "wilcoxon_statistic": 2.0,
+        "holm_p": 3.717204270745189e-05
+      },
+      {
+        "metric": "tlx100",
+        "a": "adaptive",
+        "b": "control",
+        "contrast": "adaptive minus control",
+        "unit": "adapted TLX points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 46.01449275362317,
+        "mean_b": 62.399355877616756,
+        "mean_difference": -16.38486312399356,
+        "paired_sd": 13.456903721847718,
+        "t": -5.839310787936815,
+        "p": 7.098060685043014e-06,
+        "ci95": [
+          -22.204064668179562,
+          -10.56566157980756
+        ],
+        "bonferroni_six_ci": [
+          -24.518037147896997,
+          -8.251689100090125
+        ],
+        "cohens_dz": -1.2175804674438004,
+        "nonzero_pairs": 23,
+        "positive_pairs": 2,
+        "negative_pairs": 21,
+        "sign_p": 6.604194641113281e-05,
+        "signflip_p": 8.106231689453125e-06,
+        "wilcoxon_p": 1.0013580322265625e-05,
+        "wilcoxon_statistic": 10.0,
+        "holm_p": 3.549030342521507e-05
+      },
+      {
+        "metric": "tlx100",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "adapted TLX points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 46.01449275362317,
+        "mean_b": 49.597423510466996,
+        "mean_difference": -3.5829307568438025,
+        "paired_sd": 15.06859742747773,
+        "t": -1.1403272502445785,
+        "p": 0.266412714172593,
+        "ci95": [
+          -10.099080922675235,
+          2.9332194089876293
+        ],
+        "bonferroni_six_ci": [
+          -12.690191067761178,
+          5.524329554073573
+        ],
+        "cohens_dz": -0.23777466841806352,
+        "nonzero_pairs": 22,
+        "positive_pairs": 12,
+        "negative_pairs": 10,
+        "sign_p": 0.8318119049072266,
+        "signflip_p": 0.26888036727905273,
+        "wilcoxon_p": 0.2862100601196289,
+        "wilcoxon_statistic": 93.0,
+        "holm_p": 0.2960613421438012
+      }
+    ],
+    "original_immediate_rating_cohort_secondary_family": [
+      {
+        "metric": "durationSeconds",
+        "a": "constant",
+        "b": "control",
+        "contrast": "constant minus control",
+        "unit": "seconds",
+        "n": 24,
+        "df": 23,
+        "mean_a": 248.19444444444446,
+        "mean_b": 292.40277777777777,
+        "mean_difference": -44.20833333333332,
+        "paired_sd": 51.4711881790229,
+        "t": -4.207707763376343,
+        "p": 0.0003355288637630129,
+        "ci95": [
+          -65.94270994330945,
+          -22.473956723357194
+        ],
+        "bonferroni_six_ci": [
+          -74.53289924515667,
+          -13.883767421509976
+        ],
+        "cohens_dz": -0.8588947505849581,
+        "nonzero_pairs": 24,
+        "positive_pairs": 5,
+        "negative_pairs": 19,
+        "sign_p": 0.006610751152038574,
+        "signflip_p": 6.794929504394531e-05,
+        "wilcoxon_p": 0.00010693073272705078,
+        "wilcoxon_statistic": 25.0,
+        "holm_p": 0.0063750484114972455
+      },
+      {
+        "metric": "durationSeconds",
+        "a": "adaptive",
+        "b": "control",
+        "contrast": "adaptive minus control",
+        "unit": "seconds",
+        "n": 24,
+        "df": 23,
+        "mean_a": 265.36111111111114,
+        "mean_b": 292.40277777777777,
+        "mean_difference": -27.041666666666668,
+        "paired_sd": 31.55936243791885,
+        "t": -4.197694757494587,
+        "p": 0.0003440045759714936,
+        "ci95": [
+          -40.36801667068718,
+          -13.715316662646151
+        ],
+        "bonferroni_six_ci": [
+          -45.63505843091251,
+          -8.448274902420831
+        ],
+        "cohens_dz": -0.8568508543181427,
+        "nonzero_pairs": 24,
+        "positive_pairs": 4,
+        "negative_pairs": 20,
+        "sign_p": 0.001543879508972168,
+        "signflip_p": 0.00048804283142089844,
+        "wilcoxon_p": 0.0004286766052246094,
+        "wilcoxon_statistic": 34.0,
+        "holm_p": 0.0063750484114972455
+      },
+      {
+        "metric": "durationSeconds",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "seconds",
+        "n": 24,
+        "df": 23,
+        "mean_a": 265.36111111111114,
+        "mean_b": 248.19444444444446,
+        "mean_difference": 17.166666666666664,
+        "paired_sd": 61.446728823362015,
+        "t": 1.3686513415109791,
+        "p": 0.18432901102998686,
+        "ci95": [
+          -8.78001132827248,
+          43.11334466160581
+        ],
+        "bonferroni_six_ci": [
+          -19.035050142143746,
+          53.368383475477074
+        ],
+        "cohens_dz": 0.27937478520646497,
+        "nonzero_pairs": 23,
+        "positive_pairs": 12,
+        "negative_pairs": 11,
+        "sign_p": 1.0,
+        "signflip_p": 0.19408893585205078,
+        "wilcoxon_p": 0.3446848392486572,
+        "wilcoxon_statistic": 106.0,
+        "holm_p": 1.0
+      },
+      {
+        "metric": "helpfulness",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 4.81159420289855,
+        "mean_b": 4.536231884057971,
+        "mean_difference": 0.2753623188405797,
+        "paired_sd": 0.9777947457305225,
+        "t": 1.35058128998383,
+        "p": 0.19055950771416097,
+        "ci95": [
+          -0.14746783673333153,
+          0.698192474414491
+        ],
+        "bonferroni_six_ci": [
+          -0.3156038492366645,
+          0.8663284869178239
+        ],
+        "cohens_dz": 0.2816156663174265,
+        "nonzero_pairs": 17,
+        "positive_pairs": 14,
+        "negative_pairs": 3,
+        "sign_p": 0.012725830078125,
+        "signflip_p": 0.2209625244140625,
+        "wilcoxon_p": 0.047760009765625,
+        "wilcoxon_statistic": 35.0,
+        "holm_p": 1.0
+      },
+      {
+        "metric": "timingEffectiveness",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 5.260869565217392,
+        "mean_b": 4.695652173913044,
+        "mean_difference": 0.5652173913043479,
+        "paired_sd": 0.9557628642153281,
+        "t": 2.8361505601783557,
+        "p": 0.00961155840900981,
+        "ci95": [
+          0.1519145357382678,
+          0.9785202468704279
+        ],
+        "bonferroni_six_ci": [
+          -0.012432999968594816,
+          1.1428677825772906
+        ],
+        "cohens_dz": 0.5913782722332341,
+        "nonzero_pairs": 20,
+        "positive_pairs": 15,
+        "negative_pairs": 5,
+        "sign_p": 0.04138946533203125,
+        "signflip_p": 0.009843826293945312,
+        "wilcoxon_p": 0.009984970092773438,
+        "wilcoxon_statistic": 38.0,
+        "holm_p": 0.15378493454415695
+      },
+      {
+        "metric": "clarityAndDistraction",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 4.086956521739131,
+        "mean_b": 3.985507246376812,
+        "mean_difference": 0.1014492753623189,
+        "paired_sd": 1.2769707787513402,
+        "t": 0.3810060816548899,
+        "p": 0.7068532312971647,
+        "ci95": [
+          -0.4507542984453626,
+          0.6536528491700004
+        ],
+        "bonferroni_six_ci": [
+          -0.670334916729538,
+          0.8732334674541757
+        ],
+        "cohens_dz": 0.07944525986845134,
+        "nonzero_pairs": 21,
+        "positive_pairs": 14,
+        "negative_pairs": 7,
+        "sign_p": 0.18924713134765625,
+        "signflip_p": 0.7473592758178711,
+        "wilcoxon_p": 0.6018571853637695,
+        "wilcoxon_statistic": 100.0,
+        "holm_p": 1.0
+      },
+      {
+        "metric": "stressReduction",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 4.840579710144928,
+        "mean_b": 4.434782608695651,
+        "mean_difference": 0.40579710144927533,
+        "paired_sd": 1.0296440580384285,
+        "t": 1.8901041733848674,
+        "p": 0.07199124096872242,
+        "ci95": [
+          -0.039454378114440025,
+          0.8510485810129906
+        ],
+        "bonferroni_six_ci": [
+          -0.21650610289845024,
+          1.0281003057970008
+        ],
+        "cohens_dz": 0.39411396422017725,
+        "nonzero_pairs": 19,
+        "positive_pairs": 13,
+        "negative_pairs": 6,
+        "sign_p": 0.1670684814453125,
+        "signflip_p": 0.08363723754882812,
+        "wilcoxon_p": 0.07648468017578125,
+        "wilcoxon_statistic": 51.0,
+        "holm_p": 0.863894891624669
+      },
+      {
+        "metric": "mentalDemand",
+        "a": "constant",
+        "b": "control",
+        "contrast": "constant minus control",
+        "unit": "points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 4.782608695652174,
+        "mean_b": 5.666666666666667,
+        "mean_difference": -0.8840579710144929,
+        "paired_sd": 0.838521399786998,
+        "t": -5.056272966801067,
+        "p": 4.59776622103867e-05,
+        "ci95": [
+          -1.2466618155044733,
+          -0.5214541265245126
+        ],
+        "bonferroni_six_ci": [
+          -1.39084917708982,
+          -0.3772667649391659
+        ],
+        "cohens_dz": -1.0543057949851513,
+        "nonzero_pairs": 19,
+        "positive_pairs": 2,
+        "negative_pairs": 17,
+        "sign_p": 0.000728607177734375,
+        "signflip_p": 5.7220458984375e-05,
+        "wilcoxon_p": 4.1961669921875e-05,
+        "wilcoxon_statistic": 5.0,
+        "holm_p": 0.0010115085686285075
+      },
+      {
+        "metric": "mentalDemand",
+        "a": "adaptive",
+        "b": "control",
+        "contrast": "adaptive minus control",
+        "unit": "points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 4.565217391304348,
+        "mean_b": 5.666666666666667,
+        "mean_difference": -1.1014492753623188,
+        "paired_sd": 0.9971412805722006,
+        "t": -5.297509248720826,
+        "p": 2.571197386583365e-05,
+        "ci95": [
+          -1.5326454999631314,
+          -0.6702530507615063
+        ],
+        "bonferroni_six_ci": [
+          -1.7041082323514298,
+          -0.49879031837320786
+        ],
+        "cohens_dz": -1.1046070369589573,
+        "nonzero_pairs": 21,
+        "positive_pairs": 2,
+        "negative_pairs": 19,
+        "sign_p": 0.00022125244140625,
+        "signflip_p": 1.1444091796875e-05,
+        "wilcoxon_p": 6.67572021484375e-06,
+        "wilcoxon_statistic": 4.0,
+        "holm_p": 0.0005913753989141739
+      },
+      {
+        "metric": "mentalDemand",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 4.565217391304348,
+        "mean_b": 4.782608695652174,
+        "mean_difference": -0.21739130434782605,
+        "paired_sd": 1.229308320146559,
+        "t": -0.8480964890574215,
+        "p": 0.4055173843367551,
+        "ci95": [
+          -0.7489840854764795,
+          0.31420147678082744
+        ],
+        "bonferroni_six_ci": [
+          -0.9603689389839422,
+          0.52558633028829
+        ],
+        "cohens_dz": -0.1768403424796706,
+        "nonzero_pairs": 21,
+        "positive_pairs": 10,
+        "negative_pairs": 11,
+        "sign_p": 1.0,
+        "signflip_p": 0.43610477447509766,
+        "wilcoxon_p": 0.4871559143066406,
+        "wilcoxon_statistic": 95.0,
+        "holm_p": 1.0
+      },
+      {
+        "metric": "physicalDemand",
+        "a": "constant",
+        "b": "control",
+        "contrast": "constant minus control",
+        "unit": "points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 3.3333333333333335,
+        "mean_b": 3.7246376811594204,
+        "mean_difference": -0.391304347826087,
+        "paired_sd": 0.7891446201076731,
+        "t": -2.378055528348683,
+        "p": 0.02651606956646354,
+        "ci95": [
+          -0.732556071613118,
+          -0.05005262403905597
+        ],
+        "bonferroni_six_ci": [
+          -0.8682528835388479,
+          0.085644187886674
+        ],
+        "cohens_dz": -0.4958588550888129,
+        "nonzero_pairs": 16,
+        "positive_pairs": 5,
+        "negative_pairs": 11,
+        "sign_p": 0.210113525390625,
+        "signflip_p": 0.02850341796875,
+        "wilcoxon_p": 0.02392578125,
+        "wilcoxon_statistic": 25.0,
+        "holm_p": 0.37122497393048953
+      },
+      {
+        "metric": "physicalDemand",
+        "a": "adaptive",
+        "b": "control",
+        "contrast": "adaptive minus control",
+        "unit": "points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 3.1014492753623193,
+        "mean_b": 3.7246376811594204,
+        "mean_difference": -0.6231884057971014,
+        "paired_sd": 1.2764547961945816,
+        "t": -2.3414120189722274,
+        "p": 0.028674926420738274,
+        "ci95": [
+          -1.1751688520151735,
+          -0.07120795957902937
+        ],
+        "bonferroni_six_ci": [
+          -1.39466074487922,
+          0.1482839332850171
+        ],
+        "cohens_dz": -0.4882181552021864,
+        "nonzero_pairs": 16,
+        "positive_pairs": 4,
+        "negative_pairs": 12,
+        "sign_p": 0.076812744140625,
+        "signflip_p": 0.03204345703125,
+        "wilcoxon_p": 0.033355712890625,
+        "wilcoxon_statistic": 27.5,
+        "holm_p": 0.3727740434695976
+      },
+      {
+        "metric": "physicalDemand",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 3.1014492753623193,
+        "mean_b": 3.3333333333333335,
+        "mean_difference": -0.23188405797101447,
+        "paired_sd": 1.1211230958496174,
+        "t": -0.9919311082680919,
+        "p": 0.3320164505655363,
+        "ci95": [
+          -0.7166940399283568,
+          0.25292592398632785
+        ],
+        "bonferroni_six_ci": [
+          -0.909475978760228,
+          0.44570786281819913
+        ],
+        "cohens_dz": -0.20683193382550596,
+        "nonzero_pairs": 19,
+        "positive_pairs": 7,
+        "negative_pairs": 12,
+        "sign_p": 0.359283447265625,
+        "signflip_p": 0.3613853454589844,
+        "wilcoxon_p": 0.37888336181640625,
+        "wilcoxon_statistic": 72.5,
+        "holm_p": 1.0
+      },
+      {
+        "metric": "temporalDemand",
+        "a": "constant",
+        "b": "control",
+        "contrast": "constant minus control",
+        "unit": "points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 3.63768115942029,
+        "mean_b": 3.9565217391304355,
+        "mean_difference": -0.3188405797101449,
+        "paired_sd": 0.8316847989130756,
+        "t": -1.838563966882159,
+        "p": 0.0795188939705878,
+        "ci95": [
+          -0.6784880562878005,
+          0.04080689686751071
+        ],
+        "bonferroni_six_ci": [
+          -0.8214998349453014,
+          0.18381867552501163
+        ],
+        "cohens_dz": -0.38336708826088434,
+        "nonzero_pairs": 18,
+        "positive_pairs": 6,
+        "negative_pairs": 12,
+        "sign_p": 0.237884521484375,
+        "signflip_p": 0.09505462646484375,
+        "wilcoxon_p": 0.0845184326171875,
+        "wilcoxon_statistic": 45.5,
+        "holm_p": 0.8747078336764658
+      },
+      {
+        "metric": "temporalDemand",
+        "a": "adaptive",
+        "b": "control",
+        "contrast": "adaptive minus control",
+        "unit": "points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 3.5507246376811596,
+        "mean_b": 3.9565217391304355,
+        "mean_difference": -0.4057971014492752,
+        "paired_sd": 1.1324262044283788,
+        "t": -1.7185530709100156,
+        "p": 0.09973868003742492,
+        "ci95": [
+          -0.8954949140885627,
+          0.0839007111900123
+        ],
+        "bonferroni_six_ci": [
+          -1.090220471060768,
+          0.2786262681622175
+        ],
+        "cohens_dz": -0.35834308660678843,
+        "nonzero_pairs": 20,
+        "positive_pairs": 8,
+        "negative_pairs": 12,
+        "sign_p": 0.5034446716308594,
+        "signflip_p": 0.11354827880859375,
+        "wilcoxon_p": 0.1487102508544922,
+        "wilcoxon_statistic": 66.0,
+        "holm_p": 0.9063377243074473
+      },
+      {
+        "metric": "temporalDemand",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 3.5507246376811596,
+        "mean_b": 3.63768115942029,
+        "mean_difference": -0.08695652173913043,
+        "paired_sd": 1.4221103656056757,
+        "t": -0.29324645836227853,
+        "p": 0.7720821178046232,
+        "ci95": [
+          -0.7019231594285902,
+          0.5280101159503294
+        ],
+        "bonferroni_six_ci": [
+          -0.9464611539889463,
+          0.7725481105106855
+        ],
+        "cohens_dz": -0.061146113439722885,
+        "nonzero_pairs": 20,
+        "positive_pairs": 11,
+        "negative_pairs": 9,
+        "sign_p": 0.8238029479980469,
+        "signflip_p": 0.8084869384765625,
+        "wilcoxon_p": 0.9499530792236328,
+        "wilcoxon_statistic": 103.0,
+        "holm_p": 1.0
+      },
+      {
+        "metric": "performance",
+        "a": "constant",
+        "b": "control",
+        "contrast": "constant minus control",
+        "unit": "points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 4.507246376811595,
+        "mean_b": 2.9565217391304346,
+        "mean_difference": 1.5507246376811596,
+        "paired_sd": 1.3127528930087211,
+        "t": 5.665204884312979,
+        "p": 1.0701259278091757e-05,
+        "ci95": [
+          0.9830477173411155,
+          2.118401558021204
+        ],
+        "bonferroni_six_ci": [
+          0.7573142105939531,
+          2.3441350647683663
+        ],
+        "cohens_dz": 1.1812768769657989,
+        "nonzero_pairs": 20,
+        "positive_pairs": 18,
+        "negative_pairs": 2,
+        "sign_p": 0.0004024505615234375,
+        "signflip_p": 1.1444091796875e-05,
+        "wilcoxon_p": 7.62939453125e-06,
+        "wilcoxon_statistic": 3.0,
+        "holm_p": 0.00025683022267420215
+      },
+      {
+        "metric": "performance",
+        "a": "adaptive",
+        "b": "control",
+        "contrast": "adaptive minus control",
+        "unit": "points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 4.913043478260869,
+        "mean_b": 2.9565217391304346,
+        "mean_difference": 1.956521739130435,
+        "paired_sd": 1.40814495001882,
+        "t": 6.663482074372356,
+        "p": 1.0647890316960746e-06,
+        "ci95": [
+          1.3475942000054013,
+          2.5654492782554685
+        ],
+        "bonferroni_six_ci": [
+          1.1054576187273097,
+          2.8075858595335603
+        ],
+        "cohens_dz": 1.3894320603175732,
+        "nonzero_pairs": 23,
+        "positive_pairs": 22,
+        "negative_pairs": 1,
+        "sign_p": 5.7220458984375e-06,
+        "signflip_p": 3.0994415283203125e-06,
+        "wilcoxon_p": 3.0994415283203125e-06,
+        "wilcoxon_statistic": 6.0,
+        "holm_p": 2.6619725792401864e-05
+      },
+      {
+        "metric": "performance",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 4.913043478260869,
+        "mean_b": 4.507246376811595,
+        "mean_difference": 0.40579710144927517,
+        "paired_sd": 1.403302460392895,
+        "t": 1.386824712510293,
+        "p": 0.1793879075198041,
+        "ci95": [
+          -0.20103638813127545,
+          1.0126305910298257
+        ],
+        "bonferroni_six_ci": [
+          -0.4423402824882652,
+          1.2539344853868155
+        ],
+        "cohens_dz": 0.2891729423289549,
+        "nonzero_pairs": 22,
+        "positive_pairs": 13,
+        "negative_pairs": 9,
+        "sign_p": 0.5234670639038086,
+        "signflip_p": 0.1939239501953125,
+        "wilcoxon_p": 0.19379711151123047,
+        "wilcoxon_statistic": 86.0,
+        "holm_p": 1.0
+      },
+      {
+        "metric": "effort",
+        "a": "constant",
+        "b": "control",
+        "contrast": "constant minus control",
+        "unit": "points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 4.666666666666666,
+        "mean_b": 5.434782608695653,
+        "mean_difference": -0.7681159420289856,
+        "paired_sd": 0.8191815489797393,
+        "t": -4.49687209499486,
+        "p": 0.00017923545221647786,
+        "ci95": [
+          -1.1223566078852947,
+          -0.4138752761726765
+        ],
+        "bonferroni_six_ci": [
+          -1.2632183989341454,
+          -0.27301348512382567
+        ],
+        "cohens_dz": -0.9376626499774634,
+        "nonzero_pairs": 21,
+        "positive_pairs": 3,
+        "negative_pairs": 18,
+        "sign_p": 0.0014896392822265625,
+        "signflip_p": 0.0004520416259765625,
+        "wilcoxon_p": 0.000453948974609375,
+        "wilcoxon_statistic": 22.0,
+        "holm_p": 0.003763944496546035
+      },
+      {
+        "metric": "effort",
+        "a": "adaptive",
+        "b": "control",
+        "contrast": "adaptive minus control",
+        "unit": "points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 4.753623188405798,
+        "mean_b": 5.434782608695653,
+        "mean_difference": -0.6811594202898551,
+        "paired_sd": 1.0611517512055084,
+        "t": -3.0784718740899977,
+        "p": 0.005494561230545011,
+        "ci95": [
+          -1.1400358480973434,
+          -0.22228299248236683
+        ],
+        "bonferroni_six_ci": [
+          -1.322505456251481,
+          -0.03981338432822923
+        ],
+        "cohens_dz": -0.6419057590170607,
+        "nonzero_pairs": 22,
+        "positive_pairs": 5,
+        "negative_pairs": 17,
+        "sign_p": 0.01690053939819336,
+        "signflip_p": 0.007419109344482422,
+        "wilcoxon_p": 0.008774280548095703,
+        "wilcoxon_statistic": 48.0,
+        "holm_p": 0.09340754091926519
+      },
+      {
+        "metric": "effort",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 4.753623188405798,
+        "mean_b": 4.666666666666666,
+        "mean_difference": 0.08695652173913042,
+        "paired_sd": 0.8239924444609708,
+        "t": 0.5061075874147806,
+        "p": 0.6178152642152466,
+        "ci95": [
+          -0.26936453132897453,
+          0.4432775748072354
+        ],
+        "bonferroni_six_ci": [
+          -0.41105357654984515,
+          0.584966620028106
+        ],
+        "cohens_dz": 0.1055307270396327,
+        "nonzero_pairs": 18,
+        "positive_pairs": 10,
+        "negative_pairs": 8,
+        "sign_p": 0.8145294189453125,
+        "signflip_p": 0.6753463745117188,
+        "wilcoxon_p": 0.582122802734375,
+        "wilcoxon_statistic": 72.5,
+        "holm_p": 1.0
+      },
+      {
+        "metric": "frustration",
+        "a": "constant",
+        "b": "control",
+        "contrast": "constant minus control",
+        "unit": "points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 3.942028985507247,
+        "mean_b": 4.63768115942029,
+        "mean_difference": -0.6956521739130433,
+        "paired_sd": 1.1972740227863456,
+        "t": -2.786522184076943,
+        "p": 0.010759626603464177,
+        "ci95": [
+          -1.213392286068312,
+          -0.17791206175777474
+        ],
+        "bonferroni_six_ci": [
+          -1.419268704349455,
+          0.02796435652336815
+        ],
+        "cohens_dz": -0.581030040469844,
+        "nonzero_pairs": 18,
+        "positive_pairs": 4,
+        "negative_pairs": 14,
+        "sign_p": 0.0308837890625,
+        "signflip_p": 0.01137542724609375,
+        "wilcoxon_p": 0.01520538330078125,
+        "wilcoxon_statistic": 31.0,
+        "holm_p": 0.16139439905196265
+      },
+      {
+        "metric": "frustration",
+        "a": "adaptive",
+        "b": "control",
+        "contrast": "adaptive minus control",
+        "unit": "points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 3.5072463768115942,
+        "mean_b": 4.63768115942029,
+        "mean_difference": -1.1304347826086956,
+        "paired_sd": 1.2257305817092097,
+        "t": -4.422974221565194,
+        "p": 0.00021469317162902408,
+        "ci95": [
+          -1.66048043361963,
+          -0.6003891315977612
+        ],
+        "bonferroni_six_ci": [
+          -1.8712500796131817,
+          -0.38961948560420934
+        ],
+        "cohens_dz": -0.9222538781992127,
+        "nonzero_pairs": 23,
+        "positive_pairs": 4,
+        "negative_pairs": 19,
+        "sign_p": 0.002599477767944336,
+        "signflip_p": 0.0004723072052001953,
+        "wilcoxon_p": 0.00047969818115234375,
+        "wilcoxon_statistic": 30.5,
+        "holm_p": 0.004293863432580481
+      },
+      {
+        "metric": "frustration",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 3.5072463768115942,
+        "mean_b": 3.942028985507247,
+        "mean_difference": -0.4347826086956521,
+        "paired_sd": 1.1782317799824287,
+        "t": -1.7697232208435625,
+        "p": 0.09063377243074473,
+        "ci95": [
+          -0.9442882375686027,
+          0.07472302017729848
+        ],
+        "bonferroni_six_ci": [
+          -1.1468902602895823,
+          0.2773250428982781
+        ],
+        "cohens_dz": -0.36901280043739454,
+        "nonzero_pairs": 22,
+        "positive_pairs": 6,
+        "negative_pairs": 16,
+        "sign_p": 0.052478790283203125,
+        "signflip_p": 0.10231304168701172,
+        "wilcoxon_p": 0.10673809051513672,
+        "wilcoxon_statistic": 76.5,
+        "holm_p": 0.9063377243074473
+      }
+    ],
+    "confirmed_recorded_completion_P101_excluded": [
+      {
+        "metric": "recordedSuccess",
+        "a": "constant",
+        "b": "control",
+        "contrast": "constant minus control",
+        "unit": "percentage points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 59.42028985507247,
+        "mean_b": 15.942028985507243,
+        "mean_difference": 43.47826086956522,
+        "paired_sd": 29.189008946906558,
+        "t": 7.143593481928514,
+        "p": 3.6660771523883015e-07,
+        "ci95": [
+          30.855986871919697,
+          56.10053486721074
+        ],
+        "bonferroni_six_ci": [
+          25.83681122724965,
+          61.11971051188078
+        ],
+        "cohens_dz": 1.4895422091462627,
+        "nonzero_pairs": 19,
+        "positive_pairs": 19,
+        "negative_pairs": 0,
+        "sign_p": 3.814697265625e-06,
+        "signflip_p": 3.814697265625e-06,
+        "wilcoxon_p": 3.814697265625e-06,
+        "wilcoxon_statistic": 0.0,
+        "holm_p": 1.0998231457164904e-06
+      },
+      {
+        "metric": "recordedSuccess",
+        "a": "adaptive",
+        "b": "control",
+        "contrast": "adaptive minus control",
+        "unit": "percentage points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 52.17391304347825,
+        "mean_b": 15.942028985507243,
+        "mean_difference": 36.231884057971016,
+        "paired_sd": 30.005123263312086,
+        "t": 5.791078083211594,
+        "p": 7.950543682022329e-06,
+        "ci95": [
+          23.256695765297216,
+          49.207072350644815
+        ],
+        "bonferroni_six_ci": [
+          18.097185753413125,
+          54.3665823625289
+        ],
+        "cohens_dz": 1.2075232532796332,
+        "nonzero_pairs": 18,
+        "positive_pairs": 17,
+        "negative_pairs": 1,
+        "sign_p": 0.00014495849609375,
+        "signflip_p": 7.62939453125e-05,
+        "wilcoxon_p": 7.62939453125e-05,
+        "wilcoxon_statistic": 5.0,
+        "holm_p": 1.5901087364044658e-05
+      },
+      {
+        "metric": "recordedSuccess",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "percentage points",
+        "n": 23,
+        "df": 22,
+        "mean_a": 52.17391304347825,
+        "mean_b": 59.42028985507247,
+        "mean_difference": -7.246376811594206,
+        "paired_sd": 30.078217459961465,
+        "t": -1.1554009937293117,
+        "p": 0.2603211662030965,
+        "ci95": [
+          -20.25317340516731,
+          5.760419781978897
+        ],
+        "bonferroni_six_ci": [
+          -25.425252278579265,
+          10.932498655390852
+        ],
+        "cohens_dz": -0.2409177612084293,
+        "nonzero_pairs": 10,
+        "positive_pairs": 4,
+        "negative_pairs": 6,
+        "sign_p": 0.75390625,
+        "signflip_p": 0.369140625,
+        "wilcoxon_p": 0.240234375,
+        "wilcoxon_statistic": 16.0,
+        "holm_p": 0.2603211662030965
+      }
+    ],
+    "count_derived_completion_all24": [
+      {
+        "metric": "countDerivedSuccess",
+        "a": "constant",
+        "b": "control",
+        "contrast": "constant minus control",
+        "unit": "percentage points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 59.72222222222222,
+        "mean_b": 15.277777777777777,
+        "mean_difference": 44.444444444444436,
+        "paired_sd": 28.9371577427477,
+        "t": 7.524319545007682,
+        "p": 1.207759884173079e-07,
+        "ci95": [
+          32.225354373788434,
+          56.66353451510044
+        ],
+        "bonferroni_six_ci": [
+          27.395940644246366,
+          61.492948244642506
+        ],
+        "cohens_dz": 1.535895295576609,
+        "nonzero_pairs": 20,
+        "positive_pairs": 20,
+        "negative_pairs": 0,
+        "sign_p": 1.9073486328125e-06,
+        "signflip_p": 1.9073486328125e-06,
+        "wilcoxon_p": 1.9073486328125e-06,
+        "wilcoxon_statistic": 0.0,
+        "holm_p": 3.623279652519237e-07
+      },
+      {
+        "metric": "countDerivedSuccess",
+        "a": "adaptive",
+        "b": "control",
+        "contrast": "adaptive minus control",
+        "unit": "percentage points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 50.0,
+        "mean_b": 15.277777777777777,
+        "mean_difference": 34.72222222222222,
+        "paired_sd": 30.26320395608503,
+        "t": 5.620801241229456,
+        "p": 1.0138902235828702e-05,
+        "ci95": [
+          21.943191943800585,
+          47.50125250064386
+        ],
+        "bonferroni_six_ci": [
+          16.892470169922213,
+          52.55197427452223
+        ],
+        "cohens_dz": 1.1473412488845425,
+        "nonzero_pairs": 18,
+        "positive_pairs": 17,
+        "negative_pairs": 1,
+        "sign_p": 0.00014495849609375,
+        "signflip_p": 7.62939453125e-05,
+        "wilcoxon_p": 7.62939453125e-05,
+        "wilcoxon_statistic": 5.0,
+        "holm_p": 2.0277804471657403e-05
+      },
+      {
+        "metric": "countDerivedSuccess",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "percentage points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 50.0,
+        "mean_b": 59.72222222222222,
+        "mean_difference": -9.722222222222221,
+        "paired_sd": 31.819488857860733,
+        "t": -1.4968489102243292,
+        "p": 0.1480306710719006,
+        "ci95": [
+          -23.158413979993547,
+          3.7139695355491043
+        ],
+        "bonferroni_six_ci": [
+          -28.468869060734036,
+          9.024424616289593
+        ],
+        "cohens_dz": -0.3055430043408893,
+        "nonzero_pairs": 11,
+        "positive_pairs": 4,
+        "negative_pairs": 7,
+        "sign_p": 0.548828125,
+        "signflip_p": 0.2158203125,
+        "wilcoxon_p": 0.1279296875,
+        "wilcoxon_statistic": 16.0,
+        "holm_p": 0.1480306710719006
+      }
+    ],
+    "P101_previous_working_completion_included": [
+      {
+        "metric": "success_working",
+        "a": "constant",
+        "b": "control",
+        "contrast": "constant minus control",
+        "unit": "percentage points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 59.72222222222222,
+        "mean_b": 15.277777777777777,
+        "mean_difference": 44.444444444444436,
+        "paired_sd": 28.9371577427477,
+        "t": 7.524319545007682,
+        "p": 1.207759884173079e-07,
+        "ci95": [
+          32.225354373788434,
+          56.66353451510044
+        ],
+        "bonferroni_six_ci": [
+          27.395940644246366,
+          61.492948244642506
+        ],
+        "cohens_dz": 1.535895295576609,
+        "nonzero_pairs": 20,
+        "positive_pairs": 20,
+        "negative_pairs": 0,
+        "sign_p": 1.9073486328125e-06,
+        "signflip_p": 1.9073486328125e-06,
+        "wilcoxon_p": 1.9073486328125e-06,
+        "wilcoxon_statistic": 0.0,
+        "holm_p": 3.623279652519237e-07
+      },
+      {
+        "metric": "success_working",
+        "a": "adaptive",
+        "b": "control",
+        "contrast": "adaptive minus control",
+        "unit": "percentage points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 50.0,
+        "mean_b": 15.277777777777777,
+        "mean_difference": 34.72222222222222,
+        "paired_sd": 30.26320395608503,
+        "t": 5.620801241229456,
+        "p": 1.0138902235828702e-05,
+        "ci95": [
+          21.943191943800585,
+          47.50125250064386
+        ],
+        "bonferroni_six_ci": [
+          16.892470169922213,
+          52.55197427452223
+        ],
+        "cohens_dz": 1.1473412488845425,
+        "nonzero_pairs": 18,
+        "positive_pairs": 17,
+        "negative_pairs": 1,
+        "sign_p": 0.00014495849609375,
+        "signflip_p": 7.62939453125e-05,
+        "wilcoxon_p": 7.62939453125e-05,
+        "wilcoxon_statistic": 5.0,
+        "holm_p": 2.0277804471657403e-05
+      },
+      {
+        "metric": "success_working",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "percentage points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 50.0,
+        "mean_b": 59.72222222222222,
+        "mean_difference": -9.722222222222221,
+        "paired_sd": 31.819488857860733,
+        "t": -1.4968489102243292,
+        "p": 0.1480306710719006,
+        "ci95": [
+          -23.158413979993547,
+          3.7139695355491043
+        ],
+        "bonferroni_six_ci": [
+          -28.468869060734036,
+          9.024424616289593
+        ],
+        "cohens_dz": -0.3055430043408893,
+        "nonzero_pairs": 11,
+        "positive_pairs": 4,
+        "negative_pairs": 7,
+        "sign_p": 0.548828125,
+        "signflip_p": 0.2158203125,
+        "wilcoxon_p": 0.1279296875,
+        "wilcoxon_statistic": 16.0,
+        "holm_p": 0.1480306710719006
+      }
+    ],
+    "third_laptop_excluded": [
+      {
+        "metric": "correctPieces",
+        "a": "constant",
+        "b": "control",
+        "contrast": "constant minus control",
+        "unit": "pieces out of seven",
+        "n": 15,
+        "df": 14,
+        "mean_a": 5.666666666666667,
+        "mean_b": 3.0,
+        "mean_difference": 2.6666666666666665,
+        "paired_sd": 1.2971274735120226,
+        "t": 7.962174728997997,
+        "p": 1.447069735975967e-06,
+        "ci95": [
+          1.9483414147793299,
+          3.384991918554003
+        ],
+        "bonferroni_six_ci": [
+          1.6388807162446353,
+          3.6944526170886975
+        ],
+        "cohens_dz": 2.0558246750001863,
+        "nonzero_pairs": 15,
+        "positive_pairs": 15,
+        "negative_pairs": 0,
+        "sign_p": 6.103515625e-05,
+        "signflip_p": 6.103515625e-05,
+        "wilcoxon_p": 6.103515625e-05,
+        "wilcoxon_statistic": 0.0,
+        "holm_p": 4.341209207927901e-06
+      },
+      {
+        "metric": "correctPieces",
+        "a": "adaptive",
+        "b": "control",
+        "contrast": "adaptive minus control",
+        "unit": "pieces out of seven",
+        "n": 15,
+        "df": 14,
+        "mean_a": 5.266666666666667,
+        "mean_b": 3.0,
+        "mean_difference": 2.2666666666666666,
+        "paired_sd": 1.3044490413915377,
+        "t": 6.729862166205144,
+        "p": 9.627761391271462e-06,
+        "ci95": [
+          1.5442868656323419,
+          2.9890464677009914
+        ],
+        "bonferroni_six_ci": [
+          1.2330794324423175,
+          3.3002539008910157
+        ],
+        "cohens_dz": 1.737642939465593,
+        "nonzero_pairs": 15,
+        "positive_pairs": 14,
+        "negative_pairs": 1,
+        "sign_p": 0.0009765625,
+        "signflip_p": 0.0001220703125,
+        "wilcoxon_p": 0.0001220703125,
+        "wilcoxon_statistic": 1.0,
+        "holm_p": 1.9255522782542924e-05
+      },
+      {
+        "metric": "correctPieces",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "pieces out of seven",
+        "n": 15,
+        "df": 14,
+        "mean_a": 5.266666666666667,
+        "mean_b": 5.666666666666667,
+        "mean_difference": -0.39999999999999997,
+        "paired_sd": 1.0404516723710346,
+        "t": -1.4889623224426998,
+        "p": 0.15867598218256504,
+        "ci95": [
+          -0.976182931049141,
+          0.176182931049141
+        ],
+        "bonferroni_six_ci": [
+          -1.2244074948630284,
+          0.42440749486302837
+        ],
+        "cohens_dz": -0.38444841853005957,
+        "nonzero_pairs": 14,
+        "positive_pairs": 4,
+        "negative_pairs": 10,
+        "sign_p": 0.1795654296875,
+        "signflip_p": 0.1834716796875,
+        "wilcoxon_p": 0.2213134765625,
+        "wilcoxon_statistic": 32.5,
+        "holm_p": 0.15867598218256504
+      }
+    ],
+    "P111_duration_confirmation_excluded_25_test_family": [
+      {
+        "metric": "durationSeconds",
+        "a": "constant",
+        "b": "control",
+        "contrast": "constant minus control",
+        "unit": "seconds",
+        "n": 23,
+        "df": 22,
+        "mean_a": 247.6811594202899,
+        "mean_b": 291.7971014492754,
+        "mean_difference": -44.11594202898551,
+        "paired_sd": 52.62595364386074,
+        "t": -4.020309577571464,
+        "p": 0.0005740085807455068,
+        "ci95": [
+          -66.87311091705767,
+          -21.358773140913346
+        ],
+        "bonferroni_six_ci": [
+          -75.92237001616778,
+          -12.309514041803236
+        ],
+        "cohens_dz": -0.8382924958953595,
+        "nonzero_pairs": 23,
+        "positive_pairs": 5,
+        "negative_pairs": 18,
+        "sign_p": 0.010622024536132812,
+        "signflip_p": 0.00013566017150878906,
+        "wilcoxon_p": 0.0002129077911376953,
+        "wilcoxon_statistic": 25.0,
+        "holm_p": 0.01090616303416463
+      },
+      {
+        "metric": "durationSeconds",
+        "a": "adaptive",
+        "b": "control",
+        "contrast": "adaptive minus control",
+        "unit": "seconds",
+        "n": 23,
+        "df": 22,
+        "mean_a": 264.76811594202894,
+        "mean_b": 291.7971014492754,
+        "mean_difference": -27.028985507246375,
+        "paired_sd": 32.26858763432205,
+        "t": -4.017109834734116,
+        "p": 0.0005785042329388313,
+        "ci95": [
+          -40.98296919262309,
+          -13.075001821869662
+        ],
+        "bonferroni_six_ci": [
+          -46.5316916393732,
+          -7.52627937511955
+        ],
+        "cohens_dz": -0.8376253033924966,
+        "nonzero_pairs": 23,
+        "positive_pairs": 4,
+        "negative_pairs": 19,
+        "sign_p": 0.002599477767944336,
+        "signflip_p": 0.0007982254028320312,
+        "wilcoxon_p": 0.0007214546203613281,
+        "wilcoxon_statistic": 33.0,
+        "holm_p": 0.01090616303416463
+      },
+      {
+        "metric": "durationSeconds",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "seconds",
+        "n": 23,
+        "df": 22,
+        "mean_a": 264.76811594202894,
+        "mean_b": 247.6811594202899,
+        "mean_difference": 17.08695652173913,
+        "paired_sd": 62.826457898192686,
+        "t": 1.3043257166784776,
+        "p": 0.20560412584996,
+        "ci95": [
+          -10.081241183602003,
+          44.25515422708026
+        ],
+        "bonferroni_six_ci": [
+          -20.884520866618306,
+          55.05843391009657
+        ],
+        "cohens_dz": 0.2719707125527869,
+        "nonzero_pairs": 22,
+        "positive_pairs": 11,
+        "negative_pairs": 11,
+        "sign_p": 1.0,
+        "signflip_p": 0.21660470962524414,
+        "wilcoxon_p": 0.4060330390930176,
+        "wilcoxon_statistic": 100.0,
+        "holm_p": 1.0
+      },
+      {
+        "metric": "helpfulness",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 4.833333333333333,
+        "mean_b": 4.583333333333333,
+        "mean_difference": 0.24999999999999997,
+        "paired_sd": 0.9643400286316316,
+        "t": 1.2700342566194869,
+        "p": 0.21677134402010775,
+        "ci95": [
+          -0.15720508120885043,
+          0.6572050812088504
+        ],
+        "bonferroni_six_ci": [
+          -0.3181468369826286,
+          0.8181468369826286
+        ],
+        "cohens_dz": 0.2592446570477243,
+        "nonzero_pairs": 18,
+        "positive_pairs": 14,
+        "negative_pairs": 4,
+        "sign_p": 0.0308837890625,
+        "signflip_p": 0.2507476806640625,
+        "wilcoxon_p": 0.046600341796875,
+        "wilcoxon_statistic": 40.5,
+        "holm_p": 1.0,
+        "holm_signflip_p": 1.0,
+        "holm_wilcoxon_p": 0.5592041015625,
+        "holm_all_34_p": 1.0
+      },
+      {
+        "metric": "timingEffectiveness",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 5.236111111111111,
+        "mean_b": 4.680555555555555,
+        "mean_difference": 0.5555555555555557,
+        "paired_sd": 0.9359521575507118,
+        "t": 2.9078999901889993,
+        "p": 0.007924856942167898,
+        "ci95": [
+          0.1603376210020765,
+          0.9507734901090349
+        ],
+        "bonferroni_six_ci": [
+          0.004133606770486353,
+          1.106977504340625
+        ],
+        "cohens_dz": 0.5935725999172715,
+        "nonzero_pairs": 21,
+        "positive_pairs": 16,
+        "negative_pairs": 5,
+        "sign_p": 0.02660369873046875,
+        "signflip_p": 0.007760047912597656,
+        "wilcoxon_p": 0.007801055908203125,
+        "wilcoxon_statistic": 41.5,
+        "holm_p": 0.11887285413251848,
+        "holm_signflip_p": 0.11640071868896484,
+        "holm_wilcoxon_p": 0.12351465225219727,
+        "holm_all_34_p": 0.14264742495902216
+      },
+      {
+        "metric": "clarityAndDistraction",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 4.097222222222222,
+        "mean_b": 4.013888888888889,
+        "mean_difference": 0.08333333333333336,
+        "paired_sd": 1.2520514567067704,
+        "t": 0.32606350823444996,
+        "p": 0.7473245134192276,
+        "ci95": [
+          -0.4453616289917185,
+          0.6120282956583852
+        ],
+        "bonferroni_six_ci": [
+          -0.6543204544875728,
+          0.8209871211542396
+        ],
+        "cohens_dz": 0.06655743490968197,
+        "nonzero_pairs": 22,
+        "positive_pairs": 14,
+        "negative_pairs": 8,
+        "sign_p": 0.28627872467041016,
+        "signflip_p": 0.7887215614318848,
+        "wilcoxon_p": 0.6018118858337402,
+        "wilcoxon_statistic": 110.0,
+        "holm_p": 1.0,
+        "holm_signflip_p": 1.0,
+        "holm_wilcoxon_p": 1.0,
+        "holm_all_34_p": 1.0
+      },
+      {
+        "metric": "stressReduction",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 4.819444444444444,
+        "mean_b": 4.416666666666667,
+        "mean_difference": 0.4027777777777777,
+        "paired_sd": 1.007120382763859,
+        "t": 1.959249464458507,
+        "p": 0.06231391566996213,
+        "ci95": [
+          -0.02249186267505232,
+          0.8280474182306077
+        ],
+        "bonferroni_six_ci": [
+          -0.19057336698383065,
+          0.996128922539386
+        ],
+        "cohens_dz": 0.3999301222287123,
+        "nonzero_pairs": 20,
+        "positive_pairs": 14,
+        "negative_pairs": 6,
+        "sign_p": 0.11531829833984375,
+        "signflip_p": 0.072784423828125,
+        "wilcoxon_p": 0.06942558288574219,
+        "wilcoxon_statistic": 56.5,
+        "holm_p": 0.7477669880395456,
+        "holm_signflip_p": 0.8734130859375,
+        "holm_wilcoxon_p": 0.7636814117431641,
+        "holm_all_34_p": 0.934708735049432
+      },
+      {
+        "metric": "mentalDemand",
+        "a": "constant",
+        "b": "control",
+        "contrast": "constant minus control",
+        "unit": "points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 4.819444444444444,
+        "mean_b": 5.708333333333333,
+        "mean_difference": -0.888888888888889,
+        "paired_sd": 0.8204315270022203,
+        "t": -5.307753649504445,
+        "p": 2.1811584854776074e-05,
+        "ci95": [
+          -1.2353267392945129,
+          -0.542451038483265
+        ],
+        "bonferroni_six_ci": [
+          -1.3722511503191825,
+          -0.4055266274585953
+        ],
+        "cohens_dz": -1.0834406768067597,
+        "nonzero_pairs": 20,
+        "positive_pairs": 2,
+        "negative_pairs": 18,
+        "sign_p": 0.0004024505615234375,
+        "signflip_p": 2.86102294921875e-05,
+        "wilcoxon_p": 2.09808349609375e-05,
+        "wilcoxon_statistic": 5.0,
+        "holm_p": 0.0004798548668050736,
+        "holm_signflip_p": 0.000629425048828125,
+        "holm_wilcoxon_p": 0.000461578369140625,
+        "holm_all_34_p": 0.0005452896213694019
+      },
+      {
+        "metric": "mentalDemand",
+        "a": "adaptive",
+        "b": "control",
+        "contrast": "adaptive minus control",
+        "unit": "points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 4.625,
+        "mean_b": 5.708333333333333,
+        "mean_difference": -1.0833333333333333,
+        "paired_sd": 0.9792533880807524,
+        "t": -5.419667514688821,
+        "p": 1.6571065262744754e-05,
+        "ci95": [
+          -1.4968357739437146,
+          -0.6698308927229519
+        ],
+        "bonferroni_six_ci": [
+          -1.6602664674188892,
+          -0.5064001992477773
+        ],
+        "cohens_dz": -1.1062849988771222,
+        "nonzero_pairs": 22,
+        "positive_pairs": 2,
+        "negative_pairs": 20,
+        "sign_p": 0.00012111663818359375,
+        "signflip_p": 6.198883056640625e-06,
+        "wilcoxon_p": 3.337860107421875e-06,
+        "wilcoxon_statistic": 4.0,
+        "holm_p": 0.00038113450104312934,
+        "holm_signflip_p": 0.00014257431030273438,
+        "holm_wilcoxon_p": 8.0108642578125e-05,
+        "holm_all_34_p": 0.0004308476968313636
+      },
+      {
+        "metric": "mentalDemand",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 4.625,
+        "mean_b": 4.819444444444444,
+        "mean_difference": -0.19444444444444442,
+        "paired_sd": 1.2075313847219735,
+        "t": -0.7888650816599733,
+        "p": 0.43824731341873313,
+        "ci95": [
+          -0.7043402291042102,
+          0.3154513402153214
+        ],
+        "bonferroni_six_ci": [
+          -0.9058689590531905,
+          0.5169800701643017
+        ],
+        "cohens_dz": -0.1610264104971599,
+        "nonzero_pairs": 22,
+        "positive_pairs": 11,
+        "negative_pairs": 11,
+        "sign_p": 1.0,
+        "signflip_p": 0.47060060501098633,
+        "wilcoxon_p": 0.5373916625976562,
+        "wilcoxon_statistic": 107.0,
+        "holm_p": 1.0,
+        "holm_signflip_p": 1.0,
+        "holm_wilcoxon_p": 1.0,
+        "holm_all_34_p": 1.0
+      },
+      {
+        "metric": "physicalDemand",
+        "a": "constant",
+        "b": "control",
+        "contrast": "constant minus control",
+        "unit": "points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 3.2777777777777772,
+        "mean_b": 3.652777777777778,
+        "mean_difference": -0.375,
+        "paired_sd": 0.7759208336529045,
+        "t": -2.367660755335754,
+        "p": 0.026689329878280214,
+        "ci95": [
+          -0.7026426329907779,
+          -0.04735736700922211
+        ],
+        "bonferroni_six_ci": [
+          -0.8321385136986961,
+          0.08213851369869601
+        ],
+        "cohens_dz": -0.48329672788210004,
+        "nonzero_pairs": 16,
+        "positive_pairs": 5,
+        "negative_pairs": 11,
+        "sign_p": 0.210113525390625,
+        "signflip_p": 0.02850341796875,
+        "wilcoxon_p": 0.02392578125,
+        "wilcoxon_statistic": 25.0,
+        "holm_p": 0.373650618295923,
+        "holm_signflip_p": 0.3990478515625,
+        "holm_wilcoxon_p": 0.3349609375,
+        "holm_all_34_p": 0.45371860793076363
+      },
+      {
+        "metric": "physicalDemand",
+        "a": "adaptive",
+        "b": "control",
+        "contrast": "adaptive minus control",
+        "unit": "points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 3.055555555555556,
+        "mean_b": 3.652777777777778,
+        "mean_difference": -0.5972222222222222,
+        "paired_sd": 1.2548617209909516,
+        "t": -2.3315552351701028,
+        "p": 0.028845555464162606,
+        "ci95": [
+          -1.1271038550805734,
+          -0.06734058936387088
+        ],
+        "bonferroni_six_ci": [
+          -1.3365316944664,
+          0.14208725002195566
+        ],
+        "cohens_dz": -0.4759267194401323,
+        "nonzero_pairs": 16,
+        "positive_pairs": 4,
+        "negative_pairs": 12,
+        "sign_p": 0.076812744140625,
+        "signflip_p": 0.03204345703125,
+        "wilcoxon_p": 0.033355712890625,
+        "wilcoxon_statistic": 27.5,
+        "holm_p": 0.3749922210341139,
+        "holm_signflip_p": 0.41656494140625,
+        "holm_wilcoxon_p": 0.433624267578125,
+        "holm_all_34_p": 0.4615288874266017
+      },
+      {
+        "metric": "physicalDemand",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 3.055555555555556,
+        "mean_b": 3.2777777777777772,
+        "mean_difference": -0.22222222222222218,
+        "paired_sd": 1.09750118755415,
+        "t": -0.991946177598027,
+        "p": 0.3315455335065567,
+        "ci95": [
+          -0.685656329420848,
+          0.24121188497640364
+        ],
+        "bonferroni_six_ci": [
+          -0.8688217719457314,
+          0.424377327501287
+        ],
+        "cohens_dz": -0.202480165618279,
+        "nonzero_pairs": 19,
+        "positive_pairs": 7,
+        "negative_pairs": 12,
+        "sign_p": 0.359283447265625,
+        "signflip_p": 0.3613853454589844,
+        "wilcoxon_p": 0.37888336181640625,
+        "wilcoxon_statistic": 72.5,
+        "holm_p": 1.0,
+        "holm_signflip_p": 1.0,
+        "holm_wilcoxon_p": 1.0,
+        "holm_all_34_p": 1.0
+      },
+      {
+        "metric": "temporalDemand",
+        "a": "constant",
+        "b": "control",
+        "contrast": "constant minus control",
+        "unit": "points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 3.625,
+        "mean_b": 3.9166666666666665,
+        "mean_difference": -0.29166666666666663,
+        "paired_sd": 0.8242255917447339,
+        "t": -1.7335897246272927,
+        "p": 0.09637822609332763,
+        "ci95": [
+          -0.6397066101055737,
+          0.05637327677224052
+        ],
+        "bonferroni_six_ci": [
+          -0.777264224588619,
+          0.19393089125528573
+        ],
+        "cohens_dz": -0.3538675207224056,
+        "nonzero_pairs": 19,
+        "positive_pairs": 7,
+        "negative_pairs": 12,
+        "sign_p": 0.359283447265625,
+        "signflip_p": 0.11387252807617188,
+        "wilcoxon_p": 0.09812545776367188,
+        "wilcoxon_statistic": 53.5,
+        "holm_p": 0.997035319510571,
+        "holm_signflip_p": 1.0,
+        "holm_wilcoxon_p": 0.9812545776367188,
+        "holm_all_34_p": 1.0
+      },
+      {
+        "metric": "temporalDemand",
+        "a": "adaptive",
+        "b": "control",
+        "contrast": "adaptive minus control",
+        "unit": "points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 3.5555555555555554,
+        "mean_b": 3.9166666666666665,
+        "mean_difference": -0.36111111111111116,
+        "paired_sd": 1.128962871781669,
+        "t": -1.5669921213188749,
+        "p": 0.1307728652665889,
+        "ci95": [
+          -0.8378303224228713,
+          0.11560810020064893
+        ],
+        "bonferroni_six_ci": [
+          -1.0262465048826737,
+          0.30402428266045134
+        ],
+        "cohens_dz": -0.3198609273493865,
+        "nonzero_pairs": 21,
+        "positive_pairs": 9,
+        "negative_pairs": 12,
+        "sign_p": 0.6636238098144531,
+        "signflip_p": 0.1474752426147461,
+        "wilcoxon_p": 0.20361614227294922,
+        "wilcoxon_statistic": 78.5,
+        "holm_p": 1.0,
+        "holm_signflip_p": 1.0,
+        "holm_wilcoxon_p": 1.0,
+        "holm_all_34_p": 1.0
+      },
+      {
+        "metric": "temporalDemand",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 3.5555555555555554,
+        "mean_b": 3.625,
+        "mean_difference": -0.06944444444444449,
+        "paired_sd": 1.3934947783405864,
+        "t": -0.24413934950299146,
+        "p": 0.8092875876627633,
+        "ci95": [
+          -0.6578656833548158,
+          0.5189767944659267
+        ],
+        "bonferroni_six_ci": [
+          -0.8904304319175815,
+          0.7515415430286925
+        ],
+        "cohens_dz": -0.049834736034777914,
+        "nonzero_pairs": 21,
+        "positive_pairs": 12,
+        "negative_pairs": 9,
+        "sign_p": 0.6636238098144531,
+        "signflip_p": 0.8464527130126953,
+        "wilcoxon_p": 0.9911537170410156,
+        "wilcoxon_statistic": 115.0,
+        "holm_p": 1.0,
+        "holm_signflip_p": 1.0,
+        "holm_wilcoxon_p": 1.0,
+        "holm_all_34_p": 1.0
+      },
+      {
+        "metric": "performance",
+        "a": "constant",
+        "b": "control",
+        "contrast": "constant minus control",
+        "unit": "points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 4.541666666666667,
+        "mean_b": 2.9305555555555554,
+        "mean_difference": 1.611111111111111,
+        "paired_sd": 1.3175393060043201,
+        "t": 5.990561531130117,
+        "p": 4.149686913479122e-06,
+        "ci95": [
+          1.054763055271688,
+          2.167459166950534
+        ],
+        "bonferroni_six_ci": [
+          0.8348747555915549,
+          2.387347466630667
+        ],
+        "cohens_dz": 1.2228182520012258,
+        "nonzero_pairs": 21,
+        "positive_pairs": 19,
+        "negative_pairs": 2,
+        "sign_p": 0.00022125244140625,
+        "signflip_p": 5.7220458984375e-06,
+        "wilcoxon_p": 3.814697265625e-06,
+        "wilcoxon_statistic": 3.0,
+        "holm_p": 9.959248592349894e-05,
+        "holm_signflip_p": 0.0001373291015625,
+        "holm_wilcoxon_p": 8.7738037109375e-05,
+        "holm_all_34_p": 0.00011619123357741542
+      },
+      {
+        "metric": "performance",
+        "a": "adaptive",
+        "b": "control",
+        "contrast": "adaptive minus control",
+        "unit": "points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 4.944444444444444,
+        "mean_b": 2.9305555555555554,
+        "mean_difference": 2.013888888888889,
+        "paired_sd": 1.405576082033005,
+        "t": 7.019186281689319,
+        "p": 3.7469716187910486e-07,
+        "ci95": [
+          1.4203661628421174,
+          2.6074116149356605
+        ],
+        "bonferroni_six_ci": [
+          1.1857851273156617,
+          2.841992650462116
+        ],
+        "cohens_dz": 1.4327853999735318,
+        "nonzero_pairs": 24,
+        "positive_pairs": 23,
+        "negative_pairs": 1,
+        "sign_p": 2.9802322387695312e-06,
+        "signflip_p": 1.5497207641601562e-06,
+        "wilcoxon_p": 1.5497207641601562e-06,
+        "wilcoxon_statistic": 6.0,
+        "holm_p": 9.367429046977622e-06,
+        "holm_signflip_p": 3.8743019104003906e-05,
+        "holm_wilcoxon_p": 3.8743019104003906e-05,
+        "holm_all_34_p": 1.1615612018252251e-05
+      },
+      {
+        "metric": "performance",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 4.944444444444444,
+        "mean_b": 4.541666666666667,
+        "mean_difference": 0.4027777777777777,
+        "paired_sd": 1.3725365870423005,
+        "t": 1.4376302163481234,
+        "p": 0.16400613950456103,
+        "ci95": [
+          -0.1767935931024145,
+          0.9823491486579699
+        ],
+        "bonferroni_six_ci": [
+          -0.4058605628680323,
+          1.2114161184235877
+        ],
+        "cohens_dz": 0.29345503907165743,
+        "nonzero_pairs": 23,
+        "positive_pairs": 14,
+        "negative_pairs": 9,
+        "sign_p": 0.4048728942871094,
+        "signflip_p": 0.17801308631896973,
+        "wilcoxon_p": 0.1855180263519287,
+        "wilcoxon_statistic": 94.0,
+        "holm_p": 1.0,
+        "holm_signflip_p": 1.0,
+        "holm_wilcoxon_p": 1.0,
+        "holm_all_34_p": 1.0
+      },
+      {
+        "metric": "effort",
+        "a": "constant",
+        "b": "control",
+        "contrast": "constant minus control",
+        "unit": "points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 4.708333333333333,
+        "mean_b": 5.4444444444444455,
+        "mean_difference": -0.7361111111111112,
+        "paired_sd": 0.816373308249296,
+        "t": -4.417333585004432,
+        "p": 0.0001989407050264849,
+        "ci95": [
+          -1.080835326027402,
+          -0.3913868961948205
+        ],
+        "bonferroni_six_ci": [
+          -1.2170824480958757,
+          -0.2551397741263466
+        ],
+        "cohens_dz": -0.9016844422433332,
+        "nonzero_pairs": 21,
+        "positive_pairs": 3,
+        "negative_pairs": 18,
+        "sign_p": 0.0014896392822265625,
+        "signflip_p": 0.0004520416259765625,
+        "wilcoxon_p": 0.000453948974609375,
+        "wilcoxon_statistic": 22.0,
+        "holm_p": 0.003978814100529698,
+        "holm_signflip_p": 0.008588790893554688,
+        "holm_wilcoxon_p": 0.00817108154296875,
+        "holm_all_34_p": 0.004575636215609153
+      },
+      {
+        "metric": "effort",
+        "a": "adaptive",
+        "b": "control",
+        "contrast": "adaptive minus control",
+        "unit": "points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 4.777777777777778,
+        "mean_b": 5.4444444444444455,
+        "mean_difference": -0.6666666666666666,
+        "paired_sd": 1.040252663473992,
+        "t": -3.139608710833701,
+        "p": 0.004594661609490601,
+        "ci95": [
+          -1.105926842259211,
+          -0.2274064910741222
+        ],
+        "bonferroni_six_ci": [
+          -1.2795378976308494,
+          -0.05379543570248391
+        ],
+        "cohens_dz": -0.6408699444616557,
+        "nonzero_pairs": 23,
+        "positive_pairs": 5,
+        "negative_pairs": 18,
+        "sign_p": 0.010622024536132812,
+        "signflip_p": 0.0061604976654052734,
+        "wilcoxon_p": 0.007265567779541016,
+        "wilcoxon_statistic": 52.5,
+        "holm_p": 0.07810924736134021,
+        "holm_signflip_p": 0.09889602661132812,
+        "holm_wilcoxon_p": 0.12351465225219727,
+        "holm_all_34_p": 0.09189323218981202
+      },
+      {
+        "metric": "effort",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 4.777777777777778,
+        "mean_b": 4.708333333333333,
+        "mean_difference": 0.0694444444444444,
+        "paired_sd": 0.8104341692408509,
+        "t": 0.4197835205277241,
+        "p": 0.6785389958087253,
+        "ci95": [
+          -0.2727718920156587,
+          0.41166078090454755
+        ],
+        "bonferroni_six_ci": [
+          -0.4080278124006766,
+          0.5469167012895654
+        ],
+        "cohens_dz": 0.08568795231017264,
+        "nonzero_pairs": 19,
+        "positive_pairs": 10,
+        "negative_pairs": 9,
+        "sign_p": 1.0,
+        "signflip_p": 0.7385635375976562,
+        "wilcoxon_p": 0.6566886901855469,
+        "wilcoxon_statistic": 83.0,
+        "holm_p": 1.0,
+        "holm_signflip_p": 1.0,
+        "holm_wilcoxon_p": 1.0,
+        "holm_all_34_p": 1.0
+      },
+      {
+        "metric": "frustration",
+        "a": "constant",
+        "b": "control",
+        "contrast": "constant minus control",
+        "unit": "points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 3.930555555555556,
+        "mean_b": 4.694444444444444,
+        "mean_difference": -0.7638888888888888,
+        "paired_sd": 1.2177399144295333,
+        "t": -3.0731324083040046,
+        "p": 0.005378975944296895,
+        "ci95": [
+          -1.2780953575866163,
+          -0.24968242019116138
+        ],
+        "bonferroni_six_ci": [
+          -1.4813278213288883,
+          -0.046449956448889496
+        ],
+        "cohens_dz": -0.6273005260296021,
+        "nonzero_pairs": 19,
+        "positive_pairs": 4,
+        "negative_pairs": 15,
+        "sign_p": 0.0192108154296875,
+        "signflip_p": 0.005817413330078125,
+        "wilcoxon_p": 0.00760650634765625,
+        "wilcoxon_statistic": 31.0,
+        "holm_p": 0.08606361510875032,
+        "holm_signflip_p": 0.09889602661132812,
+        "holm_wilcoxon_p": 0.12351465225219727,
+        "holm_all_34_p": 0.102200542941641
+      },
+      {
+        "metric": "frustration",
+        "a": "adaptive",
+        "b": "control",
+        "contrast": "adaptive minus control",
+        "unit": "points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 3.5138888888888893,
+        "mean_b": 4.694444444444444,
+        "mean_difference": -1.1805555555555554,
+        "paired_sd": 1.2236761225169164,
+        "t": -4.726346573096679,
+        "p": 9.207340459462878e-05,
+        "ci95": [
+          -1.6972686650900481,
+          -0.6638424460210626
+        ],
+        "bonferroni_six_ci": [
+          -1.901491841365095,
+          -0.45961926974601575
+        ],
+        "cohens_dz": -0.9647614543032281,
+        "nonzero_pairs": 24,
+        "positive_pairs": 4,
+        "negative_pairs": 20,
+        "sign_p": 0.001543879508972168,
+        "signflip_p": 0.0002416372299194336,
+        "wilcoxon_p": 0.0002429485321044922,
+        "wilcoxon_statistic": 30.5,
+        "holm_p": 0.0019335414964872044,
+        "holm_signflip_p": 0.004832744598388672,
+        "holm_wilcoxon_p": 0.004858970642089844,
+        "holm_all_34_p": 0.002209761710271091
+      },
+      {
+        "metric": "frustration",
+        "a": "adaptive",
+        "b": "constant",
+        "contrast": "adaptive minus constant",
+        "unit": "points",
+        "n": 24,
+        "df": 23,
+        "mean_a": 3.5138888888888893,
+        "mean_b": 3.930555555555556,
+        "mean_difference": -0.4166666666666667,
+        "paired_sd": 1.1557459895109008,
+        "t": -1.766167887100475,
+        "p": 0.090639574500961,
+        "ci95": [
+          -0.9046953967230065,
+          0.07136206338967316
+        ],
+        "bonferroni_six_ci": [
+          -1.0975814983653145,
+          0.26424816503198106
+        ],
+        "cohens_dz": -0.3605175102904709,
+        "nonzero_pairs": 22,
+        "positive_pairs": 6,
+        "negative_pairs": 16,
+        "sign_p": 0.052478790283203125,
+        "signflip_p": 0.10231304168701172,
+        "wilcoxon_p": 0.10673809051513672,
+        "wilcoxon_statistic": 76.5,
+        "holm_p": 0.997035319510571,
+        "holm_signflip_p": 1.0,
+        "holm_wilcoxon_p": 0.9812545776367188,
+        "holm_all_34_p": 1.0
+      }
+    ]
+  },
+  "friedman": {
+    "correctPieces": {
+      "n": 24,
+      "statistic": 30.731182795698906,
+      "p": 2.122308164184201e-07,
+      "method": "Friedman chi-square approximation; exploratory, unadjusted"
+    },
+    "success": {
+      "n": 24,
+      "statistic": 28.0845070422535,
+      "p": 7.971256466154883e-07,
+      "method": "Friedman chi-square approximation; exploratory, unadjusted"
+    },
+    "tlx100": {
+      "n": 24,
+      "statistic": 26.872340425531917,
+      "p": 1.4613203044659467e-06,
+      "method": "Friedman chi-square approximation; exploratory, unadjusted"
+    },
+    "frustration": {
+      "n": 24,
+      "statistic": 15.797752808988744,
+      "p": 0.0003711603403482803,
+      "method": "Friedman chi-square approximation; exploratory, unadjusted"
+    }
+  },
+  "limitations": [
+    "All tests exploratory; endpoint families selected after viewing prior results, not preregistered.",
+    "Each participant contributes one three-round mean per condition; 216 rows are not 216 independent people.",
+    "Participant paired comparisons do not adjust for puzzle, order, device, or period effects.",
+    "Researcher confirms correct pieces were noted and photographed, taking the maximum across admissible orientations. Per-row source/reference fields remain blank; photographs have not been independently audited and scorer reliability is unavailable.",
+    "Primary completion includes all24: P101 previously inferred outcomes confirmed by researcher with P101; P111 missing outcomes researcher-confirmed. Raw binary export fields retained, confirmation is an overlay. Earlier n23 analysis is a sensitivity.",
+    "Completion and piece counts share the scoring source; some solved rounds received seven by instruction, so they are not independent evidence.",
+    "Primary ratings now include all24 at researcher request. P111 R6\u20139 remain retrospective in source provenance; main analysis is all-available ratings, not an all-immediate cohort. Original23-person immediate-rating core/secondary families remain sensitivities. R6\u20139 durations 215/200/280/300 seconds are researcher-confirmed overlays, not imputed timestamps; pause adjustment not separately documented. Duration n24, sensitivity excludes P111 (n23).",
+    "Third-laptop future-dated timestamps remain uncorrected; sessions confirmed actual by researcher.",
+    "Adapted unweighted 1\u20137 TLX is not the original weighted NASA-TLX; confidence intervals are pointwise, not simultaneous.",
+    "College-recruited sample, exported ages 20\u201327: mostly undergraduates, also faculty and graduate students/researchers; exact role counts unavailable.",
+    "Experimental gender totals researcher-confirmed as 14 men/10 women, superseding export-coded 18/six only in aggregate reporting. Individual fields not recoded; no gender-subgroup conclusions."
+  ],
+  "cohortSizes": {
+    "pieceCounts": 24,
+    "primaryConfirmedCompletion": 24,
+    "previousRecordedCompletionSensitivity": 23,
+    "availableRatings": 24,
+    "previousImmediateRatingsSensitivity": 23,
+    "duration": 24
+  },
+  "countCorrectionCount": 9,
+  "originalCountConflictCount": 9,
+  "publicExportPolicy": "Aggregate statistics only; participant means, individual difference vectors, count corrections, duration overlays and raw inputs withheld from the public dataset. Source-method provenance is documented separately."
+}

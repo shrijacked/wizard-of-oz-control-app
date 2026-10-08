@@ -1,5 +1,13 @@
 # Paper versions and collaborator handoff
 
+## Current version — 8 October 2026
+
+Use [main.tex](main.tex), [main.pdf](main.pdf), the [source ZIP](../../output/packages/aamas2027-refreshed-source.zip), and the [current README](README.md). The completed primary round-level sample is24 participants/216 rounds, with15 final surveys and50 formative responses. Current figures, statistics, source verification and all changes are recorded in [the October8 refresh](revisions/2026-10-08-refresh/CHANGELOG.md). The PDF has nine pages, seven figures and three tables. Figures6/7 are constant–adaptive bar comparisons; Figure5 is unchanged.
+
+The remaining notes below describe the October7 versions. Their “current”, planned-sample,12-person and pending-results language is historical and does not describe the refreshed manuscript. `manuscript.md` is an archived readable draft, not the current source.
+
+## Historical handoffs — 7 October 2026
+
 Current methods/findings revision: [change log](revisions/2026-10-07-methods-findings/CHANGELOG.md), [highlighted review](revisions/2026-10-07-methods-findings/highlighted-review.html), [frozen pre-change source](revisions/2026-10-07-methods-findings/before/main.tex), [full p-value audit](analysis/ALL_OUTCOMES.md), and [current structure](structure-review.md). §3 is the formative assessment; §4 combines the system and experimental method; §5 contains findings only. Twenty downloaded-PDF-verified references now support 31 source mentions and 49 anchors. Statistics use the observed 12 matched participants, not fabricated N=24 data. All numerical results remain provisional in this internal documentation and must be refreshed from the final export. The original abstract, anonymous format and submission ID 2613 are unchanged.
 
 7 October 2026. Branch: writing. This publishing commit keeps the current draft, old source/PDF snapshots and cumulative highlighted review together. Find the publishing commit with `git log -- paper/aamas2027/VERSIONS.md`. Historical publishing notes below describe their own earlier revisions. The latest methods/findings revision changes the manuscript and preserves a new baseline.

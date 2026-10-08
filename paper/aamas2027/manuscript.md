@@ -1,4 +1,8 @@
-# When to Intervene: Trade-offs Between Constant and Physiology-Triggered Robotic Assistance
+# Historical readable draft — superseded 8 October 2026
+
+This file preserves the earlier manuscript and is not synchronized with the refreshed paper. Use [current main.tex](main.tex), [current PDF](main.pdf), and [README](README.md). The planned-sample/unfinished-results language and numerical claims below are historical; the current primary sample is24 completed participants.
+
+## Earlier title: When to Intervene: Trade-offs Between Constant and Physiology-Triggered Robotic Assistance
 
 Anonymous Author(s)
 

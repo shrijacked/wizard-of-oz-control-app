@@ -1,0 +1,556 @@
+[
+  {
+    "key": "andriella2025",
+    "url": "https://link.springer.com/content/pdf/10.1007/s11257-024-09421-1.pdf",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 2485532,
+    "pages": 43,
+    "sha256": "5a206e982bd9a40f18fe6cb998eb8c5d0eb0fede84f6fd728c010d93403de127",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section andriella2025)",
+    "manuscriptCitationLines": [
+      52,
+      66
+    ]
+  },
+  {
+    "key": "caiazzo2024",
+    "url": "https://scidar.kg.ac.rs/bitstream/123456789/21811/1/comparative-analysis-of-mental-workload-in-adaptive-human-robot-collaboration-during-assembly-tasks.pdf",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 1909673,
+    "pages": 11,
+    "sha256": "d1ad3433c37b87ce42e92953c1640c8490255ac54c3dbb37a8a444f839417cf1",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section caiazzo2024)",
+    "manuscriptCitationLines": [
+      88
+    ]
+  },
+  {
+    "key": "capponi2024",
+    "url": "https://www.qualityengineering.polito.it/content/download/1126/6184/file/Assembly%20complexity%20and%20physiological%20response%20in%20human-robot%20collaboration%20_%20Insights%20from%20a%20preliminary%20experimental%20analysis.pdf",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 8977281,
+    "pages": 16,
+    "sha256": "7bf33accbe162d3afff2cfb325582ce678d056a14e535875db495a621a5a66c1",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section capponi2024)",
+    "manuscriptCitationLines": [
+      84
+    ]
+  },
+  {
+    "key": "delazzari2025",
+    "url": "https://www.merl.com/publications/docs/TR2025-064.pdf",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 2490659,
+    "pages": 9,
+    "sha256": "9f82f2e2a06512a28721e1f180a5ba10432c76cb2232f530bfa2552e3b395626",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section delazzari2025)",
+    "manuscriptCitationLines": [
+      52,
+      66,
+      313
+    ]
+  },
+  {
+    "key": "hart2006",
+    "url": "https://www.nasa.gov/wp-content/uploads/2026/01/hfes-2006-paper.pdf",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 130125,
+    "pages": 5,
+    "sha256": "0797a7647a2a9edc6fae2a9f7d0b6844f80239dd779e1055e2a71ed13520bbcb",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section hart2006)",
+    "manuscriptCitationLines": [
+      100
+    ]
+  },
+  {
+    "key": "hostettler2025",
+    "url": "https://alexandria.unisg.ch/bitstreams/b9548afd-a853-40ed-9141-7bb837ce1f77/download",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 10491578,
+    "pages": 16,
+    "sha256": "a797f374461b6cd6bf393fd3d70c08a4160c7195716f76b53faf96f249a302f1",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section hostettler2025)",
+    "manuscriptCitationLines": [
+      76
+    ]
+  },
+  {
+    "key": "karbouj2026",
+    "url": "https://publica-rest.fraunhofer.de/server/api/core/bitstreams/e60c03db-8192-404a-a885-43c61307f554/content",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Previously downloaded original-source cache, recovered with SHA256 matched to old public-download provenance; fresh URL fetch failed (TLS certificate for Karbouj, non-PDF response for Yang).",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 5481715,
+    "pages": 25,
+    "sha256": "1be2b373a6284c3882787ca2e8866a6d013eac3ac52522fcb3e8f330cb60ff1f",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section karbouj2026)",
+    "manuscriptCitationLines": [
+      52,
+      66
+    ]
+  },
+  {
+    "key": "korivand2024",
+    "url": "https://mdpi-res.com/d_attachment/sensors/sensors-24-02817/article_deploy/sensors-24-02817.pdf",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 8438268,
+    "pages": 21,
+    "sha256": "bf037163b4237a6767b83e2f3ae849df806cf78bd9fcb33dc5c01463ede5c5ac",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section korivand2024)",
+    "manuscriptCitationLines": [
+      76
+    ]
+  },
+  {
+    "key": "melo2026",
+    "url": "https://www.jstage.jst.go.jp/article/ijabc/2026/1/2026_147/_pdf",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 494032,
+    "pages": 20,
+    "sha256": "5b69b42bfc1ab01cdb69d55dc377a2b3eabad142685c61c5ff55f69a07103774",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section melo2026)",
+    "manuscriptCitationLines": [
+      54,
+      88
+    ]
+  },
+  {
+    "key": "ojstersek2024",
+    "url": "https://mdpi-res.com/d_attachment/machines/machines-12-00546/article_deploy/machines-12-00546.pdf",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 5363293,
+    "pages": 16,
+    "sha256": "42cf6546c0888db4c975c08a3fd98472db60c755a3d235a90e330f246987a254",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section ojstersek2024)",
+    "manuscriptCitationLines": [
+      76
+    ]
+  },
+  {
+    "key": "pereira2025",
+    "url": "https://mdpi-res.com/d_attachment/applsci/applsci-15-03317/article_deploy/applsci-15-03317.pdf",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 1443566,
+    "pages": 26,
+    "sha256": "40c2fea287bf724e4dacbcfd03096cc0d4dcfd9c2c448a5535483544928f7633",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section pereira2025)",
+    "manuscriptCitationLines": [
+      84
+    ]
+  },
+  {
+    "key": "tabatabaei2025",
+    "url": "https://arxiv.org/pdf/2502.16899v1",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 1967808,
+    "pages": 11,
+    "sha256": "fae5c6acd3e1f7a5ea97f8cfe11ff2edbe5e9c8145a7112f900e922128deabad",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section tabatabaei2025)",
+    "manuscriptCitationLines": [
+      54,
+      88
+    ]
+  },
+  {
+    "key": "teo2018",
+    "url": "https://sciences.ucf.edu/psychology/perl/wp-content/uploads/sites/29/2019/08/Enhancing-the-effectiveness-of-human-robot-teaming-with-a-closed-loop-system..pdf",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 1799292,
+    "pages": 13,
+    "sha256": "10f208bb988e4c04ff649dfb609b77fc08622c804406d29830fbdc57075bd726",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section teo2018)",
+    "manuscriptCitationLines": [
+      74
+    ]
+  },
+  {
+    "key": "thunberg2026",
+    "url": "https://repositum.tuwien.at/bitstream/20.500.12708/227993/1/Thunberg-2026-Unpacking%20Lived%20Experiences%20of%20Wizards%20of%20Oz-vor.pdf",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 6275770,
+    "pages": 3,
+    "sha256": "b9938463ba167c2612cec07061ff1f8b35d4fbfec783ef1891ed7025d3a4adb5",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section thunberg2026)",
+    "manuscriptCitationLines": [
+      104
+    ]
+  },
+  {
+    "key": "yang2024",
+    "url": "https://scholarworks.indianapolis.iu.edu/bitstreams/5eb42ad8-e6eb-4495-9c1d-f520e3877a06/download",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Previously downloaded original-source cache, recovered with SHA256 matched to old public-download provenance; fresh URL fetch failed (TLS certificate for Karbouj, non-PDF response for Yang).",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 1912832,
+    "pages": 32,
+    "sha256": "f6d37101df4cb79a3e5551f7db8739184d87ed581d3b4be2f6582cd4fb31186a",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section yang2024)",
+    "manuscriptCitationLines": [
+      52,
+      74
+    ]
+  },
+  {
+    "key": "quigley2024",
+    "url": "https://knowledge.uchicago.edu/records/fnp5p-m0q24/files/Publication-guidelines-for-human-heart-rate-and-heart-rate-variability-studies-in-psychophysiology.pdf?download=1",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 7682617,
+    "pages": 63,
+    "sha256": "de52a210ed198f1a14b069b052fee813cc313b1fe87bf526ebd447ed5d57a27e",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section quigley2024)",
+    "manuscriptCitationLines": [
+      84,
+      313
+    ]
+  },
+  {
+    "key": "shukla2026",
+    "url": "https://arxiv.org/pdf/2601.20402v1",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 12261742,
+    "pages": 17,
+    "sha256": "688c0e9037f80b1723d3a1ba2e77db59d50e289fcee002fa438caa87c726b263",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section shukla2026)",
+    "manuscriptCitationLines": [
+      78
+    ]
+  },
+  {
+    "key": "smit2024",
+    "url": "https://arxiv.org/pdf/2404.08006v1",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 1819765,
+    "pages": 38,
+    "sha256": "ce8836a4336b385262089d53110470ebaa6f1c47a1fc48a213ac39c16d07c563",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section smit2024)",
+    "manuscriptCitationLines": [
+      96,
+      317
+    ]
+  },
+  {
+    "key": "wei2025",
+    "url": "https://www.frontiersin.org/journals/human-neuroscience/articles/10.3389/fnhum.2025.1611524/pdf",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 3693985,
+    "pages": 9,
+    "sha256": "d26df27fd47600204c820ba9480a9089bd6bca8e8543130b84eb6d27cdee591f",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section wei2025)",
+    "manuscriptCitationLines": [
+      78
+    ]
+  },
+  {
+    "key": "zhao2025",
+    "url": "https://arxiv.org/pdf/2505.11818v1",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 1358170,
+    "pages": 7,
+    "sha256": "7a83713f30c553b28b687a26a6aa719168a926fad1726329cc79664e9740bcbd",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section zhao2025)",
+    "manuscriptCitationLines": [
+      88,
+      317
+    ]
+  },
+  {
+    "key": "ramnauth2026",
+    "url": "https://scazlab.yale.edu/sites/default/files/files/ramnauth-thri3797264.pdf",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 73862187,
+    "pages": 32,
+    "sha256": "096f7d5f6cb49c67865ce5dd39663373ffe53bc60c6ca565e02f3adc47f8ddf1",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section ramnauth2026)",
+    "manuscriptCitationLines": [
+      66
+    ]
+  },
+  {
+    "key": "lavitnicora2024",
+    "url": "https://www.frontiersin.org/journals/robotics-and-ai/articles/10.3389/frobt.2024.1394379/pdf",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 25562710,
+    "pages": 12,
+    "sha256": "3462019f1b6c4f76750e0072d36c1a627b5eaefa31968769e2f5fb6be181a9ec",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section lavitnicora2024)",
+    "manuscriptCitationLines": [
+      68
+    ]
+  },
+  {
+    "key": "tanneberg2024",
+    "url": "https://arxiv.org/pdf/2403.12533",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 4602049,
+    "pages": 8,
+    "sha256": "d0e7f6c2f3e8431b27488f94edaed4ff3be0ada4a614e336422a611b500431f8",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section tanneberg2024)",
+    "manuscriptCitationLines": [
+      68
+    ]
+  },
+  {
+    "key": "andriella2025mentalising",
+    "url": "https://link.springer.com/content/pdf/10.1007/s12369-025-01280-z.pdf",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 3769158,
+    "pages": 17,
+    "sha256": "682fd3b475cf4705f8f6a901cea756240776f23044b03d1c258bc1673362c774",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section andriella2025mentalising)",
+    "manuscriptCitationLines": [
+      68
+    ]
+  },
+  {
+    "key": "vitry2026",
+    "url": "https://arxiv.org/pdf/2606.28469v2",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 6150252,
+    "pages": 8,
+    "sha256": "d2b4cde101c469ebb2b9dc75e297a1f8230bcb0f936042eeccf1cdd4428f6670",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section vitry2026)",
+    "manuscriptCitationLines": [
+      70
+    ]
+  },
+  {
+    "key": "prajod2024",
+    "url": "https://www.frontiersin.org/journals/robotics-and-ai/articles/10.3389/frobt.2024.1393795/pdf",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 25297402,
+    "pages": 13,
+    "sha256": "50354b6cb1164a6847d6069f8c69aa38c5bfb778aa9d6093f718cbc58140c58b",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section prajod2024)",
+    "manuscriptCitationLines": [
+      80
+    ]
+  },
+  {
+    "key": "cavicchi2025",
+    "url": "https://link.springer.com/content/pdf/10.1186/s41235-025-00616-7.pdf",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 1403911,
+    "pages": 16,
+    "sha256": "96c15c6bbf61adc162f3c2dbe14feb40d452362e15d0a6ac48d7b81de1f152a4",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section cavicchi2025)",
+    "manuscriptCitationLines": [
+      90
+    ]
+  },
+  {
+    "key": "vandijk2023",
+    "url": "https://www.frontiersin.org/journals/robotics-and-ai/articles/10.3389/frobt.2023.1244656/pdf",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 21904917,
+    "pages": 9,
+    "sha256": "4aa2af9330a5d4f6029b48847b043fd0a554ec3c03ae4219ac5ab4efbd0053e9",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section vandijk2023)",
+    "manuscriptCitationLines": [
+      92
+    ]
+  },
+  {
+    "key": "varrasi2026",
+    "url": "https://shura.shu.ac.uk/37555/1/Human%20and%20Robot%20Assistance%20for%20Cognitive%20Load%20in%20Younger%20and%20Older%20Adults%20Multimodal%20Within-Subject%20Experimental%20Study.pdf",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 1933055,
+    "pages": 18,
+    "sha256": "76fbb611493cef92ce28974d816c886dc2e9fed023fedd5828570651e58b5446",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section varrasi2026)",
+    "manuscriptCitationLines": [
+      94
+    ]
+  },
+  {
+    "key": "bejarano2024",
+    "url": "https://mirrorlab.mines.edu/publications/bejarano2024roman/bejarano2024roman___wozinterface/",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 128248,
+    "pages": 8,
+    "sha256": "4b43e592c717bc6d2a4381618c6c45e9bda1167948d06ec9ffffd9917030341a",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section bejarano2024)",
+    "manuscriptCitationLines": [
+      106
+    ]
+  },
+  {
+    "key": "candon2023",
+    "url": "https://interactive-machines.com/assets/papers/candon2023soliciting.pdf",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 5297127,
+    "pages": 11,
+    "sha256": "18fea7a5a54afdb1d746787f6bb88e53cc6659a59b7b4333101fced235db5fc8",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section candon2023)",
+    "manuscriptCitationLines": [
+      70
+    ]
+  },
+  {
+    "key": "cao2025",
+    "url": "https://www.roboticsproceedings.org/rss21/p089.pdf",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 4245610,
+    "pages": 10,
+    "sha256": "52fbf400e662655680a5eedb0ef0cf30030aef534ab71e2730976e6105b87ae3",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section cao2025)",
+    "manuscriptCitationLines": [
+      70
+    ]
+  },
+  {
+    "key": "bhagatsmith2026",
+    "url": "https://www.frontiersin.org/journals/robotics-and-ai/articles/10.3389/frobt.2026.1872363/pdf",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 1884920,
+    "pages": 17,
+    "sha256": "a61d6ad37c67459fb52ed9e7e2ebca3b8e07a67eb3b72a301a9659371b874a98",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section bhagatsmith2026)",
+    "manuscriptCitationLines": [
+      82
+    ]
+  },
+  {
+    "key": "tanjim2025",
+    "url": "https://arxiv.org/pdf/2506.08892v3",
+    "reviewStatus": "Complete: actual-PDF claim-level review",
+    "retrieval": "Existing exact downloaded PDF re-opened and re-extracted in full-source audit",
+    "downloadStatus": "Downloaded and parsed",
+    "bytes": 4291408,
+    "pages": 6,
+    "sha256": "b5c0e3b994da1a91f9b605ccd423de80c83dc8c87f922540f01d5799604e7b4f",
+    "reviewDate": "2026-10-08",
+    "reviewScope": "Identity/version, design, relevant supporting passages and limitations; not every page read or independent replication.",
+    "auditCard": "ALL_SOURCE_AUDIT.md (section tanjim2025)",
+    "manuscriptCitationLines": [
+      98
+    ]
+  }
+]
