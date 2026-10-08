@@ -1,0 +1,64 @@
+# Manuscript review — 8 October 2026
+
+This review is separate from the manuscript. It distinguishes completed editorial corrections from substantive interpretation and submission concerns.
+
+The author has authorized pushing the current setup/quote-layout revision to `writing`. Git history records the actual publication commit. Earlier local-only preparation status below is historical. Authorization to upload is not evidence of participant image-release consent or ethics approval; those separate review cautions remain unchanged.
+
+## Current setup-photo and layout revision
+
+Latest refinement: retained both original§5.4 quotes at the user's final direction, with normalized punctuation and bracketed grammar/spelling corrections (`was`, `than`). Figure3's setup photo is24% narrower; right-hand order is setup, interface, overhead. All34 current citation keys, source-PDF hashes and claim alignment rechecked against saved papers and existing audit cards. See `revisions/2026-10-08-quote-layout/CITATION_ALIGNMENT_RECHECK.md`; the immediately preceding project/PDF/ZIP is preserved in that revision's `before/`. Numerical results are unchanged; no new commit or push.
+
+The complete version at writing commit ab96ee4 is preserved locally in `revisions/2026-10-08-setup-layout/before/`, including the source project, PDF and ZIP. Figure3 now centers a three-view stack beside its70%-width schematic: rear-view robot/setup photograph (IMG_3103), overhead workspace photograph, operator dashboard. Photo EXIF/location metadata is removed without a pixel transform; the presentation crop is defined in LaTeX. No generative changes were made.
+
+Introduction carries the intervention-cost and physiological-evaluation motivation; Related Work is shortened, keeping all34 sources and verified claim caveats. Hart's citation moves to Measures. Compact captions and a slightly smaller frustration plot improve page flow. Current PDF is eight pages, body through page7 and references through page8; all final pages rendered and inspected, no overfull boxes or clipping. Numerical results, abstract and analysis inputs are unchanged. Earlier nine-page descriptions below are historical.
+
+The rear-view photograph includes a participant's head/body. Confirm consent for public use and check indirect identifiability before external publication; this is distinct from table-and-hands workspace recording consent. No broader image-release consent has been assumed or invented. The current revision is prepared locally and not yet committed or pushed.
+
+## Corrections made
+
+- Removed unfinished author checks, unavailable-role-count wording, participant IDs, later-confirmation narratives, and recording/reconciliation workflow from the manuscript and its hidden author-check comments.
+- All primary round-level analyses now use 24 participants. Recomputed workload, subscales, intervention experience, confidence intervals, t statistics and Holm-adjusted p values; regenerated all three inferential figures. Earlier exclusion analyses remain internal robustness checks.
+- Included all 15 available final surveys. Final survey n=15 is not the round-level sample size; there are complete round-level records for 24 participants. The supplied files contain no final questionnaire for nine sessions, so these responses cannot be invented.
+- Simplified Task Performance to condition totals, meaningful differences and adjusted p values. Plots retain t statistics and confidence intervals.
+- Kept three findings tables beside their introducing text. Converted the drifting full-width workload table to a compact single-column table; detailed p values remain in prose, plots and the analysis CSV.
+- Removed all caption explanations of bold values; retained bold condition means as requested.
+- Removed citation-verification workflow notes from the printed bibliography. Version/evidence information stays in the citation audit.
+- Changed the title from “Trade-offs Between” to “Comparing”: significant trade-offs between the assisted policies are not established. The abstract's concluding sentence now describes differences as descriptive.
+- Kept final-survey quotations anonymous and clearly separate from round-specific questionnaires; they are illustrative, not a coded thematic analysis.
+- Preserved raw exports, entered counts, participant confirmation overlays and historical copies. Editorial removal of provenance from prose does not delete source provenance.
+- At the author's request, removed the limitations paragraph about adapted-TLX psychometrics, combined modalities, end-only trust, and formative expectations/sample overlap. These review considerations remain here separately; factual scale/method definitions elsewhere in the manuscript are unchanged.
+- Simplified Section4.5 to the main paired analysis and Holm adjustment. Additional tests and sensitivity-check descriptions are removed throughout the manuscript but preserved internally. Removed the sentence on researcher-scoring error and the shared scoring source, as requested. No test outputs or significance conclusions were changed.
+- Figures6 and7 now use side-by-side constant/adaptive mean bars with SD whiskers and adjusted paired-test p values; they replace the paired-difference displays. Figure5 retains paired differences and pointwise95% confidence intervals. The descriptive bar heights and SD whiskers do not change the paired tests.
+
+## Substantive points to retain or resolve outside the manuscript
+
+1. **No statistically established adaptive–constant advantage.** Every corrected policy comparison is nonsignificant. Constant's better task means and adaptive's better experience means are descriptive; the paper must not claim superiority, equivalence, or an established speed–comfort trade-off. This is now reflected in the title, findings and conclusion.
+2. **Robot contribution is not isolated.** Assistance combines hints with researcher-selected retrieval. Benefits cannot be attributed specifically to robot embodiment, retrieval, physiology, or timing alone. The contribution and discussion have been narrowed accordingly. A future factorial comparison would separate these components.
+3. **Physiological trigger is not a validated stress detector.** A heart-rate rise can reflect movement and other influences. The manuscript describes a heart-rate-rise timing cue and explicitly avoids treating it as validated psychological stress. The dashboard's physiological labels illustrate the interface, not validation evidence.
+4. **Exploratory inference.** Test families were selected during analysis, not preregistered. Holm controls family-wise false positives for the specified family, assuming valid tests; it does not cure outcome selection or confounding. The assisted–control piece/completion/workload findings also survive the stricter all-34-test check. Paired tests do not explicitly model puzzle difficulty, period, device or learning effects; balanced condition orders do not eliminate these effects.
+5. **Measurement limits.** Correct-piece counts are researcher scores supported by notes/photos, selecting the highest count across admissible orientations. No independent inter-rater reliability is established. Solved puzzles receive seven pieces, so piece counts and completion are related measures, not independent replications. Seven-point unweighted NASA-TLX is an adaptation, not psychometrically interchangeable with the original instrument. The adaptation remains defined in Methods; the dedicated limitations paragraph was removed at the author's request. These are substantive review considerations, not drafting placeholders.
+6. **Limited generalization.** The sample is 24 college-recruited volunteers aged 20–27, mostly undergraduates, with some faculty and graduate students/researchers. Transfer to industrial workers, older adults, or surgery is untested. Formative ratings concern expected assistance and partly overlap with the experimental sample.
+7. **Ethics and concealed operation.** No ethics-committee review occurred and no exemption was established. The paper does not invent approval. The recorded procedure says concealed Wizard-of-Oz operation was not disclosed during or after the task; this is a substantive ethical concern, not an editorial phrase to hide. Authors must check applicable institutional/venue obligations before submission and provide truthful disclosure if required. Consent is not committee approval. [AAMAS instructions](https://warwick.ac.uk/fac/sci/dcs/aamas2027/guidelines-and-policies/instructions/) and reviewer policy should be checked against the actual procedure.
+8. **Submission/distribution.** Verify AI-use disclosure against actual tool use and venue requirements. Genuine photos/screenshots are retained; no generated photographic assets were introduced. The repository is public: raw participant data, recordings and full copyrighted reference PDFs are not part of the proposed public push. The source ZIP includes private review/provenance documents and is a working handoff bundle, not an anonymous supplemental submission.
+
+## What the current results establish
+
+Holm-adjusted paired comparisons (24 participants):
+
+| Measure | Constant vs control | Adaptive vs control | Adaptive vs constant |
+|---|---:|---:|---:|
+| Correct pieces | <.001 | <.001 | .273 |
+| Completion | <.001 | <.001 | .296 |
+| Adapted workload | <.001 | <.001 | .296 |
+| Attempt duration | .0064 | .0064 | 1.000 |
+| Frustration | .086 | .0019 | .997 |
+
+Both assisted conditions also improve mental demand and perceived performance versus control (all adjusted p<.001). Constant reduces effort versus control (p=.004); adaptive's effort contrast is not significant (p=.078). Adaptive's timing rating is higher descriptively, but raw p=.0079 becomes adjusted p=.1189. All other assisted-policy experience contrasts are nonsignificant.
+
+The statistical result is support for assistance in this task, not evidence that adaptive assistance is better than constant assistance. See `analysis/HOLM_EXPLAINED.md` and `analysis/paired-tests.csv` for the exact calculations.
+
+## Verification scope
+
+All 34 active references have downloaded actual PDFs, matching hashes, source-review cards and manuscript citation pointers. Reviews checked identity/version, study design, the passages supporting manuscript claims and relevant caveats. This does not mean every page was read or external experiments were independently replicated. Preserve this distinction in any description of verification.
+
+Publication of the current paper, supporting source, aggregate analysis, scripts and audits was authorized by the author on8October2026. Raw participant datasets, recordings and full third-party papers remain local. See the writing-branch Git history for the actual publication commit; historical pause notes in the change record describe earlier states.

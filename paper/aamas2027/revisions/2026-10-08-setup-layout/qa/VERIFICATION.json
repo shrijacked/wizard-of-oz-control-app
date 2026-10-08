@@ -1,0 +1,72 @@
+{
+  "date": "2026-10-08",
+  "pages": 8,
+  "figures": 7,
+  "tables": 3,
+  "bibliographyEntries": 34,
+  "build": "Successful Tectonic0.17 XeTeX/BibTeX build; pdfLaTeX route not independently run.",
+  "classAndStyleUnchanged": true,
+  "overfullHorizontalBoxes": 0,
+  "overfullVerticalBoxes": 0,
+  "verticalOverflowPoints": [],
+  "undefinedReferences": 0,
+  "missingCharacters": 0,
+  "figureCaptionOrder": [
+    {
+      "figure": 1,
+      "page": 3
+    },
+    {
+      "figure": 2,
+      "page": 4
+    },
+    {
+      "figure": 3,
+      "page": 5
+    },
+    {
+      "figure": 4,
+      "page": 5
+    },
+    {
+      "figure": 5,
+      "page": 6
+    },
+    {
+      "figure": 6,
+      "page": 6
+    },
+    {
+      "figure": 7,
+      "page": 7
+    }
+  ],
+  "visualReview": "All 8 setup-layout/page-*.png pages rendered and visually checked, with enlarged figure/table views; no clipping or overlap. Page3 flows without the former large gap. Figure3 centers three genuine views beside the schematic. Tables appear with findings, figures remain 1\u20137. Broader submission compliance is not certified. No overfull boxes.",
+  "citationAudit": {
+    "activeSources": 34,
+    "downloadedPDFs": 34,
+    "claimLevelReviewed": 34,
+    "alternativeAuthorPDFs": 1,
+    "everyPageRead": false,
+    "externalResultsReplicated": false
+  },
+  "warningsRetained": [
+    "Underfull lines",
+    "Optional bibliography fields",
+    "Font requests",
+    "Missing CCS concepts"
+  ],
+  "reviewFile": "FINAL_DRAFT_REVIEW.md",
+  "primaryRoundLevelN": 24,
+  "finalSurveyN": 15,
+  "pending": [
+    "Applicable institutional/venue ethics requirements",
+    "AI-use disclosure and anonymous submission checks",
+    "Participant photograph publication consent and indirect identifiability"
+  ],
+  "sourceZip": {
+    "file": "aamas2027-refreshed-source.zip",
+    "bytes": 5819497,
+    "sha256": "55612417481700863fc0fa1c7d5a36789859cd17c67f6d600ef23ca789c1e8b3"
+  }
+}

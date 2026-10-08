@@ -5,7 +5,7 @@ ACM-Reference-Format.bst are unchanged; anonymous mode and submission ID 2613
 are retained. Revised abstract reflects refreshed 24-participant data.
 Original abstract framing retained with refreshed results. All primary
 round-level analyses use24 participants. Final-survey summaries use15 responses.
-Current verified preview: nine pages, seven figures, three tables,
+Current verified preview: eight pages, seven figures, three tables,
 34 bibliography entries. All 34 actual source PDFs claim-level reviewed.
 
 Verified compiler: existing Tectonic 0.17 (XeTeX plus BibTeX).
@@ -31,7 +31,9 @@ Final QA and hashes: ../qa/VERIFICATION.json and ../output-hashes.json.
 Underfull lines, optional bibliography metadata, font-request and missing-CCS
 warnings are recorded. No overfull boxes or visually clipped text.
 Manuscript body ends on
-page8; references extend to page9. Broader submission considerations are
+page7; references extend to page8. Figure3 uses a vertically centered stack
+of three views; setup-wide-photo.jpg is required alongside the other assets.
+Broader submission considerations are
 separate in ../FINAL_DRAFT_REVIEW.md, not placeholders in the manuscript.
 
 One cached-font experiment with larger ordering-tree labels crashed

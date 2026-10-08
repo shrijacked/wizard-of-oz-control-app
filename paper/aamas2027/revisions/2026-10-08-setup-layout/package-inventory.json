@@ -1,0 +1,143 @@
+{
+  "files": [
+    {
+      "file": "main.tex",
+      "bytes": 34384,
+      "sha256": "bd58ba67ca88e719be6fbaa48aef037f8c07f4151c17e91b4901cc77d214f4a4"
+    },
+    {
+      "file": "references.bib",
+      "bytes": 16131,
+      "sha256": "654effa542f02a6efb49a74664c8856577c71f896f39bdd9511775474f2848a4"
+    },
+    {
+      "file": "aamas.cls",
+      "bytes": 122209,
+      "sha256": "e88c8e3e5fd1e39f93a2a4fa5b664e125b67487996b4236668206acf5c70ca7e"
+    },
+    {
+      "file": "ACM-Reference-Format.bst",
+      "bytes": 93560,
+      "sha256": "8ec002c927068bfc5b3cfe71b66aa4767b9e485530ac3c67ba5c064df4c2e6ac"
+    },
+    {
+      "file": "by.pdf",
+      "bytes": 5004,
+      "sha256": "19b7b19350bb937afead8e45e4ad006187e14803bef783902dbd88e370fc9917"
+    },
+    {
+      "file": "README.md",
+      "bytes": 4188,
+      "sha256": "f37848224c39931714d28e21681573343537a3b68f333bfb4113f70a11827109"
+    },
+    {
+      "file": "BUILD.txt",
+      "bytes": 2218,
+      "sha256": "9e9f0f42033c60ee765d25f2131bf3a128db14af0228ddfe6610bfe62eb1188e"
+    },
+    {
+      "file": "author-notes.md",
+      "bytes": 3554,
+      "sha256": "1d128e224b7ba6a82063a803a583f822e41966d9274cda6e1ea32dcb304a5817"
+    },
+    {
+      "file": "figures/study-system-diagram.tikz.tex",
+      "bytes": 10817,
+      "sha256": "c27e7491006c7805731beec47ef7029fed78c0473b070d5c1db956ef3a51fa3e"
+    },
+    {
+      "file": "figures/physical-setup-topdown.tikz.tex",
+      "bytes": 7587,
+      "sha256": "0cc1851f9ec2bf837a3b969e6a867071f60f90cfe544275619440786341daa14"
+    },
+    {
+      "file": "figures/condition-order-tree.tikz.tex",
+      "bytes": 3901,
+      "sha256": "f83c9582f1d17bfa9e8286f8a847b40a5ea57101e8abdb50ac1df5144800d477"
+    },
+    {
+      "file": "figures/setup-topdown-photo.png",
+      "bytes": 940038,
+      "sha256": "1a124aa4ee7d82794aff7427f002e801dc22ecb0a397254e57083daf44f11e31"
+    },
+    {
+      "file": "figures/operator-dashboard.png",
+      "bytes": 2851437,
+      "sha256": "e4849ea7ae25908b1237476eb77e88ed4a44a85a4d90e884478985938df1397f"
+    },
+    {
+      "file": "figures/setup-wide-photo.jpg",
+      "bytes": 1933384,
+      "sha256": "896eff7eaffbeea797eb79eb07d16a90942fac4e65278f0cdce659ed02bb2ef4"
+    },
+    {
+      "file": "figures/formative-helpfulness.pdf",
+      "bytes": 2238,
+      "sha256": "9f92d6295b9a61939ec7ea97ca4ec28e5cb1e75feff9696475073b2d28a7d012"
+    },
+    {
+      "file": "figures/performance-tests.pdf",
+      "bytes": 3465,
+      "sha256": "a465d8506623661fec228992978d1859b5d1ca55dd05340bddad6d7202d912ca"
+    },
+    {
+      "file": "figures/frustration-tests.pdf",
+      "bytes": 2113,
+      "sha256": "b2985f0652f1359186638e9e775dd4d36499fef3835ed3ef9f65832ea4f294aa"
+    },
+    {
+      "file": "figures/assistance-tests.pdf",
+      "bytes": 2695,
+      "sha256": "986e9cd7651af4acf32ff7a31d45d00bbcce52e84beb87630a7d280212b9b142"
+    },
+    {
+      "file": "review/CHANGELOG.md",
+      "bytes": 22120,
+      "sha256": "d014bb75e8dfcfa5af77cc1983f4081fb7e2ac6e5d71c15c2279ae40f5f40856"
+    },
+    {
+      "file": "review/ALL_SOURCE_AUDIT.md",
+      "bytes": 21223,
+      "sha256": "4e4c787f6576ccd70d323fe088f44419274075e7162af4d9b713435a937ec964"
+    },
+    {
+      "file": "review/all-source-downloads.json",
+      "bytes": 25836,
+      "sha256": "fea2164b8d8624c8dda6e789f2d242f5760d4eeea09e2f4f53d2e3e36942465b"
+    },
+    {
+      "file": "review/ANALYSIS.md",
+      "bytes": 21423,
+      "sha256": "f0eb3025cbea264e2ce0a86dd27a7691f8ab9433e0971ccd78a866a44835d5b2"
+    },
+    {
+      "file": "review/HOLM_EXPLAINED.md",
+      "bytes": 3220,
+      "sha256": "8e50f49ad42fb53921b5d44505ab46d38261147adeadf7f02960ddb94388ea8b"
+    },
+    {
+      "file": "review/paired-tests.csv",
+      "bytes": 10578,
+      "sha256": "8f4c496fe46fec7baf9cc179c95ea11258d86b3918b4e0295e29bb210cf329fa"
+    },
+    {
+      "file": "review/REFERENCE_AND_POLICY_STATUS.md",
+      "bytes": 4598,
+      "sha256": "9383000e6933e6e6bbbe9c1dfdfb4ce1aa05bf925fe467e65b6aef84eecc304b"
+    },
+    {
+      "file": "review/FINAL_DRAFT_REVIEW.md",
+      "bytes": 9943,
+      "sha256": "c0cad73bc6508725d8a7799af985fb6f080a96a8c2872965800e64604b89f484"
+    }
+  ],
+  "excludes": [
+    "Compiled preview (supplied separately)",
+    "Raw participant files",
+    "Full reference PDFs",
+    "Recordings",
+    "Puzzle/solution PDFs",
+    "Historical notes and plots",
+    "Compiler intermediates"
+  ]
+}

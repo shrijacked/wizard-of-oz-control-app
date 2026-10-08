@@ -1,0 +1,223 @@
+[
+  {
+    "key": "quigley2024",
+    "url": "https://knowledge.uchicago.edu/records/fnp5p-m0q24/files/Publication-guidelines-for-human-heart-rate-and-heart-rate-variability-studies-in-psychophysiology.pdf?download=1",
+    "status": "downloaded; claim-level verification complete",
+    "bytes": 7682617,
+    "pages": 63,
+    "sha256": "de52a210ed198f1a14b069b052fee813cc313b1fe87bf526ebd447ed5d57a27e",
+    "textCharacters": 349470,
+    "claimAudit": "CLAIM_AUDIT.md",
+    "verificationScope": "Title/author metadata and relevant claim passages; not an assertion that every page was read."
+  },
+  {
+    "key": "shukla2026",
+    "url": "https://arxiv.org/pdf/2601.20402v1",
+    "status": "downloaded; claim-level verification complete",
+    "bytes": 12261742,
+    "pages": 17,
+    "sha256": "688c0e9037f80b1723d3a1ba2e77db59d50e289fcee002fa438caa87c726b263",
+    "textCharacters": 82560,
+    "claimAudit": "CLAIM_AUDIT.md",
+    "verificationScope": "Title/author metadata and relevant claim passages; not an assertion that every page was read."
+  },
+  {
+    "key": "smit2024",
+    "url": "https://arxiv.org/pdf/2404.08006v1",
+    "status": "downloaded; claim-level verification complete",
+    "bytes": 1819765,
+    "pages": 38,
+    "sha256": "ce8836a4336b385262089d53110470ebaa6f1c47a1fc48a213ac39c16d07c563",
+    "textCharacters": 120931,
+    "claimAudit": "CLAIM_AUDIT.md",
+    "verificationScope": "Title/author metadata and relevant claim passages; not an assertion that every page was read."
+  },
+  {
+    "key": "wei2025",
+    "url": "https://www.frontiersin.org/journals/human-neuroscience/articles/10.3389/fnhum.2025.1611524/pdf",
+    "status": "downloaded; claim-level verification complete",
+    "bytes": 3693985,
+    "pages": 9,
+    "sha256": "d26df27fd47600204c820ba9480a9089bd6bca8e8543130b84eb6d27cdee591f",
+    "textCharacters": 48818,
+    "claimAudit": "CLAIM_AUDIT.md",
+    "verificationScope": "Title/author metadata and relevant claim passages; not an assertion that every page was read."
+  },
+  {
+    "key": "zhao2025",
+    "url": "https://arxiv.org/pdf/2505.11818v1",
+    "status": "downloaded; claim-level verification complete",
+    "bytes": 1358170,
+    "pages": 7,
+    "sha256": "7a83713f30c553b28b687a26a6aa719168a926fad1726329cc79664e9740bcbd",
+    "textCharacters": 33845,
+    "claimAudit": "CLAIM_AUDIT.md",
+    "verificationScope": "Title/author metadata and relevant claim passages; not an assertion that every page was read."
+  },
+  {
+    "key": "ramnauth2026",
+    "url": "https://scazlab.yale.edu/sites/default/files/files/ramnauth-thri3797264.pdf",
+    "status": "downloaded; claim-level verification complete",
+    "bytes": 73862187,
+    "pages": 32,
+    "sha256": "096f7d5f6cb49c67865ce5dd39663373ffe53bc60c6ca565e02f3adc47f8ddf1",
+    "textCharacters": 116265,
+    "claimAudit": "CLAIM_AUDIT.md",
+    "verificationScope": "Title/author metadata and relevant claim passages; not an assertion that every page was read."
+  },
+  {
+    "key": "lavitnicora2024",
+    "url": "https://www.frontiersin.org/journals/robotics-and-ai/articles/10.3389/frobt.2024.1394379/pdf",
+    "status": "downloaded; claim-level verification complete",
+    "bytes": 25562710,
+    "pages": 12,
+    "sha256": "3462019f1b6c4f76750e0072d36c1a627b5eaefa31968769e2f5fb6be181a9ec",
+    "textCharacters": 60909,
+    "claimAudit": "CLAIM_AUDIT.md",
+    "verificationScope": "Title/author metadata and relevant claim passages; not an assertion that every page was read."
+  },
+  {
+    "key": "tanneberg2024",
+    "url": "https://arxiv.org/pdf/2403.12533",
+    "status": "downloaded; claim-level verification complete",
+    "bytes": 4602049,
+    "pages": 8,
+    "sha256": "d0e7f6c2f3e8431b27488f94edaed4ff3be0ada4a614e336422a611b500431f8",
+    "textCharacters": 39174,
+    "claimAudit": "CLAIM_AUDIT.md",
+    "verificationScope": "Title/author metadata and relevant claim passages; not an assertion that every page was read."
+  },
+  {
+    "key": "andriella2025mentalising",
+    "url": "https://link.springer.com/content/pdf/10.1007/s12369-025-01280-z.pdf",
+    "status": "downloaded; claim-level verification complete",
+    "bytes": 3769158,
+    "pages": 17,
+    "sha256": "682fd3b475cf4705f8f6a901cea756240776f23044b03d1c258bc1673362c774",
+    "textCharacters": 82966,
+    "claimAudit": "CLAIM_AUDIT.md",
+    "verificationScope": "Title/author metadata and relevant claim passages; not an assertion that every page was read."
+  },
+  {
+    "key": "vitry2026",
+    "url": "https://arxiv.org/pdf/2606.28469v2",
+    "status": "downloaded; claim-level verification complete",
+    "bytes": 6150252,
+    "pages": 8,
+    "sha256": "d2b4cde101c469ebb2b9dc75e297a1f8230bcb0f936042eeccf1cdd4428f6670",
+    "textCharacters": 46007,
+    "claimAudit": "CLAIM_AUDIT.md",
+    "verificationScope": "Title/author metadata and relevant claim passages; not an assertion that every page was read."
+  },
+  {
+    "key": "prajod2024",
+    "url": "https://www.frontiersin.org/journals/robotics-and-ai/articles/10.3389/frobt.2024.1393795/pdf",
+    "status": "downloaded; claim-level verification complete",
+    "bytes": 25297402,
+    "pages": 13,
+    "sha256": "50354b6cb1164a6847d6069f8c69aa38c5bfb778aa9d6093f718cbc58140c58b",
+    "textCharacters": 67314,
+    "claimAudit": "CLAIM_AUDIT.md",
+    "verificationScope": "Title/author metadata and relevant claim passages; not an assertion that every page was read."
+  },
+  {
+    "key": "cavicchi2025",
+    "url": "https://link.springer.com/content/pdf/10.1186/s41235-025-00616-7.pdf",
+    "status": "downloaded; claim-level verification complete",
+    "bytes": 1403911,
+    "pages": 16,
+    "sha256": "96c15c6bbf61adc162f3c2dbe14feb40d452362e15d0a6ac48d7b81de1f152a4",
+    "textCharacters": 100759,
+    "claimAudit": "CLAIM_AUDIT.md",
+    "verificationScope": "Title/author metadata and relevant claim passages; not an assertion that every page was read."
+  },
+  {
+    "key": "vandijk2023",
+    "url": "https://www.frontiersin.org/journals/robotics-and-ai/articles/10.3389/frobt.2023.1244656/pdf",
+    "status": "downloaded; claim-level verification complete",
+    "bytes": 21904917,
+    "pages": 9,
+    "sha256": "4aa2af9330a5d4f6029b48847b043fd0a554ec3c03ae4219ac5ab4efbd0053e9",
+    "textCharacters": 40063,
+    "claimAudit": "CLAIM_AUDIT.md",
+    "verificationScope": "Title/author metadata and relevant claim passages; not an assertion that every page was read."
+  },
+  {
+    "key": "varrasi2026",
+    "url": "https://shura.shu.ac.uk/37555/1/Human%20and%20Robot%20Assistance%20for%20Cognitive%20Load%20in%20Younger%20and%20Older%20Adults%20Multimodal%20Within-Subject%20Experimental%20Study.pdf",
+    "resolvedUrl": "https://shura.shu.ac.uk/37555/1/Human%20and%20Robot%20Assistance%20for%20Cognitive%20Load%20in%20Younger%20and%20Older%20Adults%20Multimodal%20Within-Subject%20Experimental%20Study.pdf",
+    "status": "downloaded; claim-level verification complete",
+    "bytes": 1933055,
+    "pages": 18,
+    "sha256": "76fbb611493cef92ce28974d816c886dc2e9fed023fedd5828570651e58b5446",
+    "textCharacters": 68400,
+    "claimAudit": "CLAIM_AUDIT.md",
+    "verificationScope": "Title/author metadata and relevant claim passages; not an assertion that every page was read."
+  },
+  {
+    "key": "bejarano2024",
+    "url": "https://mirrorlab.mines.edu/publications/bejarano2024roman/bejarano2024roman___wozinterface/",
+    "status": "downloaded; claim-level verification complete",
+    "bytes": 128248,
+    "pages": 8,
+    "sha256": "4b43e592c717bc6d2a4381618c6c45e9bda1167948d06ec9ffffd9917030341a",
+    "textCharacters": 50825,
+    "claimAudit": "CLAIM_AUDIT.md",
+    "verificationScope": "Title/author metadata and relevant claim passages; not an assertion that every page was read."
+  },
+  {
+    "key": "candon2023",
+    "url": "https://interactive-machines.com/assets/papers/candon2023soliciting.pdf",
+    "status": "downloaded; claim-level verification complete",
+    "bytes": 5297127,
+    "pages": 11,
+    "sha256": "18fea7a5a54afdb1d746787f6bb88e53cc6659a59b7b4333101fced235db5fc8",
+    "textCharacters": 84731,
+    "claimAudit": "CLAIM_AUDIT.md",
+    "verificationScope": "Title/author metadata and relevant claim passages; not an assertion that every page was read."
+  },
+  {
+    "key": "cao2025",
+    "url": "https://www.roboticsproceedings.org/rss21/p089.pdf",
+    "status": "downloaded; claim-level verification complete",
+    "bytes": 4245610,
+    "pages": 10,
+    "sha256": "52fbf400e662655680a5eedb0ef0cf30030aef534ab71e2730976e6105b87ae3",
+    "textCharacters": 27,
+    "claimAudit": "CLAIM_AUDIT.md",
+    "verificationScope": "Title/author metadata and relevant claim passages; not an assertion that every page was read."
+  },
+  {
+    "key": "bhagatsmith2026",
+    "url": "https://www.frontiersin.org/journals/robotics-and-ai/articles/10.3389/frobt.2026.1872363/pdf",
+    "status": "downloaded; claim-level verification complete",
+    "bytes": 1884920,
+    "pages": 17,
+    "sha256": "a61d6ad37c67459fb52ed9e7e2ebca3b8e07a67eb3b72a301a9659371b874a98",
+    "textCharacters": 128976,
+    "claimAudit": "CLAIM_AUDIT.md",
+    "verificationScope": "Title/author metadata and relevant claim passages; not an assertion that every page was read."
+  },
+  {
+    "key": "tanjim2025",
+    "url": "https://arxiv.org/pdf/2506.08892v3",
+    "status": "downloaded; claim-level verification complete",
+    "bytes": 4291408,
+    "pages": 6,
+    "sha256": "b5c0e3b994da1a91f9b605ccd423de80c83dc8c87f922540f01d5799604e7b4f",
+    "textCharacters": 36429,
+    "claimAudit": "CLAIM_AUDIT.md",
+    "verificationScope": "Title/author metadata and relevant claim passages; not an assertion that every page was read."
+  },
+  {
+    "key": "cao2025-author",
+    "url": "https://arxiv.org/pdf/2501.01568v2",
+    "status": "downloaded; claim-level verification complete",
+    "bytes": 1585407,
+    "pages": 10,
+    "sha256": "a7450c6e3789fb1889075a2c67ec4990678ad7a8d780c0ddaa9a53728ea485b3",
+    "textCharacters": 50033,
+    "claimAudit": "CLAIM_AUDIT.md",
+    "verificationScope": "Title/author metadata and relevant claim passages; not an assertion that every page was read."
+  }
+]
