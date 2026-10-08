@@ -1,0 +1,1084 @@
+{
+  "date": "2026-10-09",
+  "manuscript": "/Users/rishit/Desktop/hti3/outputs/paper-rewrite-2026-10-09/paper/main.tex",
+  "manuscriptSha256": "6132d7b71282315d5a99748b15d7f66c14128053c499b32b31a212906522c98c",
+  "bibliographySha256": "0eb7cbfb70e181884dd732458f0b2763c763d961af856e9361a5fdabb980b82d",
+  "coverage": {
+    "references": 34,
+    "citationOccurrences": 41,
+    "abstractSentences": 11
+  },
+  "references": [
+    {
+      "number": 1,
+      "key": "andriella2025",
+      "title": "A Bayesian framework for learning proactive robot behaviour in assistive tasks",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/andriella2025.pdf",
+      "downloadUrl": "https://link.springer.com/content/pdf/10.1007/s11257-024-09421-1.pdf",
+      "sha256": "5a206e982bd9a40f18fe6cb998eb8c5d0eb0fede84f6fd728c010d93403de127",
+      "pdfPageCount": 43,
+      "supportingPages": [
+        9,
+        10
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/andriella2025.pdf",
+      "locatorPage": 10,
+      "locator": "Assistance Decision Network",
+      "evidenceParaphrase": "Sections 4 and 4.2 separate selection of the assistance action, intervention timing, and confidence through connected decision networks.",
+      "scopeBoundary": "Supports the architecture description, not universal superiority of proactive support.",
+      "uses": [
+        {
+          "key": "andriella2025",
+          "section": "Introduction",
+          "subsection": null,
+          "line": 54,
+          "exactTex": "Recent systems learn assistance type, timing, and confidence \\cite{andriella2025} or estimate action completion for proactive coordination \\cite{delazzari2025}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 2,
+      "key": "andriella2025mentalising",
+      "title": "Enhancing Robot Assistive Behaviour by Mentalising User Intent and Beliefs with Reinforcement Learning",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/andriella2025mentalising.pdf",
+      "downloadUrl": "https://link.springer.com/content/pdf/10.1007/s12369-025-01280-z.pdf",
+      "sha256": "682fd3b475cf4705f8f6a901cea756240776f23044b03d1c258bc1673362c774",
+      "pdfPageCount": 17,
+      "supportingPages": [
+        1,
+        13,
+        14,
+        15
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/andriella2025mentalising.pdf",
+      "locatorPage": 14,
+      "locator": "Regarding the timing",
+      "evidenceParaphrase": "The two-layer Q-learning/mentalising architecture reports better performance and assistance acceptance. The discussion acknowledges explanation-detail confounding and fixed assistance timing.",
+      "scopeBoundary": "Trust was not directly measured; benefits do not isolate timing or mentalising from explanation detail.",
+      "uses": [
+        {
+          "key": "andriella2025mentalising",
+          "section": "Related Work",
+          "subsection": "Assistance timing and proactive coordination",
+          "line": 72,
+          "exactTex": "A mentalising/Q-learning memory-game study reports performance and acceptance benefits, but explanation detail differs and timing remains fixed \\cite{andriella2025mentalising}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 3,
+      "key": "bejarano2024",
+      "title": "Hardships in the Land of Oz: Robot Control Challenges Faced by HRI Researchers and Real-World Teleoperators",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/bejarano2024.pdf",
+      "downloadUrl": "https://mirrorlab.mines.edu/publications/bejarano2024roman/bejarano2024roman___wozinterface/",
+      "sha256": "4b43e592c717bc6d2a4381618c6c45e9bda1167948d06ec9ffffd9917030341a",
+      "pdfPageCount": 8,
+      "supportingPages": [
+        1,
+        2,
+        5
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/bejarano2024.pdf",
+      "locatorPage": 2,
+      "locator": "We recruited six HRI researchers",
+      "evidenceParaphrase": "Six researcher interviews identify response demands, participant unpredictability, robot delays/malfunctions and precision/control needs.",
+      "scopeBoundary": "Qualitative researcher accounts of operation challenges, not a controlled comparison of interfaces.",
+      "uses": [
+        {
+          "key": "bejarano2024",
+          "section": "Related Work",
+          "subsection": "Wizard-of-Oz evaluation",
+          "line": 94,
+          "exactTex": "Interviews with six HRI researchers identify operator response processing, robot delays, unpredictable participants, and control precision as challenges \\cite{bejarano2024}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 4,
+      "key": "bhagatsmith2026",
+      "title": "A survey of machine learning for estimating workload: considering unknown tasks",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/bhagatsmith2026.pdf",
+      "downloadUrl": "https://www.frontiersin.org/journals/robotics-and-ai/articles/10.3389/frobt.2026.1872363/pdf",
+      "sha256": "a61d6ad37c67459fb52ed9e7e2ebca3b8e07a67eb3b72a301a9659371b874a98",
+      "pdfPageCount": 17,
+      "supportingPages": [
+        5,
+        6
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/bhagatsmith2026.pdf",
+      "locatorPage": 6,
+      "locator": "portability, model complexity, and adaptability",
+      "evidenceParaphrase": "The review evaluates machine-learning methods for unknown-task workload estimation against portability, model-complexity and adaptability criteria.",
+      "scopeBoundary": "A generalization review, not direct evidence for the present threshold or task.",
+      "uses": [
+        {
+          "key": "bhagatsmith2026",
+          "section": "Related Work",
+          "subsection": "Physiological information in assistance",
+          "line": 82,
+          "exactTex": "Generalizing such signals remains challenging: Bhagat Smith and Adams review portability, model complexity, and adaptability across unknown tasks \\cite{bhagatsmith2026}, and Capponi et al. find no clear RMSSD pattern across assembly configurations \\cite{capponi2024}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 5,
+      "key": "caiazzo2024",
+      "title": "Comparative Analysis Of Mental Workload In Adaptive Human-Robot Collaboration During Assembly Tasks",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/caiazzo2024.pdf",
+      "downloadUrl": "https://scidar.kg.ac.rs/bitstream/123456789/21811/1/comparative-analysis-of-mental-workload-in-adaptive-human-robot-collaboration-during-assembly-tasks.pdf",
+      "sha256": "d1ad3433c37b87ce42e92953c1640c8490255ac54c3dbb37a8a444f839417cf1",
+      "pdfPageCount": 11,
+      "supportingPages": [
+        2,
+        4
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/caiazzo2024.pdf",
+      "locatorPage": 2,
+      "locator": "analysis was conducted for three participants",
+      "evidenceParaphrase": "The preliminary study compares standard manual, collaborative and guided collaborative assembly for three participants, using EEG for workload analysis.",
+      "scopeBoundary": "Small preliminary evidence, not a large efficacy trial.",
+      "uses": [
+        {
+          "key": "caiazzo2024",
+          "section": "Related Work",
+          "subsection": "Physical tasks and participant experience",
+          "line": 86,
+          "exactTex": "A preliminary three-person assembly study compares manual, collaborative, and guided conditions using EEG \\cite{caiazzo2024}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 6,
+      "key": "candon2023",
+      "title": "Verbally Soliciting Human Feedback in Continuous Human-Robot Collaboration: Effects of the Framing and Timing of Reminders",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/candon2023.pdf",
+      "downloadUrl": "https://interactive-machines.com/assets/papers/candon2023soliciting.pdf",
+      "sha256": "18fea7a5a54afdb1d746787f6bb88e53cc6659a59b7b4333101fced235db5fc8",
+      "pdfPageCount": 11,
+      "supportingPages": [
+        6,
+        7
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/candon2023.pdf",
+      "locatorPage": 6,
+      "locator": "ten seconds after the reminder",
+      "evidenceParaphrase": "Whole-game timing tests are nonsignificant, whereas reminder timing affects feedback within the immediate ten-second window (p=.02) and latency after the reminder (p=.04).",
+      "scopeBoundary": "A feedback-solicitation result, not a whole-game performance or physiological-assistance advantage.",
+      "uses": [
+        {
+          "key": "candon2023",
+          "section": "Related Work",
+          "subsection": "Assistance timing and proactive coordination",
+          "line": 74,
+          "exactTex": "Reminders before robot behavior changes elicit faster, more immediate feedback in Space Invaders, but not a significant whole-game timing effect \\cite{candon2023}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 7,
+      "key": "cao2025",
+      "title": "Interruption Handling for Conversational Robots",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/cao2025.pdf",
+      "downloadUrl": "https://www.roboticsproceedings.org/rss21/p089.pdf",
+      "sha256": "52fbf400e662655680a5eedb0ef0cf30030aef534ab71e2730976e6105b87ae3",
+      "pdfPageCount": 10,
+      "supportingPages": [
+        7
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/cao2025-author.pdf",
+      "locatorPage": 7,
+      "locator": "Pearson correlation coefficient",
+      "evidenceParaphrase": "Section E reports exploratory negative correlations between unsuccessfully handled interruptions and perceived inclusion (p=.005) and discussion satisfaction (p=.021).",
+      "scopeBoundary": "Associations, not causal treatment effects. The official RSS PDF is image-based; searchable author text supplies the locator, with the official results page visually cross-checked.",
+      "uses": [
+        {
+          "key": "cao2025",
+          "section": "Related Work",
+          "subsection": "Assistance timing and proactive coordination",
+          "line": 74,
+          "exactTex": "Exploratory analyses of user-initiated interruptions associate unsuccessful handling with lower perceived inclusion and discussion satisfaction \\cite{cao2025}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 8,
+      "key": "capponi2024",
+      "title": "Assembly complexity and physiological response in human-robot collaboration: Insights from a preliminary experimental analysis",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/capponi2024.pdf",
+      "downloadUrl": "https://www.qualityengineering.polito.it/content/download/1126/6184/file/Assembly%20complexity%20and%20physiological%20response%20in%20human-robot%20collaboration%20_%20Insights%20from%20a%20preliminary%20experimental%20analysis.pdf",
+      "sha256": "7bf33accbe162d3afff2cfb325582ce678d056a14e535875db495a621a5a66c1",
+      "pdfPageCount": 16,
+      "supportingPages": [
+        13
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/capponi2024.pdf",
+      "locatorPage": 13,
+      "locator": "did not show any particular trend",
+      "evidenceParaphrase": "The concluding summary reports no particular RMSSD/SDNN trend across the tested assembly complexity and collaboration configurations.",
+      "scopeBoundary": "A bounded null-pattern result, not a claim that HRV is universally uninformative.",
+      "uses": [
+        {
+          "key": "capponi2024",
+          "section": "Related Work",
+          "subsection": "Physiological information in assistance",
+          "line": 82,
+          "exactTex": "Generalizing such signals remains challenging: Bhagat Smith and Adams review portability, model complexity, and adaptability across unknown tasks \\cite{bhagatsmith2026}, and Capponi et al. find no clear RMSSD pattern across assembly configurations \\cite{capponi2024}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 9,
+      "key": "cavicchi2025",
+      "title": "Can humanoid robots be used as a cognitive offloading tool?",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/cavicchi2025.pdf",
+      "downloadUrl": "https://link.springer.com/content/pdf/10.1186/s41235-025-00616-7.pdf",
+      "sha256": "96c15c6bbf61adc162f3c2dbe14feb40d452362e15d0a6ac48d7b81de1f152a4",
+      "pdfPageCount": 16,
+      "supportingPages": [
+        12
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/cavicchi2025.pdf",
+      "locatorPage": 12,
+      "locator": "collaboration comes at a cost",
+      "evidenceParaphrase": "The review conclusion discusses possible load/performance costs of shared tasks and help from appropriate social signals, including task-relevant cues.",
+      "scopeBoundary": "No unsupported recommendation to delegate difficult task segments is attributed to the review.",
+      "uses": [
+        {
+          "key": "cavicchi2025",
+          "section": "Related Work",
+          "subsection": "Physical tasks and participant experience",
+          "line": 88,
+          "exactTex": "Cavicchi et al. identify potential workload and performance costs in shared tasks and benefits of appropriate task-relevant social cues \\cite{cavicchi2025}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 10,
+      "key": "delazzari2025",
+      "title": "PACE: Proactive Assistance in Human-Robot Collaboration through Action-Completion Estimation",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/delazzari2025.pdf",
+      "downloadUrl": "https://www.merl.com/publications/docs/TR2025-064.pdf",
+      "sha256": "9f82f2e2a06512a28721e1f180a5ba10432c76cb2232f530bfa2552e3b395626",
+      "pdfPageCount": 9,
+      "supportingPages": [
+        3,
+        8
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/delazzari2025.pdf",
+      "locatorPage": 8,
+      "locator": "longest waiting times",
+      "evidenceParaphrase": "The abstract describes hand-motion/action-completion estimation and proactive coordination. The results report the greatest waiting under explicit querying; the phase-free variant leads several subjective measures.",
+      "scopeBoundary": "The discussion uses its waiting result as a design consideration, not proof that every proactive system is better.",
+      "uses": [
+        {
+          "key": "delazzari2025",
+          "section": "Introduction",
+          "subsection": null,
+          "line": 54,
+          "exactTex": "Recent systems learn assistance type, timing, and confidence \\cite{andriella2025} or estimate action completion for proactive coordination \\cite{delazzari2025}."
+        },
+        {
+          "key": "delazzari2025",
+          "section": "Discussion, Limitations, and Future Work",
+          "subsection": "Physiological feedback and limitations",
+          "line": 292,
+          "exactTex": "Future studies could test explanations and user-requested help, while accounting for PACE's finding that explicit queries can increase waiting \\cite{delazzari2025}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 11,
+      "key": "hart2006",
+      "title": "NASA-Task Load Index (NASA-TLX); 20 Years Later",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/hart2006.pdf",
+      "downloadUrl": "https://www.nasa.gov/wp-content/uploads/2026/01/hfes-2006-paper.pdf",
+      "sha256": "0797a7647a2a9edc6fae2a9f7d0b6844f80239dd779e1055e2a71ed13520bbcb",
+      "pdfPageCount": 5,
+      "supportingPages": [
+        1,
+        3
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/hart2006.pdf",
+      "locatorPage": 3,
+      "locator": "ratings are simply averaged or added",
+      "evidenceParaphrase": "The paper specifies the six NASA-TLX dimensions and describes raw/unweighted variants that average or sum ratings without the weighting procedure.",
+      "scopeBoundary": "Supports the dimensions and unweighted precedent, not psychometric validation of our seven-point items, reversal or rescaling formula; those are stated study-specific choices.",
+      "uses": [
+        {
+          "key": "hart2006",
+          "section": "Study Method: Assistance System and Experimental Protocol",
+          "subsection": "Measures and analysis",
+          "line": 185,
+          "exactTex": "Round-specific questionnaires assess six adapted NASA-TLX items \\cite{hart2006} on seven-point scales (1--7): mental, physical, and temporal demand, performance, effort, and frustration."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 12,
+      "key": "hostettler2025",
+      "title": "Real-Time Adaptive Industrial Robots: Improving Safety And Comfort In Human-Robot Collaboration",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/hostettler2025.pdf",
+      "downloadUrl": "https://alexandria.unisg.ch/bitstreams/b9548afd-a853-40ed-9141-7bb837ce1f77/download",
+      "sha256": "a797f374461b6cd6bf393fd3d70c08a4160c7195716f76b53faf96f249a302f1",
+      "pdfPageCount": 16,
+      "supportingPages": [
+        1,
+        12
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/hostettler2025.pdf",
+      "locatorPage": 1,
+      "locator": "spatial distance",
+      "evidenceParaphrase": "The implemented robot adapts movement to operator distance while recording pupil dilation. Using pupil dilation to trigger behavior is proposed as future work.",
+      "scopeBoundary": "Physiological outcome measurement is not the deployed adaptation trigger.",
+      "uses": [
+        {
+          "key": "hostettler2025",
+          "section": "Related Work",
+          "subsection": "Physiological information in assistance",
+          "line": 80,
+          "exactTex": "Hostettler et al. adapt to user distance while measuring pupil responses \\cite{hostettler2025}; Ojsteršek et al. personalize robot parameters using a skills test and analyze ECG afterward \\cite{ojstersek2024}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 13,
+      "key": "karbouj2026",
+      "title": "Adaptive Robotic Behavior in Industrial Human–Robot Collaboration: A Systematic Review of Taxonomies, Enabling Mechanisms, and Research Frontiers",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/karbouj2026.pdf",
+      "downloadUrl": "https://publica-rest.fraunhofer.de/server/api/core/bitstreams/e60c03db-8192-404a-a885-43c61307f554/content",
+      "sha256": "1be2b373a6284c3882787ca2e8866a6d013eac3ac52522fcb3e8f330cb60ff1f",
+      "pdfPageCount": 25,
+      "supportingPages": [
+        2
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/karbouj2026.pdf",
+      "locatorPage": 2,
+      "locator": "124 publications met",
+      "evidenceParaphrase": "The review includes 124 eligible publications. Its taxonomy covers task-level timing/synchronization and role allocation in addition to motion and control adaptation.",
+      "scopeBoundary": "This is a systematic review, not an implemented adaptive-assistance trial.",
+      "uses": [
+        {
+          "key": "karbouj2026",
+          "section": "Introduction",
+          "subsection": null,
+          "line": 54,
+          "exactTex": "A systematic review of 124 publications identifies timing and role allocation as dimensions of adaptive HRI \\cite{karbouj2026}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 14,
+      "key": "korivand2024",
+      "title": "Optimizing Human–Robot Teaming Performance through Q-Learning-Based Task Load Adjustment and Physiological Data Analysis",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/korivand2024.pdf",
+      "downloadUrl": "https://mdpi-res.com/d_attachment/sensors/sensors-24-02817/article_deploy/sensors-24-02817.pdf",
+      "sha256": "bf037163b4237a6767b83e2f3ae849df806cf78bd9fcb33dc5c01463ede5c5ac",
+      "pdfPageCount": 21,
+      "supportingPages": [
+        18
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/korivand2024.pdf",
+      "locatorPage": 18,
+      "locator": "after recording is complete",
+      "evidenceParaphrase": "The limitations state that available wristbands cannot transmit data in real time and therefore the collected data cannot be integrated directly into the model online.",
+      "scopeBoundary": "A framework with an explicit deployment limitation, not a completed online trigger evaluation.",
+      "uses": [
+        {
+          "key": "korivand2024",
+          "section": "Related Work",
+          "subsection": "Physiological information in assistance",
+          "line": 80,
+          "exactTex": "Korivand et al. report that wristband data could not be integrated directly in real time \\cite{korivand2024}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 15,
+      "key": "lavitnicora2024",
+      "title": "Gaze detection as a social cue to initiate natural human-robot collaboration in an assembly task",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/lavitnicora2024.pdf",
+      "downloadUrl": "https://www.frontiersin.org/journals/robotics-and-ai/articles/10.3389/frobt.2024.1394379/pdf",
+      "sha256": "3462019f1b6c4f76750e0072d36c1a627b5eaefa31968769e2f5fb6be181a9ec",
+      "pdfPageCount": 12,
+      "supportingPages": [
+        1,
+        6,
+        10
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/lavitnicora2024.pdf",
+      "locatorPage": 1,
+      "locator": "37 participants",
+      "evidenceParaphrase": "The assembly study relates looking toward the cobot to joint-action initiation and pilots gaze-triggered coordination. The gaze signal is interpreted as readiness for joint action.",
+      "scopeBoundary": "Readiness to coordinate is not equivalent to needing a puzzle hint.",
+      "uses": [
+        {
+          "key": "lavitnicora2024",
+          "section": "Related Work",
+          "subsection": "Assistance timing and proactive coordination",
+          "line": 72,
+          "exactTex": "Gaze-based assembly research studies readiness for joint action \\cite{lavitnicora2024}, while LLM-based Attentive Support uses scene and dialogue information to select help or silence, evaluated in constructed scenarios and a robot demonstration \\cite{tanneberg2024}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 16,
+      "key": "melo2026",
+      "title": "SensCogAR: Cognitive Load Estimation Via Movement Data in Assembly Tasks",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/melo2026.pdf",
+      "downloadUrl": "https://www.jstage.jst.go.jp/article/ijabc/2026/1/2026_147/_pdf",
+      "sha256": "5b69b42bfc1ab01cdb69d55dc377a2b3eabad142685c61c5ff55f69a07103774",
+      "pdfPageCount": 20,
+      "supportingPages": [
+        8,
+        9
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/melo2026.pdf",
+      "locatorPage": 8,
+      "locator": "experiment application was presented on a computer",
+      "evidenceParaphrase": "Section 4.2 describes seven-piece manual tangram assembly, computer-presented references, HoloLens movement recording and Empatica physiological recording; Figure 2 shows the physical setup.",
+      "scopeBoundary": "No robot delivers assistance. The manuscript explicitly distinguishes cognitive-load measurement from robotic help.",
+      "uses": [
+        {
+          "key": "melo2026",
+          "section": "Introduction",
+          "subsection": null,
+          "line": 60,
+          "exactTex": "Related work studies physical tangrams in HRI \\cite{tabatabaei2025} and in non-robotic cognitive-load measurement \\cite{melo2026}."
+        },
+        {
+          "key": "melo2026",
+          "section": "Related Work",
+          "subsection": "Physical tasks and participant experience",
+          "line": 86,
+          "exactTex": "Tangram research examines gaze around robot failures \\cite{tabatabaei2025}, physical-piece assembly with screen-presented targets and wearable sensing in SensCogAR \\cite{melo2026}, and autonomous robotic assembly from silhouettes in MRChaos \\cite{zhao2025}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 17,
+      "key": "ojstersek2024",
+      "title": "Personalizing Human–Robot Workplace Parameters in Human-Centered Manufacturing",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/ojstersek2024.pdf",
+      "downloadUrl": "https://mdpi-res.com/d_attachment/machines/machines-12-00546/article_deploy/machines-12-00546.pdf",
+      "sha256": "42cf6546c0888db4c975c08a3fd98472db60c755a3d235a90e330f246987a254",
+      "pdfPageCount": 16,
+      "supportingPages": [
+        3,
+        4
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/ojstersek2024.pdf",
+      "locatorPage": 4,
+      "locator": "At the end of the experiment",
+      "evidenceParaphrase": "A preliminary skills test sets robot movement/utilization parameters. ECG records are transferred to analysis software at the end of the experiment.",
+      "scopeBoundary": "Supports pre-task personalization and offline cardiac analysis, not online physiological control.",
+      "uses": [
+        {
+          "key": "ojstersek2024",
+          "section": "Related Work",
+          "subsection": "Physiological information in assistance",
+          "line": 80,
+          "exactTex": "Hostettler et al. adapt to user distance while measuring pupil responses \\cite{hostettler2025}; Ojsteršek et al. personalize robot parameters using a skills test and analyze ECG afterward \\cite{ojstersek2024}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 18,
+      "key": "pereira2025",
+      "title": "Capturing Mental Workload Through Physiological Sensors in Human–Robot Collaboration: A Systematic Literature Review",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/pereira2025.pdf",
+      "downloadUrl": "https://mdpi-res.com/d_attachment/applsci/applsci-15-03317/article_deploy/applsci-15-03317.pdf",
+      "sha256": "40c2fea287bf724e4dacbcfd03096cc0d4dcfd9c2c448a5535483544928f7633",
+      "pdfPageCount": 26,
+      "supportingPages": [
+        18,
+        19,
+        20
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/pereira2025.pdf",
+      "locatorPage": 20,
+      "locator": "inconsistent workload assessments",
+      "evidenceParaphrase": "The discussion describes diverse measures and difficulties comparing studies. Cardiac measures are discussed on p19; p20 explains interindividual HRV and other physiological variability and inconsistent workload assessment.",
+      "scopeBoundary": "The manuscript summarizes heterogeneous/mixed measurement evidence, not a pooled cardiac effect or validation of the present HR threshold.",
+      "uses": [
+        {
+          "key": "pereira2025",
+          "section": "Introduction",
+          "subsection": null,
+          "line": 58,
+          "exactTex": "Reviews report heterogeneous workload measures and mixed cardiac findings in human--robot collaboration \\cite{pereira2025}, while cardiac measurement guidelines distinguish heart rate from heart-rate variability and emphasize signal quality and physical activity \\cite{quigley2024}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 19,
+      "key": "prajod2024",
+      "title": "Flow in human-robot collaboration—multimodal analysis and perceived challenge detection in industrial scenarios",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/prajod2024.pdf",
+      "downloadUrl": "https://www.frontiersin.org/journals/robotics-and-ai/articles/10.3389/frobt.2024.1393795/pdf",
+      "sha256": "50354b6cb1164a6847d6069f8c69aa38c5bfb778aa9d6093f718cbc58140c58b",
+      "pdfPageCount": 13,
+      "supportingPages": [
+        1,
+        6,
+        8
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/prajod2024.pdf",
+      "locatorPage": 8,
+      "locator": "two-class model",
+      "evidenceParaphrase": "The paper analyzes facial emotion separately and evaluates HRV classification of challenge. Its adaptive assembly condition is triggered by a wizard watching progress toward subassembly completion.",
+      "scopeBoundary": "Neither the facial estimates nor the HRV classifier directly drives assistance in that experiment.",
+      "uses": [
+        {
+          "key": "prajod2024",
+          "section": "Related Work",
+          "subsection": "Physiological information in assistance",
+          "line": 80,
+          "exactTex": "Prajod et al. evaluate an HRV-based challenge classifier and separately analyze facial expressions; their adaptive assembly condition uses Wizard-of-Oz progress judgments rather than physiological triggers \\cite{prajod2024}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 20,
+      "key": "quigley2024",
+      "title": "Publication guidelines for human heart rate and heart rate variability studies in psychophysiology: Part 1: Physiological underpinnings and foundations of measurement",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/quigley2024.pdf",
+      "downloadUrl": "https://knowledge.uchicago.edu/records/fnp5p-m0q24/files/Publication-guidelines-for-human-heart-rate-and-heart-rate-variability-studies-in-psychophysiology.pdf?download=1",
+      "sha256": "de52a210ed198f1a14b069b052fee813cc313b1fe87bf526ebd447ed5d57a27e",
+      "pdfPageCount": 63,
+      "supportingPages": [
+        1,
+        8,
+        9
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/quigley2024.pdf",
+      "locatorPage": 9,
+      "locator": "poor electrode contact",
+      "evidenceParaphrase": "The guidelines separately address HR and HRV. The PPG discussion says movement/physical activity worsens signal-to-noise, and the artifact section lists contact and movement problems.",
+      "scopeBoundary": "Poor electrode contact is an ECG example; p8 supplies wearable PPG movement context. The guidelines do not validate our detector or show that HR rise means frustration.",
+      "uses": [
+        {
+          "key": "quigley2024",
+          "section": "Introduction",
+          "subsection": null,
+          "line": 58,
+          "exactTex": "Reviews report heterogeneous workload measures and mixed cardiac findings in human--robot collaboration \\cite{pereira2025}, while cardiac measurement guidelines distinguish heart rate from heart-rate variability and emphasize signal quality and physical activity \\cite{quigley2024}."
+        },
+        {
+          "key": "quigley2024",
+          "section": "Discussion, Limitations, and Future Work",
+          "subsection": "Physiological feedback and limitations",
+          "line": 292,
+          "exactTex": "Wearable cardiac measurements are sensitive to movement and sensor contact \\cite{quigley2024}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 21,
+      "key": "ramnauth2026",
+      "title": "To Help or Not to Help?: An Expanded Framework for Deciding Socially Appropriate Robot Assistance",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/ramnauth2026.pdf",
+      "downloadUrl": "https://scazlab.yale.edu/sites/default/files/files/ramnauth-thri3797264.pdf",
+      "sha256": "096f7d5f6cb49c67865ce5dd39663373ffe53bc60c6ca565e02f3adc47f8ddf1",
+      "pdfPageCount": 32,
+      "supportingPages": [
+        8,
+        13
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/ramnauth2026.pdf",
+      "locatorPage": 8,
+      "locator": "utility is higher than the cost",
+      "evidenceParaphrase": "The framework relates appropriateness to recipient utility and cost. Its evaluation uses 215 participants rating assistance vignettes.",
+      "scopeBoundary": "Supports appropriateness judgments and conceptual trade-offs, not observed benefits of delivered help.",
+      "uses": [
+        {
+          "key": "ramnauth2026",
+          "section": "Introduction",
+          "subsection": null,
+          "line": 56,
+          "exactTex": "Assistance-appropriateness judgments reflect this balance \\cite{ramnauth2026}, and a proactive escape-room robot elicited more interaction without significantly improving overall performance \\cite{vitry2026}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 22,
+      "key": "shukla2026",
+      "title": "GuideAI: A Real-time Personalized Learning Solution with Adaptive Interventions",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/shukla2026.pdf",
+      "downloadUrl": "https://arxiv.org/pdf/2601.20402v1",
+      "sha256": "688c0e9037f80b1723d3a1ba2e77db59d50e289fcee002fa438caa87c726b263",
+      "pdfPageCount": 17,
+      "supportingPages": [
+        8,
+        9,
+        15
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/shukla2026.pdf",
+      "locatorPage": 15,
+      "locator": "dynamically adapts",
+      "evidenceParaphrase": "GuideAI integrates gaze, HRV, posture and note-taking feedback to vary learning content, pacing and intervention types. The reported study is preliminary (25 participants).",
+      "scopeBoundary": "Educational adaptation, not a replication of robotic assistance or our physiology-trigger policy.",
+      "uses": [
+        {
+          "key": "shukla2026",
+          "section": "Related Work",
+          "subsection": "Physiological information in assistance",
+          "line": 82,
+          "exactTex": "Beyond robotic execution, GuideAI combines cardiac, gaze, and behavioral information to adapt learning content, pacing, and feedback \\cite{shukla2026}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 23,
+      "key": "smit2024",
+      "title": "Learning Efficient and Fair Policies for Uncertainty-Aware Collaborative Human-Robot Order Picking",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/smit2024.pdf",
+      "downloadUrl": "https://arxiv.org/pdf/2404.08006v1",
+      "sha256": "ce8836a4336b385262089d53110470ebaa6f1c47a1fc48a213ac39c16d07c563",
+      "pdfPageCount": 38,
+      "supportingPages": [
+        1,
+        5,
+        6
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/smit2024.pdf",
+      "locatorPage": 6,
+      "locator": "total mass of the lifted products",
+      "evidenceParaphrase": "Discrete-event order-picking simulation models picker workload as total lifted mass and fairness as its dispersion across pickers; AMRs and humans divide transport/picking tasks.",
+      "scopeBoundary": "Physical workload, not subjective cognitive workload. Retrieval/material provision is a discussion analogy, not a measured cross-domain benefit.",
+      "uses": [
+        {
+          "key": "smit2024",
+          "section": "Related Work",
+          "subsection": "Physical tasks and participant experience",
+          "line": 88,
+          "exactTex": "Workload definitions also differ: simulated order-picking research represents physical workload fairness through lifted mass \\cite{smit2024}."
+        },
+        {
+          "key": "smit2024",
+          "section": "Discussion, Limitations, and Future Work",
+          "subsection": "Physiological feedback and limitations",
+          "line": 296,
+          "exactTex": "Tangrams share orientation and placement demands with assembly \\cite{zhao2025}, while retrieval resembles material provision in order picking \\cite{smit2024}; transfer requires separate safety, precision, and workflow evaluation."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 24,
+      "key": "tabatabaei2025",
+      "title": "Gazing at Failure: Investigating Human Gaze in Response to Robot Failure in Collaborative Tasks",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/tabatabaei2025.pdf",
+      "downloadUrl": "https://arxiv.org/pdf/2502.16899v1",
+      "sha256": "fae5c6acd3e1f7a5ea97f8cfe11ff2edbe5e9c8145a7112f900e922128deabad",
+      "pdfPageCount": 11,
+      "supportingPages": [
+        1,
+        4,
+        5
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/tabatabaei2025.pdf",
+      "locatorPage": 1,
+      "locator": "27 participants",
+      "evidenceParaphrase": "A 27-person human-robot tangram study manipulates robot failures and examines gaze and robot perception during collaborative solving.",
+      "scopeBoundary": "Supports physical tangrams as an HRI task and gaze around failures; not benefits of our assistance policy.",
+      "uses": [
+        {
+          "key": "tabatabaei2025",
+          "section": "Introduction",
+          "subsection": null,
+          "line": 60,
+          "exactTex": "Related work studies physical tangrams in HRI \\cite{tabatabaei2025} and in non-robotic cognitive-load measurement \\cite{melo2026}."
+        },
+        {
+          "key": "tabatabaei2025",
+          "section": "Related Work",
+          "subsection": "Physical tasks and participant experience",
+          "line": 86,
+          "exactTex": "Tangram research examines gaze around robot failures \\cite{tabatabaei2025}, physical-piece assembly with screen-presented targets and wearable sensing in SensCogAR \\cite{melo2026}, and autonomous robotic assembly from silhouettes in MRChaos \\cite{zhao2025}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 25,
+      "key": "tanjim2025",
+      "title": "Help or Hindrance: Understanding the Impact of Robot Communication in Action Teams",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/tanjim2025.pdf",
+      "downloadUrl": "https://arxiv.org/pdf/2506.08892v3",
+      "sha256": "b5c0e3b994da1a91f9b605ccd423de80c83dc8c87f922540f01d5799604e7b4f",
+      "pdfPageCount": 6,
+      "supportingPages": [
+        3,
+        5
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/tanjim2025.pdf",
+      "locatorPage": 5,
+      "locator": "workload was significantly lower in C2",
+      "evidenceParaphrase": "The medical-training simulation compares cue combinations and a conventional crash cart. Verbal object search with visual reminders gives lower reported workload and higher usefulness/ease of use.",
+      "scopeBoundary": "Simulation with a Wizard-of-Oz crash cart, not clinical effectiveness or equal-dose timing isolation.",
+      "uses": [
+        {
+          "key": "tanjim2025",
+          "section": "Related Work",
+          "subsection": "Physical tasks and participant experience",
+          "line": 90,
+          "exactTex": "In a medical-training simulation, verbal object-search guidance with visual reminders from a Wizard-of-Oz robotic crash cart yields lower workload and higher usefulness and ease-of-use ratings than reversed cues or no feedback \\cite{tanjim2025}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 26,
+      "key": "tanneberg2024",
+      "title": "To Help or Not to Help: LLM-based Attentive Support for Human-Robot Group Interactions",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/tanneberg2024.pdf",
+      "downloadUrl": "https://arxiv.org/pdf/2403.12533",
+      "sha256": "d0e7f6c2f3e8431b27488f94edaed4ff3be0ada4a614e336422a611b500431f8",
+      "pdfPageCount": 8,
+      "supportingPages": [
+        1,
+        2,
+        5,
+        6
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/tanneberg2024.pdf",
+      "locatorPage": 1,
+      "locator": "remain silent",
+      "evidenceParaphrase": "Attentive Support combines perception, dialogue and LLM reasoning to choose help or nonintervention. The paper describes scenario-based simulation tests and a real-robot demonstration.",
+      "scopeBoundary": "Not a controlled human-participant efficacy comparison or evidence of reduced workload.",
+      "uses": [
+        {
+          "key": "tanneberg2024",
+          "section": "Related Work",
+          "subsection": "Assistance timing and proactive coordination",
+          "line": 72,
+          "exactTex": "Gaze-based assembly research studies readiness for joint action \\cite{lavitnicora2024}, while LLM-based Attentive Support uses scene and dialogue information to select help or silence, evaluated in constructed scenarios and a robot demonstration \\cite{tanneberg2024}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 27,
+      "key": "teo2018",
+      "title": "Enhancing the effectiveness of human-robot teaming with a closed-loop system",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/teo2018.pdf",
+      "downloadUrl": "https://sciences.ucf.edu/psychology/perl/wp-content/uploads/sites/29/2019/08/Enhancing-the-effectiveness-of-human-robot-teaming-with-a-closed-loop-system..pdf",
+      "sha256": "10f208bb988e4c04ff649dfb609b77fc08622c804406d29830fbdc57075bd726",
+      "pdfPageCount": 13,
+      "supportingPages": [
+        3,
+        5,
+        6
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/teo2018.pdf",
+      "locatorPage": 6,
+      "locator": "aid would be",
+      "evidenceParaphrase": "Individual low/high-workload responses determine sensitive physiological markers. The aid model uses a rolling/debounced index; if aid does not trigger during the first ten minutes, it is imposed in the last five.",
+      "scopeBoundary": "Adaptive versus later-imposed aid in simulated robot supervision, not fixed-interval periodic aid.",
+      "uses": [
+        {
+          "key": "teo2018",
+          "section": "Related Work",
+          "subsection": "Physiological information in assistance",
+          "line": 78,
+          "exactTex": "Teo et al. use individualized physiological workload markers to trigger aid during robot supervision, imposing aid later if no trigger occurs \\cite{teo2018}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 28,
+      "key": "thunberg2026",
+      "title": "Unpacking Lived Experiences of Wizards of Oz",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/thunberg2026.pdf",
+      "downloadUrl": "https://repositum.tuwien.at/bitstream/20.500.12708/227993/1/Thunberg-2026-Unpacking%20Lived%20Experiences%20of%20Wizards%20of%20Oz-vor.pdf",
+      "sha256": "b9938463ba167c2612cec07061ff1f8b35d4fbfec783ef1891ed7025d3a4adb5",
+      "pdfPageCount": 3,
+      "supportingPages": [
+        1,
+        2,
+        3
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/thunberg2026.pdf",
+      "locatorPage": 1,
+      "locator": "goal of this workshop",
+      "evidenceParaphrase": "The document proposes a workshop to surface ethical, practical, methodological and personal tensions in being a wizard.",
+      "scopeBoundary": "A workshop proposal, not completed workshop findings or a participant experiment.",
+      "uses": [
+        {
+          "key": "thunberg2026",
+          "section": "Related Work",
+          "subsection": "Wizard-of-Oz evaluation",
+          "line": 94,
+          "exactTex": "Thunberg et al.'s workshop proposal emphasizes the practical, ethical, and methodological tensions of the wizard's role \\cite{thunberg2026}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 29,
+      "key": "vandijk2023",
+      "title": "The effect of human autonomy and robot work pace on perceived workload in human-robot collaborative assembly work",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/vandijk2023.pdf",
+      "downloadUrl": "https://www.frontiersin.org/journals/robotics-and-ai/articles/10.3389/frobt.2023.1244656/pdf",
+      "sha256": "4aa2af9330a5d4f6029b48847b043fd0a554ec3c03ae4219ac5ab4efbd0053e9",
+      "pdfPageCount": 9,
+      "supportingPages": [
+        7,
+        8
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/vandijk2023.pdf",
+      "locatorPage": 7,
+      "locator": "timing of the onset",
+      "evidenceParaphrase": "The discussion reports five lower workload factors with human-led autonomy, and lower cognitive/temporal demand with slower pacing. Pacing changes action onset while robot movement speed stays constant.",
+      "scopeBoundary": "Keep autonomy and pacing effects separate; not a claim that slowing motor movement improves workload.",
+      "uses": [
+        {
+          "key": "vandijk2023",
+          "section": "Related Work",
+          "subsection": "Physical tasks and participant experience",
+          "line": 88,
+          "exactTex": "Human-led assembly collaboration lowers five workload dimensions, while slower robot pacing lowers mental and temporal demand through action-onset timing rather than movement speed \\cite{vandijk2023}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 30,
+      "key": "varrasi2026",
+      "title": "Human and Robot Assistance for Cognitive Load in Younger and Older Adults: Multimodal Within-Subject Experimental Study",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/varrasi2026.pdf",
+      "downloadUrl": "https://shura.shu.ac.uk/37555/1/Human%20and%20Robot%20Assistance%20for%20Cognitive%20Load%20in%20Younger%20and%20Older%20Adults%20Multimodal%20Within-Subject%20Experimental%20Study.pdf",
+      "sha256": "76fbb611493cef92ce28974d816c886dc2e9fed023fedd5828570651e58b5446",
+      "pdfPageCount": 18,
+      "supportingPages": [
+        11
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/varrasi2026.pdf",
+      "locatorPage": 11,
+      "locator": "No significant difference was observed",
+      "evidenceParaphrase": "Older adults have greater NASA-TLX with robot than human guidance (p=.005); the younger-adult contrast is nonsignificant (p=.83).",
+      "scopeBoundary": "Age-specific evidence, not a general robot disadvantage or proof of equivalence for younger adults.",
+      "uses": [
+        {
+          "key": "varrasi2026",
+          "section": "Related Work",
+          "subsection": "Physical tasks and participant experience",
+          "line": 88,
+          "exactTex": "Older adults report greater workload with robot than human guidance in a modified Trail Making Test; the younger-adult contrast is nonsignificant \\cite{varrasi2026}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 31,
+      "key": "vitry2026",
+      "title": "When May I Help You? On The Effect of Proactivity on Group Human-Robot Collaboration",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/vitry2026.pdf",
+      "downloadUrl": "https://arxiv.org/pdf/2606.28469v2",
+      "sha256": "d2b4cde101c469ebb2b9dc75e297a1f8230bcb0f936042eeccf1cdd4428f6670",
+      "pdfPageCount": 8,
+      "supportingPages": [
+        1,
+        4
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/vitry2026.pdf",
+      "locatorPage": 4,
+      "locator": "there are no significant differences",
+      "evidenceParaphrase": "Section IV reports more interactions with the proactive model (p<.001), but no significant overall objective-performance difference; the success-rate trend is p=.077.",
+      "scopeBoundary": "Nonsignificance is not equivalence or evidence that proactivity has no effect.",
+      "uses": [
+        {
+          "key": "vitry2026",
+          "section": "Introduction",
+          "subsection": null,
+          "line": 56,
+          "exactTex": "Assistance-appropriateness judgments reflect this balance \\cite{ramnauth2026}, and a proactive escape-room robot elicited more interaction without significantly improving overall performance \\cite{vitry2026}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 32,
+      "key": "wei2025",
+      "title": "Predicting task performance in robot-assisted surgery using physiological stress and subjective workload: a case study with interpretable machine learning",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/wei2025.pdf",
+      "downloadUrl": "https://www.frontiersin.org/journals/human-neuroscience/articles/10.3389/fnhum.2025.1611524/pdf",
+      "sha256": "d26df27fd47600204c820ba9480a9089bd6bca8e8543130b84eb6d27cdee591f",
+      "pdfPageCount": 9,
+      "supportingPages": [
+        1
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/wei2025.pdf",
+      "locatorPage": 1,
+      "locator": "A single expert surgeon",
+      "evidenceParaphrase": "One expert surgeon performs simulated tasks. Model interpretation identifies subjective workload, mean HR and muscle activation as influential predictive features.",
+      "scopeBoundary": "Single-person predictive associations, not causal effects or general validation of a cardiac trigger.",
+      "uses": [
+        {
+          "key": "wei2025",
+          "section": "Related Work",
+          "subsection": "Physiological information in assistance",
+          "line": 82,
+          "exactTex": "A single-surgeon simulation study identifies subjective workload and mean heart rate among influential task-performance prediction features \\cite{wei2025}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 33,
+      "key": "yang2024",
+      "title": "An Adaptive Human-Robotic Interaction Architecture for Augmenting Surgery Performance Using Real-Time Workload Sensing—Demonstration of a Semi-autonomous Suction Tool",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/yang2024.pdf",
+      "downloadUrl": "https://scholarworks.indianapolis.iu.edu/bitstreams/5eb42ad8-e6eb-4495-9c1d-f520e3877a06/download",
+      "sha256": "f6d37101df4cb79a3e5551f7db8739184d87ed581d3b4be2f6582cd4fb31186a",
+      "pdfPageCount": 32,
+      "supportingPages": [
+        4,
+        5,
+        8,
+        9,
+        10
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/yang2024.pdf",
+      "locatorPage": 9,
+      "locator": "suction was activated every 150 seconds",
+      "evidenceParaphrase": "The experiments use EEG/eye-tracking workload features and compare workload-adaptive versus periodic suction in surgical simulation. The periodic interval is 150 seconds, estimated using earlier adaptive suction counts.",
+      "scopeBoundary": "Supports the abstract motivation and timing comparison. It is not an HR-only detector, clinical validation, or evidence that dose is matched in our study.",
+      "uses": [
+        {
+          "key": "yang2024",
+          "section": "Introduction",
+          "subsection": null,
+          "line": 54,
+          "exactTex": "Physiological information offers another timing cue: Yang et al. compared workload-adaptive robotic suction with periodic support in surgical training \\cite{yang2024}."
+        },
+        {
+          "key": "yang2024",
+          "section": "Related Work",
+          "subsection": "Physiological information in assistance",
+          "line": 78,
+          "exactTex": "Yang et al.'s surgical system uses EEG and eye tracking to inform adaptive suction, with a periodic comparator selected to approximate earlier observed assistance frequency \\cite{yang2024}."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    },
+    {
+      "number": 34,
+      "key": "zhao2025",
+      "title": "Master Rules from Chaos: Learning to Reason, Plan, and Interact from Chaos for Tangram Assembly",
+      "pdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/zhao2025.pdf",
+      "downloadUrl": "https://arxiv.org/pdf/2505.11818v1",
+      "sha256": "7a83713f30c553b28b687a26a6aa719168a926fad1726329cc79664e9740bcbd",
+      "pdfPageCount": 7,
+      "supportingPages": [
+        1,
+        6
+      ],
+      "locatorPdf": "/Users/rishit/Desktop/hti3/outputs/paper-refresh-2026-10-08/citation-verification/zhao2025.pdf",
+      "locatorPage": 1,
+      "locator": "only silhouette prompts",
+      "evidenceParaphrase": "MRChaos learns autonomous tangram assembly from silhouettes and evaluates real-world manipulation and transfer examples. Piece placement and orientation are central task demands.",
+      "scopeBoundary": "Its assembly demands motivate an analogy in our discussion; transfer of human-assistance benefits is not established.",
+      "uses": [
+        {
+          "key": "zhao2025",
+          "section": "Related Work",
+          "subsection": "Physical tasks and participant experience",
+          "line": 86,
+          "exactTex": "Tangram research examines gaze around robot failures \\cite{tabatabaei2025}, physical-piece assembly with screen-presented targets and wearable sensing in SensCogAR \\cite{melo2026}, and autonomous robotic assembly from silhouettes in MRChaos \\cite{zhao2025}."
+        },
+        {
+          "key": "zhao2025",
+          "section": "Discussion, Limitations, and Future Work",
+          "subsection": "Physiological feedback and limitations",
+          "line": 296,
+          "exactTex": "Tangrams share orientation and placement demands with assembly \\cite{zhao2025}, while retrieval resembles material provision in order picking \\cite{smit2024}; transfer requires separate safety, precision, and workflow evaluation."
+        }
+      ],
+      "review": "Supporting passages read and compared with cited manuscript wording."
+    }
+  ],
+  "abstract": [
+    {
+      "sentence": "In human--robot interaction (HRI), deciding when to provide assistance requires understanding how different intervention strategies affect both task performance and the user experience.",
+      "claimType": "Conceptual motivation",
+      "evidence": "Introduction and the bounded assistance-timing/appropriateness sources [1], [10], [21], [31]. This is motivation, not a measured finding."
+    },
+    {
+      "sentence": "Previous work has compared physiology-triggered robotic assistance with periodic support in surgical training.",
+      "claimType": "Literature precedent",
+      "evidence": "Yang [33], PDF pp8-10: adaptive-versus-periodic robotic suction in surgical training simulation."
+    },
+    {
+      "sentence": "We extend this work to physical spatial problem solving through a within-participant experiment comparing three conditions: no assistance, constant assistance every 30 seconds, and adaptive assistance triggered by a short-term heart-rate rise.",
+      "claimType": "Study design",
+      "evidence": "Sections 4.2-4.4: control, constant 30-second help, HR-rise triggering; physical tangram task."
+    },
+    {
+      "sentence": "Twenty-four participants completed nine physical tangram attempts across three blocks.",
+      "claimType": "Sample and attempts",
+      "evidence": "Section 4.4 and aggregate analysis: 24 participants, nine attempts each across three blocks, 216 attempts in total. Completed attempts does not mean all puzzles were solved."
+    },
+    {
+      "sentence": "Condition orders were balanced across participants, and puzzles were randomly assigned to blocks.",
+      "claimType": "Condition order and puzzle allocation",
+      "evidence": "Section 4.4 and supplementary allocation table: four participants per condition order; puzzles randomly assigned to blocks, with uneven realized puzzle allocation."
+    },
+    {
+      "sentence": "Tangrams combine spatial reasoning with physical manipulation, providing a simple task for studying informational and physical assistance.",
+      "claimType": "Task rationale",
+      "evidence": "Sections 3 and 4.1: physical tangrams require spatial reasoning and manipulation; hints convey placement information and the arm retrieves physical pieces."
+    },
+    {
+      "sentence": "Participants received on-screen hints and robotic-arm interventions through a Wizard-of-Oz setup, with the assigned condition determining intervention timing and task progress guiding assistance content.",
+      "claimType": "Delivery",
+      "evidence": "Section 4.1 and apparatus: restricted preset hints and pickup-availability-controlled robot retrieval."
+    },
+    {
+      "sentence": "We evaluated puzzle completion, correct-piece progress, recorded round duration, workload, helpfulness, intervention timing, frustration, and study-wide trust.",
+      "claimType": "Measures",
+      "evidence": "Section 4.5: completion, correct pieces, descriptive recorded round duration, seven-point adapted NASA-TLX, frustration, assistance items and study-wide trust. Hart [11] supports the TLX dimensions, not our adaptation."
+    },
+    {
+      "sentence": "Both assistance conditions improved completion and correct-piece progress and reduced workload compared with no assistance (Holm-adjusted $p < .001$); both also reduced frustration.",
+      "claimType": "Progress, completion, workload and frustration",
+      "evidence": "Twelve-test main paired family: all six assisted-control comparisons for success, pieces and TLX have Holm p<.001. Frustration: constant-control Holm p=.0268948797 and adaptive-control p<.001."
+    },
+    {
+      "sentence": "Descriptively, constant assistance achieved higher completion and correct-piece progress, while adaptive assistance received higher helpfulness and timing ratings and lower workload and frustration.",
+      "claimType": "Descriptive objective/subjective pattern",
+      "evidence": "Tables 1-3: constant exceeds adaptive in completion (59.7% vs 50.0%) and pieces (5.68 vs 5.43); adaptive has lower workload (46.06 vs 49.50) and frustration (3.51 vs 3.93), and higher means on all four assistance items. This is descriptive, not significant superiority; effort is an exception among workload dimensions."
+    },
+    {
+      "sentence": "Together, these findings demonstrate benefits of assistance in physical spatial problem solving and suggest potential trade-offs between task performance and user experience that warrant further investigation.",
+      "claimType": "Conclusion",
+      "evidence": "Synthesis bounded by the main/adjusted contrasts and package/dose/physiological-validity limitations in Section 6."
+    }
+  ],
+  "numericalSource": "/Users/rishit/Desktop/hti3/outputs/paper-review-2026-10-09/audit/agreed-hierarchy-results.json",
+  "numericalSourceSha256": "d254cb318b35bbdb470684d6f39ad11e38ab79d6c7fb33e488c50079890eee7c",
+  "bounds": "Supporting claim passages and identity checked; not every source page read or external replication."
+}

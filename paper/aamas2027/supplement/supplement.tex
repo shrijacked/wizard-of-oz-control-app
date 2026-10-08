@@ -1,0 +1,67 @@
+\documentclass[sigconf,anonymous]{aamas}
+\settopmatter{printacmref=false}
+\setcopyright{none}
+\acmSubmissionID{2613}
+\acmConference[AAMAS 2027]{Supplementary material for the 26th International Conference on Autonomous Agents and Multiagent Systems (AAMAS 2027)}{3--7 May 2027}{Hanoi, Vietnam}{}
+\copyrightyear{2027}
+\acmYear{2027}
+\acmDOI{}
+\acmISBN{}
+\submissionType{Supplementary Material}
+\usepackage{booktabs,amsmath,graphicx,tikz,hyperref}
+\usetikzlibrary{arrows.meta,positioning,calc,fit,backgrounds}
+\hypersetup{pdftitle={Supplement: When to Intervene},pdfauthor={}}
+\raggedbottom
+\emergencystretch=2em
+\newsavebox{\tablebox}
+\newcommand{\fitTable}[1]{\sbox{\tablebox}{#1}\ifdim\wd\tablebox>\linewidth\resizebox{\linewidth}{!}{\usebox{\tablebox}}\else\usebox{\tablebox}\fi}
+\title{Supplementary Analysis: When to Intervene}
+\author{Anonymous Author(s)}
+\begin{document}
+\onecolumn
+\pagestyle{plain}
+\begin{center}
+{\fontsize{14}{16}\selectfont\bfseries Supplementary Analysis: When to Intervene}\par\medskip
+Anonymous submission 2613
+\end{center}
+\section{Outcomes and paired comparisons}
+The analyses use all 24 participants and 216 rounds (72 per condition). Every participant completed three rounds per condition, and all 24 contributed final-survey ratings. C denotes control, K constant assistance, and A adaptive assistance.
+
+The four main outcomes are completion, correct pieces, adapted workload, and frustration. For each outcome, two-sided paired $t$ tests compare participants' three-round condition averages across K--C, A--C, and A--K. Holm correction jointly covers these twelve tests. A separate nineteen-test group covers three contrasts each for mental demand, physical demand, temporal demand, performance, and effort, and A--K contrasts for four assistance-experience items. These analyses and comparison groups are exploratory, not preregistered. Recorded round duration and final-survey ratings are descriptive.
+
+Correct pieces range from 0 to 7, using the admissible orientation with the highest correct count. Completion corresponds to a solved seven-piece arrangement. Workload averages six seven-point burden-aligned items, reversing performance as $8-P$, then rescales the average $B$ to $(B-1)100/6$. Frustration is both a main outcome and a component of this composite; the two effects are not independent replications. Completion and correct pieces are also linked.
+
+Table~\ref{tab:paired} reports pointwise confidence intervals, not simultaneous multiplicity-adjusted intervals. $p_{\mathrm{H}}$ denotes the Holm-adjusted value. Cohen's $d_z$ divides the paired mean difference by the standard deviation of participant differences. Significance is evaluated using $p_{\mathrm{H}}<.05$, not whether an unadjusted interval excludes zero.
+\input{paired-results.tex}
+
+\section{Puzzle- and period-adjusted robustness}
+All adjusted models include condition, categorical puzzle identity, and categorical block period. Completion uses a binomial-logit generalized estimating equation with independent working correlation and participant-clustered Mancl--DeRouen bias-reduced covariance. The working correlation does not treat a person's rounds as independent. Correct pieces, workload, and numeric ratings use participant-fixed-effect ordinary least squares with CR1 participant-clustered covariance. CR1 applies the finite-sample factor $G/(G-1)\,(N-1)/(N-k)$, where $G$ is the participant count, $N$ the round count, and $k$ the parameter count. Contrasts use a $t$ reference with 23 degrees of freedom.
+
+Completion contrasts are odds ratios; their tests use log-odds coefficients. Other adjusted effects are mean-score differences. They are not interchangeable with the observed paired differences. The twelve/nineteen correction groups remain the same. The adjusted models support the same main contrast conclusions: both assistance conditions outperform control on completion and pieces and reduce workload and frustration; none establishes an A--K difference. Constant--control frustration has adjusted $p_{\mathrm{H}}=.045$, compared with $.027$ in the paired analysis.
+\input{adjusted-results.tex}
+
+These are supplementary robustness checks, not a validation of the HR-rise cue or evidence of equivalence. With 24 participant clusters, covariance corrections and the $t$ reference remain approximations. Completion models converged with full-rank designs; base fitted probabilities ranged from .053 to .805. Numeric fixed-effect models can predict beyond bounded scales (14 piece predictions outside 0--7; one workload prediction outside 0--100); predictions were not clipped. A further categorical within-block-position check retained the direction of the main contrasts; its unadjusted diagnostic $p$ values are reported separately and do not replace the main tests.
+\input{position-results.tex}
+
+\section{Secondary ratings and study-wide experience}
+Table~\ref{tab:secondary} provides every secondary contrast under the nineteen-test correction. Assisted-experience comparisons use 144 assisted rounds for adjusted models and all 24 participant averages for paired tests. Final helpfulness, efficacy, trust, and reliance summarize the study as a whole, not separate policies. Their means (SDs) are 5.00 (1.53), 4.83 (1.55), 4.79 (1.59), and 4.88 (1.48), respectively.
+\input{secondary-results.tex}
+
+\section{Condition orders and puzzle allocation}
+Four participants followed each of CKA, CAK, KCA, KAC, ACK, and AKC. Every participant attempted all nine distinct puzzles. Order balance did not imply equal puzzle allocation by condition; Table~\ref{tab:allocation} shows the realized assignment.
+\begin{figure}[htbp]
+\centering
+\begingroup
+\fontsize{12}{13}\selectfont
+\renewcommand{\small}{\fontsize{11}{12}\selectfont}
+\resizebox{.75\linewidth}{!}{\input{condition-order-tree.tikz.tex}}
+\endgroup
+\caption{Condition orders: four participants per order, 24 total.}
+\end{figure}
+\input{allocation.tex}
+
+\section{Reproducibility and interpretation}
+The analysis used Python 3.12.14, NumPy 2.3.3, SciPy 1.16.2, pandas 2.3.3, statsmodels 0.14.5, and patsy 1.0.1. Independent checks reproduced paired tests, cluster-covariance calculations, and Holm adjustment. No rounds were excluded or imputed in these analyses. Aggregate comparison CSVs accompany this supplement; raw participant files and recordings are not included.
+
+The policies share an available preset-hint list and retrieval rule, not a demonstrated equal intervention dose. Effects therefore concern the assistance packages, not timing alone or robot retrieval in isolation. Recorded duration reflects round end-marking for solved and unsolved attempts and is not treated as verified active solving time. Nonsignificance is not evidence that two policies are equivalent.
+\end{document}

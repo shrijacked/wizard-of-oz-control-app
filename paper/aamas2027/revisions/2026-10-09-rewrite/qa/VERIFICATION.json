@@ -1,0 +1,100 @@
+{
+  "date": "2026-10-09",
+  "mainPages": 8,
+  "supplementPages": 3,
+  "mainFigures": 5,
+  "mainTables": 3,
+  "citations": 34,
+  "participants": 24,
+  "rounds": 216,
+  "finalSurveys": 24,
+  "figureCaptionOrder": [
+    {
+      "figure": 1,
+      "page": 3
+    },
+    {
+      "figure": 2,
+      "page": 4
+    },
+    {
+      "figure": 3,
+      "page": 5
+    },
+    {
+      "figure": 4,
+      "page": 6
+    },
+    {
+      "figure": 5,
+      "page": 6
+    }
+  ],
+  "overfullBoxes": 0,
+  "undefinedReferences": 0,
+  "missingCharacters": 0,
+  "classAndBibliographyStyleUnchanged": true,
+  "originalImagesPreserved": 3,
+  "imageMetadataRemoved": true,
+  "referencePDFIntegrityChecks": 34,
+  "referenceTextMap": {
+    "file": "REFERENCE-TEXT-MAP.md",
+    "references": 34,
+    "citationOccurrences": 41,
+    "abstractSentences": 11,
+    "regeneratedForCurrentSource": true
+  },
+  "dashboardHeartRateAndRmssdCensored": true,
+  "dashboardBottomInputCropped": true,
+  "dashboardSolutionAndAllRobotButtonsVisible": true,
+  "nativeEditorCompilation": "Unsupported multi-file project: aamas.cls not found by isolated native compiler. Existing project compiled successfully in place with its local class and assets.",
+  "sourceZip": {
+    "file": "aamas2027-rewritten-source.zip",
+    "bytes": 1480634,
+    "sha256": "912f04eea99281556d41fa739c74eab641dac2041fb8d34e3645492a29aa191b",
+    "members": [
+      "ACM-Reference-Format.bst",
+      "README.md",
+      "aamas.cls",
+      "by.pdf",
+      "figures/experience-comparison.pdf",
+      "figures/formative-helpfulness.pdf",
+      "figures/operator-dashboard-anonymous.png",
+      "figures/performance-tests.pdf",
+      "figures/physical-setup-topdown.tikz.tex",
+      "figures/setup-topdown-anonymous.png",
+      "figures/setup-wide-anonymous.jpg",
+      "figures/study-system-diagram.tikz.tex",
+      "main.tex",
+      "references.bib",
+      "supplement/aamas.cls",
+      "supplement/adjusted-results.tex",
+      "supplement/allocation.tex",
+      "supplement/condition-order-tree.tikz.tex",
+      "supplement/paired-results.tex",
+      "supplement/position-results.tex",
+      "supplement/secondary-results.tex",
+      "supplement/supplement.tex"
+    ]
+  },
+  "supplementZip": {
+    "file": "aamas2027-aggregate-supplement.zip",
+    "bytes": 53883,
+    "sha256": "381aca746f04d6f9e1ee3291233eafc48b235e5c07e8ae9b4d20720015f3448a",
+    "members": [
+      "adjusted-comparisons.csv",
+      "paired-comparisons.csv",
+      "supplement.pdf"
+    ]
+  },
+  "previousSnapshotHashesVerified": 59,
+  "canonicalPaperUnchanged": true,
+  "visualReview": "Completed: all eight main-paper pages freshly rendered and visually inspected after the final author-supplied abstract. Spacing and alignment clean, no clipping or overflow. Unchanged three-page supplement retains its preceding completed visual review.",
+  "boundaries": [
+    "Not every source page read or external study replicated.",
+    "MRChaos page ranges conflict across records; omitted, not guessed.",
+    "Vitry uses verified author-version DOI, not an asserted IEEE DOI.",
+    "Raw-data release and institutional/submission requirements remain author decisions.",
+    "No commit, push or submission."
+  ]
+}

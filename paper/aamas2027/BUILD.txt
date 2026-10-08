@@ -1,10 +1,35 @@
+AAMAS final rewrite — 9 October 2026
+
+CURRENT VERIFIED BUILD
+Source: main.tex; preview: main.pdf. Eight pages, five figures, three tables,
+34 references, 24 experimental participants, 216 rounds, 24 final surveys.
+The final author-supplied abstract is installed. All eight pages visually
+checked; no overfull boxes or undefined references. Class/style and margins
+are unchanged. Figure 3 uses the cropped, censored dashboard with the solution
+and all seven robot buttons retained, alongside two anonymized setup images.
+
+Run Tectonic from this directory (when this existing compiler/cache is available):
+  FONTCONFIG_FILE=/private/tmp/hti-latex-preview/fonts.conf /private/tmp/hti-latex-preview/tectonic --untrusted --only-cached --keep-intermediates --keep-logs main.tex
+
+Ordinary installation: XeLaTeX, BibTeX, XeLaTeX, XeLaTeX. The checked route is
+Tectonic's XeTeX/BibTeX build; other routes were not independently tested.
+Use the exact assets in output/packages/aamas2027-rewritten-source.zip.
+Keep the AAMAS class, bibliography style and by.pdf next to main.tex.
+Compile supplement/supplement.tex from its own folder; preview is three pages.
+See revisions/2026-10-09-rewrite/qa/VERIFICATION.json for current package hashes.
+Raw study inputs and original reference PDFs are not compilation dependencies.
+Native standalone preview has a known neighboring-class resolution limitation;
+the existing full-project build and saved PDF are verified.
+
+HISTORICAL BUILD NOTES BELOW (8 OCTOBER; SUPERSEDED)
+
 AAMAS paper refresh — 8 October 2026
 
 Source: main.tex. Preview: main.pdf. Original aamas.cls and
 ACM-Reference-Format.bst are unchanged; anonymous mode and submission ID 2613
 are retained. Revised abstract reflects refreshed 24-participant data.
 Original abstract framing retained with refreshed results. All primary
-round-level analyses use24 participants. Final-survey summaries use15 responses.
+round-level analyses use24 participants. Final-survey summaries use24 responses.
 Current verified preview: eight pages, seven figures, three tables,
 34 bibliography entries. All 34 actual source PDFs claim-level reviewed.
 

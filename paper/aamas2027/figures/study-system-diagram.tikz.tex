@@ -65,7 +65,7 @@
     \usebox{\camerabox} &
     \begin{tabular}{@{}l@{}}
       {\sffamily\bfseries\footnotesize Workspace camera}\\[1pt]
-      {\sffamily\scriptsize Puzzle solution}\\[0.5pt]
+      {\sffamily\scriptsize Piece arrangement}\\[0.5pt]
       {\sffamily\scriptsize Observed task progress}
     \end{tabular}
   \end{tabular}%
@@ -107,7 +107,7 @@
   {\scriptsize\color{body} $\Delta$HR $=$ HR\textsubscript{cur} $-$ HR\textsubscript{ref}}%
 };
 \node[pbox,draw=phys,minimum width=4.95cm] (flag) at (\ax,4.42) {%
-  {\bfseries Arousal flag}\\[1pt]
+  {\bfseries HR-rise flag}\\[1pt]
   {\scriptsize\color{body} Raised when $\Delta$HR $\geq$ 5 bpm}%
 };
 
@@ -120,7 +120,7 @@
 \node[pbox,draw=time,text width=3.25cm,minimum height=1.42cm] (adapt) at (\bx,\yMid) {%
   {\bfseries Adaptive}\\[1pt]
   {\scriptsize\color{body} Assistance whenever}\\[0.5pt]
-  {\scriptsize\color{body} arousal is flagged}\\[0.5pt]
+  {\scriptsize\color{body} HR rise is flagged}\\[0.5pt]
   {\scriptsize\color{body} 15 s repeat wait}%
 };
 \node[pbox,draw=time,text width=3.25cm,minimum height=1.42cm] (none) at (\bx,\yLow) {%
@@ -206,7 +206,7 @@
 
 % Wizard delivery
 \draw[arr,draw=woz] (dash.south) -- (hint.north);
-\draw[darr,draw=woz] (hint.south) -- node[left,note]{Optional} (oper.north);
+\draw[darr,draw=woz] (hint.south) -- node[left,note]{At pickup spot} (oper.north);
 \draw[arr,draw=woz] (hint.east) -- (laptop.west);
 \draw[arr,draw=woz] (oper.east) -- (arm.west);
 

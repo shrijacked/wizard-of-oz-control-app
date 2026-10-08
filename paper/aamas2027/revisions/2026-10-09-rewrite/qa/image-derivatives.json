@@ -1,0 +1,134 @@
+[
+  {
+    "source": "setup-wide-photo.jpg",
+    "sourceSha256": "896eff7eaffbeea797eb79eb07d16a90942fac4e65278f0cdce659ed02bb2ef4",
+    "original": "/Users/rishit/Desktop/hti3/outputs/paper-rewrite-2026-10-09/private-original-images/setup-wide-photo.jpg",
+    "derivative": "setup-wide-anonymous.jpg",
+    "crop": [
+      250,
+      650,
+      3110,
+      2840
+    ],
+    "redactions": [
+      [
+        "ellipse",
+        [
+          2340,
+          1530,
+          2900,
+          1960
+        ]
+      ]
+    ],
+    "size": [
+      850,
+      651
+    ],
+    "bytes": 113726,
+    "method": "pixel crop, opaque masks, Lanczos resize; no generative editing"
+  },
+  {
+    "source": "operator-dashboard.png",
+    "sourceSha256": "e4849ea7ae25908b1237476eb77e88ed4a44a85a4d90e884478985938df1397f",
+    "original": "/Users/rishit/Desktop/hti3/outputs/paper-rewrite-2026-10-09/private-original-images/operator-dashboard.png",
+    "derivative": "operator-dashboard-anonymous.png",
+    "crop": [
+      295,
+      280,
+      2730,
+      1645
+    ],
+    "redactions": [
+      [
+        "rectangle",
+        [
+          487,
+          865,
+          825,
+          1090
+        ]
+      ],
+      [
+        "rectangle",
+        [
+          325,
+          1440,
+          454,
+          1496
+        ]
+      ],
+      [
+        "rectangle",
+        [
+          583,
+          1440,
+          745,
+          1496
+        ]
+      ],
+      [
+        "rectangle",
+        [
+          900,
+          1700,
+          1080,
+          1755
+        ]
+      ],
+      [
+        "rectangle",
+        [
+          295,
+          1860,
+          980,
+          1920
+        ]
+      ]
+    ],
+    "size": [
+      1300,
+      729
+    ],
+    "bytes": 683176,
+    "method": "pixel crop, opaque masks, Lanczos resize; no generative editing"
+  },
+  {
+    "source": "setup-topdown-photo.png",
+    "sourceSha256": "1a124aa4ee7d82794aff7427f002e801dc22ecb0a397254e57083daf44f11e31",
+    "original": "/Users/rishit/Desktop/hti3/outputs/paper-rewrite-2026-10-09/private-original-images/setup-topdown-photo.png",
+    "derivative": "setup-topdown-anonymous.png",
+    "crop": [
+      0,
+      0,
+      980,
+      552
+    ],
+    "redactions": [
+      [
+        "rectangle",
+        [
+          151,
+          187,
+          261,
+          279
+        ]
+      ],
+      [
+        "rectangle",
+        [
+          0,
+          272,
+          72,
+          353
+        ]
+      ]
+    ],
+    "size": [
+      850,
+      479
+    ],
+    "bytes": 540771,
+    "method": "pixel crop, opaque masks, Lanczos resize; no generative editing"
+  }
+]
