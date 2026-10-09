@@ -1,66 +1,24 @@
-AAMAS final rewrite — 9 October 2026
+FINAL SUBMITTED SOURCE — 10 OCTOBER 2026
 
-CURRENT VERIFIED BUILD
-Source: main.tex; preview: main.pdf. Eight pages, five figures, three tables,
-34 references, 24 experimental participants, 216 rounds, 24 final surveys.
-The final author-supplied abstract is installed. All eight pages visually
-checked; no overfull boxes or undefined references. Class/style and margins
-are unchanged. Figure 3 uses the cropped, censored dashboard with the solution
-and all seven robot buttons retained, alongside two anonymized setup images.
+main.tex is byte-identical to the author-supplied main (2).tex.
+No manuscript changes were made during this build.
 
-Run Tectonic from this directory (when this existing compiler/cache is available):
+Checked local route, from this directory:
   FONTCONFIG_FILE=/private/tmp/hti-latex-preview/fonts.conf /private/tmp/hti-latex-preview/tectonic --untrusted --only-cached --keep-intermediates --keep-logs main.tex
 
-Ordinary installation: XeLaTeX, BibTeX, XeLaTeX, XeLaTeX. The checked route is
-Tectonic's XeTeX/BibTeX build; other routes were not independently tested.
-Use the exact assets in output/packages/aamas2027-rewritten-source.zip.
-Keep the AAMAS class, bibliography style and by.pdf next to main.tex.
-Compile supplement/supplement.tex from its own folder; preview is three pages.
-See revisions/2026-10-09-rewrite/qa/VERIFICATION.json for current package hashes.
-Raw study inputs and original reference PDFs are not compilation dependencies.
-Native standalone preview has a known neighboring-class resolution limitation;
-the existing full-project build and saved PDF are verified.
+Overleaf: select main.tex and XeLaTeX; BibTeX manages references.
+Ordinary local route: XeLaTeX, BibTeX, XeLaTeX, XeLaTeX.
+Only the existing full-project Tectonic route was tested here.
 
-HISTORICAL BUILD NOTES BELOW (8 OCTOBER; SUPERSEDED)
+Keep aamas.cls, ACM-Reference-Format.bst, by.pdf, references.bib and all
+bundled figures next to main.tex in their supplied relative locations.
+Compile supplement/supplement.tex separately from its own directory.
+The supplementary PDF and sources are unchanged from the preceding archive.
 
-AAMAS paper refresh — 8 October 2026
+The built-in single-file compiler cannot find the project-local AAMAS class.
+This does not prevent the full-project compiler from producing main.pdf.
+Underfull lines, font-request messages and optional BibTeX metadata warnings
+remain. See the saved build logs and qa/VERIFICATION.json for actual checks.
 
-Source: main.tex. Preview: main.pdf. Original aamas.cls and
-ACM-Reference-Format.bst are unchanged; anonymous mode and submission ID 2613
-are retained. Revised abstract reflects refreshed 24-participant data.
-Original abstract framing retained with refreshed results. All primary
-round-level analyses use24 participants. Final-survey summaries use24 responses.
-Current verified preview: eight pages, seven figures, three tables,
-34 bibliography entries. All 34 actual source PDFs claim-level reviewed.
-
-Verified compiler: existing Tectonic 0.17 (XeTeX plus BibTeX).
-Run from this directory while the temporary compiler/cache exist:
-
-  FONTCONFIG_FILE=/private/tmp/hti-latex-preview/fonts.conf /private/tmp/hti-latex-preview/tectonic --untrusted --only-cached --keep-intermediates --keep-logs main.tex
-
-Overleaf/pdfLaTeX alternative, not independently run locally:
-
-  pdflatex -interaction=nonstopmode -halt-on-error main.tex
-  bibtex main
-  pdflatex -interaction=nonstopmode -halt-on-error main.tex
-  pdflatex -interaction=nonstopmode -halt-on-error main.tex
-
-Packages include TikZ (arrows.meta, positioning, calc, fit, backgrounds),
-placeins and float (provided through the class). Forced float barriers were
-removed to resolve the large assistance-conditions gap; figure captions
-remain in numerical order. Keep every active figure
-asset and by.pdf. Literature PDFs, personal data, videos, old plots,
-historical notes and revision archives are not compile dependencies.
-
-Final QA and hashes: ../qa/VERIFICATION.json and ../output-hashes.json.
-Underfull lines, optional bibliography metadata, font-request and missing-CCS
-warnings are recorded. No overfull boxes or visually clipped text.
-Manuscript body ends on
-page7; references extend to page8. Figure3 uses a vertically centered stack
-of three views; setup-wide-photo.jpg is required alongside the other assets.
-Broader submission considerations are
-separate in ../FINAL_DRAFT_REVIEW.md, not placeholders in the manuscript.
-
-One cached-font experiment with larger ordering-tree labels crashed
-Tectonic before PDF generation. Text separators and a supported font size
-resolved it; only a successful final build is packaged.
+IMPORTANT: The source's ethics-committee approval claim conflicts with the
+author's prior statement. Archival preservation is not factual validation.
